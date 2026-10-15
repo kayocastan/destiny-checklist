@@ -78,6 +78,7 @@ li.open .more{display:block}
 .chip.solar{color:var(--solar)} .chip.arc{color:var(--arc)} .chip.hot{color:var(--exotic)} .chip.easy{color:var(--done)} .chip.mid{color:var(--exotic)} .chip.hard{color:var(--hard)}
 li.is-done .t{text-decoration:line-through;color:var(--muted)}
 body.hide-done section:not(.complete) li.is-done{display:none}
+body.hide-done section.complete{display:none!important}
 li.no-match{display:none}
 section.empty{display:none}
 body:not(.show-complete) section.complete{display:none}
