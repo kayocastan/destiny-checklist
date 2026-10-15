@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Destiny Checklist</title>
+<meta name="description" content="Checklist de Destiny 2 gerado a partir da sua conta Bungie.net.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow" id="eyebrow">Destiny 2</div>
+    <div class="title-row">
+      <h1 id="title">Destiny Checklist</h1>
+      <div class="title-actions">
+        <button class="langtoggle" id="langbtn" type="button" aria-label="Language / Idioma"></button>
+        <button class="ldtoggle" id="ldbtn" type="button" aria-pressed="false" hidden>Loadouts</button>
+      </div>
+    </div>
+    <div class="chars" id="chars" hidden></div>
+    <nav class="tabs" id="tabs" hidden></nav>
+    <div class="subtabs" id="subtabs" hidden></div>
+    <div class="overall" id="overall" hidden><div class="bar"><i id="ovbar"></i></div><span class="count" id="ovcount"></span>
+      <div class="tools">
+        <button class="icon" id="searchbtn" type="button" aria-expanded="false"><svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <label for="hide"><input type="checkbox" id="hide"> <span data-u="hide"></span></label>
+      </div>
+    </div>
+    <input class="search" id="q" type="search" hidden>
+  </header>
+  <main id="list"></main>
+  <footer id="footer">
+    <div class="foot-tools">
+      <span class="sync" id="status"></span>
+      <button class="reset" id="refresh" type="button" data-u="refresh" hidden></button>
+      <button class="reset" id="logout" type="button" data-u="logout" hidden></button>
+    </div>
+    <p data-u="disclaimer"></p>
+  </footer>
+</div>
+<script src="app.js" defer></script>
+</body>
+</html>
