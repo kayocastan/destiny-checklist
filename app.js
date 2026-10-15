@@ -150,17 +150,18 @@ async function bungie(path, needAuth = true) {
 }
 
 /* ---------- nomes de itens (API de entidades, com cache) ---------- */
-const entCache = { en: LS.get('dc-ent-en', {}), pt: LS.get('dc-ent-pt', {}) };
+const entCache = { en: LS.get('dc-ent2-en', {}), pt: LS.get('dc-ent2-pt', {}) };
+LS.del('dc-ent-en'); LS.del('dc-ent-pt');
 let entDirty = false;
 async function entity(type, hash, lc) {
   const key = type + ':' + hash, store = entCache[lc];
   if (store[key]) return store[key];
   try {
     const d = await bungie(`/Destiny2/Manifest/${type}/${hash >>> 0}/?lc=${lc === 'pt' ? 'pt-br' : 'en'}`, false);
-    const v = { n: d.displayProperties?.name || '', d: d.displayProperties?.description || '', ql: d.setData?.questLineName || '', il: (d.setData?.itemList || []).map(x => x.itemHash), b: d.inventory?.bucketTypeHash || 0, it: d.itemType || 0 };
+    const v = { n: d.displayProperties?.name || '', d: d.displayProperties?.description || '', ql: d.setData?.questLineName || '', il: (d.setData?.itemList || []).map(x => x.itemHash), b: d.inventory?.bucketTypeHash || 0, it: d.itemType || 0, tl: d.itemTypeDisplayName || '', su: d.inventory?.stackUniqueLabel || '' };
     store[key] = v; entDirty = true;
     return v;
-  } catch { return { n: '', d: '', ql: '', il: [], b: 0, it: 0 }; }
+  } catch { return { n: '', d: '', ql: '', il: [], b: 0, it: 0, tl: '', su: '' }; }
 }
 async function entities(type, hashes, lc) {
   const list = [...new Set(hashes)];
@@ -168,7 +169,7 @@ async function entities(type, hashes, lc) {
   let i = 0;
   const worker = async () => { while (i < list.length) { const h = list[i++]; out[h] = await entity(type, h, lc); } };
   await Promise.all(Array.from({ length: 6 }, worker));
-  if (entDirty) { LS.set('dc-ent-en', entCache.en); LS.set('dc-ent-pt', entCache.pt); entDirty = false; }
+  if (entDirty) { LS.set('dc-ent2-en', entCache.en); LS.set('dc-ent2-pt', entCache.pt); entDirty = false; }
   return out;
 }
 
@@ -297,7 +298,11 @@ function build() {
   }
   const contracts = qItems.filter(x => x.isContract).sort((a, b) => b.frac - a.frac);
   const expires = x => { const d = x.it.expirationDate ? new Date(x.it.expirationDate) : null; if (!d || isNaN(d)) return ''; const h = Math.max(0, Math.round((d - Date.now()) / 3600000)); return s.expires(h); };
-  out.push(S('obj', 'contracts', s.contracts, contracts.length ? s.contractsNote : s.noContracts, contracts.map(x => I('k-' + (x.it.itemInstanceId || x.it.itemHash), x.qd.n || x.q.n, [x.qd.d, expires(x)].filter(Boolean).join(' '), [Math.round(x.frac * 100) + '%'], x.frac >= 1))));
+  if (!contracts.length) out.push(S('obj', 'contracts', s.contracts, s.noContracts, []));
+  // Um painel por vendedor/origem, usando o rótulo oficial do jogo (ex.: "Recompensa da Vanguarda", "Contrato do Sindicato").
+  const byVendor = new Map();
+  for (const x of contracts) { const label = x.qd.tl || x.q.tl || s.contracts; if (!byVendor.has(label)) byVendor.set(label, []); byVendor.get(label).push(x); }
+  for (const [label, list] of byVendor) out.push(S('obj', 'contracts-' + label.replace(/[^a-z0-9]+/gi, '-'), label, null, list.map(x => I('k-' + (x.it.itemInstanceId || x.it.itemHash), x.qd.n || x.q.n, [x.qd.d, expires(x)].filter(Boolean).join(' '), [Math.round(x.frac * 100) + '%'], x.frac >= 1))));
   const quests = qItems.filter(x => !x.isCamp && !x.isContract && x.objs.length).sort((a, b) => b.frac - a.frac).slice(0, 20);
   out.push(S('obj', 'quests', s.quests, s.questsNote, quests.map(x => I('q-' + x.it.itemHash, x.qd.n || x.q.n, (x.qd.ql ? x.qd.ql + ' — ' : '') + (x.qd.d || ''), [Math.round(x.frac * 100) + '%'], x.frac >= 1))));
   // catalisadores quase prontos
