@@ -184,8 +184,9 @@ async function idbDel(k) { try { const db = await idb(); db.transaction('kv', 'r
 /* ---------- leitura do perfil ----------
    O perfil vem em 3 partes em paralelo, da mais leve para a mais pesada, e a tela é desenhada
    conforme cada parte chega. Se houver uma cópia da última visita, ela aparece na hora. */
-const PARTS = { a: '100,200,800,1100', b: '900', c: '102,201,205,206,300,301' };
-let have = { a: false, b: false, c: false };
+// q: missões e contratos (prioridade) · a: coleções e métricas · b: triunfos · c: equipamentos e loadouts
+const PARTS = { q: '200,201,301', a: '100,200,800,1100', b: '900', c: '102,205,206,300' };
+let have = { q: false, a: false, b: false, c: false };
 function pickChar() {
   const chars = Object.values(profile.characters?.data || {});
   if (!chars.length) return false;
@@ -215,12 +216,12 @@ async function loadAccount() {
   if (!profile) {
     const cached = await idbGet('profile-' + member.id);
     if (cached?.p?.characters) {
-      profile = cached.p; have = { a: true, b: true, c: true }; usingCache = true;
+      profile = cached.p; have = { q: true, a: true, b: true, c: true }; usingCache = true;
       if (pickChar()) { loadedAt = new Date(cached.t); build(); render(); status(u().cached(loadedAt.toLocaleTimeString(lang === 'pt' ? 'pt-BR' : 'en-US', { hour: '2-digit', minute: '2-digit' }))); }
     } else showMessage(`<p class="loading">${esc(u().loading)}</p>`);
   } else usingCache = true;
   // 2) dados ao vivo, em 3 partes
-  const live = {}, got = { a: false, b: false, c: false };
+  const live = {}, got = { q: false, a: false, b: false, c: false };
   let hydrated = false;
   const url = k => `/Destiny2/${member.type}/Profile/${member.id}/?components=${PARTS[k]}`;
   const onPart = (k, r) => {
@@ -229,16 +230,18 @@ async function loadAccount() {
     profile = live; have = { ...got };
     if (!pickChar()) return;
     loadedAt = new Date();
-    if (got.c && !hydrated) { hydrated = true; hydrate(); } else { build(); render(); }
+    if (got.q && !hydrated) { hydrated = true; hydrate(); }
+    else if (k === 'c' && hydrated) loadLoadouts(gen);
+    else { build(); render(); }
   };
-  const results = await Promise.allSettled(['a', 'b', 'c'].map(k => bungie(url(k)).then(r => onPart(k, r))));
+  const results = await Promise.allSettled(['q', 'a', 'b', 'c'].map(k => bungie(url(k)).then(r => onPart(k, r))));
   const failed = results.find(r => r.status === 'rejected');
   if (failed) {
     if (failed.reason?.message === 'auth') throw failed.reason;
-    if (!got.a && !usingCache) { LS.del('dc-member'); throw failed.reason; }
+    if (!got.q && !got.a && !usingCache) { LS.del('dc-member'); throw failed.reason; }
   }
   if (!Object.values(got).every(Boolean)) { if (!usingCache) throw failed?.reason || new Error('profile'); status(u().apiError(failed?.reason?.message || '')); return; }
-  profile = live; have = { a: true, b: true, c: true };
+  profile = live; have = { q: true, a: true, b: true, c: true };
   if (!pickChar()) { showMessage(`<p class="notice">${esc(u().noChars)}</p>`); return; }
   loadedAt = new Date();
   idbSet('profile-' + member.id, { t: Date.now(), p: live });
@@ -296,15 +299,22 @@ async function hydrate() {
   const qEn = await entities('DestinyInventoryItemDefinition', quests, 'en'); if (my !== gen) return;
   const qLang = lang === 'pt' ? await entities('DestinyInventoryItemDefinition', quests, 'pt') : qEn; if (my !== gen) return;
   questInfo = { en: qEn, pt: qLang };
-  const inst = instanceMap(), ldItems = [], ldNames = [];
-  for (const l of p.characterLoadouts?.data?.[charId]?.loadouts || []) { ldNames.push(l.nameHash); for (const i of l.items || []) if (inst[i.itemInstanceId]) ldItems.push(inst[i.itemInstanceId]); }
-  loadoutNames = await entities('DestinyLoadoutNameDefinition', ldNames, lang); if (my !== gen) return;
-  itemNames = await entities('DestinyInventoryItemDefinition', ldItems, lang); if (my !== gen) return;
-  stage = 1; build(); render();
+  stage = 1;
+  if (have.c) await loadLoadouts(my, true); if (my !== gen) return;
+  build(); render();
   status(u().loadingPlaces);
   await prepareLocations(quests.map(h => qEn[h]).filter(Boolean)); if (my !== gen) return;
   stage = 2; build(); render();
   status(updatedText());
+}
+/* Nomes dos loadouts e dos itens deles (precisa da parte de equipamentos). */
+async function loadLoadouts(my, quiet) {
+  const p = profile, inst = instanceMap(), ldItems = [], ldNames = [];
+  for (const l of p.characterLoadouts?.data?.[charId]?.loadouts || []) { ldNames.push(l.nameHash); for (const i of l.items || []) if (inst[i.itemInstanceId]) ldItems.push(inst[i.itemInstanceId]); }
+  const ln = await entities('DestinyLoadoutNameDefinition', ldNames, lang); if (my !== gen) return;
+  const it = await entities('DestinyInventoryItemDefinition', ldItems, lang); if (my !== gen) return;
+  loadoutNames = ln; itemNames = it;
+  if (!quiet) { build(); render(); }
 }
 function instanceMap() {
   const p = profile, map = {};
@@ -493,7 +503,7 @@ function render() {
   $('ldbtn').setAttribute('aria-pressed', tab === 'ld'); $('ldbtn').textContent = tab === 'ld' ? U.checklist : U.loadouts;
   document.body.classList.toggle('on-ld', tab === 'ld');
   if (tab === 'ld') {
-    showMessage(stage < 1 ? `<p class="empty-msg">${esc(U.loadingDefs)}</p>` : LOADOUTS.length ? LOADOUTS.map(l => `<article class="ld"><div class="ld-head"><h2>${esc(l.name)}</h2></div><ul class="items">${l.items.map(n => `<li>${esc(n)}</li>`).join('')}</ul><div class="ld-actions"><a class="ld-btn" href="https://app.destinyitemmanager.com/" target="_blank" rel="noopener">${esc(U.openDim)}</a></div></article>`).join('') : `<p class="empty-msg">${esc(U.noLoadouts)}</p>`);
+    showMessage(stage < 1 || !have.c ? `<p class="empty-msg">${esc(U.loadingDefs)}</p>` : LOADOUTS.length ? LOADOUTS.map(l => `<article class="ld"><div class="ld-head"><h2>${esc(l.name)}</h2></div><ul class="items">${l.items.map(n => `<li>${esc(n)}</li>`).join('')}</ul><div class="ld-actions"><a class="ld-btn" href="https://app.destinyitemmanager.com/" target="_blank" rel="noopener">${esc(U.openDim)}</a></div></article>`).join('') : `<p class="empty-msg">${esc(U.noLoadouts)}</p>`);
     $('ovcount').textContent = U.ld(LOADOUTS.length); $('ovbar').style.width = '0';
     return;
   }
