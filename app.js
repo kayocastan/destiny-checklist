@@ -23,7 +23,7 @@ const UI = {
     heroTitle: 'Seu checklist de Destiny 2', heroText: 'Entre com a sua conta Bungie.net para ver o que falta: exóticos, catalisadores, títulos, incursões, masmorras e campanhas, do mais fácil para o mais difícil.',
     heroList: ['O site só lê os seus dados; não altera nada no jogo.', 'Sua senha fica na Bungie; o site nunca vê.', 'As suas marcações ficam salvas neste navegador.'],
     login: 'Entrar com Bungie.net', notConfigured: 'O site ainda não foi configurado: faltam as chaves da Bungie nas variáveis de ambiente da Vercel.',
-    loading: 'Carregando sua conta…', loadingDefs: 'Buscando nomes de missões e itens…', loadingPlaces: 'Buscando locais das missões…', updated: t => `Atualizado às ${t}`,
+    loading: 'Carregando sua conta…', loadingDefs: 'Buscando nomes de missões e itens…', loadingPlaces: 'Buscando locais das missões…', cached: t => `Mostrando dados das ${t}; atualizando…`, updated: t => `Atualizado às ${t}`,
     authError: m => `Não deu para entrar: ${m}. Tente de novo.`, apiError: m => `Erro ao falar com a Bungie: ${m}`,
     maintenance: 'A API da Bungie está em manutenção agora. Tente de novo em alguns minutos.',
     noChars: 'Nenhum personagem de Destiny 2 encontrado nesta conta.',
@@ -33,7 +33,7 @@ const UI = {
     show: 'Mostrar', hideDone: 'Ocultar concluídos',
     s: {
       contracts: 'Contratos ativos', contractsNote: 'Contratos e recompensas que estão com você agora.', noContracts: 'Nenhum contrato ativo agora. Pegue novos com os Sindicatos ou vendedores.', expires: h => h >= 48 ? `Expira em ${Math.round(h / 24)} dias.` : `Expira em ${h} h.`,
-      loadingQuests: 'Carregando missões e contratos…',
+      loadingQuests: 'Carregando missões e contratos…', loadingRecords: 'Carregando títulos e catalisadores…',
       quests: 'Missões em andamento', questsNote: 'Do seu registro de missões, das mais adiantadas para as menos.',
       nearCats: 'Catalisadores quase prontos', nearCatsNote: 'Já passaram da metade.',
       nearTitles: 'Títulos quase prontos', nearTitlesNote: 'Faltam poucos triunfos.',
@@ -59,7 +59,7 @@ const UI = {
     heroTitle: 'Your Destiny 2 checklist', heroText: "Sign in with your Bungie.net account to see what's left: exotics, catalysts, titles, raids, dungeons and campaigns, from easiest to hardest.",
     heroList: ['The site only reads your data; it never changes anything in the game.', 'Your password stays with Bungie; the site never sees it.', 'Your checkmarks are saved in this browser.'],
     login: 'Sign in with Bungie.net', notConfigured: "The site isn't configured yet: the Bungie keys are missing from the Vercel environment variables.",
-    loading: 'Loading your account…', loadingDefs: 'Fetching quest and item names…', loadingPlaces: 'Fetching quest locations…', updated: t => `Updated at ${t}`,
+    loading: 'Loading your account…', loadingDefs: 'Fetching quest and item names…', loadingPlaces: 'Fetching quest locations…', cached: t => `Showing data from ${t}; updating…`, updated: t => `Updated at ${t}`,
     authError: m => `Couldn't sign in: ${m}. Please try again.`, apiError: m => `Error talking to Bungie: ${m}`,
     maintenance: 'The Bungie API is down for maintenance. Try again in a few minutes.',
     noChars: 'No Destiny 2 characters found on this account.',
@@ -69,7 +69,7 @@ const UI = {
     show: 'Show', hideDone: 'Hide completed',
     s: {
       contracts: 'Active contracts', contractsNote: 'Contracts and bounties you are holding right now.', noContracts: 'No active contracts right now. Pick up new ones from the Syndicates or vendors.', expires: h => h >= 48 ? `Expires in ${Math.round(h / 24)} days.` : `Expires in ${h} h.`,
-      loadingQuests: 'Loading quests and contracts…',
+      loadingQuests: 'Loading quests and contracts…', loadingRecords: 'Loading titles and catalysts…',
       quests: 'Quests in progress', questsNote: 'From your quest log, most advanced first.',
       nearCats: 'Catalysts almost done', nearCatsNote: 'Already past halfway.',
       nearTitles: 'Titles almost done', nearTitlesNote: 'Only a few triumphs left.',
@@ -128,7 +128,7 @@ function login() {
   try { sessionStorage.setItem('dc-state', st); } catch {}
   location.href = `https://www.bungie.net/${lang === 'pt' ? 'pt-br' : 'en'}/OAuth/Authorize?client_id=${encodeURIComponent(cfg.clientId)}&response_type=code&state=${st}`;
 }
-function logout() { LS.del('dc-auth'); auth = null; profile = null; render(); }
+function logout() { if (member) idbDel('profile-' + member.id); LS.del('dc-auth'); LS.del('dc-member'); auth = null; profile = null; member = null; render(); }
 async function token() {
   if (!auth) throw new Error('auth');
   if (auth.access_expires - Date.now() > 60000) return auth.access_token;
@@ -175,24 +175,74 @@ async function entities(type, hashes, lc) {
   return out;
 }
 
-/* ---------- leitura do perfil ---------- */
-async function loadAccount() {
-  status(u().loading);
-  showMessage(`<p class="loading">${esc(u().loading)}</p>`);
+/* ---------- cópia local do último perfil (IndexedDB) ---------- */
+const idb = () => new Promise((res, rej) => { const q = indexedDB.open('destiny-checklist', 1); q.onupgradeneeded = () => q.result.createObjectStore('kv'); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); });
+async function idbGet(k) { try { const db = await idb(); return await new Promise(r => { const q = db.transaction('kv').objectStore('kv').get(k); q.onsuccess = () => r(q.result); q.onerror = () => r(null); }); } catch { return null; } }
+async function idbSet(k, v) { try { const db = await idb(); db.transaction('kv', 'readwrite').objectStore('kv').put(v, k); } catch {} }
+async function idbDel(k) { try { const db = await idb(); db.transaction('kv', 'readwrite').objectStore('kv').delete(k); } catch {} }
+
+/* ---------- leitura do perfil ----------
+   O perfil vem em 3 partes em paralelo, da mais leve para a mais pesada, e a tela é desenhada
+   conforme cada parte chega. Se houver uma cópia da última visita, ela aparece na hora. */
+const PARTS = { a: '100,200,800,1100', b: '900', c: '102,201,205,206,300,301' };
+let have = { a: false, b: false, c: false };
+function pickChar() {
+  const chars = Object.values(profile.characters?.data || {});
+  if (!chars.length) return false;
+  const saved = LS.get('dc-char-' + member.id, null);
+  if (!chars.some(c => c.characterId === charId)) charId = chars.some(c => c.characterId === saved) ? saved : chars.slice().sort((a, b) => new Date(b.dateLastPlayed) - new Date(a.dateLastPlayed))[0].characterId;
+  return true;
+}
+async function loadMember() {
   const m = await bungie('/User/GetMembershipsForCurrentUser/');
   const list = m.destinyMemberships || [];
-  if (!list.length) { showMessage(`<p class="notice">${esc(u().noChars)}</p>`); return; }
-  let pick = list.find(x => x.membershipId === m.primaryMembershipId) || list.find(x => x.crossSaveOverride && x.crossSaveOverride === x.membershipType) || list[0];
-  member = { type: pick.membershipType, id: pick.membershipId, name: m.bungieNetUser?.uniqueName || pick.bungieGlobalDisplayName || pick.displayName };
-  const p = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=100,102,200,201,202,205,206,300,301,800,900,1100`);
-  profile = p;
+  if (!list.length) return null;
+  const pick = list.find(x => x.membershipId === m.primaryMembershipId) || list.find(x => x.crossSaveOverride && x.crossSaveOverride === x.membershipType) || list[0];
+  return { type: pick.membershipType, id: pick.membershipId, name: m.bungieNetUser?.uniqueName || pick.bungieGlobalDisplayName || pick.displayName };
+}
+async function loadAccount() {
+  status(u().loading);
+  member = LS.get('dc-member', null);
+  if (!member) {
+    showMessage(`<p class="loading">${esc(u().loading)}</p>`);
+    member = await loadMember();
+    if (!member) { showMessage(`<p class="notice">${esc(u().noChars)}</p>`); return; }
+    LS.set('dc-member', member);
+  }
   marks = new Set(LS.get('dc-marks-' + member.id, []));
-  const chars = Object.values(p.characters?.data || {});
-  if (!chars.length) { showMessage(`<p class="notice">${esc(u().noChars)}</p>`); return; }
-  const saved = LS.get('dc-char-' + member.id, null);
-  charId = chars.some(c => c.characterId === saved) ? saved : chars.sort((a, b) => new Date(b.dateLastPlayed) - new Date(a.dateLastPlayed))[0].characterId;
+  // 1) cópia da última visita, se houver
+  let usingCache = false;
+  if (!profile) {
+    const cached = await idbGet('profile-' + member.id);
+    if (cached?.p?.characters) {
+      profile = cached.p; have = { a: true, b: true, c: true }; usingCache = true;
+      if (pickChar()) { loadedAt = new Date(cached.t); build(); render(); status(u().cached(loadedAt.toLocaleTimeString(lang === 'pt' ? 'pt-BR' : 'en-US', { hour: '2-digit', minute: '2-digit' }))); }
+    } else showMessage(`<p class="loading">${esc(u().loading)}</p>`);
+  } else usingCache = true;
+  // 2) dados ao vivo, em 3 partes
+  const live = {}, got = { a: false, b: false, c: false };
+  let hydrated = false;
+  const url = k => `/Destiny2/${member.type}/Profile/${member.id}/?components=${PARTS[k]}`;
+  const onPart = (k, r) => {
+    Object.assign(live, r); got[k] = true;
+    if (usingCache) return; // troca tudo de uma vez quando as 3 partes chegarem
+    profile = live; have = { ...got };
+    if (!pickChar()) return;
+    loadedAt = new Date();
+    if (got.c && !hydrated) { hydrated = true; hydrate(); } else { build(); render(); }
+  };
+  const results = await Promise.allSettled(['a', 'b', 'c'].map(k => bungie(url(k)).then(r => onPart(k, r))));
+  const failed = results.find(r => r.status === 'rejected');
+  if (failed) {
+    if (failed.reason?.message === 'auth') throw failed.reason;
+    if (!got.a && !usingCache) { LS.del('dc-member'); throw failed.reason; }
+  }
+  if (!Object.values(got).every(Boolean)) { if (!usingCache) throw failed?.reason || new Error('profile'); status(u().apiError(failed?.reason?.message || '')); return; }
+  profile = live; have = { a: true, b: true, c: true };
+  if (!pickChar()) { showMessage(`<p class="notice">${esc(u().noChars)}</p>`); return; }
   loadedAt = new Date();
-  hydrate();
+  idbSet('profile-' + member.id, { t: Date.now(), p: live });
+  if (usingCache) hydrate();
 }
 
 let questInfo = {}, loadoutNames = {}, itemNames = {}, questLoc = {};
@@ -354,10 +404,11 @@ function build() {
   const quests = qItems.filter(x => !x.isCamp && !x.isContract && x.objs.length).sort((a, b) => b.frac - a.frac).slice(0, 20);
   out.push(S('obj', 'quests', s.quests, waiting ? s.loadingQuests : s.questsNote, quests.map(x => I('q-' + x.it.itemHash, x.qd.n || x.q.n, cleanDesc(x), [Math.round(x.frac * 100) + '%'], x.frac >= 1, { loc: questWhere(x) }))));
   // catalisadores quase prontos
-  const nearCats = defs.cats.map(c => ({ c, r: recState(c.h) })).filter(x => x.r && !recDone(x.r) && pct(x.r) >= 0.5).sort((a, b) => pct(b.r) - pct(a.r));
+  const recOK = have.b;
+  const nearCats = !recOK ? [] : defs.cats.map(c => ({ c, r: recState(c.h) })).filter(x => x.r && !recDone(x.r) && pct(x.r) >= 0.5).sort((a, b) => pct(b.r) - pct(a.r));
   if (nearCats.length) out.push(S('obj', 'nearcats', s.nearCats, s.nearCatsNote, nearCats.map(x => I('c-' + x.c.h, L(x.c.n), L(x.c.d), [progText(x.r) || Math.round(pct(x.r) * 100) + '%'], false))));
   // títulos quase prontos
-  const sealStats = defs.seals.map(se => { const recs = se.r.filter(r => { const st = recState(r[0]); return !st || !(st.state & 16); }); const done = recs.filter(r => recDone(recState(r[0]))).length; return { se, recs, done, total: recs.length }; }).filter(x => x.total);
+  const sealStats = !recOK ? [] : defs.seals.map(se => { const recs = se.r.filter(r => { const st = recState(r[0]); return !st || !(st.state & 16); }); const done = recs.filter(r => recDone(recState(r[0]))).length; return { se, recs, done, total: recs.length }; }).filter(x => x.total);
   const near = sealStats.filter(x => x.done < x.total && x.done / x.total >= 0.7 && x.se.tier < 5).sort((a, b) => b.done / b.total - a.done / a.total).slice(0, 5);
   if (near.length) out.push(S('obj', 'neartitles', s.nearTitles, s.nearTitlesNote, near.map(x => I('nt-' + x.se.cr, L(x.se.t), L(x.se.ds), [`${x.done}/${x.total}`], false))));
   // Campanhas
@@ -378,6 +429,7 @@ function build() {
     }
   }
   // Títulos
+  if (!recOK) out.push(S('tit', 'tit-wait', '', s.loadingRecords, [], { empty: true }), S('cat', 'cat-wait', '', s.loadingRecords, [], { empty: true }));
   const ordered = sealStats.slice().sort((a, b) => (a.se.tier - b.se.tier) || (b.done / b.total - a.done / a.total));
   for (const x of ordered) {
     const items = x.recs.map(r => { const st = recState(r[0]); return I('t-' + r[0], L(r[1]), L(r[2]), [progText(st) || U.chip[['Fácil', 'Médio', 'Difícil', 'Muito difícil', 'Evento'][x.se.tier - 1]]].filter(Boolean), recDone(st)); });
@@ -393,7 +445,7 @@ function build() {
   const armor = missing.filter(e => e.t === 'a');
   if (armor.length) out.push(S('exo', 'exo-armor', s.armor(U.classes[cls]), null, armor.map(e => { const g = srcGroup(e.s[0]); return I('x-' + e.h[0], L(e.n), L(e.s), [U.chip[g[1]], U.chip[g[2]]], false); })));
   // Drops: catalisadores
-  const catRows = defs.cats.map(c => ({ c, r: recState(c.h) })).filter(x => x.r && !(x.r.state & 16));
+  const catRows = !recOK ? [] : defs.cats.map(c => ({ c, r: recState(c.h) })).filter(x => x.r && !(x.r.state & 16));
   const catSrc = c => { const k = c.n[0].replace(/ Catalyst$/, ''); return defs.catsrc[k] ? L(defs.catsrc[k]) : ''; };
   const prog = catRows.filter(x => !recDone(x.r) && pct(x.r) > 0).sort((a, b) => pct(b.r) - pct(a.r));
   const fresh = catRows.filter(x => !recDone(x.r) && pct(x.r) === 0);
