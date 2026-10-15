@@ -23,7 +23,7 @@ const UI = {
     heroTitle: 'Seu checklist de Destiny 2', heroText: 'Entre com a sua conta Bungie.net para ver o que falta: exóticos, catalisadores, títulos, incursões, masmorras e campanhas, do mais fácil para o mais difícil.',
     heroList: ['O site só lê os seus dados; não altera nada no jogo.', 'Sua senha fica na Bungie; o site nunca vê.', 'As suas marcações ficam salvas neste navegador.'],
     login: 'Entrar com Bungie.net', notConfigured: 'O site ainda não foi configurado: faltam as chaves da Bungie nas variáveis de ambiente da Vercel.',
-    loading: 'Carregando sua conta…', loadingDefs: 'Buscando nomes de itens…', updated: t => `Atualizado às ${t}`,
+    loading: 'Carregando sua conta…', loadingDefs: 'Buscando nomes de missões e itens…', loadingPlaces: 'Buscando locais das missões…', updated: t => `Atualizado às ${t}`,
     authError: m => `Não deu para entrar: ${m}. Tente de novo.`, apiError: m => `Erro ao falar com a Bungie: ${m}`,
     maintenance: 'A API da Bungie está em manutenção agora. Tente de novo em alguns minutos.',
     noChars: 'Nenhum personagem de Destiny 2 encontrado nesta conta.',
@@ -33,6 +33,7 @@ const UI = {
     show: 'Mostrar', hideDone: 'Ocultar concluídos',
     s: {
       contracts: 'Contratos ativos', contractsNote: 'Contratos e recompensas que estão com você agora.', noContracts: 'Nenhum contrato ativo agora. Pegue novos com os Sindicatos ou vendedores.', expires: h => h >= 48 ? `Expira em ${Math.round(h / 24)} dias.` : `Expira em ${h} h.`,
+      loadingQuests: 'Carregando missões e contratos…',
       quests: 'Missões em andamento', questsNote: 'Do seu registro de missões, das mais adiantadas para as menos.',
       nearCats: 'Catalisadores quase prontos', nearCatsNote: 'Já passaram da metade.',
       nearTitles: 'Títulos quase prontos', nearTitlesNote: 'Faltam poucos triunfos.',
@@ -58,7 +59,7 @@ const UI = {
     heroTitle: 'Your Destiny 2 checklist', heroText: "Sign in with your Bungie.net account to see what's left: exotics, catalysts, titles, raids, dungeons and campaigns, from easiest to hardest.",
     heroList: ['The site only reads your data; it never changes anything in the game.', 'Your password stays with Bungie; the site never sees it.', 'Your checkmarks are saved in this browser.'],
     login: 'Sign in with Bungie.net', notConfigured: "The site isn't configured yet: the Bungie keys are missing from the Vercel environment variables.",
-    loading: 'Loading your account…', loadingDefs: 'Fetching item names…', updated: t => `Updated at ${t}`,
+    loading: 'Loading your account…', loadingDefs: 'Fetching quest and item names…', loadingPlaces: 'Fetching quest locations…', updated: t => `Updated at ${t}`,
     authError: m => `Couldn't sign in: ${m}. Please try again.`, apiError: m => `Error talking to Bungie: ${m}`,
     maintenance: 'The Bungie API is down for maintenance. Try again in a few minutes.',
     noChars: 'No Destiny 2 characters found on this account.',
@@ -68,6 +69,7 @@ const UI = {
     show: 'Show', hideDone: 'Hide completed',
     s: {
       contracts: 'Active contracts', contractsNote: 'Contracts and bounties you are holding right now.', noContracts: 'No active contracts right now. Pick up new ones from the Syndicates or vendors.', expires: h => h >= 48 ? `Expires in ${Math.round(h / 24)} days.` : `Expires in ${h} h.`,
+      loadingQuests: 'Loading quests and contracts…',
       quests: 'Quests in progress', questsNote: 'From your quest log, most advanced first.',
       nearCats: 'Catalysts almost done', nearCatsNote: 'Already past halfway.',
       nearTitles: 'Titles almost done', nearTitlesNote: 'Only a few triumphs left.',
@@ -95,7 +97,7 @@ let cfg = null, defs = null, ITEMS = null, auth = LS.get('dc-auth', null), profi
 let charId = null, tab = LS.get('dc-tab', 'obj'), prevTab = 'obj', query = '';
 const lastSub = LS.get('dc-subs', {});
 let marks = new Set(), SECTIONS = [], LOADOUTS = [], loadedAt = null;
-const openSecs = new Set();
+const openSecs = new Set(), openItems = new Set();
 const GROUPS = [{ id: 'obj', subs: ['obj'] }, { id: 'camp', subs: ['camp'] }, { id: 'act', subs: ['raid', 'dg', 'tit'] }, { id: 'drops', subs: ['exo', 'cat'] }];
 const groupOf = t => GROUPS.find(g => g.subs.includes(t));
 
@@ -189,10 +191,8 @@ async function loadAccount() {
   if (!chars.length) { showMessage(`<p class="notice">${esc(u().noChars)}</p>`); return; }
   const saved = LS.get('dc-char-' + member.id, null);
   charId = chars.some(c => c.characterId === saved) ? saved : chars.sort((a, b) => new Date(b.dateLastPlayed) - new Date(a.dateLastPlayed))[0].characterId;
-  status(u().loadingDefs);
-  await prepareEntities();
   loadedAt = new Date();
-  build(); render();
+  hydrate();
 }
 
 let questInfo = {}, loadoutNames = {}, itemNames = {}, questLoc = {};
@@ -232,21 +232,29 @@ function guessLoc(en) {
   return out.length ? out.join(P ? ', ' : ', ').replace(/, ([^,]+)$/, P ? ' and $1' : ' e $1') : '';
 }
 const questWhere = x => questLoc[x.it.itemHash] || guessLoc(x.q.d);
-async function prepareEntities() {
-  const p = profile, quests = [];
-  for (const [cid, inv] of Object.entries(p.characterInventories?.data || {})) for (const it of inv.items || []) if (it.bucketHash === QUEST_BUCKET) quests.push(it.itemHash);
-  const qEn = await entities('DestinyInventoryItemDefinition', quests, 'en');
-  const steps = [];
-  for (const h of quests) { const q = qEn[h]; if (q && q.il.length) steps.push(...q.il); }
-  questInfo = { en: qEn, pt: lang === 'pt' ? await entities('DestinyInventoryItemDefinition', quests, 'pt') : qEn };
-  await prepareLocations(quests.map(h => qEn[h]).filter(Boolean));
-  // loadouts
-  const inst = instanceMap();
-  const ldItems = [], ldNames = [];
+/* Carregamento em etapas: a lista aparece na hora; nomes de missões e loadouts chegam em seguida,
+   e os locais por último. Cada etapa redesenha a tela sem perder aba, itens abertos ou busca. */
+let gen = 0, stage = 0;
+const updatedText = () => u().updated(loadedAt.toLocaleTimeString(lang === 'pt' ? 'pt-BR' : 'en-US', { hour: '2-digit', minute: '2-digit' }));
+async function hydrate() {
+  const my = ++gen, p = profile;
+  stage = 0; questLoc = {};
+  build(); render();
+  status(u().loadingDefs);
+  const quests = [];
+  for (const inv of Object.values(p.characterInventories?.data || {})) for (const it of inv.items || []) if (it.bucketHash === QUEST_BUCKET) quests.push(it.itemHash);
+  const qEn = await entities('DestinyInventoryItemDefinition', quests, 'en'); if (my !== gen) return;
+  const qLang = lang === 'pt' ? await entities('DestinyInventoryItemDefinition', quests, 'pt') : qEn; if (my !== gen) return;
+  questInfo = { en: qEn, pt: qLang };
+  const inst = instanceMap(), ldItems = [], ldNames = [];
   for (const l of p.characterLoadouts?.data?.[charId]?.loadouts || []) { ldNames.push(l.nameHash); for (const i of l.items || []) if (inst[i.itemInstanceId]) ldItems.push(inst[i.itemInstanceId]); }
-  const lc = lang;
-  loadoutNames = await entities('DestinyLoadoutNameDefinition', ldNames, lc);
-  itemNames = await entities('DestinyInventoryItemDefinition', ldItems, lc);
+  loadoutNames = await entities('DestinyLoadoutNameDefinition', ldNames, lang); if (my !== gen) return;
+  itemNames = await entities('DestinyInventoryItemDefinition', ldItems, lang); if (my !== gen) return;
+  stage = 1; build(); render();
+  status(u().loadingPlaces);
+  await prepareLocations(quests.map(h => qEn[h]).filter(Boolean)); if (my !== gen) return;
+  stage = 2; build(); render();
+  status(updatedText());
 }
 function instanceMap() {
   const p = profile, map = {};
@@ -320,13 +328,14 @@ const S = (tab, id, title, note, items, extra) => ({ tab, id, title, note, items
 const I = (id, t, d, c, done, extra) => ({ id, t, d, c: c || [], auto: !!done, ...extra });
 function build() {
   const p = profile, U = u(), s = U.s, ch = p.characters.data[charId];
+  const waiting = stage < 1;
   const out = [];
   // Objetivos: missões em andamento
   const qItems = [];
   const inv = p.characterInventories?.data?.[charId]?.items || [];
   for (const it of inv) {
     if (it.bucketHash !== QUEST_BUCKET) continue;
-    const q = questInfo.en[it.itemHash], qd = (questInfo[lang] || questInfo.en)[it.itemHash];
+    const q = (questInfo.en || {})[it.itemHash], qd = (questInfo[lang] || questInfo.en || {})[it.itemHash];
     if (!q || !q.n) continue;
     const objs = (it.itemInstanceId ? p.itemComponents?.objectives?.data?.[it.itemInstanceId]?.objectives : null) || p.characterUninstancedItemComponents?.[charId]?.objectives?.data?.[it.itemHash]?.objectives || [];
     let a = 0, b = 0; for (const o of objs) { a += Math.min(o.progress || 0, o.completionValue || 1); b += o.completionValue || 1; }
@@ -337,13 +346,13 @@ function build() {
   }
   const contracts = qItems.filter(x => x.isContract).sort((a, b) => b.frac - a.frac);
   const expires = x => { const d = x.it.expirationDate ? new Date(x.it.expirationDate) : null; if (!d || isNaN(d)) return ''; const h = Math.max(0, Math.round((d - Date.now()) / 3600000)); return s.expires(h); };
-  if (!contracts.length) out.push(S('obj', 'contracts', s.contracts, s.noContracts, []));
+  if (!contracts.length) out.push(S('obj', 'contracts', s.contracts, waiting ? s.loadingQuests : s.noContracts, []));
   // Um painel por vendedor/origem, usando o rótulo oficial do jogo (ex.: "Recompensa da Vanguarda", "Contrato do Sindicato").
   const byVendor = new Map();
   for (const x of contracts) { const label = x.qd.tl || x.q.tl || s.contracts; if (!byVendor.has(label)) byVendor.set(label, []); byVendor.get(label).push(x); }
   for (const [label, list] of byVendor) out.push(S('obj', 'contracts-' + label.replace(/[^a-z0-9]+/gi, '-'), label, null, list.map(x => I('k-' + (x.it.itemInstanceId || x.it.itemHash), x.qd.n || x.q.n, [cleanDesc(x), expires(x)].filter(Boolean).join(' '), [Math.round(x.frac * 100) + '%'], x.frac >= 1, { loc: questWhere(x) }))));
   const quests = qItems.filter(x => !x.isCamp && !x.isContract && x.objs.length).sort((a, b) => b.frac - a.frac).slice(0, 20);
-  out.push(S('obj', 'quests', s.quests, s.questsNote, quests.map(x => I('q-' + x.it.itemHash, x.qd.n || x.q.n, cleanDesc(x), [Math.round(x.frac * 100) + '%'], x.frac >= 1, { loc: questWhere(x) }))));
+  out.push(S('obj', 'quests', s.quests, waiting ? s.loadingQuests : s.questsNote, quests.map(x => I('q-' + x.it.itemHash, x.qd.n || x.q.n, cleanDesc(x), [Math.round(x.frac * 100) + '%'], x.frac >= 1, { loc: questWhere(x) }))));
   // catalisadores quase prontos
   const nearCats = defs.cats.map(c => ({ c, r: recState(c.h) })).filter(x => x.r && !recDone(x.r) && pct(x.r) >= 0.5).sort((a, b) => pct(b.r) - pct(a.r));
   if (nearCats.length) out.push(S('obj', 'nearcats', s.nearCats, s.nearCatsNote, nearCats.map(x => I('c-' + x.c.h, L(x.c.n), L(x.c.d), [progText(x.r) || Math.round(pct(x.r) * 100) + '%'], false))));
@@ -358,7 +367,7 @@ function build() {
       const idx = Math.max(0, x.q.il.indexOf(x.it.itemHash)) + 1, tot = x.q.il.length || 1;
       out.push(S('camp', 'cp-' + x.it.itemHash, x.qd.ql || x.q.ql, s.campNote(idx, tot), [I('cp-' + x.it.itemHash, x.qd.n || x.q.n, x.qd.d, [`${idx}/${tot}`], false)]));
     }
-  } else out.push(S('camp', 'nocamp', '', s.noCamp, [], { empty: true }));
+  } else out.push(S('camp', 'nocamp', '', waiting ? s.loadingQuests : s.noCamp, [], { empty: true }));
   // Atividades: incursões e masmorras
   for (const [kind, list] of [['raid', defs.raids], ['dg', defs.dungeons]]) {
     for (const a of list) {
@@ -432,7 +441,7 @@ function render() {
   $('ldbtn').setAttribute('aria-pressed', tab === 'ld'); $('ldbtn').textContent = tab === 'ld' ? U.checklist : U.loadouts;
   document.body.classList.toggle('on-ld', tab === 'ld');
   if (tab === 'ld') {
-    showMessage(LOADOUTS.length ? LOADOUTS.map(l => `<article class="ld"><div class="ld-head"><h2>${esc(l.name)}</h2></div><ul class="items">${l.items.map(n => `<li>${esc(n)}</li>`).join('')}</ul><div class="ld-actions"><a class="ld-btn" href="https://app.destinyitemmanager.com/" target="_blank" rel="noopener">${esc(U.openDim)}</a></div></article>`).join('') : `<p class="empty-msg">${esc(U.noLoadouts)}</p>`);
+    showMessage(stage < 1 ? `<p class="empty-msg">${esc(U.loadingDefs)}</p>` : LOADOUTS.length ? LOADOUTS.map(l => `<article class="ld"><div class="ld-head"><h2>${esc(l.name)}</h2></div><ul class="items">${l.items.map(n => `<li>${esc(n)}</li>`).join('')}</ul><div class="ld-actions"><a class="ld-btn" href="https://app.destinyitemmanager.com/" target="_blank" rel="noopener">${esc(U.openDim)}</a></div></article>`).join('') : `<p class="empty-msg">${esc(U.noLoadouts)}</p>`);
     $('ovcount').textContent = U.ld(LOADOUTS.length); $('ovbar').style.width = '0';
     return;
   }
@@ -450,6 +459,7 @@ function render() {
         return `<li data-li="${esc(i.id)}" data-search="${esc([i.t, i.d, i.loc, ...i.c, sec.title].join(' ').toLowerCase())}"><div class="row"><label class="ck" for="${cid}"><input type="checkbox" id="${cid}" data-id="${esc(i.id)}" aria-label="${esc(i.t)}"${i.auto ? ' checked disabled' : ''}></label>${more ? `<button class="it" type="button" aria-expanded="false">${head}<span class="chev" aria-hidden="true"></span></button>` : `<span class="it">${head}</span>`}</div>${more ? `<div class="more">${i.loc ? `<div class="loc"><span class="loc-k">${esc(U.where)}</span> ${esc(i.loc)}</div>` : ''}${i.d ? `<div class="d">${esc(i.d)}</div>` : ''}${rest.length ? `<div class="chips">${rest.map(x => `<span class="chip ${chipClass(x)}">${esc(x)}</span>`).join('')}</div>` : ''}</div>` : ''}</li>`;
       }).join('')}</ul></section>`;
   }).join('')}<p class="donebar" id="donebar" hidden><span id="donetxt"></span><button class="reset" id="togglecomplete" type="button"></button></p></div>`;
+  document.querySelectorAll('#list li[data-li]').forEach(li => { if (openItems.has(li.dataset.li)) { li.classList.add('open'); li.querySelector('button.it')?.setAttribute('aria-expanded', 'true'); } });
   update(); filter();
 }
 const isDone = i => i.auto || marks.has(i.id);
@@ -486,9 +496,9 @@ function filter() {
 function go(t) { tab = t; const g = groupOf(t); if (g) { lastSub[g.id] = t; LS.set('dc-subs', lastSub); } LS.set('dc-tab', t); render(); }
 $('tabs').addEventListener('click', e => { const b = e.target.closest('.tab'); if (!b) return; const g = GROUPS.find(x => x.id === b.dataset.group); go(lastSub[g.id] || g.subs[0]); });
 $('subtabs').addEventListener('click', e => { const b = e.target.closest('.sub'); if (b) go(b.dataset.sub); });
-$('chars').addEventListener('click', async e => { const b = e.target.closest('.char'); if (!b || b.dataset.char === charId) return; charId = b.dataset.char; LS.set('dc-char-' + member.id, charId); await prepareEntities(); build(); render(); });
+$('chars').addEventListener('click', e => { const b = e.target.closest('.char'); if (!b || b.dataset.char === charId) return; charId = b.dataset.char; LS.set('dc-char-' + member.id, charId); hydrate(); });
 $('ldbtn').addEventListener('click', () => { if (tab === 'ld') go(prevTab || 'obj'); else { prevTab = tab; go('ld'); } });
-$('langbtn').addEventListener('click', async () => { lang = lang === 'en' ? 'pt' : 'en'; LS.set('dc-lang', lang); if (profile) { status(u().loadingDefs); await prepareEntities(); build(); status(u().updated(loadedAt.toLocaleTimeString(lang === 'pt' ? 'pt-BR' : 'en-US', { hour: '2-digit', minute: '2-digit' }))); } render(); });
+$('langbtn').addEventListener('click', () => { lang = lang === 'en' ? 'pt' : 'en'; LS.set('dc-lang', lang); if (profile) hydrate(); else render(); });
 $('refresh').addEventListener('click', () => start());
 $('logout').addEventListener('click', logout);
 $('hide').addEventListener('change', e => { document.body.classList.toggle('hide-done', e.target.checked); LS.set('dc-hide', e.target.checked); });
@@ -498,7 +508,7 @@ const toggleSec = h => { const id = h.dataset.coll, sec = h.closest('section'); 
 $('list').addEventListener('keydown', e => { const h = e.target.closest && e.target.closest('.sec-head[data-coll]'); if (h && e.target === h && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleSec(h); } });
 $('list').addEventListener('click', e => {
   const hd = e.target.closest('.sec-head[data-coll]'); if (hd) { toggleSec(hd); return; }
-  const it = e.target.closest('button.it'); if (it) { const li = it.closest('li'); const o = li.classList.toggle('open'); it.setAttribute('aria-expanded', o); return; }
+  const it = e.target.closest('button.it'); if (it) { const li = it.closest('li'); const o = li.classList.toggle('open'); it.setAttribute('aria-expanded', o); o ? openItems.add(li.dataset.li) : openItems.delete(li.dataset.li); return; }
   if (e.target.id === 'togglecomplete') { document.body.classList.toggle('show-complete'); update(); }
 });
 $('list').addEventListener('change', e => { const id = e.target.dataset.id; if (!id || !member) return; e.target.checked ? marks.add(id) : marks.delete(id); LS.set('dc-marks-' + member.id, [...marks]); update(); });
@@ -508,7 +518,6 @@ async function start() {
   try {
     status(u().loading);
     await loadAccount();
-    status(u().updated(loadedAt.toLocaleTimeString(lang === 'pt' ? 'pt-BR' : 'en-US', { hour: '2-digit', minute: '2-digit' })));
   } catch (e) {
     if (e.message === 'auth') { status(''); render(); return; }
     status('');
