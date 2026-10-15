@@ -209,7 +209,7 @@ async function prepareLocations(defsEn) {
   const quests = Object.entries(questInfo.en);
   for (const [h, d] of quests) {
     const names = [];
-    for (const o of d.ob || []) { const l = locs[objs[o]?.lh]; if (!l || !l.lr) continue; const nm = (l.lr[0] && dN[l.lr[0]]?.n) || (l.lr[1] && aN[l.lr[1]]?.n); if (nm && !names.includes(nm)) names.push(nm); }
+    for (const o of d.ob || []) { const l = locs[objs[o]?.lh]; if (!l || !l.lr) continue; let nm = (l.lr[0] && dN[l.lr[0]]?.n) || (l.lr[1] && aN[l.lr[1]]?.n); if (nm && nm === nm.toUpperCase()) nm = nm.toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase()); if (nm && !names.includes(nm)) names.push(nm); }
     if (names.length) questLoc[h] = names.join(', ');
   }
 }
