@@ -446,13 +446,13 @@ function render() {
     return;
   }
   const secs = SECTIONS.filter(x => x.tab === tab);
-  // Fora de Objetivos, o que já foi concluído fica no fim da lista, minimizado.
+  // O que já foi concluído fica no fim da lista, minimizado.
   const secDone = x => x.items.length > 0 && x.items.every(isDone);
-  if (tab !== 'obj') secs.sort((a, b) => secDone(a) - secDone(b));
+  secs.sort((a, b) => secDone(a) - secDone(b));
   $('list').innerHTML = `<div class="panel">${secs.map(sec => {
     if (sec.empty) return `<p class="empty-msg">${esc(sec.note)}</p>`;
     if (!sec.items.length) return `<section data-sec="${sec.id}"><div class="sec-head"><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2></div></div><p>${esc(sec.note)}</p></div></section>`;
-    const keep = tab !== 'obj', coll = sec.coll || (keep && secDone(sec)), open = openSecs.has(sec.id);
+    const keep = true, coll = sec.coll || (keep && secDone(sec)), open = openSecs.has(sec.id);
     return `<section data-sec="${sec.id}" class="${keep ? 'keep' : ''}${coll ? ` coll${open ? '' : ' collapsed'}` : ''}">
       <div class="sec-head"${coll ? ` data-coll="${sec.id}" role="button" tabindex="0" aria-expanded="${open}"` : ''}><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2></div><span class="count" data-sc="${sec.id}"></span>${coll ? '<span class="chev" aria-hidden="true"></span>' : ''}</div>
       ${sec.note ? `<p>${esc(sec.note)}</p>` : ''}<div class="sec-bar"><i data-sb="${sec.id}"></i></div></div>
@@ -504,7 +504,7 @@ $('ldbtn').addEventListener('click', () => { if (tab === 'ld') go(prevTab || 'ob
 $('langbtn').addEventListener('click', () => { lang = lang === 'en' ? 'pt' : 'en'; LS.set('dc-lang', lang); if (profile) hydrate(); else render(); });
 $('refresh').addEventListener('click', () => start());
 $('logout').addEventListener('click', logout);
-$('hide').addEventListener('change', e => { document.body.classList.toggle('hide-done', e.target.checked); LS.set('dc-hide', e.target.checked); });
+$('hide').addEventListener('change', e => { document.body.classList.toggle('hide-done', e.target.checked); LS.set('dc-hide2', e.target.checked); });
 $('searchbtn').addEventListener('click', () => { const q = $('q'), show = q.hidden; q.hidden = !show; $('searchbtn').setAttribute('aria-expanded', show); if (show) q.focus(); else { q.value = ''; query = ''; filter(); } });
 $('q').addEventListener('input', e => { query = e.target.value; filter(); });
 const toggleSec = h => { const id = h.dataset.coll, sec = h.closest('section'); const o = sec.classList.toggle('collapsed') === false; o ? openSecs.add(id) : openSecs.delete(id); h.setAttribute('aria-expanded', o); };
@@ -528,7 +528,7 @@ async function start() {
   }
 }
 (async function init() {
-  if (LS.get('dc-hide', true)) { $('hide').checked = true; document.body.classList.add('hide-done'); }
+  if (LS.get('dc-hide2', false)) { $('hide').checked = true; document.body.classList.add('hide-done'); }
   applyUI();
   const h = readHash();
   try {
