@@ -374,7 +374,7 @@ function build() {
       const items = [I(`${kind}-${a.k}-clear`, s.clear(L(a.n)), null, [U.chip[a.d], kind === 'raid' ? U.chip['6'] : U.chip.Trio], a.m && metric(a.m) > 0)];
       const ex = a.x && exoticByName(a.x);
       if (ex) items.push(I(`${kind}-${a.k}-x`, s.exotic(L(ex.n)), L(ex.s), [U.chip['Exótico']], colAcquired(ex.h)));
-      out.push(S(kind, `${kind}-${a.k}`, L(a.n), L(a.note), items, { firstIsClear: true }));
+      out.push(S(kind, `${kind}-${a.k}`, L(a.n), L([a.note[1], a.note[0]]), items, { firstIsClear: true }));
     }
   }
   // Títulos
@@ -446,11 +446,14 @@ function render() {
     return;
   }
   const secs = SECTIONS.filter(x => x.tab === tab);
+  // Fora de Objetivos, o que já foi concluído fica no fim da lista, minimizado.
+  const secDone = x => x.items.length > 0 && x.items.every(isDone);
+  if (tab !== 'obj') secs.sort((a, b) => secDone(a) - secDone(b));
   $('list').innerHTML = `<div class="panel">${secs.map(sec => {
     if (sec.empty) return `<p class="empty-msg">${esc(sec.note)}</p>`;
     if (!sec.items.length) return `<section data-sec="${sec.id}"><div class="sec-head"><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2></div></div><p>${esc(sec.note)}</p></div></section>`;
-    const coll = sec.coll, open = openSecs.has(sec.id);
-    return `<section data-sec="${sec.id}"${coll ? ` class="coll${open ? '' : ' collapsed'}"` : ''}>
+    const keep = tab !== 'obj', coll = sec.coll || (keep && secDone(sec)), open = openSecs.has(sec.id);
+    return `<section data-sec="${sec.id}" class="${keep ? 'keep' : ''}${coll ? ` coll${open ? '' : ' collapsed'}` : ''}">
       <div class="sec-head"${coll ? ` data-coll="${sec.id}" role="button" tabindex="0" aria-expanded="${open}"` : ''}><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2></div><span class="count" data-sc="${sec.id}"></span>${coll ? '<span class="chev" aria-hidden="true"></span>' : ''}</div>
       ${sec.note ? `<p>${esc(sec.note)}</p>` : ''}<div class="sec-bar"><i data-sb="${sec.id}"></i></div></div>
       <ul>${sec.items.map(i => {
@@ -470,9 +473,9 @@ function update() {
   for (const sec of SECTIONS) {
     const el = document.querySelector(`[data-sc="${sec.id}"]`); if (!el) continue;
     const n = sec.items.filter(isDone).length, t = sec.items.length;
-    el.textContent = `${n}/${t}`;
+    el.textContent = (t && n === t ? '✓ ' : '') + `${n}/${t}`;
     document.querySelector(`[data-sb="${sec.id}"]`).style.width = (t ? n / t * 100 : 0) + '%';
-    const complete = t > 0 && n === t; el.closest('section').classList.toggle('complete', complete); if (complete) full++;
+    const complete = t > 0 && n === t; const secEl = el.closest('section'); secEl.classList.toggle('complete', complete); if (complete && !secEl.classList.contains('keep')) full++;
   }
   const bar = $('donebar');
   if (bar) { bar.hidden = full === 0; const sh = document.body.classList.contains('show-complete'); $('donetxt').textContent = U.panels(full, sh); $('togglecomplete').textContent = sh ? U.hideDone : U.show; }

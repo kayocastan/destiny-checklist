@@ -20,3 +20,5 @@ li input:disabled{opacity:.7;cursor:not-allowed}
 .ld ul.items li{border:0}
 .loc{font-size:13px;color:var(--fg);margin-bottom:3px}
 .loc-k{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--exotic);margin-right:4px}
+body:not(.show-complete) section.complete.keep{display:block}
+section.keep.complete .count{color:var(--done)}
