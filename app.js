@@ -46,7 +46,7 @@ const UI = {
     },
     chip: { 'Fácil': 'Fácil', 'Médio': 'Médio', 'Difícil': 'Difícil', 'Muito difícil': 'Muito difícil', 'Evento': 'Evento', 'Solo': 'Solo', 'Trio': 'Trio', '6': '6 jogadores', 'Exótico': 'Exótico', 'Mestre': 'Mestre' },
     openDim: 'Abrir no DIM', noLoadouts: 'Nenhum loadout salvo no jogo para este personagem.',
-    classes: ['Titã', 'Caçador', 'Arcano'], races: ['Humano', 'Despertado', 'Exo'], power: 'Poder',
+    classes: ['Titã', 'Caçador', 'Arcano'], races: ['Humano', 'Despertado', 'Exo'], power: 'Poder', max: 'máx.',
   },
   en: {
     hide: 'Hide done', search: 'Search by name or source', refresh: 'Refresh', logout: 'Sign out',
@@ -80,7 +80,7 @@ const UI = {
     },
     chip: { 'Fácil': 'Easy', 'Médio': 'Medium', 'Difícil': 'Hard', 'Muito difícil': 'Very hard', 'Evento': 'Event', 'Solo': 'Solo', 'Trio': 'Trio', '6': '6 players', 'Exótico': 'Exotic', 'Mestre': 'Master' },
     openDim: 'Open in DIM', noLoadouts: 'No in-game loadouts saved for this character.',
-    classes: ['Titan', 'Hunter', 'Warlock'], races: ['Human', 'Awoken', 'Exo'], power: 'Power',
+    classes: ['Titan', 'Hunter', 'Warlock'], races: ['Human', 'Awoken', 'Exo'], power: 'Power', max: 'max',
   },
 };
 let lang = LS.get('dc-lang', null) || ((navigator.language || '').toLowerCase().startsWith('pt') ? 'pt' : 'en');
@@ -89,7 +89,7 @@ const L = pair => Array.isArray(pair) ? (lang === 'en' ? pair[0] : (pair[1] || p
 const chipClass = x => /^(Fácil|Easy)$/.test(x) ? 'easy' : /^(Médio|Medium)$/.test(x) ? 'mid' : /^(Difícil|Hard|Muito difícil|Very hard)$/.test(x) ? 'hard' : /%$/.test(x) ? 'hot' : '';
 
 /* ---------- estado ---------- */
-let cfg = null, defs = null, auth = LS.get('dc-auth', null), profile = null, member = null;
+let cfg = null, defs = null, ITEMS = null, auth = LS.get('dc-auth', null), profile = null, member = null;
 let charId = null, tab = LS.get('dc-tab', 'obj'), prevTab = 'obj', query = '';
 const lastSub = LS.get('dc-subs', {});
 let marks = new Set(), SECTIONS = [], LOADOUTS = [], loadedAt = null;
@@ -217,6 +217,35 @@ function instanceMap() {
   return map;
 }
 
+/* ---------- poder máximo (como o DIM: melhor item por espaço, no máximo 1 exótico de arma e 1 de armadura) ---------- */
+function maxPower(cls) {
+  if (!ITEMS) return null;
+  const inst = profile.itemComponents?.instances?.data || {}, all = [];
+  const add = items => { for (const it of items || []) if (it.itemInstanceId) all.push(it); };
+  add(profile.profileInventory?.data?.items);
+  for (const v of Object.values(profile.characterInventories?.data || {})) add(v.items);
+  for (const v of Object.values(profile.characterEquipment?.data || {})) add(v.items);
+  const best = Array.from({ length: 8 }, () => ({ n: 0, x: 0 }));
+  for (const it of all) {
+    const code = ITEMS[it.itemHash]; if (code == null) continue;
+    const slot = Math.floor(code / 100), c = Math.floor(code / 10) % 10, ex = code % 2;
+    if (slot >= 3 && c !== 3 && c !== cls) continue;
+    const pw = inst[it.itemInstanceId]?.primaryStat?.value; if (!pw) continue;
+    const k = ex ? 'x' : 'n'; if (pw > best[slot][k]) best[slot][k] = pw;
+  }
+  const pick = slots => {
+    let top = slots.every(t => best[t].n) ? slots.reduce((a, t) => a + best[t].n, 0) : 0;
+    for (const s of slots) {
+      if (!best[s].x || !slots.every(t => t === s || best[t].n)) continue;
+      const sum = slots.reduce((a, t) => a + (t === s ? best[t].x : best[t].n), 0);
+      if (sum > top) top = sum;
+    }
+    return top;
+  };
+  const w = pick([0, 1, 2]), a = pick([3, 4, 5, 6, 7]);
+  return w && a ? Math.floor((w + a) / 8) : null;
+}
+
 /* ---------- regras ---------- */
 const recState = h => profile.profileRecords?.data?.records?.[h] || profile.characterRecords?.data?.[charId]?.records?.[h] || null;
 const recDone = r => !!r && (!!(r.state & 1) || !(r.state & 4));
@@ -339,7 +368,8 @@ function render() {
   const U = u(), ch = profile.characters.data[charId];
   const cls = U.classes[ch.classType] || '';
   $('title').textContent = cls; document.title = cls + ' · Destiny Checklist';
-  $('eyebrow').textContent = `${U.races[ch.raceType] || ''} ${cls} · ${U.power} ${ch.light} · ${member.name}`;
+  const mx = maxPower(ch.classType);
+  $('eyebrow').textContent = `${U.races[ch.raceType] || ''} ${cls} · ${U.power} ${ch.light}${mx && mx > ch.light ? ` (${U.max} ${mx})` : ''} · ${member.name}`;
   $('chars').innerHTML = Object.values(profile.characters.data).map(c => `<button class="char" type="button" data-char="${c.characterId}" aria-pressed="${c.characterId === charId}">${esc(U.classes[c.classType])}<span class="pw">${c.light}</span></button>`).join('');
   $('chars').hidden = Object.keys(profile.characters.data).length < 2;
   $('tabs').innerHTML = GROUPS.map(g => `<button class="tab" type="button" data-group="${g.id}" aria-current="${groupOf(tab)?.id === g.id}">${esc(U.tabs[g.id])}</button>`).join('');
@@ -436,7 +466,7 @@ async function start() {
   applyUI();
   const h = readHash();
   try {
-    [cfg, defs] = await Promise.all([fetch('/api/config').then(r => r.json()), fetch('/data/defs.json').then(r => r.json())]);
+    [cfg, defs, ITEMS] = await Promise.all([fetch('/api/config').then(r => r.json()), fetch('/data/defs.json').then(r => r.json()), fetch('/data/items.json').then(r => r.json()).catch(() => ({}))]);
   } catch { cfg = { configured: false }; showMessage(`<p class="notice">${esc(u().notConfigured)}</p>`); return; }
   if (h?.error) { render(); $('list').insertAdjacentHTML('afterbegin', `<p class="notice">${esc(u().authError(h.error))}</p>`); return; }
   if (h?.auth) { auth = h.auth; LS.set('dc-auth', auth); }
