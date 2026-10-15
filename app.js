@@ -32,6 +32,7 @@ const UI = {
     panels: (n, sh) => n === 1 ? '1 painel concluído ' + (sh ? 'aparecendo.' : 'oculto.') : `${n} painéis concluídos ${sh ? 'aparecendo.' : 'ocultos.'}`,
     show: 'Mostrar', hideDone: 'Ocultar concluídos',
     s: {
+      contracts: 'Contratos ativos', contractsNote: 'Contratos e recompensas que estão com você agora.', noContracts: 'Nenhum contrato ativo agora. Pegue novos com os Sindicatos ou vendedores.', expires: h => h >= 48 ? `Expira em ${Math.round(h / 24)} dias.` : `Expira em ${h} h.`,
       quests: 'Missões em andamento', questsNote: 'Do seu registro de missões, das mais adiantadas para as menos.',
       nearCats: 'Catalisadores quase prontos', nearCatsNote: 'Já passaram da metade.',
       nearTitles: 'Títulos quase prontos', nearTitlesNote: 'Faltam poucos triunfos.',
@@ -66,6 +67,7 @@ const UI = {
     panels: (n, sh) => `${n} completed panel${n === 1 ? '' : 's'} ${sh ? 'shown.' : 'hidden.'}`,
     show: 'Show', hideDone: 'Hide completed',
     s: {
+      contracts: 'Active contracts', contractsNote: 'Contracts and bounties you are holding right now.', noContracts: 'No active contracts right now. Pick up new ones from the Syndicates or vendors.', expires: h => h >= 48 ? `Expires in ${Math.round(h / 24)} days.` : `Expires in ${h} h.`,
       quests: 'Quests in progress', questsNote: 'From your quest log, most advanced first.',
       nearCats: 'Catalysts almost done', nearCatsNote: 'Already past halfway.',
       nearTitles: 'Titles almost done', nearTitlesNote: 'Only a few triumphs left.',
@@ -252,7 +254,10 @@ const recDone = r => !!r && (!!(r.state & 1) || !(r.state & 4));
 const recObjs = r => (r && (r.objectives?.length ? r.objectives : r.intervalObjectives)) || [];
 const progText = r => { const o = recObjs(r); if (o.length !== 1 || !o[0].completionValue || o[0].completionValue <= 1) return ''; return `${Math.min(o[0].progress || 0, o[0].completionValue)}/${o[0].completionValue}`; };
 const pct = r => { const o = recObjs(r); let a = 0, b = 0; for (const x of o) { a += Math.min(x.progress || 0, x.completionValue || 1); b += x.completionValue || 1; } return b ? a / b : 0; };
-const colAcquired = hashes => hashes.some(h => { const s = profile.profileCollectibles?.data?.collectibles?.[h]?.state ?? profile.characterCollectibles?.data?.[charId]?.collectibles?.[h]?.state; return s !== undefined && !(s & 1); });
+const colStates = hashes => hashes.map(h => profile.profileCollectibles?.data?.collectibles?.[h]?.state ?? profile.characterCollectibles?.data?.[charId]?.collectibles?.[h]?.state).filter(s => s !== undefined);
+const colAcquired = hashes => colStates(hashes).some(s => !(s & 1));
+// Faltando = não adquirido e visível nas Coleções do jogo (o bit 4 marca itens que o jogo esconde, como exóticos que não dá mais para obter).
+const colMissing = hashes => { const st = colStates(hashes); return st.length > 0 && !st.some(s => !(s & 1)) && st.some(s => !(s & 4)); };
 const metric = h => profile.metrics?.data?.metrics?.[h]?.objectiveProgress?.progress || 0;
 const exoticByName = name => defs.exotics.find(e => e.n[0] === name);
 function srcGroup(s) {
@@ -283,13 +288,17 @@ function build() {
     if (it.bucketHash !== QUEST_BUCKET) continue;
     const q = questInfo.en[it.itemHash], qd = (questInfo[lang] || questInfo.en)[it.itemHash];
     if (!q || !q.n) continue;
-    const objs = it.itemInstanceId ? p.itemComponents?.objectives?.data?.[it.itemInstanceId]?.objectives || [] : [];
+    const objs = (it.itemInstanceId ? p.itemComponents?.objectives?.data?.[it.itemInstanceId]?.objectives : null) || p.characterUninstancedItemComponents?.[charId]?.objectives?.data?.[it.itemHash]?.objectives || [];
     let a = 0, b = 0; for (const o of objs) { a += Math.min(o.progress || 0, o.completionValue || 1); b += o.completionValue || 1; }
     const frac = b ? a / b : 0;
     const isCamp = CAMPAIGN_RE.test(q.ql);
-    qItems.push({ it, q, qd, frac, objs, isCamp });
+    const isContract = q.it === 26 || /\bcontract\b/i.test(q.n) || /\bcontract/i.test(q.ql);
+    qItems.push({ it, q, qd, frac, objs, isCamp, isContract });
   }
-  const quests = qItems.filter(x => !x.isCamp && x.objs.length).sort((a, b) => b.frac - a.frac).slice(0, 20);
+  const contracts = qItems.filter(x => x.isContract).sort((a, b) => b.frac - a.frac);
+  const expires = x => { const d = x.it.expirationDate ? new Date(x.it.expirationDate) : null; if (!d || isNaN(d)) return ''; const h = Math.max(0, Math.round((d - Date.now()) / 3600000)); return s.expires(h); };
+  out.push(S('obj', 'contracts', s.contracts, contracts.length ? s.contractsNote : s.noContracts, contracts.map(x => I('k-' + (x.it.itemInstanceId || x.it.itemHash), x.qd.n || x.q.n, [x.qd.d, expires(x)].filter(Boolean).join(' '), [Math.round(x.frac * 100) + '%'], x.frac >= 1))));
+  const quests = qItems.filter(x => !x.isCamp && !x.isContract && x.objs.length).sort((a, b) => b.frac - a.frac).slice(0, 20);
   out.push(S('obj', 'quests', s.quests, s.questsNote, quests.map(x => I('q-' + x.it.itemHash, x.qd.n || x.q.n, (x.qd.ql ? x.qd.ql + ' — ' : '') + (x.qd.d || ''), [Math.round(x.frac * 100) + '%'], x.frac >= 1))));
   // catalisadores quase prontos
   const nearCats = defs.cats.map(c => ({ c, r: recState(c.h) })).filter(x => x.r && !recDone(x.r) && pct(x.r) >= 0.5).sort((a, b) => pct(b.r) - pct(a.r));
@@ -323,7 +332,7 @@ function build() {
   }
   // Drops: exóticos
   const cls = ch.classType;
-  const missing = defs.exotics.filter(e => (e.t === 'w' || e.c === cls) && !colAcquired(e.h));
+  const missing = defs.exotics.filter(e => (e.t === 'w' || e.c === cls) && colMissing(e.h));
   const weapons = missing.filter(e => e.t === 'w');
   const bySrc = {};
   for (const e of weapons) { const g = srcGroup(e.s[0]); (bySrc[g[0]] = bySrc[g[0]] || []).push([e, g]); }
@@ -386,6 +395,7 @@ function render() {
   const secs = SECTIONS.filter(x => x.tab === tab);
   $('list').innerHTML = `<div class="panel">${secs.map(sec => {
     if (sec.empty) return `<p class="empty-msg">${esc(sec.note)}</p>`;
+    if (!sec.items.length) return `<section data-sec="${sec.id}"><div class="sec-head"><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2></div></div><p>${esc(sec.note)}</p></div></section>`;
     const coll = sec.coll, open = openSecs.has(sec.id);
     return `<section data-sec="${sec.id}"${coll ? ` class="coll${open ? '' : ' collapsed'}"` : ''}>
       <div class="sec-head"${coll ? ` data-coll="${sec.id}" role="button" tabindex="0" aria-expanded="${open}"` : ''}><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2></div><span class="count" data-sc="${sec.id}"></span>${coll ? '<span class="chev" aria-hidden="true"></span>' : ''}</div>
