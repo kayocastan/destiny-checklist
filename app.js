@@ -152,7 +152,8 @@ async function bungie(path, needAuth = true) {
 }
 
 /* ---------- nomes de itens (API de entidades, com cache) ---------- */
-const entCache = { en: LS.get('dc-ent3-en', {}), pt: LS.get('dc-ent3-pt', {}) };
+LS.del('dc-ent3-en'); LS.del('dc-ent3-pt');
+const entCache = { en: LS.get('dc-ent4-en', {}), pt: LS.get('dc-ent4-pt', {}) };
 for (const k of ['dc-ent-en', 'dc-ent-pt', 'dc-ent2-en', 'dc-ent2-pt']) LS.del(k);
 let entDirty = false;
 async function entity(type, hash, lc) {
@@ -160,7 +161,7 @@ async function entity(type, hash, lc) {
   if (store[key]) return store[key];
   try {
     const d = await bungie(`/Destiny2/Manifest/${type}/${hash >>> 0}/?lc=${lc === 'pt' ? 'pt-br' : 'en'}`, false);
-    const v = { n: d.displayProperties?.name || '', d: d.displayProperties?.description || '', ql: d.setData?.questLineName || '', il: (d.setData?.itemList || []).map(x => x.itemHash), b: d.inventory?.bucketTypeHash || 0, it: d.itemType || 0, tl: d.itemTypeDisplayName || '', su: d.inventory?.stackUniqueLabel || '', ob: d.objectives?.objectiveHashes || [], lh: d.locationHash || 0, lr: (d.locationReleases || []).map(r => [r.destinationHash || 0, r.activityHash || 0]).slice(-1)[0] || null };
+    const v = { n: d.displayProperties?.name || '', d: d.displayProperties?.description || '', ql: d.setData?.questLineName || '', il: (d.setData?.itemList || []).map(x => x.itemHash), b: d.inventory?.bucketTypeHash || 0, it: d.itemType || 0, tl: d.itemTypeDisplayName || '', su: d.inventory?.stackUniqueLabel || '', ob: d.objectives?.objectiveHashes || [], lh: d.locationHash || 0, lr: (d.locationReleases || []).map(r => [r.destinationHash || 0, r.activityHash || 0]).slice(-1)[0] || null, ic: d.displayProperties?.icon || '', tt: d.inventory?.tierType || 0, dt: d.talentGrid?.hudDamageType || 0 };
     store[key] = v; entDirty = true;
     return v;
   } catch { return { n: '', d: '', ql: '', il: [], b: 0, it: 0, tl: '', su: '', ob: [], lh: 0, lr: null }; }
@@ -171,7 +172,7 @@ async function entities(type, hashes, lc) {
   let i = 0;
   const worker = async () => { while (i < list.length) { const h = list[i++]; out[h] = await entity(type, h, lc); } };
   await Promise.all(Array.from({ length: 6 }, worker));
-  if (entDirty) { LS.set('dc-ent3-en', entCache.en); LS.set('dc-ent3-pt', entCache.pt); entDirty = false; }
+  if (entDirty) { LS.set('dc-ent4-en', entCache.en); LS.set('dc-ent4-pt', entCache.pt); entDirty = false; }
   return out;
 }
 
@@ -248,7 +249,7 @@ async function loadAccount() {
   if (usingCache) hydrate();
 }
 
-let questInfo = {}, loadoutNames = {}, itemNames = {}, questLoc = {};
+let questInfo = {}, loadoutNames = {}, itemNames = {}, questLoc = {}, gearDefs = {};
 /* Local oficial da missão: objetivo -> local -> destino/atividade (quando a Bungie informa). */
 async function prepareLocations(defsEn) {
   const objHashes = [...new Set(defsEn.flatMap(d => d.ob || []))];
@@ -314,7 +315,28 @@ async function loadLoadouts(my, quiet) {
   const ln = await entities('DestinyLoadoutNameDefinition', ldNames, lang); if (my !== gen) return;
   const it = await entities('DestinyInventoryItemDefinition', ldItems, lang); if (my !== gen) return;
   loadoutNames = ln; itemNames = it;
+  const eq = (p.characterEquipment?.data?.[charId]?.items || []).filter(i => GEAR_BUCKETS.includes(i.bucketHash)).map(i => i.itemHash);
+  const gd = await entities('DestinyInventoryItemDefinition', eq, lang); if (my !== gen) return;
+  gearDefs = gd;
   if (!quiet) { build(); render(); }
+}
+/* Identidade do personagem: subclasse e exóticos equipados (cor de destaque = elemento da subclasse) */
+const SUB_BUCKET = 3284755031, GEAR_BUCKETS = [3284755031, 1498876634, 2465295065, 953998645, 3448274439, 3551918588, 14239492, 20886954, 1585787867];
+const ELEMENTS = { 1: 'prismatic', 2: 'arc', 3: 'solar', 4: 'void', 6: 'stasis', 7: 'strand' };
+const BNET = 'https://www.bungie.net';
+function renderGuardian(ch) {
+  const gh = $('gh');
+  if (!ch) { gh.classList.add('noemb'); $('ghband').style.backgroundImage = ''; $('gear').innerHTML = ''; $('ghpw').hidden = true; delete document.documentElement.dataset.el; return; }
+  gh.classList.toggle('noemb', !ch.emblemBackgroundPath);
+  $('ghband').style.backgroundImage = ch.emblemBackgroundPath ? `url("${BNET}${ch.emblemBackgroundPath}")` : '';
+  const eq = profile.characterEquipment?.data?.[ch.characterId]?.items || [];
+  const sub = eq.find(i => i.bucketHash === SUB_BUCKET), sd = sub && gearDefs[sub.itemHash];
+  const exo = eq.filter(i => i.bucketHash !== SUB_BUCKET && gearDefs[i.itemHash]?.tt === 6).map(i => gearDefs[i.itemHash]);
+  const el = sd ? ELEMENTS[sd.dt] : null;
+  if (el) document.documentElement.dataset.el = el; else delete document.documentElement.dataset.el;
+  const g = (d, cls) => d && d.ic ? `<span class="g${cls}" title="${esc(d.n)}"><img src="${BNET}${d.ic}" alt="" loading="lazy"><span>${esc(d.n)}</span></span>` : '';
+  $('gear').innerHTML = g(sd, ' g-sub') + exo.map(d => g(d, '')).join('');
+  return el;
 }
 function instanceMap() {
   const p = profile, map = {};
@@ -481,7 +503,7 @@ function render() {
   for (const id of ['tabs', 'overall', 'chars', 'ldbtn', 'refresh', 'logout']) $(id).hidden = !logged;
   if (!cfg) return;
   if (!logged) {
-    $('title').textContent = 'Destiny Checklist'; document.title = 'Destiny Checklist'; $('eyebrow').textContent = 'Destiny 2';
+    $('title').textContent = 'Destiny Checklist'; document.title = 'Destiny Checklist'; $('eyebrow').textContent = 'Destiny 2'; renderGuardian(null);
     $('subtabs').hidden = true;
     if (auth) return; // carregando
     const U = u();
@@ -493,7 +515,11 @@ function render() {
   const cls = U.classes[ch.classType] || '';
   $('title').textContent = cls; document.title = cls + ' · Destiny Checklist';
   const mx = maxPower(ch.classType);
-  $('eyebrow').textContent = `${U.races[ch.raceType] || ''} ${cls} · ${U.power} ${ch.light}${mx && mx > ch.light ? ` (${U.max} ${mx})` : ''} · ${member.name}`;
+  const sub = (profile.characterEquipment?.data?.[charId]?.items || []).find(i => i.bucketHash === SUB_BUCKET), sn = sub && gearDefs[sub.itemHash]?.n;
+  renderGuardian(ch);
+  $('eyebrow').textContent = `${U.races[ch.raceType] || ''} ${cls} · ${member.name}`;
+  $('eyebrow').title = sn || '';
+  $('ghpw').hidden = false; $('pwv').textContent = ch.light; $('pwmax').textContent = mx && mx > ch.light ? `${U.max} ${mx}` : U.power;
   $('chars').innerHTML = Object.values(profile.characters.data).map(c => `<button class="char" type="button" data-char="${c.characterId}" aria-pressed="${c.characterId === charId}">${esc(U.classes[c.classType])}<span class="pw">${c.light}</span></button>`).join('');
   $('chars').hidden = Object.keys(profile.characters.data).length < 2;
   $('tabs').innerHTML = GROUPS.map(g => `<button class="tab" type="button" data-group="${g.id}" aria-current="${groupOf(tab)?.id === g.id}">${esc(U.tabs[g.id])}</button>`).join('');
