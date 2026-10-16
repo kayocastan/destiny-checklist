@@ -226,7 +226,7 @@ async function loadAccount() {
   let hydrated = false;
   const url = k => `/Destiny2/${member.type}/Profile/${member.id}/?components=${PARTS[k]}`;
   const onPart = (k, r) => {
-    Object.assign(live, r); got[k] = true;
+    const ic = live.itemComponents; Object.assign(live, r); if (ic && r.itemComponents) live.itemComponents = { ...ic, ...r.itemComponents }; got[k] = true;
     if (usingCache) return; // troca tudo de uma vez quando as 3 partes chegarem
     profile = live; have = { ...got };
     if (!pickChar()) return;
