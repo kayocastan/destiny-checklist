@@ -88,3 +88,7 @@ body{background:radial-gradient(900px 420px at 50% -120px,color-mix(in srgb,var(
 .g{flex:none}.gear{overflow:hidden}.title-actions{flex:none}
 @media (max-width:400px){.gh-strip{padding-inline:8px;gap:6px}.gear .g img{width:28px;height:28px}}
 @media (max-width:400px){.gh .ldtoggle{font-size:14.5px;padding:6px 8px}.gh .langtoggle{font-size:12px;padding:7px 7px}.gh .themetoggle{width:32px;height:32px}.gear{gap:5px}}
+section.collapsed .sec-head{padding-block:10px 9px;gap:5px}
+section.collapsed h2{font-size:18px;line-height:1.2}
+section.collapsed .sec-bar{height:3px}
+.panel:has(section.collapsed){gap:10px}
