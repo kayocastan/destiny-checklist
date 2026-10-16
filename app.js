@@ -128,7 +128,7 @@ function login() {
   try { sessionStorage.setItem('dc-state', st); } catch {}
   location.href = `https://www.bungie.net/${lang === 'pt' ? 'pt-br' : 'en'}/OAuth/Authorize?client_id=${encodeURIComponent(cfg.clientId)}&response_type=code&state=${st}`;
 }
-function logout() { if (member) idbDel('profile-' + member.id); LS.del('dc-auth'); LS.del('dc-member'); auth = null; profile = null; member = null; render(); }
+function logout() { if (member) idbDel('profile-' + member.id); LS.del('dc-auth'); LS.del('dc-member'); LS.del('dc-el'); auth = null; profile = null; member = null; render(); }
 async function token() {
   if (!auth) throw new Error('auth');
   if (auth.access_expires - Date.now() > 60000) return auth.access_token;
@@ -185,9 +185,13 @@ async function idbDel(k) { try { const db = await idb(); db.transaction('kv', 'r
 /* ---------- leitura do perfil ----------
    O perfil vem em 3 partes em paralelo, da mais leve para a mais pesada, e a tela é desenhada
    conforme cada parte chega. Se houver uma cópia da última visita, ela aparece na hora. */
-// q: missões e contratos (prioridade) · a: coleções e métricas · b: triunfos · c: equipamentos e loadouts
-const PARTS = { q: '200,201,301', a: '100,200,800,1100', b: '900', c: '102,201,205,206,300' }; // 201 também em c: a Bungie só manda instâncias (300) dos itens incluídos na mesma resposta
-let have = { q: false, a: false, b: false, c: false };
+// id: personagens e equipados (cabeçalho e cor da subclasse, sempre primeiro) · q: missões e contratos
+// a: coleções e métricas · b: triunfos · c: inventário, instâncias e loadouts
+// 201 também em c: a Bungie só manda instâncias (300) dos itens incluídos na mesma resposta
+const PARTS = { id: '200,205', q: '201,301', a: '100,800,1100', b: '900', c: '102,201,205,206,300' };
+// parte de que cada aba depende: ela é pedida logo depois do cabeçalho
+const TAB_PART = { obj: 'q', camp: 'q', raid: 'a', dg: 'a', exo: 'a', cat: 'b', tit: 'b', ld: 'c' };
+let have = { id: false, q: false, a: false, b: false, c: false };
 function pickChar() {
   const chars = Object.values(profile.characters?.data || {});
   if (!chars.length) return false;
@@ -217,32 +221,37 @@ async function loadAccount() {
   if (!profile) {
     const cached = await idbGet('profile-' + member.id);
     if (cached?.p?.characters) {
-      profile = cached.p; have = { q: true, a: true, b: true, c: true }; usingCache = true;
-      if (pickChar()) { loadedAt = new Date(cached.t); build(); render(); status(u().cached(loadedAt.toLocaleTimeString(lang === 'pt' ? 'pt-BR' : 'en-US', { hour: '2-digit', minute: '2-digit' }))); }
+      profile = cached.p; have = { id: true, q: true, a: true, b: true, c: true }; usingCache = true;
+      if (pickChar()) { loadedAt = new Date(cached.t); hydrate(u().cached(loadedAt.toLocaleTimeString(lang === 'pt' ? 'pt-BR' : 'en-US', { hour: '2-digit', minute: '2-digit' }))); }
     } else showMessage(`<p class="loading">${esc(u().loading)}</p>`);
   } else usingCache = true;
   // 2) dados ao vivo, em 3 partes
-  const live = {}, got = { q: false, a: false, b: false, c: false };
+  const live = {}, got = { id: false, q: false, a: false, b: false, c: false };
   let hydrated = false;
+  const need = TAB_PART[tab] || 'q';
   const url = k => `/Destiny2/${member.type}/Profile/${member.id}/?components=${PARTS[k]}`;
   const onPart = (k, r) => {
     const ic = live.itemComponents; Object.assign(live, r); if (ic && r.itemComponents) live.itemComponents = { ...ic, ...r.itemComponents }; got[k] = true;
     if (usingCache) return; // troca tudo de uma vez quando as 3 partes chegarem
     profile = live; have = { ...got };
-    if (!pickChar()) return;
+    if (!got.id || !pickChar()) return;
     loadedAt = new Date();
-    if (got.q && !hydrated) { hydrated = true; hydrate(); }
+    if (got.q && got[need] && !hydrated) { hydrated = true; hydrate(); return; }
+    if (k === 'id') { build(); render(); loadGear(gen); }
     else if (k === 'c' && hydrated) loadLoadouts(gen);
     else { build(); render(); }
   };
-  const results = await Promise.allSettled(['q', 'a', 'b', 'c'].map(k => bungie(url(k)).then(r => onPart(k, r))));
+  // ordem: cabeçalho, a parte da aba aberta, e o resto
+  const order = ['id', need, ...['q', 'a', 'b', 'c'].filter(k => k !== need)];
+  const results = await Promise.allSettled(order.map(k => bungie(url(k)).then(r => onPart(k, r))));
   const failed = results.find(r => r.status === 'rejected');
   if (failed) {
     if (failed.reason?.message === 'auth') throw failed.reason;
-    if (!got.q && !got.a && !usingCache) { LS.del('dc-member'); throw failed.reason; }
+    if (!got.id && !usingCache) { LS.del('dc-member'); throw failed.reason; }
   }
+  if (!hydrated && got.id && got.q && !usingCache && pickChar()) { hydrated = true; hydrate(); }
   if (!Object.values(got).every(Boolean)) { if (!usingCache) throw failed?.reason || new Error('profile'); status(u().apiError(failed?.reason?.message || '')); return; }
-  profile = live; have = { q: true, a: true, b: true, c: true };
+  profile = live; have = { id: true, q: true, a: true, b: true, c: true };
   if (!pickChar()) { showMessage(`<p class="notice">${esc(u().noChars)}</p>`); return; }
   loadedAt = new Date();
   idbSet('profile-' + member.id, { t: Date.now(), p: live });
@@ -290,10 +299,11 @@ const questWhere = x => questLoc[x.it.itemHash] || guessLoc(x.q.d);
    e os locais por último. Cada etapa redesenha a tela sem perder aba, itens abertos ou busca. */
 let gen = 0, stage = 0;
 const updatedText = () => u().updated(loadedAt.toLocaleTimeString(lang === 'pt' ? 'pt-BR' : 'en-US', { hour: '2-digit', minute: '2-digit' }));
-async function hydrate() {
+async function hydrate(doneMsg) {
   const my = ++gen, p = profile;
   stage = 0; questLoc = {};
   build(); render();
+  await loadGear(my); if (my !== gen) return; // cabeçalho e cor primeiro
   status(u().loadingDefs);
   const quests = [];
   for (const inv of Object.values(p.characterInventories?.data || {})) for (const it of inv.items || []) if (it.bucketHash === QUEST_BUCKET) quests.push(it.itemHash);
@@ -306,7 +316,7 @@ async function hydrate() {
   status(u().loadingPlaces);
   await prepareLocations(quests.map(h => qEn[h]).filter(Boolean)); if (my !== gen) return;
   stage = 2; build(); render();
-  status(updatedText());
+  status(doneMsg || updatedText());
 }
 /* Nomes dos loadouts e dos itens deles (precisa da parte de equipamentos). */
 async function loadLoadouts(my, quiet) {
@@ -315,15 +325,18 @@ async function loadLoadouts(my, quiet) {
   const ln = await entities('DestinyLoadoutNameDefinition', ldNames, lang); if (my !== gen) return;
   const it = await entities('DestinyInventoryItemDefinition', ldItems, lang); if (my !== gen) return;
   loadoutNames = ln; itemNames = it;
-  const eq = (p.characterEquipment?.data?.[charId]?.items || []).filter(i => GEAR_BUCKETS.includes(i.bucketHash)).map(i => i.itemHash);
-  const gd = await entities('DestinyInventoryItemDefinition', eq, lang); if (my !== gen) return;
-  gearDefs = gd;
   if (!quiet) { build(); render(); }
 }
 /* Identidade do personagem: subclasse e exóticos equipados (cor de destaque = elemento da subclasse) */
 const SUB_BUCKET = 3284755031, GEAR_BUCKETS = [3284755031, 1498876634, 2465295065, 953998645, 3448274439, 3551918588, 14239492, 20886954, 1585787867];
 const ELEMENTS = { 1: 'prismatic', 2: 'arc', 3: 'solar', 4: 'void', 6: 'stasis', 7: 'strand' };
 const BNET = 'https://www.bungie.net';
+async function loadGear(my) {
+  const eq = (profile.characterEquipment?.data?.[charId]?.items || []).filter(i => GEAR_BUCKETS.includes(i.bucketHash)).map(i => i.itemHash);
+  if (!eq.length) return;
+  const gd = await entities('DestinyInventoryItemDefinition', eq, lang); if (my !== gen) return;
+  gearDefs = gd; render();
+}
 function renderGuardian(ch) {
   const gh = $('gh');
   if (!ch) { gh.classList.add('noemb'); $('ghband').style.backgroundImage = ''; $('gear').innerHTML = ''; $('ghpw').hidden = true; delete document.documentElement.dataset.el; return; }
@@ -333,7 +346,7 @@ function renderGuardian(ch) {
   const sub = eq.find(i => i.bucketHash === SUB_BUCKET), sd = sub && gearDefs[sub.itemHash];
   const exo = eq.filter(i => i.bucketHash !== SUB_BUCKET && gearDefs[i.itemHash]?.tt === 6).map(i => gearDefs[i.itemHash]);
   const el = sd ? ELEMENTS[sd.dt] : null;
-  if (el) document.documentElement.dataset.el = el; else delete document.documentElement.dataset.el;
+  if (el) { document.documentElement.dataset.el = el; LS.set('dc-el', el); } else if (sd) delete document.documentElement.dataset.el;
   const g = (d, cls) => d && d.ic ? `<span class="g${cls}" title="${esc(d.n)}"><img src="${BNET}${d.ic}" alt="" loading="lazy"><span>${esc(d.n)}</span></span>` : '';
   $('gear').innerHTML = g(sd, ' g-sub') + exo.map(d => g(d, '')).join('');
   return el;
