@@ -186,7 +186,7 @@ async function idbDel(k) { try { const db = await idb(); db.transaction('kv', 'r
    O perfil vem em 3 partes em paralelo, da mais leve para a mais pesada, e a tela é desenhada
    conforme cada parte chega. Se houver uma cópia da última visita, ela aparece na hora. */
 // q: missões e contratos (prioridade) · a: coleções e métricas · b: triunfos · c: equipamentos e loadouts
-const PARTS = { q: '200,201,301', a: '100,200,800,1100', b: '900', c: '102,205,206,300' };
+const PARTS = { q: '200,201,301', a: '100,200,800,1100', b: '900', c: '102,201,205,206,300' }; // 201 também em c: a Bungie só manda instâncias (300) dos itens incluídos na mesma resposta
 let have = { q: false, a: false, b: false, c: false };
 function pickChar() {
   const chars = Object.values(profile.characters?.data || {});
