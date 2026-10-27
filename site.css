@@ -331,3 +331,16 @@ section.vend.collapsed .sec-head{border-bottom:0}
 .cmp-leg .lg.miss{box-shadow:inset 0 0 0 1.5px #e0566a}
 .cmp-leg .lg.same{width:auto;font-family:var(--mono);color:#5cc487;box-shadow:none}
 .fd-hero .cmp{background:#0f1420}
+/* Barra de ações na build de outro jogador: comparar, DIM e imagem alinhados */
+.fd-act{display:flex;gap:8px;align-items:center;padding:12px 14px 0}
+.fd-act-k{margin-right:auto;font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#8f9bb0}
+.fd-ib{display:inline-grid;grid-auto-flow:column;place-items:center;gap:6px;height:36px;min-width:36px;padding:0 10px;border-radius:9px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#e6ebf2;cursor:pointer;text-decoration:none;font:600 12px/1 var(--mono);letter-spacing:.06em;box-sizing:border-box}
+.fd-ib:hover{background:rgba(255,255,255,.12);border-color:color-mix(in srgb,var(--a1) 60%,transparent)}
+.fd-ib:focus-visible{outline:2px solid var(--a2);outline-offset:2px}
+.fd-ib.fd-cmpbtn,.fd-ib.fd-cam{padding:0;width:36px}
+.fd-ib.fd-cmpbtn[aria-pressed="true"]{background:color-mix(in srgb,var(--a1) 22%,transparent);border-color:var(--a1);color:#fff}
+.fd-ib.fd-cam{background:linear-gradient(90deg,var(--a1),var(--a2));border:0;color:#0d121c}
+.fd-build .b-top{display:none}
+.fd-build{padding-top:10px}
+.fd-act .fd-dim{margin-left:0;padding:0 10px}
+.cmp-leg .li{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}.cmp-leg .lg{margin-right:0}
