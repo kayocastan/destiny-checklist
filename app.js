@@ -160,7 +160,7 @@ function login() {
   try { sessionStorage.setItem('dc-state', st); } catch {}
   location.href = `https://www.bungie.net/${lang === 'pt' ? 'pt-br' : 'en'}/OAuth/Authorize?client_id=${encodeURIComponent(cfg.clientId)}&response_type=code&state=${st}`;
 }
-function logout() { XUR = null; GD = null; BUILD = null; buildOpen = false; if (member) idbDel('profile-' + member.id); LS.del('dc-auth'); LS.del('dc-member'); LS.del('dc-el'); auth = null; profile = null; member = null; render(); }
+function logout() { resetChar(); buildOpen = false; if (member) idbDel('profile-' + member.id); LS.del('dc-auth'); LS.del('dc-member'); LS.del('dc-el'); auth = null; profile = null; member = null; render(); }
 async function token() {
   if (!auth) throw new Error('auth');
   if (auth.access_expires - Date.now() > 60000) return auth.access_token;
@@ -262,9 +262,11 @@ async function loadAccount() {
   let hydrated = false;
   const need = TAB_PART[tab] || 'q';
   const url = k => `/Destiny2/${member.type}/Profile/${member.id}/?components=${PARTS[k]}`;
+  const merge = (dst, r) => { const ic = dst.itemComponents; Object.assign(dst, r); if (ic && r.itemComponents) { const m = { ...ic }; for (const [c, v] of Object.entries(r.itemComponents)) m[c] = { ...ic[c], ...v, data: { ...ic[c]?.data, ...v?.data } }; dst.itemComponents = m; } };
   const onPart = (k, r) => {
-    const ic = live.itemComponents; Object.assign(live, r); if (ic && r.itemComponents) { const m = { ...ic }; for (const [c, v] of Object.entries(r.itemComponents)) m[c] = { ...ic[c], ...v, data: { ...ic[c]?.data, ...v?.data } }; live.itemComponents = m; } got[k] = true;
-    if (usingCache) return; // troca tudo de uma vez quando as 3 partes chegarem
+    merge(live, r); got[k] = true;
+    // Com a cópia da última visita na tela: o cabeçalho, a aba aberta e a build já trocam pelos dados novos; o resto troca de uma vez no fim
+    if (usingCache) { if ((k === 'id' || k === need || k === 'g') && profile) { merge(profile, r); if (pickChar()) { if (k === 'id') { build(); render(); loadGear(gen); } else if (k === 'g') loadBuild(gen); else { build(); render(); } } } return; }
     profile = live; have = { ...got };
     if (!got.id || !pickChar()) return;
     loadedAt = new Date();
@@ -275,7 +277,7 @@ async function loadAccount() {
     else { build(); render(); if (k === 'a' && hydrated) { loadMilestones(gen); if (tab === 'gd') loadGuardian(gen); } }
   };
   // ordem: cabeçalho, a parte da aba aberta, e o resto
-  const order = ['id', need, ...['q', 'a', 'b', 'c', 'g'].filter(k => k !== need)];
+  const order = ['id', need, 'g', ...['q', 'a', 'b', 'c'].filter(k => k !== need)];
   const results = await Promise.allSettled(order.map(k => bungie(url(k)).then(r => onPart(k, r))));
   const failed = results.find(r => r.status === 'rejected');
   if (failed) {
@@ -337,7 +339,8 @@ async function hydrate(doneMsg) {
   stage = 0; questLoc = {};
   build(); render();
   await loadGear(my); if (my !== gen) return; // cabeçalho e cor primeiro
-  XUR = null; GD = null; loadXur(my); if (have.g) loadBuild(my); if (have.a) loadMilestones(my); if (tab === 'gd' && have.a) loadGuardian(my);
+  GD = null; if (have.g) loadBuild(my); loadXur(my); if (have.a) loadMilestones(my); if (tab === 'gd' && have.a) loadGuardian(my);
+  if (!weekT) weekT = setTimeout(() => { weekReady.x = weekReady.m = true; renderWeek(); }, 6000);
   status(u().loadingDefs);
   const quests = [];
   for (const inv of Object.values(p.characterInventories?.data || {})) for (const it of inv.items || []) if (it.bucketHash === QUEST_BUCKET) quests.push(it.itemHash);
@@ -547,6 +550,8 @@ const AMMO = {};
 const AMMO_COLOR = { 1: '#f2f4f7', 2: '#7fe08f', 3: '#b98cff' };
 const AMMO_PATH = 'M5 14V6.2L8 2l3 4.2V14z';
 const ammoSVG = t => AMMO_COLOR[t] ? `<svg viewBox="0 0 ${t * 7 + 3} 16" height="16" aria-hidden="true">${Array.from({ length: t }, (_, k) => `<path transform="translate(${k * 7 - 3.5} 0)" d="${AMMO_PATH}" fill="${AMMO_COLOR[t]}"/>`).join('')}</svg>` : '';
+let weekReady = { x: false, m: false }, weekT = null;
+function resetChar() { XUR = null; MSN = {}; BUILD = null; GD = null; weekReady = { x: false, m: false }; clearTimeout(weekT); weekT = null; }
 let XUR = null, MSN = {}, BUILD = null, buildOpen = false, GD = null, gdLoading = false;
 const rtf = () => { try { return new Intl.RelativeTimeFormat(lang === 'pt' ? 'pt-BR' : 'en', { numeric: 'auto' }); } catch { return null; } };
 function nextReset() { const d = new Date(); d.setUTCHours(17, 0, 0, 0); while (d.getUTCDay() !== 2 || d <= Date.now()) d.setUTCDate(d.getUTCDate() + 1); return d.getTime(); }
@@ -563,7 +568,7 @@ async function loadXur(my) {
     const loc = lang === 'pt' ? await entities('DestinyInventoryItemDefinition', hs, 'pt') : en; if (my !== gen) return;
     XUR = { until: r.vendor?.data?.nextRefreshDate || null, items: sales.filter(s => en[s.itemHash]?.tt === 6).map(s => ({ en: en[s.itemHash].n, n: loc[s.itemHash]?.n || en[s.itemHash].n, cost: (s.costs || []).find(c => c.itemHash === STRANGE_COIN)?.quantity || 0 })) };
   } catch { XUR = null; }
-  if (my === gen) renderWeek();
+  if (my === gen) { weekReady.x = true; renderWeek(); }
 }
 const coins = () => { let n = 0; for (const it of profile.profileInventory?.data?.items || []) if (it.itemHash === STRANGE_COIN) n += it.quantity || 0; for (const it of profile.profileCurrencies?.data?.items || []) if (it.itemHash === STRANGE_COIN) n += it.quantity || 0; return n; };
 function xurMissing() {
@@ -573,9 +578,9 @@ function xurMissing() {
 }
 /* Rotação: incursões e masmorras com desafios ativos nos marcos do personagem */
 async function loadMilestones(my) {
-  const ms = profile.characterProgressions?.data?.[charId]?.milestones; if (!ms) return;
+  const ms = profile.characterProgressions?.data?.[charId]?.milestones; if (!ms) { weekReady.m = true; renderWeek(); return; }
   const d = await entities('DestinyMilestoneDefinition', Object.keys(ms).map(Number), 'en'); if (my !== gen) return;
-  MSN = d; build(); render();
+  MSN = d; weekReady.m = true; build(); render();
 }
 function featured() {
   const ms = profile.characterProgressions?.data?.[charId]?.milestones || {}, out = { raid: new Set(), dg: new Set(), ends: null };
@@ -598,7 +603,8 @@ function weekItems() {
 }
 function renderWeek() {
   const el = $('week'); if (!el) return;
-  WK = OPTS.week && auth && profile && have.id ? weekItems() : []; el.hidden = !WK.length;
+  // a faixa só aparece completa (Xûr e rotação já conferidos), para não crescer na frente da pessoa
+  WK = OPTS.week && auth && profile && have.id && weekReady.x && weekReady.m ? weekItems() : []; el.hidden = !WK.length;
   el.innerHTML = WK.length ? `<div class="week-k">${esc(u().w.week)}</div><div class="week-items">${WK.map((w, i) => `<button class="wk ${w.cls}" type="button" data-wk="${i}"${w.to ? '' : ' tabindex="-1"'}><span class="wk-ic" aria-hidden="true">${w.ic}</span><span class="wk-t">${esc(w.t)}</span><span class="wk-s">${esc(w.s)}</span></button>`).join('')}</div>` : '';
 }
 function jumpTo(t, id) { go(t); requestAnimationFrame(() => { const sec = document.querySelector(`[data-sec="${id}"]`); if (!sec) return; const h = sec.querySelector('.sec-head[data-coll]'); if (h && sec.classList.contains('collapsed')) toggleSec(h); sec.scrollIntoView({ behavior: 'smooth', block: 'start' }); }); }
@@ -831,7 +837,7 @@ function gdHTML() {
     ${RANK_PROGS.map(h => { const x = cp?.progressions?.[h]; const n = G?.names?.[h]?.n; return x && n && (x.level || x.currentProgress) ? st(x.level, n, x.nextLevelAt ? pc(x.progressToNextLevel, x.nextLevelAt) : null) : ''; }).join('')}</div>`}</article>`;
   const rows = (kind, list) => { const done = list.filter(a => metric(a.m) > 0).sort((a, b) => metric(b.m) - metric(a.m)), z = list.length - done.length; return done.map(a => `<tr><td>${esc((kind === 'dg' ? W.dgW : W.raidW) + ' ' + L(a.n))}</td><td class="n">${fmtN(metric(a.m))}</td></tr>`).join('') + (z ? `<tr><td class="z">${esc(W.others(kind, z, done.length))}</td><td class="n z">${esc(W.noneYet)}</td></tr>` : ''); };
   const clears = `<article class="gd"><div class="gd-head"><h2>${esc(W.clearsT)}</h2></div>${!have.a ? wait : `<div class="gd-grid">${COUNT_METRICS.map(h => G?.metricNames?.[h]?.n ? st(fmtN(metric(h)), G.metricNames[h].n) : '').join('')}</div><table>${rows('dg', defs.dungeons)}${rows('raid', defs.raids)}</table>`}</article>`;
-  const wp = `<article class="gd"><div class="gd-head"><h2>${esc(W.wpnT)}</h2></div><p>${esc(W.wpnNote)}</p>${!G ? wait : G.weapons?.length ? `<table>${G.weapons.map(w => `<tr><td class="wn">${w.ic ? `<img src="${BNET}${w.ic}" alt="" loading="lazy">` : ''}${esc(w.n)}</td><td class="n">${fmtN(w.k)} ${esc(W.kills)}</td><td class="n z">${Math.round(w.p <= 1 ? w.p * 100 : w.p)}% ${esc(W.prec)}</td></tr>`).join('')}</table>` : `<p>${esc(W.unavailable)}</p>`}</article>`;
+  const wp = `<article class="gd"><div class="gd-head"><h2>${esc(W.wpnT)}</h2></div><p>${esc(W.wpnNote)}</p>${!G ? wait : G.weapons?.length ? `<table>${G.weapons.map(w => `<tr><td class="wn">${w.ic ? `<img src="${BNET}${w.ic}" alt="" loading="lazy">` : ''}${esc(w.n)}</td><td class="n">${fmtN(w.k)} ${esc(W.kills)}<small>${Math.round(w.p <= 1 ? w.p * 100 : w.p)}% ${esc(W.prec)}</small></td></tr>`).join('')}</table>` : `<p>${esc(W.unavailable)}</p>`}</article>`;
   const c = G?.comm;
   const comm = `<article class="gd"><div class="gd-head"><h2>${esc(W.commT)}</h2></div>${!G ? wait : c ? `<div class="gd-grid">${st(fmtN(c.totalScore), W.commScore)}${Object.entries(c.commendationNodePercentagesByHash || {}).filter(([h]) => G.commNames[h]?.n).sort((a, b) => b[1] - a[1]).map(([h, v]) => st(v + '%', G.commNames[h].n, v)).join('')}</div>` : `<p>${esc(W.unavailable)}</p>`}</article>`;
   const r = rtf(), ago = t => t && r ? (() => { const d = (t - Date.now()) / 1000; const a = Math.abs(d); return a < 3600 ? r.format(Math.round(d / 60), 'minute') : a < 86400 ? r.format(Math.round(d / 3600), 'hour') : r.format(Math.round(d / 86400), 'day'); })() : '';
@@ -947,7 +953,7 @@ function filter() {
 function go(t) { tab = t; const g = groupOf(t); if (g) { lastSub[g.id] = t; LS.set('dc-subs', lastSub); } LS.set('dc-tab', t); render(); }
 $('tabs').addEventListener('click', e => { const b = e.target.closest('.tab'); if (!b) return; const g = GROUPS.find(x => x.id === b.dataset.group); go(lastSub[g.id] || g.subs[0]); });
 $('subtabs').addEventListener('click', e => { const b = e.target.closest('.sub'); if (b) go(b.dataset.sub); });
-$('chars').addEventListener('click', e => { const b = e.target.closest('.char'); if (!b || b.dataset.char === charId) return; charId = b.dataset.char; LS.set('dc-char-' + member.id, charId); hydrate(); });
+$('chars').addEventListener('click', e => { const b = e.target.closest('.char'); if (!b || b.dataset.char === charId) return; charId = b.dataset.char; LS.set('dc-char-' + member.id, charId); resetChar(); buildOpen && renderBuild(); hydrate(); });
 $('ldbtn').addEventListener('click', () => { if (tab === 'ld') go(prevTab || 'obj'); else { prevTab = tab; go('ld'); } });
 $('themebtn').addEventListener('click', () => { const t = curTheme() === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = t; LS.set('dc-theme', t); applyTheme(); });
 try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme); } catch {}

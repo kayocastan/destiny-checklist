@@ -187,3 +187,13 @@ dialog.sh:has(.sh-img){padding:0}
 .b-name>span:not(.ammo){flex:0 1 auto}
 .b-name small{margin-left:auto}
 .sh-err{padding-right:64px}.sh-err .sh-x{top:10px;right:10px}
+.gd td.n small{display:block;font-size:11.5px;color:var(--muted)}
+.gd td.wn{min-width:0;overflow-wrap:anywhere}
+.gd,.gd table{min-width:0;max-width:100%}
+.gd table{table-layout:auto}
+/* Celular: nada pode alargar a página (itens de grid usam min-width:auto = largura do conteúdo) */
+.wrap>*,header>*,.panel>*,.gh>*,.gh-band>*{min-width:0}
+.gd table{table-layout:fixed}
+.gd td.n{width:38%;white-space:normal}
+.b-name{flex-wrap:wrap;row-gap:2px}
+.b-name small{white-space:normal}
