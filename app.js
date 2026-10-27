@@ -138,6 +138,9 @@ let marks = new Set(), SECTIONS = [], LOADOUTS = [], loadedAt = null;
 const openSecs = new Set(), openItems = new Set();
 const GROUPS = [{ id: 'obj', subs: ['obj'] }, { id: 'act', subs: ['camp', 'raid', 'dg', 'tit'] }, { id: 'drops', subs: ['exo', 'cat'] }, { id: 'gd', subs: ['gd'] }];
 const groupOf = t => GROUPS.find(g => g.subs.includes(t));
+// aba salva que não existe mais (ex.: Padrões, que foi retirada) volta para Objetivos
+if (tab !== 'ld' && !groupOf(tab)) { tab = 'obj'; LS.set('dc-tab', 'obj'); }
+for (const [k, v] of Object.entries(lastSub)) if (!GROUPS.find(g => g.id === k)?.subs.includes(v)) delete lastSub[k];
 
 /* ---------- status ---------- */
 function status(msg) { $('status').textContent = msg || ''; }
@@ -1160,7 +1163,7 @@ function filter() {
 
 /* ---------- eventos ---------- */
 function go(t) { tab = t; const g = groupOf(t); if (g) { lastSub[g.id] = t; LS.set('dc-subs', lastSub); } LS.set('dc-tab', t); render(); }
-$('tabs').addEventListener('click', e => { const b = e.target.closest('.tab'); if (!b) return; const g = GROUPS.find(x => x.id === b.dataset.group); go(lastSub[g.id] || g.subs[0]); });
+$('tabs').addEventListener('click', e => { const b = e.target.closest('.tab'); if (!b) return; const g = GROUPS.find(x => x.id === b.dataset.group); go(g.subs.includes(lastSub[g.id]) ? lastSub[g.id] : g.subs[0]); });
 $('subtabs').addEventListener('click', e => { const b = e.target.closest('.sub'); if (b) go(b.dataset.sub); });
 $('chars').addEventListener('click', e => { if (e.target.closest('#findbtn')) { openFind(); return; } const b = e.target.closest('.char'); if (!b || b.dataset.char === charId) return; charId = b.dataset.char; LS.set('dc-char-' + member.id, charId); resetChar(); buildOpen && renderBuild(); hydrate(); });
 $('ldbtn').addEventListener('click', () => { if (tab === 'ld') go(prevTab || 'obj'); else { prevTab = tab; go('ld'); } });
