@@ -344,3 +344,4 @@ section.vend.collapsed .sec-head{border-bottom:0}
 .fd-build{padding-top:10px}
 .fd-act .fd-dim{margin-left:0;padding:0 10px}
 .cmp-leg .li{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}.cmp-leg .lg{margin-right:0}
+.fd-act .fd-ib.fd-cmpbtn,.fd-act .fd-ib.fd-cam{display:inline-grid;place-items:center;padding:0;width:36px;height:36px;gap:0}
