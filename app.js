@@ -1401,11 +1401,11 @@ function compareHTML(A, Bc) {
   const cell = (h, nm, ic, cls) => h ? `<span class="${cls}">${ic(h) ? `<img src="${BNET}${ic(h)}" alt="" loading="lazy">` : ''}${esc(nm(h))}</span>` : `<span class="${cls} none">—</span>`;
   const own = (h, kind) => { if (kind === 'na') return ''; const o = kind === 'plug' ? iOwnPlug(h) : iOwnItem(h); return o === true ? 'have' : o === false ? 'miss' : 'unk'; };
   const row = (ha, hb, kind, exA, exB) => {
-    if (ha && hb && ha === hb) return `<div class="cmp-row same">${cell(ha, nmA, icA, 'mine' + (exA ? ' ex' : ''))}${cell(hb, nmB, icB, 'theirs' + (exB ? ' ex' : ''))}</div>`;
+    if (ha && hb && (ha === hb || (nmA(ha) && nmA(ha) === nmB(hb)))) return `<div class="cmp-row same">${cell(ha, nmA, icA, 'mine' + (exA ? ' ex' : ''))}${cell(hb, nmB, icB, 'theirs' + (exB ? ' ex' : ''))}</div>`;
     return `<div class="cmp-row diff">${cell(ha, nmA, icA, 'mine' + (exA ? ' ex' : ''))}${cell(hb, nmB, icB, 'theirs ' + (hb ? own(hb, kind) : '') + (exB ? ' ex' : ''))}</div>`;
   };
   // alinha listas (aspectos, fragmentos): iguais primeiro, depois o resto lado a lado
-  const pairs = (la, lb) => { const same = la.filter(h => lb.includes(h)), ra = la.filter(h => !lb.includes(h)), rb = lb.filter(h => !la.includes(h)), out = same.map(h => [h, h]); for (let i = 0; i < Math.max(ra.length, rb.length); i++) out.push([ra[i] || 0, rb[i] || 0]); return out; };
+  const pairs = (la, lb) => { const k = h => nmA(h) || h, kb = h => nmB(h) || h, ka = la.map(k), kbl = lb.map(kb); const same = la.filter(h => kbl.includes(k(h))), ra = la.filter(h => !kbl.includes(k(h))), rb = lb.filter(h => !ka.includes(kb(h))), out = same.map(h => [h, lb[kbl.indexOf(k(h))]]); for (let i = 0; i < Math.max(ra.length, rb.length); i++) out.push([ra[i] || 0, rb[i] || 0]); return out; };
   const grp = (t, rows) => rows ? `<div class="cmp-r"><div class="cmp-k">${esc(t)}</div>${rows}</div>` : '';
   const exW = (C, h) => C.B.en[h]?.tt === 6;
   const chA = A.p.characters.data[A.cid], chB = Bc.p.characters.data[Bc.cid];
