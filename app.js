@@ -558,6 +558,14 @@ const COUNT_METRICS = [740213466, 2959623395, 26751835, 3264536674];
 const OPTS = Object.assign({ week: true, clears: true, build: true }, LS.get('dc-opts', {}));
 const ARTIFACT_BUCKET = 1506418338;
 const AMMO = {};
+/* Dados de item que não mudam (munição, conjunto de armadura, coleção): uma busca por item, guardada neste navegador.
+   Antes cada build buscava de novo, e várias builds ao mesmo tempo repetiam a mesma busca. */
+const IDEF = LS.get('dc-idef1', {}), IDEF_P = new Map(); let idefT = null;
+function idef(h) {
+  if (IDEF[h]) return Promise.resolve(IDEF[h]);
+  if (!IDEF_P.has(h)) IDEF_P.set(h, bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${h}/`, false).then(d => { IDEF[h] = { a: d.equippingBlock?.ammoType || 0, s: d.equippingBlock?.equipableItemSetHash || 0, c: d.collectibleHash || 0 }; clearTimeout(idefT); idefT = setTimeout(() => { try { LS.set('dc-idef1', IDEF); } catch {} }, 500); return IDEF[h]; }).catch(() => ({ a: 0, s: 0, c: 0 })));
+  return IDEF_P.get(h);
+}
 /* Tipo de munição: 1 primária (branca), 2 especial (verde), 3 pesada (roxa) */
 const AMMO_COLOR = { 1: '#f2f4f7', 2: '#7fe08f', 3: '#b98cff' };
 const AMMO_PATH = 'M5 14V6.2L8 2l3 4.2V14z';
@@ -668,7 +676,7 @@ async function fetchBuild(p, cid) {
   const en = await entities('DestinyInventoryItemDefinition', all, 'en');
   const loc = lang === 'pt' ? await entities('DestinyInventoryItemDefinition', all, 'pt') : en;
   const wh = eq.filter(i => [1498876634, 2465295065, 953998645].includes(i.bucketHash)).map(i => i.itemHash).filter(h => AMMO[h] == null);
-  await Promise.all(wh.map(h => bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${h}/`, false).then(d => { AMMO[h] = d.equippingBlock?.ammoType || 0; }).catch(() => {})));
+  await Promise.all(wh.map(h => idef(h).then(d => { AMMO[h] = d.a; })));
   // artefato: desde Monumento do Triunfo é um item equipado (7 artefatos para escolher); as vantagens escolhidas são os encaixes dele
   const ai = eq.find(i => i.bucketHash === ARTIFACT_BUCKET);
   const artPerks = ai ? (sk[ai.itemInstanceId]?.sockets || []).map(x => x.plugHash).filter(h => h && en[h]?.n && !SKIP_NAME.test(en[h].n) && !/Empty|Default/i.test(en[h].n)) : [];
@@ -679,15 +687,20 @@ async function loadBuild(my) {
   BUILD = b; if (buildOpen) renderBuild(); if (FD.cmp) renderFind();
 }
 /* Bônus de conjunto da armadura: conta as peças equipadas de cada conjunto e marca os bônus ativos */
-const SETOF = {}, SETDEF = {};
+const SETOF = {}, SETDEF = LS.get('dc-sets1', {}), SETDEF_P = new Map();
+function setDef(h, lc) {
+  const key = h + ':' + lc;
+  if (!SETDEF_P.has(key)) SETDEF_P.set(key, (async () => { try { const d = await bungie(`/Destiny2/Manifest/DestinyEquipableItemSetDefinition/${h}/?lc=${lc}`, false); const perks = await Promise.all((d.setPerks || []).map(p => bungie(`/Destiny2/Manifest/DestinySandboxPerkDefinition/${p.sandboxPerkHash}/?lc=${lc}`, false).then(sp => ({ c: p.requiredSetCount, n: sp.displayProperties?.name || '', d: sp.displayProperties?.description || '', ic: sp.displayProperties?.icon || '' })).catch(() => null))); const v = { n: d.displayProperties?.name || '', perks: perks.filter(Boolean).sort((a, b) => a.c - b.c) }; SETDEF[key] = v; try { LS.set('dc-sets1', SETDEF); } catch {} return v; } catch { SETDEF_P.delete(key); return null; } })());
+  return SETDEF_P.get(key);
+}
 async function armorSets(eq) {
   const lc = lang === 'pt' ? 'pt-br' : 'en', arm = eq.filter(i => [3448274439, 3551918588, 14239492, 20886954, 1585787867].includes(i.bucketHash));
-  await Promise.all(arm.filter(i => SETOF[i.itemHash] === undefined).map(i => bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${i.itemHash}/`, false).then(d => { SETOF[i.itemHash] = d.equippingBlock?.equipableItemSetHash || 0; }).catch(() => { SETOF[i.itemHash] = 0; })));
+  await Promise.all(arm.filter(i => SETOF[i.itemHash] === undefined).map(i => idef(i.itemHash).then(d => { SETOF[i.itemHash] = d.s; })));
   const count = {}; for (const i of arm) { const h = SETOF[i.itemHash]; if (h) count[h] = (count[h] || 0) + 1; }
   const out = [];
   for (const [h, n] of Object.entries(count)) {
     const key = h + ':' + lc;
-    if (!SETDEF[key]) { try { const d = await bungie(`/Destiny2/Manifest/DestinyEquipableItemSetDefinition/${h}/?lc=${lc}`, false); const perks = await Promise.all((d.setPerks || []).map(p => bungie(`/Destiny2/Manifest/DestinySandboxPerkDefinition/${p.sandboxPerkHash}/?lc=${lc}`, false).then(sp => ({ c: p.requiredSetCount, n: sp.displayProperties?.name || '', d: sp.displayProperties?.description || '', ic: sp.displayProperties?.icon || '' })).catch(() => null))); SETDEF[key] = { n: d.displayProperties?.name || '', perks: perks.filter(Boolean).sort((a, b) => a.c - b.c) }; } catch { continue; } }
+    if (!SETDEF[key]) { const v = await setDef(h, lc); if (!v) continue; SETDEF[key] = v; }
     out.push({ n: SETDEF[key].n, count: n, perks: SETDEF[key].perks.map(p => ({ ...p, on: n >= p.c })) });
   }
   return out.sort((a, b) => b.count - a.count);
@@ -1017,7 +1030,7 @@ async function loadVendors(my) {
       const en = await entities('DestinyInventoryItemDefinition', all, 'en'), loc = lang === 'pt' ? await entities('DestinyInventoryItemDefinition', all, 'pt') : en;
       // coleção: só as armas e tonalizadores precisam (poucos itens)
       const need = hs.filter(h => (en[h]?.it === 3 || /Shader/.test(en[h]?.tl || '')) && COLL[h] === undefined);
-      await Promise.all(need.map(h => bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${h}/`, false).then(d => { COLL[h] = d.collectibleHash || 0; }).catch(() => { COLL[h] = 0; })));
+      await Promise.all(need.map(h => idef(h).then(d => { COLL[h] = d.c; })));
       const weapons = [], other = []; let sh = 0, shOwn = 0;
       for (const [i, x] of sales) {
         const e = en[x.itemHash], d = loc[x.itemHash]; if (!e?.n || !e.tl) continue;
@@ -1312,8 +1325,10 @@ let ldBusy = false;
 async function ensureLdCtx() {
   // só busca (e redesenha) se faltar algum; sem isso o desenho chamaria a busca de novo sem fim
   const miss = LOADOUTS.filter(l => !LDCTX[charId + ':' + l.i + ':' + lang]); if (ldBusy || !miss.length) return;
-  ldBusy = true; const my = gen; await Promise.all(miss.map(l => getLdCtx(l.i))); ldBusy = false;
-  if (my === gen && tab === 'ld') setTimeout(render, 0);
+  ldBusy = true; const my = gen; let t = null;
+  // cada loadout aparece assim que fica pronto, sem esperar os outros
+  await Promise.all(miss.map(l => getLdCtx(l.i).then(() => { if (my === gen && tab === 'ld' && !t) t = setTimeout(() => { t = null; render(); }, 120); })));
+  ldBusy = false;
 }
 function ldListHTML() {
   const W = u().w;
@@ -1468,7 +1483,7 @@ function iOwnItem(h) { const c = COLL[h]; if (c === undefined) return null; retu
 async function loadCmpOwnership() {
   const P = buildParts(fdCtx()), need = [...P.w, P.xa].filter(h => h && COLL[h] === undefined);
   if (!need.length) return;
-  await Promise.all(need.map(h => bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${h}/`, false).then(d => { COLL[h] = d.collectibleHash || 0; }).catch(() => { COLL[h] = 0; })));
+  await Promise.all(need.map(h => idef(h).then(d => { COLL[h] = d.c; })));
   if (FD.cmp) renderFind();
 }
 function compareHTML(A, Bc) {
