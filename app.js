@@ -345,7 +345,7 @@ async function hydrate(doneMsg) {
   stage = 0; questLoc = {};
   build(); render();
   await loadGear(my); if (my !== gen) return; // cabeçalho e cor primeiro
-  GD = null; VEND = null; VAULT = null; if (have.g) loadBuild(my); loadXur(my); if (have.a) loadVendors(my); if (have.a) loadMilestones(my); if (tab === 'gd' && have.a) loadGuardian(my);
+  GD = null; VAULT = null; if (have.g) loadBuild(my); loadXur(my); if (have.a) loadVendors(my); if (have.a) loadMilestones(my); if (tab === 'gd' && have.a) loadGuardian(my);
   if (!weekT) weekT = setTimeout(() => { weekReady.x = weekReady.m = true; if (my === gen) { build(); render(); } }, 6000);
   status(u().loadingDefs);
   const quests = [];
@@ -983,7 +983,7 @@ const VENDORS = [[672118013, 'Banshee-44'], [350061650, 'Ada-1']];
 let VEND = null, vendLoading = false;
 async function loadVendors(my) {
   if (vendLoading) return; vendLoading = true;
-  const out = [];
+  const out = [], cid = charId;
   await Promise.all(VENDORS.map(async ([vh, vname], vi) => {
     try {
       const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/Character/${charId}/Vendors/${vh}/?components=400,402,305`);
@@ -1012,7 +1012,7 @@ async function loadVendors(my) {
       out[vi] = { name: vname, until: r.vendor?.data?.nextRefreshDate, weapons, other, sh, shOwn };
     } catch { out[vi] = { name: vname, failed: true }; }
   }));
-  vendLoading = false; if (my !== gen) return;
+  vendLoading = false; if (cid !== charId) return;
   VEND = out.filter(Boolean); if (tab === 'obj') { build(); render(); }
 }
 const COLL = {};
