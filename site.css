@@ -380,3 +380,28 @@ section.vend.collapsed .sec-head{border-bottom:0}
 .cl-p.fav-p::before{background:#d9b84a}
 /* "Esta semana" recolhido: a descrição continua à mostra */
 section.wk-sec.collapsed:not(.q-open) .sec-head>p{display:block}
+/* aba Loadouts: cartões de build */
+.ld-intro{margin:0 2px;font-size:13.5px;color:var(--muted)}
+button.ldc{all:unset;box-sizing:border-box;cursor:pointer;width:100%;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--el,var(--acc));border-radius:10px;padding:12px 14px;display:grid;gap:10px;min-width:0}
+button.ldc:hover{border-color:var(--el,var(--acc))}
+button.ldc:focus-visible{outline:2px solid var(--arc);outline-offset:2px}
+.ldc-top{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center}
+.ldc-t small{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;color:var(--muted)}
+.ldc-t small b{color:var(--done);font-weight:500}
+.ldc-t h2{font-size:20px;line-height:1.15;overflow-wrap:anywhere}
+.ldc-top .chev{width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg)}
+.ldc-g{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.ldc-i{width:40px;height:40px;border-radius:7px;background:var(--chip);overflow:hidden;flex:none;box-shadow:inset 0 0 0 1px var(--line)}
+.ldc-i img{width:100%;height:100%;display:block}
+.ldc-i.ex{box-shadow:0 0 0 2px color-mix(in srgb,var(--exotic) 70%,transparent)}
+.ldc-i.sub{width:44px;height:44px;border-radius:50%;box-shadow:0 0 0 2px var(--el,var(--acc))}
+.ldc-n{flex-basis:100%;font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+/* exóticos: filtro da semana */
+.wkx{display:flex}
+.wkx-b{font-size:13px}
+.wkx-b[aria-pressed="true"]{border-color:var(--exotic);color:var(--exotic);background:color-mix(in srgb,var(--exotic) 12%,transparent)}
+/* salvar build */
+.fd-act .fd-ib.fd-save{display:inline-grid;place-items:center;padding:0;width:36px;height:36px;gap:0}
+.fd-ib.fd-save[aria-pressed="true"],.b-save[aria-pressed="true"]{color:#7fd0ff;border-color:rgba(127,208,255,.55)}
+.cl-p.sv-p::before{background:var(--arc)}
+@media (max-width:420px){.fd-act .fd-ib.fd-save{width:34px;height:34px}}
