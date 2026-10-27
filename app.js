@@ -1309,7 +1309,12 @@ async function copyLink(name, btn) {
 }
 /* aba Loadouts: cada loadout como um cartão da build */
 let ldBusy = false;
-async function ensureLdCtx() { if (ldBusy) return; ldBusy = true; const my = gen; await Promise.all(LOADOUTS.map(l => getLdCtx(l.i))); ldBusy = false; if (my === gen && tab === 'ld') render(); }
+async function ensureLdCtx() {
+  // só busca (e redesenha) se faltar algum; sem isso o desenho chamaria a busca de novo sem fim
+  const miss = LOADOUTS.filter(l => !LDCTX[charId + ':' + l.i + ':' + lang]); if (ldBusy || !miss.length) return;
+  ldBusy = true; const my = gen; await Promise.all(miss.map(l => getLdCtx(l.i))); ldBusy = false;
+  if (my === gen && tab === 'ld') setTimeout(render, 0);
+}
 function ldListHTML() {
   const W = u().w;
   return `<p class="ld-intro">${esc(W.ldNote)}</p>` + LOADOUTS.map(l => {
@@ -1373,7 +1378,7 @@ async function loadLdCtx(i) {
   add(profile.profileInventory?.data?.items); for (const v of Object.values(profile.characterInventories?.data || {})) add(v.items); for (const v of Object.values(profile.characterEquipment?.data || {})) add(v.items);
   const ORDER = [SUB_BUCKET, ...WEAPON_B, ...ARMOR_B], picked = [];
   (l.items || []).forEach((x, k) => { const it = all[x.itemInstanceId]; if (it) picked.push({ it, k, plugs: x.plugItemHashes || [] }); });
-  if (!picked.length) { FD.ldErr = true; return; }
+  if (!picked.length) { FD.ldErr = true; LDCTX[key] = { p: null, B: null, name: '' }; return; }
   const en = await entities('DestinyInventoryItemDefinition', picked.map(x => x.it.itemHash), 'en');
   const sk = profile.itemComponents?.sockets?.data || {}, items = [], sockets = {};
   for (const { it, k, plugs } of picked) {
