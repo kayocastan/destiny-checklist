@@ -18,8 +18,8 @@ const UI = {
     hide: 'Ocultar feitos', search: 'Buscar por nome ou origem', refresh: 'Atualizar', logout: 'Sair',
     disclaimer: 'Dados lidos da sua conta pela API oficial da Bungie. Este site não é afiliado à Bungie.',
     loadouts: 'Loadouts', checklist: 'Checklist',
-    tabs: { obj: 'Objetivos', camp: 'Campanhas', act: 'Atividades', drops: 'Drops' },
-    subs: { raid: 'Incursões', dg: 'Masmorras', tit: 'Títulos', exo: 'Exóticos', cat: 'Catalisadores' },
+    tabs: { obj: 'Objetivos', act: 'Atividades', drops: 'Drops', gd: 'Guardião' },
+    subs: { camp: 'Campanhas', raid: 'Incursões', dg: 'Masmorras', tit: 'Títulos', exo: 'Exóticos', cat: 'Catalisadores' },
     heroTitle: 'Seu checklist de Destiny 2', heroText: 'Entre com a sua conta Bungie.net para ver o que falta: exóticos, catalisadores, títulos, incursões, masmorras e campanhas, do mais fácil para o mais difícil.',
     heroList: ['O site só lê os seus dados; não altera nada no jogo.', 'Sua senha fica na Bungie; o site nunca vê.', 'As suas marcações ficam salvas neste navegador.'],
     login: 'Entrar com Bungie.net', notConfigured: 'O site ainda não foi configurado: faltam as chaves da Bungie nas variáveis de ambiente da Vercel.',
@@ -47,6 +47,18 @@ const UI = {
       tierNote: ['Fácil · solo', 'Médio · masmorras e um pouco de PvP', 'Difícil · incursão (6 jogadores)', 'Muito difícil · PvP competitivo e Grão-mestre', 'Evento · só com o evento ativo'],
     },
     chip: { 'Fácil': 'Fácil', 'Médio': 'Médio', 'Difícil': 'Difícil', 'Muito difícil': 'Muito difícil', 'Evento': 'Evento', 'Solo': 'Solo', 'Trio': 'Trio', '6': '6 jogadores', 'Exótico': 'Exótico', 'Mestre': 'Mestre' },
+    w: {
+      week: 'Esta semana', xurSells: n => `Xûr vende ${n}`, xurSub: (c, h, t) => `${c} moedas${h != null ? ` · você tem ${h}` : ''} · sai em ${t}`,
+      featured: 'Em destaque: ', missingEx: n => `${n} ainda falta`, untilReset: 'até o reset', reset: 'Reset semanal', resetSub: t => `em ${t} · terça, 14h (Brasília)`,
+      featWeek: 'Em destaque nesta semana', clears: n => n === 1 ? '1 conclusão' : `${n} conclusões`, showBuild: 'Ver a build equipada',
+      subclass: 'Subclasse', weapons: 'Armas', armor: 'Armadura e mods', aspects: 'Aspectos', frags: 'Fragmentos',
+      ranksT: 'Patentes e reputação', gRank: 'Patente de Guardião', pass: 'Passe',
+      clearsT: 'Conclusões', dgW: 'Masmorra', raidW: 'Incursão', others: (k, z, any) => k === 'dg' ? (any ? `Outras ${z} masmorras` : 'Masmorras') : (any ? `Outras ${z} incursões` : 'Incursões'), noneYet: 'nenhuma ainda',
+      wpnT: 'Armas que você mais usa', wpnNote: 'Abates e precisão com cada arma neste personagem, segundo a Bungie.', kills: 'abates', prec: 'precisão',
+      commT: 'Elogios', commScore: 'Pontuação de elogios', clanT: 'Clã', noClan: 'Você não está em um clã.', clanNote: n => n === 1 ? '1 pessoa do clã online agora.' : n ? `${n} pessoas do clã online agora.` : 'Ninguém do clã online agora.',
+      unavailable: 'Não deu para carregar agora. Tente Atualizar.',
+      optsT: 'Ajustes', optsNote: 'Ligue ou desligue as partes novas. Fica salvo neste navegador.', optWeek: 'Mostrar a faixa “Esta semana”', optClears: 'Mostrar conclusões nas incursões e masmorras', optBuild: 'Abrir a build ao tocar nos ícones do cabeçalho',
+    },
     openDim: 'Abrir no DIM', noLoadouts: 'Nenhum loadout salvo no jogo para este personagem.',
     toLight: 'Mudar para tema claro', toDark: 'Mudar para tema escuro', classes: ['Titã', 'Caçador', 'Arcano'], races: ['Humano', 'Despertado', 'Exo'], power: 'Poder', max: 'máx.', where: 'Onde',
   },
@@ -54,8 +66,8 @@ const UI = {
     hide: 'Hide done', search: 'Search by name or source', refresh: 'Refresh', logout: 'Sign out',
     disclaimer: 'Data read from your account through the official Bungie API. This site is not affiliated with Bungie.',
     loadouts: 'Loadouts', checklist: 'Checklist',
-    tabs: { obj: 'Objectives', camp: 'Campaigns', act: 'Activities', drops: 'Drops' },
-    subs: { raid: 'Raids', dg: 'Dungeons', tit: 'Titles', exo: 'Exotics', cat: 'Catalysts' },
+    tabs: { obj: 'Objectives', act: 'Activities', drops: 'Drops', gd: 'Guardian' },
+    subs: { camp: 'Campaigns', raid: 'Raids', dg: 'Dungeons', tit: 'Titles', exo: 'Exotics', cat: 'Catalysts' },
     heroTitle: 'Your Destiny 2 checklist', heroText: "Sign in with your Bungie.net account to see what's left: exotics, catalysts, titles, raids, dungeons and campaigns, from easiest to hardest.",
     heroList: ['The site only reads your data; it never changes anything in the game.', 'Your password stays with Bungie; the site never sees it.', 'Your checkmarks are saved in this browser.'],
     login: 'Sign in with Bungie.net', notConfigured: "The site isn't configured yet: the Bungie keys are missing from the Vercel environment variables.",
@@ -83,6 +95,18 @@ const UI = {
       tierNote: ['Easy · solo', 'Medium · dungeons and some PvP', 'Hard · raid (6 players)', 'Very hard · competitive PvP and Grandmaster', 'Event · only while the event is live'],
     },
     chip: { 'Fácil': 'Easy', 'Médio': 'Medium', 'Difícil': 'Hard', 'Muito difícil': 'Very hard', 'Evento': 'Event', 'Solo': 'Solo', 'Trio': 'Trio', '6': '6 players', 'Exótico': 'Exotic', 'Mestre': 'Master' },
+    w: {
+      week: 'This week', xurSells: n => `Xûr sells ${n}`, xurSub: (c, h, t) => `${c} coins${h != null ? ` · you have ${h}` : ''} · leaves in ${t}`,
+      featured: 'Featured: ', missingEx: n => `${n} still missing`, untilReset: 'until reset', reset: 'Weekly reset', resetSub: t => `in ${t} · Tuesday, 17:00 UTC`,
+      featWeek: 'Featured this week', clears: n => n === 1 ? '1 clear' : `${n} clears`, showBuild: 'Show the equipped build',
+      subclass: 'Subclass', weapons: 'Weapons', armor: 'Armor and mods', aspects: 'Aspects', frags: 'Fragments',
+      ranksT: 'Ranks and reputation', gRank: 'Guardian Rank', pass: 'Pass',
+      clearsT: 'Clears', dgW: 'Dungeon', raidW: 'Raid', others: (k, z, any) => k === 'dg' ? (any ? `Other ${z} dungeons` : 'Dungeons') : (any ? `Other ${z} raids` : 'Raids'), noneYet: 'none yet',
+      wpnT: 'Your most used weapons', wpnNote: 'Kills and precision with each weapon on this character, from Bungie.', kills: 'kills', prec: 'precision',
+      commT: 'Commendations', commScore: 'Commendation score', clanT: 'Clan', noClan: "You're not in a clan.", clanNote: n => n === 1 ? '1 clanmate online now.' : n ? `${n} clanmates online now.` : 'No clanmates online right now.',
+      unavailable: "Couldn't load this right now. Try Refresh.",
+      optsT: 'Settings', optsNote: 'Turn the new parts on or off. Saved in this browser.', optWeek: 'Show the “This week” strip', optClears: 'Show clears on raids and dungeons', optBuild: 'Open the build when tapping the header icons',
+    },
     openDim: 'Open in DIM', noLoadouts: 'No in-game loadouts saved for this character.',
     toLight: 'Switch to light theme', toDark: 'Switch to dark theme', classes: ['Titan', 'Hunter', 'Warlock'], races: ['Human', 'Awoken', 'Exo'], power: 'Power', max: 'max', where: 'Where',
   },
@@ -98,7 +122,7 @@ let charId = null, tab = LS.get('dc-tab', 'obj'), prevTab = 'obj', query = '';
 const lastSub = LS.get('dc-subs', {});
 let marks = new Set(), SECTIONS = [], LOADOUTS = [], loadedAt = null;
 const openSecs = new Set(), openItems = new Set();
-const GROUPS = [{ id: 'obj', subs: ['obj'] }, { id: 'camp', subs: ['camp'] }, { id: 'act', subs: ['raid', 'dg', 'tit'] }, { id: 'drops', subs: ['exo', 'cat'] }];
+const GROUPS = [{ id: 'obj', subs: ['obj'] }, { id: 'act', subs: ['camp', 'raid', 'dg', 'tit'] }, { id: 'drops', subs: ['exo', 'cat'] }, { id: 'gd', subs: ['gd'] }];
 const groupOf = t => GROUPS.find(g => g.subs.includes(t));
 
 /* ---------- status ---------- */
@@ -128,7 +152,7 @@ function login() {
   try { sessionStorage.setItem('dc-state', st); } catch {}
   location.href = `https://www.bungie.net/${lang === 'pt' ? 'pt-br' : 'en'}/OAuth/Authorize?client_id=${encodeURIComponent(cfg.clientId)}&response_type=code&state=${st}`;
 }
-function logout() { if (member) idbDel('profile-' + member.id); LS.del('dc-auth'); LS.del('dc-member'); LS.del('dc-el'); auth = null; profile = null; member = null; render(); }
+function logout() { XUR = null; GD = null; BUILD = null; buildOpen = false; if (member) idbDel('profile-' + member.id); LS.del('dc-auth'); LS.del('dc-member'); LS.del('dc-el'); auth = null; profile = null; member = null; render(); }
 async function token() {
   if (!auth) throw new Error('auth');
   if (auth.access_expires - Date.now() > 60000) return auth.access_token;
@@ -186,12 +210,12 @@ async function idbDel(k) { try { const db = await idb(); db.transaction('kv', 'r
    O perfil vem em 3 partes em paralelo, da mais leve para a mais pesada, e a tela é desenhada
    conforme cada parte chega. Se houver uma cópia da última visita, ela aparece na hora. */
 // id: personagens e equipados (cabeçalho e cor da subclasse, sempre primeiro) · q: missões e contratos
-// a: coleções e métricas · b: triunfos · c: inventário, instâncias e loadouts
+// a: coleções, métricas, marcos e elogios · b: triunfos · c: inventário, instâncias e loadouts · g: encaixes do equipamento (build)
 // 201 também em c: a Bungie só manda instâncias (300) dos itens incluídos na mesma resposta
-const PARTS = { id: '200,205', q: '201,301', a: '100,800,1100', b: '900', c: '102,201,205,206,300' };
+const PARTS = { id: '200,205', q: '201,301', a: '100,202,800,1100,1400', b: '900', c: '102,201,205,206,300', g: '205,300,305' };
 // parte de que cada aba depende: ela é pedida logo depois do cabeçalho
-const TAB_PART = { obj: 'q', camp: 'q', raid: 'a', dg: 'a', exo: 'a', cat: 'b', tit: 'b', ld: 'c' };
-let have = { id: false, q: false, a: false, b: false, c: false };
+const TAB_PART = { obj: 'q', camp: 'q', raid: 'a', dg: 'a', exo: 'a', cat: 'b', tit: 'b', ld: 'c', gd: 'a' };
+let have = { id: false, q: false, a: false, b: false, c: false, g: false };
 function pickChar() {
   const chars = Object.values(profile.characters?.data || {});
   if (!chars.length) return false;
@@ -221,17 +245,17 @@ async function loadAccount() {
   if (!profile) {
     const cached = await idbGet('profile-' + member.id);
     if (cached?.p?.characters) {
-      profile = cached.p; have = { id: true, q: true, a: true, b: true, c: true }; usingCache = true;
+      profile = cached.p; have = { id: true, q: true, a: true, b: true, c: true, g: true }; usingCache = true;
       if (pickChar()) { loadedAt = new Date(cached.t); hydrate(u().cached(loadedAt.toLocaleTimeString(lang === 'pt' ? 'pt-BR' : 'en-US', { hour: '2-digit', minute: '2-digit' }))); }
     } else showMessage(`<p class="loading">${esc(u().loading)}</p>`);
   } else usingCache = true;
   // 2) dados ao vivo, em 3 partes
-  const live = {}, got = { id: false, q: false, a: false, b: false, c: false };
+  const live = {}, got = { id: false, q: false, a: false, b: false, c: false, g: false };
   let hydrated = false;
   const need = TAB_PART[tab] || 'q';
   const url = k => `/Destiny2/${member.type}/Profile/${member.id}/?components=${PARTS[k]}`;
   const onPart = (k, r) => {
-    const ic = live.itemComponents; Object.assign(live, r); if (ic && r.itemComponents) live.itemComponents = { ...ic, ...r.itemComponents }; got[k] = true;
+    const ic = live.itemComponents; Object.assign(live, r); if (ic && r.itemComponents) { const m = { ...ic }; for (const [c, v] of Object.entries(r.itemComponents)) m[c] = { ...ic[c], ...v, data: { ...ic[c]?.data, ...v?.data } }; live.itemComponents = m; } got[k] = true;
     if (usingCache) return; // troca tudo de uma vez quando as 3 partes chegarem
     profile = live; have = { ...got };
     if (!got.id || !pickChar()) return;
@@ -239,10 +263,11 @@ async function loadAccount() {
     if (got.q && got[need] && !hydrated) { hydrated = true; hydrate(); return; }
     if (k === 'id') { build(); render(); loadGear(gen); }
     else if (k === 'c' && hydrated) loadLoadouts(gen);
-    else { build(); render(); }
+    else if (k === 'g' && hydrated) loadBuild(gen);
+    else { build(); render(); if (k === 'a' && hydrated) { loadMilestones(gen); if (tab === 'gd') loadGuardian(gen); } }
   };
   // ordem: cabeçalho, a parte da aba aberta, e o resto
-  const order = ['id', need, ...['q', 'a', 'b', 'c'].filter(k => k !== need)];
+  const order = ['id', need, ...['q', 'a', 'b', 'c', 'g'].filter(k => k !== need)];
   const results = await Promise.allSettled(order.map(k => bungie(url(k)).then(r => onPart(k, r))));
   const failed = results.find(r => r.status === 'rejected');
   if (failed) {
@@ -251,7 +276,7 @@ async function loadAccount() {
   }
   if (!hydrated && got.id && got.q && !usingCache && pickChar()) { hydrated = true; hydrate(); }
   if (!Object.values(got).every(Boolean)) { if (!usingCache) throw failed?.reason || new Error('profile'); status(u().apiError(failed?.reason?.message || '')); return; }
-  profile = live; have = { id: true, q: true, a: true, b: true, c: true };
+  profile = live; have = { id: true, q: true, a: true, b: true, c: true, g: true };
   if (!pickChar()) { showMessage(`<p class="notice">${esc(u().noChars)}</p>`); return; }
   loadedAt = new Date();
   idbSet('profile-' + member.id, { t: Date.now(), p: live });
@@ -304,6 +329,7 @@ async function hydrate(doneMsg) {
   stage = 0; questLoc = {};
   build(); render();
   await loadGear(my); if (my !== gen) return; // cabeçalho e cor primeiro
+  XUR = null; GD = null; loadXur(my); if (have.g) loadBuild(my); if (have.a) loadMilestones(my); if (tab === 'gd' && have.a) loadGuardian(my);
   status(u().loadingDefs);
   const quests = [];
   for (const inv of Object.values(p.characterInventories?.data || {})) for (const it of inv.items || []) if (it.bucketHash === QUEST_BUCKET) quests.push(it.itemHash);
@@ -469,8 +495,8 @@ function build() {
     for (const a of list) {
       const items = [I(`${kind}-${a.k}-clear`, s.clear(L(a.n)), null, [U.chip[a.d], kind === 'raid' ? U.chip['6'] : U.chip.Trio], a.m && metric(a.m) > 0)];
       const ex = a.x && exoticByName(a.x);
-      if (ex) items.push(I(`${kind}-${a.k}-x`, s.exotic(L(ex.n)), L(ex.s), [U.chip['Exótico']], colAcquired(ex.h)));
-      out.push(S(kind, `${kind}-${a.k}`, L(a.n), L([a.note[1], a.note[0]]), items, { firstIsClear: true }));
+      if (ex) items.push(I(`${kind}-${a.k}-x`, s.exotic(L(ex.n)), L(ex.s), [U.chip['Exótico']], colAcquired(ex.h), { isEx: true, exName: L(ex.n) }));
+      out.push(S(kind, `${kind}-${a.k}`, L(a.n), L([a.note[1], a.note[0]]), items, { firstIsClear: true, kind, key: a.k, metric: a.m }));
     }
   }
   // Títulos
@@ -502,6 +528,142 @@ function build() {
   LOADOUTS = (p.characterLoadouts?.data?.[charId]?.loadouts || []).map((l, i) => ({ i, name: loadoutNames[l.nameHash]?.n || `Loadout ${i + 1}`, items: (l.items || []).map(x => itemNames[inst[x.itemInstanceId]]?.n).filter(Boolean) })).filter(l => l.items.length);
 }
 
+/* ---------- novidades: faixa da semana, build, conclusões e aba Guardião ---------- */
+const XUR_VENDOR = 2190858386, STRANGE_COIN = 800069450;
+const RANK_PROGS = [457612306, 3011295063, 1807348350, 689153319, 584850370];
+const COUNT_METRICS = [740213466, 2959623395, 26751835, 3264536674];
+const OPTS = Object.assign({ week: true, clears: true, build: true }, LS.get('dc-opts', {}));
+let XUR = null, MSN = {}, BUILD = null, buildOpen = false, GD = null, gdLoading = false;
+const rtf = () => { try { return new Intl.RelativeTimeFormat(lang === 'pt' ? 'pt-BR' : 'en', { numeric: 'auto' }); } catch { return null; } };
+function nextReset() { const d = new Date(); d.setUTCHours(17, 0, 0, 0); while (d.getUTCDay() !== 2 || d <= Date.now()) d.setUTCDate(d.getUTCDate() + 1); return d.getTime(); }
+function cd(ms) { const m = Math.max(0, Math.round(ms / 60000)), d = Math.floor(m / 1440), h = Math.floor(m % 1440 / 60), mm = m % 60; return d ? `${d}d ${h}h` : h ? `${h}h ${String(mm).padStart(2, '0')}min` : `${mm}min`; }
+const fmtN = n => Number(n || 0).toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US');
+
+/* Xûr: o que ele vende agora (só aparece quando ele está no jogo) */
+async function loadXur(my) {
+  try {
+    const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/Character/${charId}/Vendors/${XUR_VENDOR}/?components=400,402`);
+    const sales = Object.values(r.sales?.data || {});
+    const hs = sales.map(s => s.itemHash);
+    const en = await entities('DestinyInventoryItemDefinition', hs, 'en'); if (my !== gen) return;
+    const loc = lang === 'pt' ? await entities('DestinyInventoryItemDefinition', hs, 'pt') : en; if (my !== gen) return;
+    XUR = { until: r.vendor?.data?.nextRefreshDate || null, items: sales.filter(s => en[s.itemHash]?.tt === 6).map(s => ({ en: en[s.itemHash].n, n: loc[s.itemHash]?.n || en[s.itemHash].n, cost: (s.costs || []).find(c => c.itemHash === STRANGE_COIN)?.quantity || 0 })) };
+  } catch { XUR = null; }
+  if (my === gen) renderWeek();
+}
+const coins = () => { let n = 0; for (const it of profile.profileInventory?.data?.items || []) if (it.itemHash === STRANGE_COIN) n += it.quantity || 0; for (const it of profile.profileCurrencies?.data?.items || []) if (it.itemHash === STRANGE_COIN) n += it.quantity || 0; return n; };
+function xurMissing() {
+  if (!XUR || !have.a) return [];
+  const cls = profile.characters.data[charId].classType;
+  return XUR.items.filter(x => { const e = exoticByName(x.en); return e && (e.t === 'w' || e.c === cls) && colMissing(e.h); });
+}
+/* Rotação: incursões e masmorras com desafios ativos nos marcos do personagem */
+async function loadMilestones(my) {
+  const ms = profile.characterProgressions?.data?.[charId]?.milestones; if (!ms) return;
+  const d = await entities('DestinyMilestoneDefinition', Object.keys(ms).map(Number), 'en'); if (my !== gen) return;
+  MSN = d; build(); render();
+}
+function featured() {
+  const ms = profile.characterProgressions?.data?.[charId]?.milestones || {}, out = { raid: new Set(), dg: new Set(), ends: null };
+  for (const m of Object.values(ms)) {
+    const name = (MSN[m.milestoneHash]?.n || '').toLowerCase(); if (!name) continue;
+    if (!(m.activities || []).some(a => (a.challenges || []).length)) continue;
+    for (const [kind, list] of [['raid', defs.raids], ['dg', defs.dungeons]]) { const a = list.find(x => x.n[0].toLowerCase() === name); if (a) { out[kind].add(a.k); if (m.endDate) out.ends = Math.min(out.ends || Infinity, Date.parse(m.endDate)); } }
+  }
+  return out;
+}
+let WK = [];
+function weekItems() {
+  const W = u().w, it = [], t = Date.now();
+  const miss = xurMissing();
+  if (miss.length && XUR.until && Date.parse(XUR.until) > t) it.push({ cls: 'xur', ic: '◆', t: W.xurSells(miss.map(x => x.n).join(', ')), s: W.xurSub(miss[0].cost, have.c ? coins() : null, cd(Date.parse(XUR.until) - t)), to: null });
+  const f = featured(), feat = [...[...f.raid].map(k => 'raid-' + k), ...[...f.dg].map(k => 'dg-' + k)].map(id => SECTIONS.find(s => s.id === id)).filter(s => s && !s.items.every(isDone));
+  if (feat.length) { const ex = feat.map(s => s.items.find(i => i.isEx && !isDone(i))).find(Boolean); it.push({ cls: 'rot', ic: '★', t: W.featured + feat.map(s => s.title).join(' · '), s: ex ? W.missingEx(ex.exName) : W.untilReset, to: [feat[0].tab, feat[0].id] }); }
+  it.push({ cls: 'reset', ic: '↻', t: W.reset, s: W.resetSub(cd(nextReset() - t)), to: null });
+  return it.slice(0, 3);
+}
+function renderWeek() {
+  const el = $('week'); if (!el) return;
+  WK = OPTS.week && auth && profile && have.id ? weekItems() : []; el.hidden = !WK.length;
+  el.innerHTML = WK.length ? `<div class="week-k">${esc(u().w.week)}</div><div class="week-items">${WK.map((w, i) => `<button class="wk ${w.cls}" type="button" data-wk="${i}"${w.to ? '' : ' tabindex="-1"'}><span class="wk-ic" aria-hidden="true">${w.ic}</span><span class="wk-t">${esc(w.t)}</span><span class="wk-s">${esc(w.s)}</span></button>`).join('')}</div>` : '';
+}
+function jumpTo(t, id) { go(t); requestAnimationFrame(() => { const sec = document.querySelector(`[data-sec="${id}"]`); if (!sec) return; const h = sec.querySelector('.sec-head[data-coll]'); if (h && sec.classList.contains('collapsed')) toggleSec(h); sec.scrollIntoView({ behavior: 'smooth', block: 'start' }); }); }
+function secMeta(sec) {
+  const W = u().w, c = [], f = featured(), n = metric(sec.metric);
+  if (f[sec.kind].has(sec.key) && (!f.ends || f.ends > Date.now())) c.push(`<span class="chip feat">${esc(W.featWeek)}</span>`);
+  if (n && have.a) c.push(`<span class="chip clr">${esc(W.clears(n))}</span>`);
+  return c.length ? `<div class="sec-meta">${c.join('')}</div>` : '';
+}
+
+/* Build equipada: abre ao tocar nos ícones do cabeçalho */
+async function loadBuild(my) {
+  const eq = profile.characterEquipment?.data?.[charId]?.items || [], sk = profile.itemComponents?.sockets?.data;
+  if (!sk || !eq.length) return;
+  const plugs = []; for (const i of eq) for (const s of sk[i.itemInstanceId]?.sockets || []) if (s.plugHash && s.isVisible !== false) plugs.push(s.plugHash);
+  const all = [...plugs, ...eq.map(i => i.itemHash)];
+  const en = await entities('DestinyInventoryItemDefinition', all, 'en'); if (my !== gen) return;
+  const loc = lang === 'pt' ? await entities('DestinyInventoryItemDefinition', all, 'pt') : en; if (my !== gen) return;
+  BUILD = { en, loc }; if (buildOpen) renderBuild();
+}
+const SKIP_NAME = /^(Empty|Default|Upgrade Armor|Locked|No |Restore Defaults|Kill Tracker|Tracker Disabled|Change Energy|Deepsight)/i;
+const SKIP_TYPE = /Shader|Ornament|Memento|Tracker|Flair|Emote|Transmat|Projection/i;
+function buildHTML() {
+  const W = u().w, B = BUILD; if (!B) return `<p class="b-note">${esc(u().loadingDefs)}</p>`;
+  const inst = profile.itemComponents?.instances?.data || {}, sk = profile.itemComponents?.sockets?.data || {};
+  const eq = (profile.characterEquipment?.data?.[charId]?.items || []).filter(i => GEAR_BUCKETS.includes(i.bucketHash)).sort((a, b) => GEAR_BUCKETS.indexOf(a.bucketHash) - GEAR_BUCKETS.indexOf(b.bucketHash));
+  const chip = (h, cls) => { const d = B.loc[h] || B.en[h] || {}; return `<span class="${cls || ''}">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy">` : ''}${esc(d.n)}</span>`; };
+  const plugsOf = i => { const own = B.en[i.itemHash]?.tl || ''; return (sk[i.itemInstanceId]?.sockets || []).filter(s => s.plugHash && s.isVisible !== false).map(s => s.plugHash).filter(h => { const e = B.en[h]; return e && e.n && !SKIP_NAME.test(e.n) && !SKIP_TYPE.test(e.tl) && e.tl !== own; }); };
+  const row = (i, body) => { const d = B.loc[i.itemHash] || {}, pw = inst[i.itemInstanceId]?.primaryStat?.value; return `<div class="b-row${d.tt === 6 ? ' exo' : ''}"><div class="b-name">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy">` : ''}<span>${esc(d.n)}</span><small>${esc(d.tl || '')}${pw && pw > 0 ? ` · <b>${pw}</b>` : ''}</small></div>${body}</div>`; };
+  const sub = eq.find(i => i.bucketHash === SUB_BUCKET);
+  let html = '';
+  if (sub) {
+    const ps = plugsOf(sub), t = h => B.en[h]?.tl || '';
+    const sup = ps.filter(h => /Super/.test(t(h))), asp = ps.filter(h => /Aspect/.test(t(h))), fr = ps.filter(h => /Fragment/.test(t(h))), ab = ps.filter(h => !sup.includes(h) && !asp.includes(h) && !fr.includes(h));
+    html += `<div class="b-grp"><div class="b-k">${esc(W.subclass)}</div>${row(sub, `<div class="b-perks">${sup.map(h => chip(h, 'mw')).join('')}${ab.map(h => chip(h)).join('')}</div>${asp.length ? `<div class="b-perks"><span class="k">${esc(W.aspects)}</span>${asp.map(h => chip(h)).join('')}</div>` : ''}${fr.length ? `<div class="b-perks"><span class="k">${esc(W.frags)}</span>${fr.map(h => chip(h)).join('')}</div>` : ''}`)}</div>`;
+  }
+  const grp = (k, list) => list.length ? `<div class="b-grp"><div class="b-k">${esc(k)}</div>${list.map(i => row(i, `<div class="b-perks">${plugsOf(i).map(h => { const e = B.en[h]; return chip(h, /^Masterworked|^Tier \d/i.test(e.n) || /Intrinsic/i.test(e.tl) ? 'mw' : ''); }).join('')}</div>`)).join('')}</div>` : '';
+  html += `<div class="b-cols">${grp(W.weapons, eq.filter(i => [1498876634, 2465295065, 953998645].includes(i.bucketHash)))}${grp(W.armor, eq.filter(i => [3448274439, 3551918588, 14239492, 20886954, 1585787867].includes(i.bucketHash)))}</div>`;
+  return html;
+}
+function renderBuild() { const b = $('build'); if (!b) return; b.hidden = !buildOpen || !OPTS.build; if (!b.hidden) b.innerHTML = buildHTML(); const g = $('gear'); if (OPTS.build && profile) { g.setAttribute('role', 'button'); g.tabIndex = 0; g.setAttribute('aria-expanded', !b.hidden); g.title = u().w.showBuild; if (!g.querySelector('.g-more') && g.children.length) g.insertAdjacentHTML('beforeend', '<span class="g-more" aria-hidden="true"></span>'); } else { g.removeAttribute('role'); g.removeAttribute('tabindex'); g.removeAttribute('aria-expanded'); g.title = ''; g.querySelector('.g-more')?.remove(); } }
+function toggleBuild() { if (!OPTS.build || !profile) return; buildOpen = !buildOpen; renderBuild(); }
+
+/* Aba Guardião: o que é para consultar */
+async function loadGuardian(my) {
+  if (gdLoading) return; gdLoading = true;
+  const out = { weapons: null, clan: null, pass: null, names: {}, metricNames: {}, commNames: {} };
+  const tasks = [
+    entities('DestinyProgressionDefinition', RANK_PROGS, lang).then(d => { out.names = d; }),
+    entities('DestinyMetricDefinition', COUNT_METRICS, lang).then(d => { out.metricNames = d; }),
+    (async () => { const h = profile.profile?.data?.currentSeasonPassHash; if (!h) return; const d = await bungie(`/Destiny2/Manifest/DestinySeasonPassDefinition/${h}/?lc=${lang === 'pt' ? 'pt-br' : 'en'}`, false); const p = profile.characterProgressions?.data?.[charId]?.progressions?.[d.rewardProgressionHash]; if (p) out.pass = { n: d.displayProperties?.name || '', lvl: p.level, a: p.progressToNextLevel, b: p.nextLevelAt }; })(),
+    (async () => { const r = await bungie(`/Destiny2/${member.type}/Account/${member.id}/Character/${charId}/Stats/UniqueWeapons/`); const v = (w, k) => w.values?.[k]?.basic?.value || 0; const top = (r.weapons || []).map(w => ({ h: w.referenceId, k: v(w, 'uniqueWeaponKills'), p: v(w, 'uniqueWeaponKillsPrecisionKills') })).sort((a, b) => b.k - a.k).slice(0, 6); const n = await entities('DestinyInventoryItemDefinition', top.map(w => w.h), lang); out.weapons = top.map(w => ({ ...w, n: n[w.h]?.n || '', ic: n[w.h]?.ic || '' })); })(),
+    (async () => { const g = await bungie(`/GroupV2/User/${member.type}/${member.id}/0/1/`); const grp = g.results?.[0]?.group; if (!grp) { out.clan = { none: true }; return; } const m = await bungie(`/GroupV2/${grp.groupId}/Members/?currentpage=1`); const list = (m.results || []).filter(x => x.destinyUserInfo?.membershipId !== member.id).map(x => ({ n: x.destinyUserInfo?.bungieGlobalDisplayName || x.destinyUserInfo?.displayName || '?', on: !!x.isOnline, t: (x.lastOnlineStatusChange || 0) * 1000 })).sort((a, b) => (b.on - a.on) || (b.t - a.t)); out.clan = { name: grp.name, list }; })(),
+    (async () => { const c = profile.profileCommendations?.data; if (!c) return; out.comm = c; const ks = Object.keys(c.commendationNodePercentagesByHash || {}).map(Number); if (ks.length) out.commNames = await entities('DestinySocialCommendationNodeDefinition', ks, lang); })(),
+  ];
+  await Promise.allSettled(tasks);
+  gdLoading = false; if (my !== gen) return;
+  GD = out; if (tab === 'gd') render();
+}
+function gdHTML() {
+  const W = u().w, G = GD, p = profile, cp = p.characterProgressions?.data?.[charId];
+  const pc = (a, b) => b ? Math.min(100, a / b * 100) : 100;
+  const st = (big, label, bar) => `<div class="st"><b>${big}</b><span>${esc(label)}</span>${bar != null ? `<i><u style="width:${bar}%"></u></i>` : ''}</div>`;
+  const wait = `<p class="gd-wait">${esc(u().loadingDefs)}</p>`;
+  const gr = p.profile?.data?.currentGuardianRank;
+  const ranks = `<article class="gd"><div class="gd-head"><h2>${esc(W.ranksT)}</h2></div>${!have.a ? wait : `<div class="gd-grid">
+    ${gr ? st(gr, W.gRank) : ''}${G?.pass ? st(G.pass.lvl, `${W.pass} ${G.pass.n}`, pc(G.pass.a, G.pass.b)) : ''}
+    ${RANK_PROGS.map(h => { const x = cp?.progressions?.[h]; const n = G?.names?.[h]?.n; return x && n && (x.level || x.currentProgress) ? st(x.level, n, x.nextLevelAt ? pc(x.progressToNextLevel, x.nextLevelAt) : null) : ''; }).join('')}</div>`}</article>`;
+  const rows = (kind, list) => { const done = list.filter(a => metric(a.m) > 0).sort((a, b) => metric(b.m) - metric(a.m)), z = list.length - done.length; return done.map(a => `<tr><td>${esc((kind === 'dg' ? W.dgW : W.raidW) + ' ' + L(a.n))}</td><td class="n">${fmtN(metric(a.m))}</td></tr>`).join('') + (z ? `<tr><td class="z">${esc(W.others(kind, z, done.length))}</td><td class="n z">${esc(W.noneYet)}</td></tr>` : ''); };
+  const clears = `<article class="gd"><div class="gd-head"><h2>${esc(W.clearsT)}</h2></div>${!have.a ? wait : `<div class="gd-grid">${COUNT_METRICS.map(h => G?.metricNames?.[h]?.n ? st(fmtN(metric(h)), G.metricNames[h].n) : '').join('')}</div><table>${rows('dg', defs.dungeons)}${rows('raid', defs.raids)}</table>`}</article>`;
+  const wp = `<article class="gd"><div class="gd-head"><h2>${esc(W.wpnT)}</h2></div><p>${esc(W.wpnNote)}</p>${!G ? wait : G.weapons?.length ? `<table>${G.weapons.map(w => `<tr><td class="wn">${w.ic ? `<img src="${BNET}${w.ic}" alt="" loading="lazy">` : ''}${esc(w.n)}</td><td class="n">${fmtN(w.k)} ${esc(W.kills)}</td><td class="n z">${Math.round(w.p <= 1 ? w.p * 100 : w.p)}% ${esc(W.prec)}</td></tr>`).join('')}</table>` : `<p>${esc(W.unavailable)}</p>`}</article>`;
+  const c = G?.comm;
+  const comm = `<article class="gd"><div class="gd-head"><h2>${esc(W.commT)}</h2></div>${!G ? wait : c ? `<div class="gd-grid">${st(fmtN(c.totalScore), W.commScore)}${Object.entries(c.commendationNodePercentagesByHash || {}).filter(([h]) => G.commNames[h]?.n).sort((a, b) => b[1] - a[1]).map(([h, v]) => st(v + '%', G.commNames[h].n, v)).join('')}</div>` : `<p>${esc(W.unavailable)}</p>`}</article>`;
+  const r = rtf(), ago = t => t && r ? (() => { const d = (t - Date.now()) / 1000; const a = Math.abs(d); return a < 3600 ? r.format(Math.round(d / 60), 'minute') : a < 86400 ? r.format(Math.round(d / 3600), 'hour') : r.format(Math.round(d / 86400), 'day'); })() : '';
+  const clan = `<article class="gd"><div class="gd-head"><h2>${esc(G?.clan?.name || W.clanT)}</h2></div>${!G ? wait : G.clan?.none ? `<p>${esc(W.noClan)}</p>` : G.clan ? `<p>${esc(W.clanNote(G.clan.list.filter(x => x.on).length))}</p><div class="cl">${G.clan.list.slice(0, 12).map(x => `<span class="${x.on ? 'on' : ''}">${esc(x.n)}${x.on ? '' : ` · ${esc(ago(x.t))}`}</span>`).join('')}</div>` : `<p>${esc(W.unavailable)}</p>`}</article>`;
+  const opts = `<article class="gd"><div class="gd-head"><h2>${esc(W.optsT)}</h2></div><p>${esc(W.optsNote)}</p><div class="opts">${[['week', W.optWeek], ['clears', W.optClears], ['build', W.optBuild]].map(([k, t]) => `<label><input type="checkbox" data-opt="${k}"${OPTS[k] ? ' checked' : ''}> ${esc(t)}</label>`).join('')}</div></article>`;
+  return `<div class="panel">${ranks}${clears}${wp}${comm}${clan}${opts}</div>`;
+}
+
 /* ---------- renderização ---------- */
 /* Tema claro/escuro: segue o sistema até a pessoa escolher; a escolha fica salva neste navegador */
 const SUN = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="3.6" fill="currentColor"/><g stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 1.8v2.2M10 16v2.2M1.8 10H4M16 10h2.2M4.2 4.2l1.6 1.6M14.2 14.2l1.6 1.6M4.2 15.8l1.6-1.6M14.2 5.8l1.6-1.6"/></g></svg>';
@@ -520,6 +682,7 @@ function render() {
   applyUI();
   const logged = !!(auth && profile);
   for (const id of ['tabs', 'overall', 'chars', 'ldbtn', 'refresh', 'logout']) $(id).hidden = !logged;
+  renderWeek(); renderBuild();
   if (!cfg) return;
   if (!logged) {
     $('title').textContent = 'Destiny Checklist'; document.title = 'Destiny Checklist'; $('eyebrow').textContent = 'Destiny 2'; renderGuardian(null);
@@ -546,7 +709,9 @@ function render() {
   if (g && g.subs.length > 1) { st.hidden = false; st.innerHTML = g.subs.map(id => `<button class="sub" type="button" data-sub="${id}" aria-pressed="${id === tab}">${esc(U.subs[id])}</button>`).join(''); }
   else { st.hidden = true; st.innerHTML = ''; }
   $('ldbtn').setAttribute('aria-pressed', tab === 'ld'); $('ldbtn').textContent = tab === 'ld' ? U.checklist : U.loadouts;
-  document.body.classList.toggle('on-ld', tab === 'ld');
+  document.body.classList.toggle('on-ld', tab === 'ld'); document.body.classList.toggle('no-clears', !OPTS.clears);
+  $('overall').hidden = tab === 'gd';
+  if (tab === 'gd') { $('list').innerHTML = gdHTML(); if (!GD && have.a) loadGuardian(gen); return; }
   if (tab === 'ld') {
     showMessage(stage < 1 || !have.c ? `<p class="empty-msg">${esc(U.loadingDefs)}</p>` : LOADOUTS.length ? LOADOUTS.map(l => `<article class="ld"><div class="ld-head"><h2>${esc(l.name)}</h2></div><ul class="items">${l.items.map(n => `<li>${esc(n)}</li>`).join('')}</ul><div class="ld-actions"><a class="ld-btn" href="https://app.destinyitemmanager.com/" target="_blank" rel="noopener">${esc(U.openDim)}</a></div></article>`).join('') : `<p class="empty-msg">${esc(U.noLoadouts)}</p>`);
     $('ovcount').textContent = U.ld(LOADOUTS.length); $('ovbar').style.width = '0';
@@ -561,7 +726,7 @@ function render() {
     if (!sec.items.length) return `<section data-sec="${sec.id}"><div class="sec-head"><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2></div></div><p>${esc(sec.note)}</p></div></section>`;
     const keep = true, coll = sec.coll || ((tab === 'exo' || tab === 'cat') && sec.items?.length) || (keep && secDone(sec)), open = openSecs.has(sec.id);
     return `<section data-sec="${sec.id}" class="${keep ? 'keep' : ''}${coll ? ` coll${open ? '' : ' collapsed'}` : ''}">
-      <div class="sec-head"${coll ? ` data-coll="${sec.id}" role="button" tabindex="0" aria-expanded="${open}"` : ''}><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2></div><span class="count" data-sc="${sec.id}"></span>${coll ? '<span class="chev" aria-hidden="true"></span>' : ''}</div>
+      <div class="sec-head"${coll ? ` data-coll="${sec.id}" role="button" tabindex="0" aria-expanded="${open}"` : ''}><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2>${sec.kind ? secMeta(sec) : ''}</div><span class="count" data-sc="${sec.id}"></span>${coll ? '<span class="chev" aria-hidden="true"></span>' : ''}</div>
       ${sec.note ? `<p>${esc(sec.note)}</p>` : ''}<div class="sec-bar"><i data-sb="${sec.id}"></i></div></div>
       <ul>${sec.items.map(i => {
         const cid = 'c-' + i.id.replace(/[^a-z0-9]+/gi, '-'), first = i.c[0], rest = i.c.slice(1), more = !!(i.d || rest.length || i.loc);
@@ -623,7 +788,11 @@ $('list').addEventListener('click', e => {
   const it = e.target.closest('button.it'); if (it) { const li = it.closest('li'); const o = li.classList.toggle('open'); it.setAttribute('aria-expanded', o); o ? openItems.add(li.dataset.li) : openItems.delete(li.dataset.li); return; }
   if (e.target.id === 'togglecomplete') { document.body.classList.toggle('show-complete'); update(); }
 });
-$('list').addEventListener('change', e => { const id = e.target.dataset.id; if (!id || !member) return; e.target.checked ? marks.add(id) : marks.delete(id); LS.set('dc-marks-' + member.id, [...marks]); update(); });
+$('list').addEventListener('change', e => { const k = e.target.dataset.opt; if (k) { OPTS[k] = e.target.checked; LS.set('dc-opts', OPTS); render(); return; } const id = e.target.dataset.id; if (!id || !member) return; e.target.checked ? marks.add(id) : marks.delete(id); LS.set('dc-marks-' + member.id, [...marks]); update(); renderWeek(); });
+$('week').addEventListener('click', e => { const b = e.target.closest('.wk'); if (!b) return; const w = WK[+b.dataset.wk]; if (w && w.to) jumpTo(w.to[0], w.to[1]); });
+$('gear').addEventListener('click', toggleBuild);
+$('gear').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleBuild(); } });
+setInterval(() => { if (document.visibilityState === 'visible') renderWeek(); }, 60000);
 
 /* ---------- início ---------- */
 async function start() {
