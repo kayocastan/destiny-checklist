@@ -53,6 +53,7 @@ const UI = {
       week: 'Esta semana', xurSells: n => `Xûr vende ${n}`, xurSub: (c, h, t) => `${c} moedas${h != null ? ` · você tem ${h}` : ''} · sai em ${t}`,
       featured: 'Em destaque: ', missingEx: n => `${n} ainda falta`, untilReset: 'até o reset', reset: 'Reset semanal', resetSub: t => `em ${t} · terça, 14h (Brasília)`,
       featWeek: 'Em destaque nesta semana', clears: n => n === 1 ? '1 conclusão' : `${n} conclusões`, showBuild: 'Ver a build equipada',
+      share: 'Gerar imagem para compartilhar', shareMaking: 'Montando a imagem da sua build…', shareAlt: 'Imagem da build equipada', shareBtn: 'Compartilhar', shareDl: 'Baixar imagem', shareClose: 'Fechar', shareTitle: 'Minha build no Destiny 2', shareFail: 'Não deu para gerar a imagem agora. Tente de novo.',
       subclass: 'Subclasse', weapons: 'Armas', armor: 'Armadura e mods', aspects: 'Aspectos', frags: 'Fragmentos',
       ranksT: 'Patentes e reputação', gRank: 'Patente de Guardião', pass: 'Passe',
       clearsT: 'Conclusões', dgW: 'Masmorra', raidW: 'Incursão', others: (k, z, any) => k === 'dg' ? (any ? `Outras ${z} masmorras` : 'Masmorras') : (any ? `Outras ${z} incursões` : 'Incursões'), noneYet: 'nenhuma ainda',
@@ -103,6 +104,7 @@ const UI = {
       week: 'This week', xurSells: n => `Xûr sells ${n}`, xurSub: (c, h, t) => `${c} coins${h != null ? ` · you have ${h}` : ''} · leaves in ${t}`,
       featured: 'Featured: ', missingEx: n => `${n} still missing`, untilReset: 'until reset', reset: 'Weekly reset', resetSub: t => `in ${t} · Tuesday, 17:00 UTC`,
       featWeek: 'Featured this week', clears: n => n === 1 ? '1 clear' : `${n} clears`, showBuild: 'Show the equipped build',
+      share: 'Make an image to share', shareMaking: 'Putting your build image together…', shareAlt: 'Image of the equipped build', shareBtn: 'Share', shareDl: 'Download image', shareClose: 'Close', shareTitle: 'My Destiny 2 build', shareFail: "Couldn't make the image right now. Please try again.",
       subclass: 'Subclass', weapons: 'Weapons', armor: 'Armor and mods', aspects: 'Aspects', frags: 'Fragments',
       ranksT: 'Ranks and reputation', gRank: 'Guardian Rank', pass: 'Pass',
       clearsT: 'Clears', dgW: 'Dungeon', raidW: 'Raid', others: (k, z, any) => k === 'dg' ? (any ? `Other ${z} dungeons` : 'Dungeons') : (any ? `Other ${z} raids` : 'Raids'), noneYet: 'none yet',
@@ -628,7 +630,155 @@ function buildHTML() {
   }
   const grp = (k, list) => list.length ? `<div class="b-grp"><div class="b-k">${esc(k)}</div>${list.map(i => row(i, `<div class="b-perks">${plugsOf(i).map(h => { const e = B.en[h]; return chip(h, /^Masterworked|^Tier \d/i.test(e.n) || /Intrinsic/i.test(e.tl) ? 'mw' : ''); }).join('')}</div>`)).join('')}</div>` : '';
   html += `<div class="b-cols">${grp(W.weapons, eq.filter(i => [1498876634, 2465295065, 953998645].includes(i.bucketHash)))}${grp(W.armor, eq.filter(i => [3448274439, 3551918588, 14239492, 20886954, 1585787867].includes(i.bucketHash)))}</div>`;
-  return html;
+  return html + `<div class="b-share"><button class="btn b-sharebtn" id="sharebtn" type="button">${esc(W.share)}</button></div>`;
+}
+/* ---------- imagem da build para compartilhar ----------
+   Desenha o conteúdo numa tela transparente, anotando os cartões; no fim compõe:
+   fundo + brilho da cor da subclasse, cartões, conteúdo, e corta na altura usada. */
+const STAT_ORDER = [2996146975, 392767087, 1943323491, 1735777505, 144602215, 4244567218];
+const imgCache = new Map();
+function loadImg(path) {
+  if (!path) return Promise.resolve(null);
+  if (!imgCache.has(path)) imgCache.set(path, fetch(BNET + path, { mode: 'cors' }).then(r => r.ok ? r.blob() : null).then(b => b ? createImageBitmap(b) : null).catch(() => null));
+  return imgCache.get(path);
+}
+async function buildShareCanvas() {
+  const W = u().w, B = BUILD, ch = profile.characters.data[charId], U = u();
+  const cs = getComputedStyle(document.documentElement), acc = cs.getPropertyValue('--acc').trim() || '#6fd3ff', acc2 = cs.getPropertyValue('--acc2').trim() || '#a8f0ff';
+  try { await Promise.all(['700 40px Rajdhani', '500 20px "IBM Plex Sans"', '600 20px "IBM Plex Sans"', '500 20px "IBM Plex Mono"'].map(f => document.fonts.load(f))); } catch {}
+  const statDefs = await entities('DestinyStatDefinition', STAT_ORDER, lang);
+  const eq = (profile.characterEquipment?.data?.[charId]?.items || []).filter(i => GEAR_BUCKETS.includes(i.bucketHash)).sort((a, b) => GEAR_BUCKETS.indexOf(a.bucketHash) - GEAR_BUCKETS.indexOf(b.bucketHash));
+  const inst = profile.itemComponents?.instances?.data || {}, sk = profile.itemComponents?.sockets?.data || {};
+  const def = h => B.loc[h] || B.en[h] || {};
+  const plugsOf = i => { const own = B.en[i.itemHash]?.tl || ''; return (sk[i.itemInstanceId]?.sockets || []).filter(s => s.plugHash && s.isVisible !== false).map(s => s.plugHash).filter(h => { const e = B.en[h]; return e && e.n && !SKIP_NAME.test(e.n) && !SKIP_TYPE.test(e.tl) && e.tl !== own; }); };
+  const paths = new Set([ch.emblemBackgroundPath]);
+  for (const i of eq) { paths.add(def(i.itemHash).ic); for (const h of plugsOf(i)) paths.add(def(h).ic); }
+  for (const h of STAT_ORDER) paths.add(statDefs[h]?.ic);
+  await Promise.all([...paths].filter(Boolean).map(loadImg));
+
+  const Wd = 1080, PAD = 48, IN = PAD + 28, CW = Wd - PAD * 2, MAXH = 4400;
+  const cv = document.createElement('canvas'); cv.width = Wd; cv.height = MAXH;
+  const x = cv.getContext('2d'), cards = [];
+  const F = { d: s => `700 ${s}px Rajdhani, "Arial Narrow", sans-serif`, b: (s, w = 500) => `${w} ${s}px "IBM Plex Sans", system-ui, sans-serif`, m: s => `500 ${s}px "IBM Plex Mono", ui-monospace, monospace` };
+  const rr = (c, X, Y, w, h, r) => { c.beginPath(); if (c.roundRect) c.roundRect(X, Y, w, h, r); else c.rect(X, Y, w, h); };
+  const icon = (p, X, Y, s, r = 8, ring) => { return loadImg(p).then(im2 => { x.save(); rr(x, X, Y, s, s, r); x.clip(); if (im2) x.drawImage(im2, X, Y, s, s); else { x.fillStyle = 'rgba(255,255,255,.1)'; x.fill(); } x.restore(); if (ring) { x.save(); rr(x, X + 1, Y + 1, s - 2, s - 2, r); x.strokeStyle = ring; x.lineWidth = 2.5; x.stroke(); x.restore(); } }); };
+  const fit = (s, maxW) => { s = String(s ?? ''); if (maxW) while (s.length > 1 && x.measureText(s).width > maxW) s = s.slice(0, -2).trimEnd() + '…'; return s; };
+  const text = (t, X, Y, font, color, align = 'left', maxW) => { x.font = font; x.fillStyle = color; x.textAlign = align; x.textBaseline = 'alphabetic'; const s = fit(t, maxW); x.fillText(s, X, Y); return x.measureText(s).width; };
+  const label = (t, Y) => { text(t.toUpperCase(), PAD + 4, Y, F.m(22), '#8f9bb0'); return Y + 20; };
+  const GOLD = '#f3d77a';
+  const chips = async (hs, X, Y, maxW, hl, sm) => {
+    let cx = X, cy = Y; const H = sm ? 40 : 48, IS = sm ? 30 : 36, FS = sm ? 20 : 23;
+    for (const h of hs) {
+      const d = def(h), on = hl && hl(h); x.font = F.b(FS, 500);
+      const w = Math.min(maxW, IS + 12 + x.measureText(d.n).width + 18);
+      if (cx > X && cx + w > X + maxW) { cx = X; cy += H + (sm ? 8 : 10); }
+      x.save(); rr(x, cx, cy, w, H, sm ? 8 : 10); x.fillStyle = on ? 'rgba(243,215,122,.14)' : 'rgba(255,255,255,.075)'; x.fill(); x.restore();
+      await icon(d.ic, cx + 5, cy + 5, IS, 6);
+      text(d.n, cx + IS + 14, cy + (sm ? 27 : 32), F.b(FS, 500), on ? GOLD : '#dfe5ee', 'left', w - IS - 24);
+      cx += w + (sm ? 8 : 10);
+    }
+    return hs.length ? cy + H : Y;
+  };
+
+  // cabeçalho com o emblema
+  const HH = 240, em = await loadImg(ch.emblemBackgroundPath);
+  x.fillStyle = '#1b2232'; x.fillRect(0, 0, Wd, HH);
+  if (em) { const s = HH / em.height; x.drawImage(em, 0, 0, em.width * s, HH); }
+  const og = x.createLinearGradient(0, 0, Wd, 0); og.addColorStop(0, 'rgba(14,18,28,0)'); og.addColorStop(.22, 'rgba(14,18,28,.5)'); og.addColorStop(.6, 'rgba(14,18,28,.78)'); og.addColorStop(1, 'rgba(14,18,28,.94)'); x.fillStyle = og; x.fillRect(0, 0, Wd, HH);
+  const sub = eq.find(i => i.bucketHash === SUB_BUCKET), sd = sub ? def(sub.itemHash) : {};
+  const el = ELEMENTS[gearDefs[sub?.itemHash]?.dt] || '';
+  const elName = { prismatic: ['Prismatic', 'Prismático'], arc: ['Arc', 'Arco'], solar: ['Solar', 'Solar'], void: ['Void', 'Vácuo'], stasis: ['Stasis', 'Estase'], strand: ['Strand', 'Filamento'] }[el];
+  const cls = U.classes[ch.classType] || '', who = String(member.name || '').replace(/#\d+$/, '');
+  const hx = em ? 270 : PAD;
+  text(`${U.races[ch.raceType] || ''} ${cls}${elName ? ' · ' + L(elName) : ''}`.toUpperCase(), hx, 100, F.m(24), '#c3ccda', 'left', 560);
+  text(who || cls, hx - 3, 170, F.d(76), '#ffffff', 'left', Wd - hx - 280);
+  text(String(ch.light), Wd - PAD, 160, F.d(96), GOLD, 'right');
+  x.font = F.d(96); const pwW = x.measureText(String(ch.light)).width; text('✦', Wd - PAD - pwW - 8, 120, F.d(40), GOLD, 'right');
+  text(U.power.toUpperCase(), Wd - PAD, 196, F.m(20), '#c3ccda', 'right');
+  const bar = x.createLinearGradient(0, 0, Wd, 0); bar.addColorStop(0, acc); bar.addColorStop(1, acc2); x.fillStyle = bar; x.fillRect(0, HH, Wd, 8);
+  let y = HH + 66;
+
+  // subclasse
+  if (sub) {
+    const ps = plugsOf(sub), t = h => B.en[h]?.tl || '';
+    const sup = ps.filter(h => /Super/.test(t(h))), asp = ps.filter(h => /Aspect/.test(t(h))), fr = ps.filter(h => /Fragment/.test(t(h))), ab = ps.filter(h => !sup.includes(h) && !asp.includes(h) && !fr.includes(h));
+    y = label(W.subclass, y) + 16; const top = y; y += 28;
+    await icon(sd.ic, IN, y, 104, 52);
+    text(sd.n, IN + 128, y + 50, F.d(58), '#ffffff', 'left', CW - 190);
+    if (sup[0]) { const d = def(sup[0]); await icon(d.ic, IN + 128, y + 64, 38, 6); text(d.n, IN + 176, y + 92, F.b(27, 600), GOLD, 'left', CW - 240); }
+    y += 132;
+    const colW = (CW - 56 - 20) / 2;
+    for (let k = 0; k < ab.length; k++) { const d = def(ab[k]), cx = IN + (k % 2) * (colW + 20), cy = y + Math.floor(k / 2) * 72; await icon(d.ic, cx, cy, 56, 8); text(d.tl || '', cx + 70, cy + 22, F.m(17), '#8f9bb0', 'left', colW - 78); text(d.n, cx + 70, cy + 49, F.b(25, 600), '#e9eef5', 'left', colW - 78); }
+    y += Math.ceil(ab.length / 2) * 72;
+    for (const [lbl, list] of [[W.aspects, asp], [W.frags, fr]]) if (list.length) { y += 16; text(lbl.toUpperCase(), IN, y + 18, F.m(18), '#8f9bb0'); y = await chips(list, IN, y + 30, CW - 56); }
+    const st = STAT_ORDER.filter(h => ch.stats?.[h] != null);
+    if (st.length) {
+      y += 24; const tw = (CW - 56 - 10 * (st.length - 1)) / st.length;
+      for (let k = 0; k < st.length; k++) { const h = st[k], cx = IN + k * (tw + 10); x.save(); rr(x, cx, y, tw, 108, 12); x.fillStyle = 'rgba(255,255,255,.06)'; x.fill(); x.restore(); await icon(statDefs[h]?.ic, cx + (tw - 32) / 2, y + 12, 32, 4); text(ch.stats[h], cx + tw / 2, y + 80, F.d(40), '#ffffff', 'center'); text(statDefs[h]?.n || '', cx + tw / 2, y + 99, F.m(14), '#8f9bb0', 'center', tw - 10); }
+      y += 108;
+    }
+    y += 28; cards.push({ y: top, h: y - top });
+    y += 44;
+  }
+  // armas
+  const wpns = eq.filter(i => [1498876634, 2465295065, 953998645].includes(i.bucketHash));
+  if (wpns.length) {
+    y = label(W.weapons, y) + 16;
+    for (const i of wpns) {
+      const d = def(i.itemHash), pw = inst[i.itemInstanceId]?.primaryStat?.value, top = y, exo = d.tt === 6;
+      await icon(d.ic, IN - 4, top + 24, 96, 10, exo ? 'rgba(243,215,122,.9)' : 'rgba(255,255,255,.28)');
+      text(d.n, IN + 112, top + 64, F.d(46), exo ? GOLD : '#ffffff', 'left', CW - 200);
+      text(`${d.tl || ''}${pw > 0 ? '  ·  ✦' + pw : ''}`, IN + 112, top + 100, F.m(22), '#b9c3d3', 'left', CW - 200);
+      const end = await chips(plugsOf(i), IN + 112, top + 122, CW - 56 - 112, h => /^Masterworked|^Tier \d/i.test(B.en[h]?.n || '') || /Intrinsic/i.test(B.en[h]?.tl || ''));
+      y = Math.max(end, top + 120) + 26; cards.push({ y: top, h: y - top, exo }); y += 14;
+    }
+    y += 40;
+  }
+  // armaduras
+  const arm = eq.filter(i => [3448274439, 3551918588, 14239492, 20886954, 1585787867].includes(i.bucketHash));
+  if (arm.length) {
+    y = label(W.armor, y) + 16;
+    for (const i of arm) {
+      const d = def(i.itemHash), exo = d.tt === 6, top = y, ps = plugsOf(i);
+      await icon(d.ic, IN - 4, top + 20, 76, 8, exo ? 'rgba(243,215,122,.9)' : 'rgba(255,255,255,.28)');
+      text(d.n, IN + 92, top + 54, F.b(29, 600), exo ? GOLD : '#ffffff', 'left', CW - 140);
+      const end = await chips(ps, IN + 92, top + 70, CW - 56 - 92, h => /Intrinsic/i.test(B.en[h]?.tl || ''), true);
+      y = Math.max(end, top + 96) + 22; cards.push({ y: top, h: y - top, exo }); y += 12;
+    }
+    y += 30;
+  }
+  // rodapé
+  x.fillStyle = 'rgba(255,255,255,.12)'; x.fillRect(PAD, y, CW, 2); y += 46;
+  text('destiny-checklist.vercel.app', PAD, y, F.m(22), '#c3ccda');
+  text(new Date().toLocaleDateString(lang === 'pt' ? 'pt-BR' : 'en-US', { day: '2-digit', month: 'short', year: 'numeric' }), Wd - PAD, y, F.m(22), '#8f9bb0', 'right');
+  y += 40;
+
+  // composição final
+  const out = document.createElement('canvas'); out.width = Wd; out.height = Math.min(y, MAXH);
+  const o = out.getContext('2d');
+  o.fillStyle = '#0d121c'; o.fillRect(0, 0, Wd, out.height);
+  const glow = (cx, cy, r, c, a) => { const g = o.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, c); g.addColorStop(1, 'rgba(13,18,28,0)'); o.globalAlpha = a; o.fillStyle = g; o.fillRect(0, 0, Wd, out.height); o.globalAlpha = 1; };
+  glow(Wd * .1, 420, 760, acc, .28); glow(Wd * .95, out.height * .55, 720, acc2, .2); glow(Wd * .3, out.height, 700, acc, .14);
+  for (const c of cards) { rr(o, PAD, c.y, CW, c.h, 18); o.fillStyle = 'rgba(255,255,255,.045)'; o.fill(); }
+  o.drawImage(cv, 0, 0);
+  for (const c of cards) { rr(o, PAD + 1, c.y + 1, CW - 2, c.h - 2, 18); o.strokeStyle = c.exo ? 'rgba(243,215,122,.5)' : 'rgba(255,255,255,.09)'; o.lineWidth = 2; o.stroke(); }
+  return out;
+}
+let shareUrl = null;
+async function openShare() {
+  const W = u().w, dlg = $('sharedlg'); if (!dlg || !BUILD) return;
+  dlg.innerHTML = `<div class="sh-box"><p class="sh-wait">${esc(W.shareMaking)}</p></div>`; dlg.showModal();
+  try {
+    const cv = await buildShareCanvas();
+    const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
+    if (shareUrl) URL.revokeObjectURL(shareUrl); shareUrl = URL.createObjectURL(blob);
+    const name = `build-${(u().classes[profile.characters.data[charId].classType] || 'destiny').toLowerCase()}-${new Date().toISOString().slice(0, 10)}.png`;
+    const file = new File([blob], name, { type: 'image/png' });
+    const canShare = !!(navigator.canShare && navigator.canShare({ files: [file] }));
+    dlg.innerHTML = `<div class="sh-box"><div class="sh-img"><img src="${shareUrl}" alt="${esc(W.shareAlt)}"></div><div class="sh-actions">${canShare ? `<button class="btn" id="shgo" type="button">${esc(W.shareBtn)}</button>` : ''}<a class="${canShare ? 'reset' : 'btn'}" id="shdl" href="${shareUrl}" download="${name}">${esc(W.shareDl)}</a><button class="reset" id="shclose" type="button">${esc(W.shareClose)}</button></div></div>`;
+    $('shclose').onclick = () => dlg.close();
+    if (canShare) $('shgo').onclick = () => navigator.share({ files: [file], title: W.shareTitle }).catch(() => {});
+  } catch (e) { console.error(e); dlg.innerHTML = `<div class="sh-box"><p class="sh-wait">${esc(W.shareFail)}</p><div class="sh-actions"><button class="reset" id="shclose" type="button">${esc(W.shareClose)}</button></div></div>`; $('shclose').onclick = () => dlg.close(); }
 }
 function renderBuild() { const b = $('build'); if (!b) return; b.hidden = !buildOpen || !OPTS.build; if (!b.hidden) b.innerHTML = buildHTML(); const g = $('gear'); if (OPTS.build && profile) { g.setAttribute('role', 'button'); g.tabIndex = 0; g.setAttribute('aria-expanded', !b.hidden); g.title = u().w.showBuild; if (!g.querySelector('.g-more') && g.children.length) g.insertAdjacentHTML('beforeend', '<span class="g-more" aria-hidden="true"></span>'); } else { g.removeAttribute('role'); g.removeAttribute('tabindex'); g.removeAttribute('aria-expanded'); g.title = ''; g.querySelector('.g-more')?.remove(); } }
 function toggleBuild() { if (!OPTS.build || !profile) return; buildOpen = !buildOpen; renderBuild(); }
@@ -796,6 +946,7 @@ $('list').addEventListener('click', e => {
 $('list').addEventListener('change', e => { const k = e.target.dataset.opt; if (k) { OPTS[k] = e.target.checked; LS.set('dc-opts', OPTS); render(); return; } const id = e.target.dataset.id; if (!id || !member) return; e.target.checked ? marks.add(id) : marks.delete(id); LS.set('dc-marks-' + member.id, [...marks]); update(); renderWeek(); });
 $('week').addEventListener('click', e => { const b = e.target.closest('.wk'); if (!b) return; const w = WK[+b.dataset.wk]; if (w && w.to) jumpTo(w.to[0], w.to[1]); });
 $('gear').addEventListener('click', toggleBuild);
+$('build').addEventListener('click', e => { if (e.target.closest('#sharebtn')) openShare(); });
 $('gear').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleBuild(); } });
 setInterval(() => { if (document.visibilityState === 'visible') renderWeek(); }, 60000);
 

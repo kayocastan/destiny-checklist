@@ -159,3 +159,14 @@ body.no-clears .sec-meta .chip.clr{display:none}
 .opts label{display:flex;gap:10px;align-items:center;font-size:14px;cursor:pointer}
 .opts input{width:18px;height:18px;margin:0;accent-color:var(--acc)}
 .gd-wait{color:var(--muted)}
+.b-share{display:flex;justify-content:flex-end}
+.b-sharebtn{font-size:16px;padding:8px 16px;background:linear-gradient(90deg,var(--acc),var(--acc2));color:#0d121c}
+dialog.sh{border:0;padding:0;background:transparent;max-width:min(560px,calc(100vw - 32px));width:100%}
+dialog.sh::backdrop{background:rgba(5,8,14,.78)}
+.sh-box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:12px}
+.sh-img{max-height:min(70vh,900px);overflow:auto;border-radius:10px;background:#0d121c}
+.sh-img img{display:block;width:100%;height:auto}
+.sh-actions{display:flex;gap:10px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
+.sh-actions .reset{text-decoration:none;color:var(--fg);padding:8px 14px}
+.sh-actions a.btn{font-size:16px;padding:8px 16px}
+.sh-wait{margin:8px;color:var(--muted)}
