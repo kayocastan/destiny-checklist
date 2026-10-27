@@ -1022,8 +1022,11 @@ async function searchPlayers(q) {
     if (!r?.length) return [];
     const p = pickMembership(r); return [{ name: fullName(p.bungieGlobalDisplayName, p.bungieGlobalDisplayNameCode), type: p.membershipType, id: p.membershipId }];
   }
-  const r = await bungiePost('/User/Search/GlobalName/0/', { displayNamePrefix: q });
-  return (r?.searchResults || []).filter(x => x.destinyMemberships?.length).slice(0, 20).map(x => { const p = pickMembership(x.destinyMemberships); return { name: fullName(x.bungieGlobalDisplayName, x.bungieGlobalDisplayNameCode), type: p.membershipType, id: p.membershipId }; });
+  // A busca da Bungie casa palavras inteiras ("Kayo Cast" não acha "Kayo Castan"): sem resultado, busca pela 1ª palavra e filtra aqui
+  const pages = async (term, n) => { const out = []; for (let i = 0; i < n; i++) { const r = await bungiePost(`/User/Search/GlobalName/${i}/`, { displayNamePrefix: term }); out.push(...(r?.searchResults || [])); if (!r?.hasMore) break; } return out; };
+  let list = await pages(q, 2);
+  if (!list.length && /\s/.test(q)) { const ql = q.toLowerCase(); list = (await pages(q.split(/\s+/)[0], 5)).filter(x => (x.bungieGlobalDisplayName || '').toLowerCase().startsWith(ql)); }
+  return list.filter(x => x.destinyMemberships?.length).slice(0, 25).map(x => { const p = pickMembership(x.destinyMemberships); return { name: fullName(x.bungieGlobalDisplayName, x.bungieGlobalDisplayNameCode), type: p.membershipType, id: p.membershipId }; });
 }
 const FD = { q: '', results: null, status: '', sel: null, p: null, cid: null, B: null, seq: 0 };
 let fdTimer = null;
