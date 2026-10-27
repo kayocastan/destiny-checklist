@@ -706,8 +706,8 @@ async function buildShareCanvas(S = 1, MAXH = 4400) {
   const elName = { prismatic: ['Prismatic', 'Prismático'], arc: ['Arc', 'Arco'], solar: ['Solar', 'Solar'], void: ['Void', 'Vácuo'], stasis: ['Stasis', 'Estase'], strand: ['Strand', 'Filamento'] }[el];
   const cls = U.classes[ch.classType] || '', who = String(member.name || '').replace(/#\d+$/, '');
   const hx = em ? 270 : PAD;
-  text(`${U.races[ch.raceType] || ''} ${cls}${elName ? ' · ' + L(elName) : ''}`.toUpperCase(), hx, 100, F.m(24), '#c3ccda', 'left', 560);
-  text(who || cls, hx - 3, 170, F.d(76), '#ffffff', 'left', Wd - hx - 280);
+  text((member.name || '').toUpperCase(), hx, 100, F.m(24), '#c3ccda', 'left', 560);
+  text(charTitle(cls, sd.n), hx - 3, 170, F.d(70), '#ffffff', 'left', Wd - hx - 280);
   text(String(ch.light), Wd - PAD, 160, F.d(96), GOLD, 'right');
   x.font = F.d(96); const pwW = x.measureText(String(ch.light)).width; text('✦', Wd - PAD - pwW - 8, 120, F.d(40), GOLD, 'right');
   text(U.power.toUpperCase(), Wd - PAD, 196, F.m(20), '#c3ccda', 'right');
@@ -846,6 +846,8 @@ function gdHTML() {
   return `<div class="panel">${ranks}${clears}${wp}${comm}${clan}${opts}</div>`;
 }
 
+/* Título do cabeçalho: subclasse + classe ("Titã Combatente" / "Striker Titan"); se o nome da subclasse já traz a classe ("Titã Prismático"), usa só ele */
+function charTitle(cls, sn) { if (!sn) return cls; if (sn.toLowerCase().includes(cls.toLowerCase())) return sn; return lang === 'pt' ? `${cls} ${sn}` : `${sn} ${cls}`; }
 /* ---------- renderização ---------- */
 /* Tema claro/escuro: segue o sistema até a pessoa escolher; a escolha fica salva neste navegador */
 const SUN = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="3.6" fill="currentColor"/><g stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 1.8v2.2M10 16v2.2M1.8 10H4M16 10h2.2M4.2 4.2l1.6 1.6M14.2 14.2l1.6 1.6M4.2 15.8l1.6-1.6M14.2 5.8l1.6-1.6"/></g></svg>';
@@ -877,12 +879,12 @@ function render() {
   }
   const U = u(), ch = profile.characters.data[charId];
   const cls = U.classes[ch.classType] || '';
-  $('title').textContent = cls; document.title = cls + ' · Destiny Checklist';
   const mx = maxPower(ch.classType);
   const sub = (profile.characterEquipment?.data?.[charId]?.items || []).find(i => i.bucketHash === SUB_BUCKET), sn = sub && gearDefs[sub.itemHash]?.n;
+  const ttl = charTitle(cls, sn);
+  $('title').textContent = ttl; $('title').title = `${U.races[ch.raceType] || ''} ${cls}`; document.title = ttl + ' · Destiny Checklist';
   renderGuardian(ch);
-  $('eyebrow').innerHTML = `<span>${esc(`${U.races[ch.raceType] || ''} ${cls}`)}</span><span class="who">${esc(member.name || '')}</span>`;
-  $('eyebrow').title = sn || '';
+  $('eyebrow').textContent = member.name || ''; $('eyebrow').title = member.name || '';
   $('ghpw').hidden = false; $('pwv').textContent = ch.light; $('pwmax').textContent = mx && mx > ch.light ? `${U.max} ${mx}` : U.power;
   $('chars').innerHTML = Object.values(profile.characters.data).map(c => `<button class="char" type="button" data-char="${c.characterId}" aria-pressed="${c.characterId === charId}">${esc(U.classes[c.classType])}<span class="pw">${c.light}</span></button>`).join('');
   $('chars').hidden = Object.keys(profile.characters.data).length < 2;
