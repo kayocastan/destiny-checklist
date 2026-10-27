@@ -1454,7 +1454,7 @@ async function pickFdChar(cid) {
 }
 $('finddlg').addEventListener('input', e => {
   const sv = e.target.closest('.fd-sv');
-  if (sv) { const l = savedList(), x = l.find(y => y.k === sv.dataset.svk); if (!x) return; if (e.target.classList.contains('fd-svn')) x.title = e.target.value.trim(); else x.note = e.target.value.trim(); clearTimeout(svT); svT = setTimeout(() => { try { LS.set('dc-builds', l); } catch {} }, 300); return; }
+  if (sv) { const l = savedList(), x = l.find(y => y.k === sv.dataset.svk); if (!x) return; if (e.target.classList.contains('fd-svn')) x.title = e.target.value.trim(); else x.note = e.target.value.trim(); try { LS.set('dc-builds', l); } catch {} return; }
   if (e.target.id !== 'fdq') return; FD.q = e.target.value.trim(); clearTimeout(fdTimer); fdTimer = setTimeout(() => doSearch(FD.q), 600); });
 $('finddlg').addEventListener('keydown', e => { if (e.target.id === 'fdq' && e.key === 'Enter') { clearTimeout(fdTimer); doSearch(FD.q); } });
 $('finddlg').addEventListener('click', e => {
