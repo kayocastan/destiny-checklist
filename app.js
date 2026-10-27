@@ -19,7 +19,7 @@ const UI = {
     disclaimer: 'Dados lidos da sua conta pela API oficial da Bungie. Este site não é afiliado à Bungie.',
     loadouts: 'Loadouts', checklist: 'Checklist',
     tabs: { obj: 'Objetivos', act: 'Atividades', drops: 'Drops', gd: 'Guardião' },
-    subs: { camp: 'Campanhas', raid: 'Incursões', dg: 'Masmorras', tit: 'Títulos', exo: 'Exóticos', cat: 'Catalisadores' },
+    subs: { pat: 'Padrões', camp: 'Campanhas', raid: 'Incursões', dg: 'Masmorras', tit: 'Títulos', exo: 'Exóticos', cat: 'Catalisadores' },
     heroTitle: 'Seu checklist de Destiny 2', heroText: 'Entre com a sua conta Bungie.net para ver o que falta: exóticos, catalisadores, títulos, incursões, masmorras e campanhas, do mais fácil para o mais difícil.',
     heroList: ['O site só lê os seus dados; não altera nada no jogo.', 'Sua senha fica na Bungie; o site nunca vê.', 'As suas marcações ficam salvas neste navegador.'],
     login: 'Entrar com Bungie.net', notConfigured: 'O site ainda não foi configurado: faltam as chaves da Bungie nas variáveis de ambiente da Vercel.',
@@ -57,6 +57,8 @@ const UI = {
       find: 'Buscar guardião', findShort: 'Buscar', findPh: 'Nome Bungie (ex.: Fulano#1234)', findHint: 'Digite o nome Bungie completo, como aparece no jogo (ex.: Kayo Castan). O #código é opcional: sem ele aparecem todos com esse nome.', findNone: 'Ninguém com esse nome exato. Confira se o nome está completo, com espaços e acentos.', findErr: 'Não deu para buscar agora. Tente de novo em instantes.', findLoading: 'Buscando…', findLoadingP: 'Carregando a build…', back: 'Voltar', privateP: 'Não deu para ver o equipamento desse guardião agora.', seeBuild: 'Ver a build', recentT: 'Esquadrão recente', recentNote: 'Quem jogou no seu esquadrão nas últimas atividades. Toque num nome para ver a build.', recentNone: 'Ninguém no seu esquadrão nas últimas atividades.', together: n => n === 1 ? '1 atividade juntos' : `${n} atividades juntos`, clanTip: 'Toque num nome para ver a build da pessoa.', lastPlayed: d => `jogou ${d}`,
       ammo: { 1: 'Munição primária', 2: 'Munição especial', 3: 'Munição pesada' },
       share: 'Gerar imagem para compartilhar', shareMaking: 'Montando a imagem da sua build…', shareAlt: 'Imagem da build equipada', shareBtn: 'Compartilhar', shareDl: 'Baixar imagem', shareClose: 'Fechar', shareTitle: 'Minha build no Destiny 2', shareFail: 'Não deu para gerar a imagem agora. Tente de novo.',
+      patNote: c => `${c}. Extraia Ressonância de Visão Profunda dessas armas para liberar o padrão e poder criá-las na Forja.`, patDesc: 'Progresso do padrão: extrações de Visão Profunda feitas.', patDone: 'Liberado',
+      tsumT: 'Seus títulos', scoreActive: 'Pontuação de triunfos ativa', scoreLife: 'Pontuação vitalícia', titlesEarned: 'Títulos conquistados', titlesGilded: 'Títulos dourados', tsumNote: 'Os com ✦ estão dourados. Dourar um título é refazer os triunfos de douramento dele; reinicia a cada temporada.', noTitles: 'Você ainda não conquistou nenhum título. Os mais próximos estão logo abaixo.',
       setT: 'Bônus de conjunto', setPieces: n => n === 1 ? '1 peça' : `${n} peças`, setReq: n => `${n} peças`,
       subclass: 'Subclasse', weapons: 'Armas', armor: 'Armadura e mods', aspects: 'Aspectos', frags: 'Fragmentos',
       ranksT: 'Patentes e reputação', gRank: 'Patente de Guardião', pass: 'Passe',
@@ -74,7 +76,7 @@ const UI = {
     disclaimer: 'Data read from your account through the official Bungie API. This site is not affiliated with Bungie.',
     loadouts: 'Loadouts', checklist: 'Checklist',
     tabs: { obj: 'Objectives', act: 'Activities', drops: 'Drops', gd: 'Guardian' },
-    subs: { camp: 'Campaigns', raid: 'Raids', dg: 'Dungeons', tit: 'Titles', exo: 'Exotics', cat: 'Catalysts' },
+    subs: { pat: 'Patterns', camp: 'Campaigns', raid: 'Raids', dg: 'Dungeons', tit: 'Titles', exo: 'Exotics', cat: 'Catalysts' },
     heroTitle: 'Your Destiny 2 checklist', heroText: "Sign in with your Bungie.net account to see what's left: exotics, catalysts, titles, raids, dungeons and campaigns, from easiest to hardest.",
     heroList: ['The site only reads your data; it never changes anything in the game.', 'Your password stays with Bungie; the site never sees it.', 'Your checkmarks are saved in this browser.'],
     login: 'Sign in with Bungie.net', notConfigured: "The site isn't configured yet: the Bungie keys are missing from the Vercel environment variables.",
@@ -112,6 +114,8 @@ const UI = {
       find: 'Find a guardian', findShort: 'Search', findPh: 'Bungie Name (e.g. Someone#1234)', findHint: 'Type the full Bungie Name as it shows in game (e.g. Kayo Castan). The #code is optional: without it you see everyone with that name.', findNone: 'No one with that exact name. Check that the name is complete, with spaces and accents.', findErr: "Couldn't search right now. Try again in a moment.", findLoading: 'Searching…', findLoadingP: 'Loading the build…', back: 'Back', privateP: "Couldn't see this guardian's gear right now.", seeBuild: 'See their build', recentT: 'Recent fireteam', recentNote: 'People in your fireteam in your latest activities. Tap a name to see their build.', recentNone: 'No one in your fireteam in your latest activities.', together: n => n === 1 ? '1 activity together' : `${n} activities together`, clanTip: 'Tap a name to see their build.', lastPlayed: d => `played ${d}`,
       ammo: { 1: 'Primary ammo', 2: 'Special ammo', 3: 'Heavy ammo' },
       share: 'Make an image to share', shareMaking: 'Putting your build image together…', shareAlt: 'Image of the equipped build', shareBtn: 'Share', shareDl: 'Download image', shareClose: 'Close', shareTitle: 'My Destiny 2 build', shareFail: "Couldn't make the image right now. Please try again.",
+      patNote: c => `${c}. Extract Deepsight Resonance from these weapons to unlock the pattern and craft them.`, patDesc: 'Pattern progress: Deepsight extractions done.', patDone: 'Unlocked',
+      tsumT: 'Your titles', scoreActive: 'Active triumph score', scoreLife: 'Lifetime score', titlesEarned: 'Titles earned', titlesGilded: 'Titles gilded', tsumNote: 'Titles with ✦ are gilded. Gilding means completing the title\'s gilding triumphs; it resets every season.', noTitles: 'You haven\'t earned a title yet. The closest ones are right below.',
       setT: 'Set bonuses', setPieces: n => n === 1 ? '1 piece' : `${n} pieces`, setReq: n => `${n} pieces`,
       subclass: 'Subclass', weapons: 'Weapons', armor: 'Armor and mods', aspects: 'Aspects', frags: 'Fragments',
       ranksT: 'Ranks and reputation', gRank: 'Guardian Rank', pass: 'Pass',
@@ -136,7 +140,7 @@ let charId = null, tab = LS.get('dc-tab', 'obj'), prevTab = 'obj', query = '';
 const lastSub = LS.get('dc-subs', {});
 let marks = new Set(), SECTIONS = [], LOADOUTS = [], loadedAt = null;
 const openSecs = new Set(), openItems = new Set();
-const GROUPS = [{ id: 'obj', subs: ['obj'] }, { id: 'act', subs: ['camp', 'raid', 'dg', 'tit'] }, { id: 'drops', subs: ['exo', 'cat'] }, { id: 'gd', subs: ['gd'] }];
+const GROUPS = [{ id: 'obj', subs: ['obj'] }, { id: 'act', subs: ['camp', 'raid', 'dg', 'tit'] }, { id: 'drops', subs: ['exo', 'cat', 'pat'] }, { id: 'gd', subs: ['gd'] }];
 const groupOf = t => GROUPS.find(g => g.subs.includes(t));
 
 /* ---------- status ---------- */
@@ -228,7 +232,7 @@ async function idbDel(k) { try { const db = await idb(); db.transaction('kv', 'r
 // 201 também em c: a Bungie só manda instâncias (300) dos itens incluídos na mesma resposta
 const PARTS = { id: '200,205', q: '201,301', a: '100,202,800,1100,1400', b: '900', c: '102,201,205,206,300', g: '205,300,305' };
 // parte de que cada aba depende: ela é pedida logo depois do cabeçalho
-const TAB_PART = { obj: 'q', camp: 'q', raid: 'a', dg: 'a', exo: 'a', cat: 'b', tit: 'b', ld: 'c', gd: 'a' };
+const TAB_PART = { obj: 'q', camp: 'q', raid: 'a', dg: 'a', exo: 'a', cat: 'b', pat: 'b', tit: 'b', ld: 'c', gd: 'a' };
 let have = { id: false, q: false, a: false, b: false, c: false, g: false };
 function pickChar() {
   const chars = Object.values(profile.characters?.data || {});
@@ -518,6 +522,7 @@ function build() {
   }
   // Títulos
   if (!recOK) out.push(S('tit', 'tit-wait', '', s.loadingRecords, [], { empty: true }), S('cat', 'cat-wait', '', s.loadingRecords, [], { empty: true }));
+  if (recOK) out.push(S('tit', 'tit-sum', '', null, [], { html: titleSummary(sealStats) }));
   const ordered = sealStats.slice().sort((a, b) => (a.se.tier - b.se.tier) || (b.done / b.total - a.done / a.total));
   for (const x of ordered) {
     const items = x.recs.map(r => { const st = recState(r[0]); return I('t-' + r[0], L(r[1]), L(r[2]), [progText(st) || U.chip[['Fácil', 'Médio', 'Difícil', 'Muito difícil', 'Evento'][x.se.tier - 1]]].filter(Boolean), recDone(st)); });
@@ -541,6 +546,14 @@ function build() {
   const fresh = catRows.filter(x => !recDone(x.r) && pct(x.r) === 0);
   if (prog.length) out.push(S('cat', 'cat-prog', s.catProg, s.catProgNote, prog.map(x => I('c-' + x.c.h, L(x.c.n), L(x.c.d), [progText(x.r) || Math.round(pct(x.r) * 100) + '%'], false))));
   if (fresh.length) out.push(S('cat', 'cat-new', s.catNew, s.catNewNote, fresh.map(x => I('c-' + x.c.h, L(x.c.n), [catSrc(x.c), L(x.c.d)].filter(Boolean).join(' '), [], false))));
+  // Drops: padrões de criação
+  if (!PAT || !recOK) out.push(S('pat', 'pat-wait', '', PAT?.failed ? u().w.unavailable : s.loadingRecords, [], { empty: true }));
+  else if (!PAT.groups.length) out.push(S('pat', 'pat-none', '', u().w.unavailable, [], { empty: true }));
+  else for (const g of PAT.groups) {
+    const items = g.recs.map(h => ({ h, r: recState(h) })).filter(x => x.r && !(x.r.state & 16) && PAT.names[h]?.n).map(x => { const o = recObjs(x.r)[0] || {}, cv = o.completionValue || 1, pr = Math.min(o.progress || 0, cv); return { x, pr, cv, done: recDone(x.r) }; })
+      .sort((a, b) => (a.done - b.done) || (b.pr / b.cv - a.pr / a.cv));
+    if (items.length) out.push(S('pat', 'pat-' + g.h, g.n, U.w.patNote(g.cat), items.map(i => I('p-' + i.x.h, PAT.names[i.x.h].n, U.w.patDesc, [i.done ? U.w.patDone : `${i.pr}/${i.cv}`], i.done)), { coll: true }));
+  }
   SECTIONS = out; SECTIONS_PREV = out;
   // Loadouts
   const inst = instanceMap();
@@ -558,7 +571,7 @@ const AMMO_COLOR = { 1: '#f2f4f7', 2: '#7fe08f', 3: '#b98cff' };
 const AMMO_PATH = 'M5 14V6.2L8 2l3 4.2V14z';
 const ammoSVG = t => AMMO_COLOR[t] ? `<svg viewBox="0 0 ${t * 7 + 3} 16" height="16" aria-hidden="true">${Array.from({ length: t }, (_, k) => `<path transform="translate(${k * 7 - 3.5} 0)" d="${AMMO_PATH}" fill="${AMMO_COLOR[t]}"/>`).join('')}</svg>` : '';
 let weekReady = { x: false, m: false }, weekT = null;
-function resetChar() { XUR = null; MSN = {}; BUILD = null; GD = null; weekReady = { x: false, m: false }; clearTimeout(weekT); weekT = null; }
+function resetChar() { PAT = null; XUR = null; MSN = {}; BUILD = null; GD = null; weekReady = { x: false, m: false }; clearTimeout(weekT); weekT = null; }
 const EMBLEMS = {};
 let MSL = {}, ACTN = {};
 let XUR = null, MSN = {}, BUILD = null, buildOpen = false, GD = null, gdLoading = false;
@@ -680,6 +693,35 @@ async function armorSets(eq) {
     out.push({ n: SETDEF[key].n, count: n, perks: SETDEF[key].perks.map(p => ({ ...p, on: n >= p.c })) });
   }
   return out.sort((a, b) => b.count - a.count);
+}
+/* Padrões de criação: registros de Visão Profunda por arma, nos nós Primária/Especial/Pesada do jogo */
+const PAT_ROOTS = [127506319, 3289524180, 1464475380];
+let PAT = null, patLoading = false;
+async function loadPatterns(my) {
+  if (patLoading || PAT) return; patLoading = true;
+  try {
+    const lc = lang === 'pt' ? 'pt-br' : 'en', node = h => bungie(`/Destiny2/Manifest/DestinyPresentationNodeDefinition/${h}/?lc=${lc}`, false);
+    const roots = await Promise.all(PAT_ROOTS.map(node));
+    const groups = [];
+    for (const r of roots) { const kids = await Promise.all((r.children?.presentationNodes || []).map(c => node(c.presentationNodeHash))); for (const k of kids) groups.push({ n: k.displayProperties?.name || '', cat: r.displayProperties?.name || '', h: k.hash, recs: (k.children?.records || []).map(x => x.recordHash) }); }
+    const names = await entities('DestinyRecordDefinition', groups.flatMap(g => g.recs), lang);
+    PAT = { groups, names };
+  } catch { PAT = { groups: [], names: {}, failed: true }; }
+  patLoading = false; if (my === gen) { build(); render(); }
+}
+/* Resumo no topo de Títulos: pontuação de triunfos, títulos conquistados e dourados */
+const GILD = LS.get('dc-gild', {}); let gildLoading = false;
+async function loadGilding(my) {
+  if (gildLoading) return; const need = defs.seals.map(se => se.cr).filter(h => h && GILD[h] === undefined); if (!need.length) return;
+  gildLoading = true;
+  await Promise.all(need.map(h => bungie(`/Destiny2/Manifest/DestinyRecordDefinition/${h}/`, false).then(d => { GILD[h] = d.titleInfo?.gildingTrackingRecordHash || 0; }).catch(() => {})));
+  LS.set('dc-gild', GILD); gildLoading = false; if (my === gen) { build(); render(); }
+}
+function titleSummary(stats) {
+  const W = u().w, pr = profile.profileRecords?.data || {}, earned = stats.filter(x => x.done === x.total && x.total), gild = earned.filter(x => { const g = GILD[x.se.cr]; const r = g && recState(g); return r && ((r.completedCount || 0) > 0 || recDone(r)); });
+  if (defs.seals.some(se => se.cr && GILD[se.cr] === undefined)) setTimeout(() => loadGilding(gen), 0);
+  const st = (b, t) => `<div class="st"><b>${b}</b><span>${esc(t)}</span></div>`;
+  return `<article class="gd tsum"><div class="gd-head"><h2>${esc(W.tsumT)}</h2></div><div class="gd-grid">${st(fmtN(pr.activeScore), W.scoreActive)}${st(fmtN(pr.lifetimeScore), W.scoreLife)}${st(`${earned.length}/${stats.length}`, W.titlesEarned)}${st(gild.length, W.titlesGilded)}</div>${earned.length ? `<div class="tsum-list">${earned.map(x => `<span class="${gild.includes(x) ? 'g' : ''}">${gild.includes(x) ? '✦ ' : ''}${esc(L(x.se.t))}</span>`).join('')}</div><p>${esc(W.tsumNote)}</p>` : `<p>${esc(W.noTitles)}</p>`}</article>`;
 }
 const ownCtx = () => ({ p: profile, cid: charId, B: BUILD, name: member?.name || '' });
 const SKIP_NAME = /^(Empty|Default|Upgrade Armor|Locked|No |Restore Defaults|Kill Tracker|Tracker Disabled|Change Energy|Deepsight)/i;
@@ -1015,6 +1057,7 @@ function render() {
   document.body.classList.toggle('on-ld', tab === 'ld'); document.body.classList.toggle('no-clears', !OPTS.clears);
   $('overall').hidden = tab === 'gd';
   if (tab === 'gd') { $('list').innerHTML = gdHTML(); if (!GD && have.a) loadGuardian(gen); return; }
+  if (tab === 'pat' && !PAT && have.b) loadPatterns(gen);
   if (tab === 'ld') {
     showMessage(stage < 1 || !have.c ? `<p class="empty-msg">${esc(U.loadingDefs)}</p>` : LOADOUTS.length ? LOADOUTS.map(l => `<article class="ld"><div class="ld-head"><h2>${esc(l.name)}</h2></div><ul class="items">${l.items.map(n => `<li>${esc(n)}</li>`).join('')}</ul><div class="ld-actions"><a class="ld-btn" href="https://app.destinyitemmanager.com/" target="_blank" rel="noopener">${esc(U.openDim)}</a></div></article>`).join('') : `<p class="empty-msg">${esc(U.noLoadouts)}</p>`);
     $('ovcount').textContent = U.ld(LOADOUTS.length); $('ovbar').style.width = '0';
@@ -1026,6 +1069,7 @@ function render() {
   secs.sort((a, b) => secDone(a) - secDone(b));
   $('list').innerHTML = `<div class="panel">${secs.map(sec => {
     if (sec.empty) return `<p class="empty-msg">${esc(sec.note)}</p>`;
+    if (sec.html != null) return sec.html;
     if (!sec.items.length) return `<section data-sec="${sec.id}"><div class="sec-head"><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2></div></div><p>${esc(sec.note)}</p></div></section>`;
     const keep = true, coll = sec.coll || ((tab === 'exo' || tab === 'cat') && sec.items?.length) || (keep && secDone(sec)), open = openSecs.has(sec.id);
     return `<section data-sec="${sec.id}" class="${keep ? 'keep' : ''}${coll ? ` coll${open ? '' : ' collapsed'}` : ''}">
@@ -1054,7 +1098,7 @@ function update() {
   }
   const bar = $('donebar');
   if (bar) { bar.hidden = full === 0; const sh = document.body.classList.contains('show-complete'); $('donetxt').textContent = U.panels(full, sh); $('togglecomplete').textContent = sh ? U.hideDone : U.show; }
-  const secs = SECTIONS.filter(x => x.tab === tab && !x.empty);
+  const secs = SECTIONS.filter(x => x.tab === tab && !x.empty && x.html == null);
   let n, t, label;
   if (tab === 'raid' || tab === 'dg') { t = secs.length; n = secs.filter(x => isDone(x.items[0])).length; label = U[tab](n, t); }
   else if (tab === 'tit') { t = secs.length; n = secs.filter(x => x.items.every(isDone)).length; label = U.tit(n, t); }
@@ -1078,7 +1122,7 @@ $('chars').addEventListener('click', e => { if (e.target.closest('#findbtn')) { 
 $('ldbtn').addEventListener('click', () => { if (tab === 'ld') go(prevTab || 'obj'); else { prevTab = tab; go('ld'); } });
 $('themebtn').addEventListener('click', () => { const t = curTheme() === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = t; LS.set('dc-theme', t); applyTheme(); });
 try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme); } catch {}
-$('langbtn').addEventListener('click', () => { lang = lang === 'en' ? 'pt' : 'en'; LS.set('dc-lang', lang); if (profile) hydrate(); else render(); });
+$('langbtn').addEventListener('click', () => { PAT = null; lang = lang === 'en' ? 'pt' : 'en'; LS.set('dc-lang', lang); if (profile) hydrate(); else render(); });
 $('refresh').addEventListener('click', () => start());
 $('logout').addEventListener('click', logout);
 $('hide').addEventListener('change', e => { document.body.classList.toggle('hide-done', e.target.checked); LS.set('dc-hide2', e.target.checked); });
