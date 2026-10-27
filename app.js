@@ -50,7 +50,7 @@ const UI = {
     },
     chip: { 'Fácil': 'Fácil', 'Médio': 'Médio', 'Difícil': 'Difícil', 'Muito difícil': 'Muito difícil', 'Evento': 'Evento', 'Solo': 'Solo', 'Trio': 'Trio', '6': '6 jogadores', 'Exótico': 'Exótico', 'Mestre': 'Mestre' },
     w: {
-      wkChallenge: n => `Desafio semanal: ${n}`, wkChallengeD: 'Conclua o desafio da semana nessa atividade para a recompensa extra.', wkClaim: n => `${n} para resgatar. Fale com quem entrega as recompensas.`, wkRewardsD: 'Recompensas semanais.', wkQuestD: 'Missão da semana.', wkStarted: 'Em andamento', wkNew: 'Disponível', weeklyChip: 'Semanal', xurChip: 'Xûr', resetNote: t => `Reseta em ${t} (terça, 14h de Brasília).`,
+      wkChallenge: n => `Desafio semanal: ${n}`, wkChallengeD: 'Conclua o desafio da semana nessa atividade para a recompensa extra.', wkClaim: n => `${n} para resgatar. Fale com quem entrega as recompensas.`, wkRewardsD: 'Recompensas semanais.', wkRewardT: n => `${n}: recompensas da semana`, wkQuestD: 'Missão da semana.', wkStarted: 'Em andamento', wkNew: 'Disponível', weeklyChip: 'Semanal', xurChip: 'Xûr', resetNote: t => `Reseta em ${t} (terça, 14h de Brasília).`,
       week: 'Esta semana', xurSells: n => `Xûr vende ${n}`, xurSub: (c, h, t) => `${c} moedas${h != null ? ` · você tem ${h}` : ''} · sai em ${t}`,
       featured: 'Em destaque: ', missingEx: n => `${n} ainda falta`, untilReset: 'até o reset', reset: 'Reset semanal', resetSub: t => `em ${t} · terça, 14h (Brasília)`,
       featWeek: 'Em destaque nesta semana', clears: n => n === 1 ? '1 conclusão' : `${n} conclusões`, showBuild: 'Ver a build equipada',
@@ -107,7 +107,7 @@ const UI = {
     },
     chip: { 'Fácil': 'Easy', 'Médio': 'Medium', 'Difícil': 'Hard', 'Muito difícil': 'Very hard', 'Evento': 'Event', 'Solo': 'Solo', 'Trio': 'Trio', '6': '6 players', 'Exótico': 'Exotic', 'Mestre': 'Master' },
     w: {
-      wkChallenge: n => `Weekly challenge: ${n}`, wkChallengeD: 'Finish this week\'s challenge in this activity for the extra reward.', wkClaim: n => `${n} to claim. Talk to whoever hands out the rewards.`, wkRewardsD: 'Weekly rewards.', wkQuestD: 'Quest of the week.', wkStarted: 'In progress', wkNew: 'Available', weeklyChip: 'Weekly', xurChip: 'Xûr', resetNote: t => `Resets in ${t} (Tuesday, 17:00 UTC).`,
+      wkChallenge: n => `Weekly challenge: ${n}`, wkChallengeD: 'Finish this week\'s challenge in this activity for the extra reward.', wkClaim: n => `${n} to claim. Talk to whoever hands out the rewards.`, wkRewardsD: 'Weekly rewards.', wkRewardT: n => `${n}: weekly rewards`, wkQuestD: 'Quest of the week.', wkStarted: 'In progress', wkNew: 'Available', weeklyChip: 'Weekly', xurChip: 'Xûr', resetNote: t => `Resets in ${t} (Tuesday, 17:00 UTC).`,
       week: 'This week', xurSells: n => `Xûr sells ${n}`, xurSub: (c, h, t) => `${c} coins${h != null ? ` · you have ${h}` : ''} · leaves in ${t}`,
       featured: 'Featured: ', missingEx: n => `${n} still missing`, untilReset: 'until reset', reset: 'Weekly reset', resetSub: t => `in ${t} · Tuesday, 17:00 UTC`,
       featWeek: 'Featured this week', clears: n => n === 1 ? '1 clear' : `${n} clears`, showBuild: 'Show the equipped build',
@@ -627,7 +627,7 @@ function weekSection() {
       items.push(I(`wk-${m.milestoneHash}-${a.activityHash}-${o.objectiveHash || 0}`, W.wkChallenge(an), W.wkChallengeD, [`${Math.min(o.progress || 0, cv)}/${cv}`, U_CHIP_WEEK()], !!o.complete));
     }
     const rw = (m.rewards || []).flatMap(r => r.entries || []);
-    if (rw.length) { const red = rw.filter(e => e.redeemed).length, earn = rw.filter(e => e.earned).length; items.push(I(`wk-${m.milestoneHash}-rw`, name, earn > red ? W.wkClaim(earn - red) : W.wkRewardsD, [`${red}/${rw.length}`, U_CHIP_WEEK()], red === rw.length)); }
+    if (rw.length) { const red = rw.filter(e => e.redeemed).length, earn = rw.filter(e => e.earned).length; items.push(I(`wk-${m.milestoneHash}-rw`, W.wkRewardT(name), earn > red ? W.wkClaim(earn - red) : W.wkRewardsD, [`${red}/${rw.length}`, U_CHIP_WEEK()], red === rw.length)); }
     for (const q of m.availableQuests || []) if (q.status) items.push(I(`wk-${m.milestoneHash}-q`, name, W.wkQuestD, [q.status.completed ? '✓' : q.status.started ? W.wkStarted : W.wkNew], !!q.status.completed));
   }
   const miss = xurMissing();
