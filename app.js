@@ -881,7 +881,7 @@ function render() {
   const mx = maxPower(ch.classType);
   const sub = (profile.characterEquipment?.data?.[charId]?.items || []).find(i => i.bucketHash === SUB_BUCKET), sn = sub && gearDefs[sub.itemHash]?.n;
   renderGuardian(ch);
-  $('eyebrow').textContent = `${U.races[ch.raceType] || ''} ${cls} · ${member.name}`;
+  $('eyebrow').innerHTML = `<span>${esc(`${U.races[ch.raceType] || ''} ${cls}`)}</span><span class="who">${esc(member.name || '')}</span>`;
   $('eyebrow').title = sn || '';
   $('ghpw').hidden = false; $('pwv').textContent = ch.light; $('pwmax').textContent = mx && mx > ch.light ? `${U.max} ${mx}` : U.power;
   $('chars').innerHTML = Object.values(profile.characters.data).map(c => `<button class="char" type="button" data-char="${c.characterId}" aria-pressed="${c.characterId === charId}">${esc(U.classes[c.classType])}<span class="pw">${c.light}</span></button>`).join('');

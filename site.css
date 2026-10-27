@@ -71,7 +71,7 @@ body{background:radial-gradient(900px 420px at 50% -120px,color-mix(in srgb,var(
 .gh .ldtoggle{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.22);color:#fff}
 .gh .ldtoggle[aria-pressed="true"]{background:linear-gradient(90deg,var(--acc),var(--acc2));border-color:transparent;color:#fff}
 .title-actions{margin-left:auto}
-@media (max-width:860px){.g>span{display:none}.g-sub>span{display:inline}}
+.g>span{display:none}.g-sub>span{display:inline}
 @media (max-width:400px){.g-sub>span{display:none}.gh-band{min-height:92px;background-size:auto 92px;padding-left:102px}.gh-band::before{left:92px}}
 .tab[aria-current="true"]{box-shadow:0 1px 2px rgba(0,0,0,.12),inset 0 -2px 0 var(--acc)}
 .tabs{background:color-mix(in srgb,var(--chip) 85%,var(--acc) 15%)}
@@ -198,3 +198,8 @@ dialog.sh:has(.sh-img){padding:0}
 .b-name{flex-wrap:wrap;row-gap:2px}
 .b-name small{white-space:normal}
 .gd-grid{grid-template-columns:repeat(auto-fit,minmax(min(130px,100%),1fr))}
+/* Linha de cima do cabeçalho em duas linhas: raça e classe; nome da conta menor embaixo */
+.gh .eyebrow{display:grid;gap:1px;font-size:11px;line-height:1.25;white-space:normal}
+.gh .eyebrow>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gh .eyebrow .who{font-size:10px;letter-spacing:.06em;opacity:.75;text-transform:none}
+.gh h1{margin-top:2px}
