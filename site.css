@@ -197,3 +197,4 @@ dialog.sh:has(.sh-img){padding:0}
 .gd td.n{width:38%;white-space:normal}
 .b-name{flex-wrap:wrap;row-gap:2px}
 .b-name small{white-space:normal}
+.gd-grid{grid-template-columns:repeat(auto-fit,minmax(min(130px,100%),1fr))}
