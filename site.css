@@ -405,3 +405,11 @@ button.ldc:focus-visible{outline:2px solid var(--arc);outline-offset:2px}
 .fd-ib.fd-save[aria-pressed="true"],.b-save[aria-pressed="true"]{color:#7fd0ff;border-color:rgba(127,208,255,.55)}
 .cl-p.sv-p::before{background:var(--arc)}
 @media (max-width:420px){.fd-act .fd-ib.fd-save{width:34px;height:34px}}
+/* nome e anotação da build salva */
+.fd-sv{display:grid;gap:6px;padding:10px 14px 0}
+.fd-sv input,.fd-sv textarea{font:inherit;font-size:13.5px;color:#e6ebf2;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:8px 10px;resize:vertical;min-width:0}
+.fd-sv input{font-weight:600}
+.fd-sv input:focus,.fd-sv textarea:focus{outline:2px solid var(--a2);outline-offset:0;border-color:transparent}
+.sv-note{font-style:italic;grid-column:2}
+.sv-src{display:inline-flex;align-items:center;gap:5px}
+.sv-src svg{width:12px;height:12px;color:#7fd0ff}
