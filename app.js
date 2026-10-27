@@ -44,6 +44,8 @@ const UI = {
       catProg: 'Em progresso', catProgNote: 'Catalisador obtido; use a arma para completar.',
       catNew: 'Ainda não iniciados', catNewNote: 'Ainda sem progresso. Alguns precisam ser obtidos antes.',
       src: { archive: 'Arquivo Exótico', engram: 'Engramas exóticos', raid: 'Incursões', dungeon: 'Masmorras', mission: 'Missões e jornadas', lost: 'Setores perdidos', xur: 'Xûr', season: 'Temporadas, passes e eventos', other: 'Outras fontes' },
+      xg: { archive: 'Arquivo Exótico na Torre', armor: c => `Armaduras exóticas de ${c}`, explore: 'Exploração e atividades', mission: 'Jornadas e missões exóticas', dungeon: 'Masmorras', raid: 'Incursões', season: 'Passes e temporadas' },
+      xn: { archive: 'Fácil · solo. Compra direta no Arquivo Exótico, na Torre; só precisa dos materiais.', armor: 'Fácil · solo. Foco de engrama exótico na Torre ou a fonte indicada em cada uma.', explore: 'Fácil a médio · solo. Engramas exóticos, Xûr, setores perdidos e outras atividades.', mission: 'Médio · quase todas dá para fazer solo. Missões exóticas pedem atenção às mecânicas.', dungeon: 'Médio · trio. Ideal para jogar com dois amigos.', raid: 'Difícil · incursão com 6 jogadores. O exótico cai com chance baixa.', season: 'Médio · solo. Passes e eventos antigos; alguns custam Prata.' },
       tierNote: ['Fácil · solo', 'Médio · masmorras e um pouco de PvP', 'Difícil · incursão (6 jogadores)', 'Muito difícil · PvP competitivo e Grão-mestre', 'Evento · só com o evento ativo'],
     },
     chip: { 'Fácil': 'Fácil', 'Médio': 'Médio', 'Difícil': 'Difícil', 'Muito difícil': 'Muito difícil', 'Evento': 'Evento', 'Solo': 'Solo', 'Trio': 'Trio', '6': '6 jogadores', 'Exótico': 'Exótico', 'Mestre': 'Mestre' },
@@ -92,6 +94,8 @@ const UI = {
       catProg: 'In progress', catProgNote: 'Catalyst obtained; use the weapon to finish it.',
       catNew: 'Not started', catNewNote: 'No progress yet. Some must be obtained first.',
       src: { archive: 'Exotic Archive', engram: 'Exotic engrams', raid: 'Raids', dungeon: 'Dungeons', mission: 'Missions and quests', lost: 'Lost Sectors', xur: 'Xûr', season: 'Seasons, passes and events', other: 'Other sources' },
+      xg: { archive: 'Exotic Archive in the Tower', armor: c => `${c} exotic armor`, explore: 'Exploration and activities', mission: 'Exotic quests and missions', dungeon: 'Dungeons', raid: 'Raids', season: 'Passes and seasons' },
+      xn: { archive: 'Easy · solo. Buy it at the Exotic Archive in the Tower; you only need the materials.', armor: 'Easy · solo. Exotic engram focusing in the Tower, or the source shown on each one.', explore: 'Easy to medium · solo. Exotic engrams, Xûr, Lost Sectors and other activities.', mission: 'Medium · almost all can be done solo. Exotic missions need attention to mechanics.', dungeon: 'Medium · trio. Great with two friends.', raid: 'Hard · 6-player raid. The exotic has a low drop chance.', season: 'Medium · solo. Old passes and events; some cost Silver.' },
       tierNote: ['Easy · solo', 'Medium · dungeons and some PvP', 'Hard · raid (6 players)', 'Very hard · competitive PvP and Grandmaster', 'Event · only while the event is live'],
     },
     chip: { 'Fácil': 'Easy', 'Médio': 'Medium', 'Difícil': 'Hard', 'Muito difícil': 'Very hard', 'Evento': 'Event', 'Solo': 'Solo', 'Trio': 'Trio', '6': '6 players', 'Exótico': 'Exotic', 'Mestre': 'Master' },
@@ -439,7 +443,6 @@ function srcGroup(s) {
   if (/season|pass|event|festival|solstice|dawning|guardian games|episode/.test(t)) return ['season', 'Médio', 'Solo'];
   return ['other', 'Médio', 'Solo'];
 }
-const SRC_ORDER = ['archive', 'xur', 'engram', 'mission', 'lost', 'dungeon', 'season', 'raid', 'other'];
 const CAMPAIGN_RE = /^(the edge of fate|renegades|lightfall|the final shape|legacy:|the witch queen|beyond light|shadowkeep|forsaken)/i;
 
 /* ---------- montagem das seções ---------- */
@@ -508,13 +511,15 @@ function build() {
   }
   // Drops: exóticos
   const cls = ch.classType;
-  const missing = defs.exotics.filter(e => (e.t === 'w' || e.c === cls) && colMissing(e.h));
-  const weapons = missing.filter(e => e.t === 'w');
-  const bySrc = {};
-  for (const e of weapons) { const g = srcGroup(e.s[0]); (bySrc[g[0]] = bySrc[g[0]] || []).push([e, g]); }
-  for (const g of SRC_ORDER) if (bySrc[g]) out.push(S('exo', 'exo-' + g, `${s.wpn} · ${s.src[g]}`, null, bySrc[g].map(([e, gg]) => I('x-' + e.h[0], L(e.n), L(e.s), [U.chip[gg[1]], U.chip[gg[2]]], false))));
-  const armor = missing.filter(e => e.t === 'a');
-  if (armor.length) out.push(S('exo', 'exo-armor', s.armor(U.classes[cls]), null, armor.map(e => { const g = srcGroup(e.s[0]); return I('x-' + e.h[0], L(e.n), L(e.s), [U.chip[g[1]], U.chip[g[2]]], false); })));
+  // Toda a coleção que ainda dá para obter: o que você já tem aparece marcado, para mostrar o progresso de cada grupo.
+  const obtainable = defs.exotics.filter(e => (e.t === 'w' || e.c === cls) && (colAcquired(e.h) || colMissing(e.h)));
+  const XG = { archive: 'archive', xur: 'explore', engram: 'explore', lost: 'explore', other: 'explore', mission: 'mission', dungeon: 'dungeon', raid: 'raid', season: 'season' };
+  const byG = {};
+  for (const e of obtainable) { const g = srcGroup(e.s[0]), k = e.t === 'a' ? 'armor' : XG[g[0]]; (byG[k] = byG[k] || []).push([e, g]); }
+  if (have.a) for (const k of ['archive', 'armor', 'explore', 'mission', 'dungeon', 'raid', 'season']) if (byG[k]) {
+    const list = byG[k].map(([e, g]) => ({ e, g, has: colAcquired(e.h) })).sort((a, b) => (a.has - b.has) || ['Fácil', 'Médio', 'Difícil'].indexOf(a.g[1]) - ['Fácil', 'Médio', 'Difícil'].indexOf(b.g[1]));
+    out.push(S('exo', 'exo-' + k, k === 'armor' ? s.xg.armor(U.classes[cls]) : s.xg[k], s.xn[k], list.map(x => I('x-' + x.e.h[0], L(x.e.n), L(x.e.s), [U.chip[x.g[1]], U.chip[x.g[2]]], x.has))));
+  }
   // Drops: catalisadores
   const catRows = !recOK ? [] : defs.cats.map(c => ({ c, r: recState(c.h) })).filter(x => x.r && !(x.r.state & 16));
   const catSrc = c => { const k = c.n[0].replace(/ Catalyst$/, ''); return defs.catsrc[k] ? L(defs.catsrc[k]) : ''; };
