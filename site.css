@@ -262,3 +262,4 @@ dialog.fd::backdrop{background:rgba(5,8,14,.78)}
 .b-set-p.on b{color:#fff}
 .b-set-c{font-family:var(--mono);font-size:11px;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.07);white-space:nowrap}
 .b-set-p.on .b-set-c{color:#f3d77a;background:rgba(243,215,122,.14)}
+.gd-k{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
