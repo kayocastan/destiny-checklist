@@ -298,3 +298,7 @@ section.vend .vd-body{display:grid;gap:10px;padding:12px 16px 14px}
 .vd-xi small{font-size:12px;color:var(--muted)}
 .vd-xi:not(.miss){opacity:.75}
 .vd-xi.miss{box-shadow:inset 3px 0 0 var(--exotic)}
+section.vend.collapsed .vd-body{display:none}
+section.vend .sec-title .chip{align-self:center;flex:none}
+section.vend .sec-head{border-bottom:1px solid var(--line)}
+section.vend.collapsed .sec-head{border-bottom:0}
