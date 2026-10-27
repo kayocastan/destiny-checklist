@@ -540,7 +540,7 @@ function build() {
   }
   // Drops: catalisadores
   const catRows = !recOK ? [] : defs.cats.map(c => ({ c, r: recState(c.h) })).filter(x => x.r && !(x.r.state & 16));
-  const catSrc = c => { const k = c.n[0].replace(/ Catalyst$/, ''); if (defs.catsrc[k]) return L(defs.catsrc[k]); const e = exoticByName(k); return e ? u().w.weaponFrom + ' ' + L(e.s).replace(/^(Fonte|Source):\s*/, '') : ''; };
+  const catSrc = c => { const k = c.n[0].replace(/ Catalyst$/, ''); if (defs.catsrc[k]) return defs.catsrc[k][lang === 'pt' ? 0 : 1]; const e = exoticByName(k); return e ? u().w.weaponFrom + ' ' + L(e.s).replace(/^(Fonte|Source):\s*/, '') : ''; };
   const prog = catRows.filter(x => !recDone(x.r) && pct(x.r) > 0).sort((a, b) => pct(b.r) - pct(a.r));
   const fresh = catRows.filter(x => !recDone(x.r) && pct(x.r) === 0);
   if (prog.length) out.push(S('cat', 'cat-prog', s.catProg, s.catProgNote, prog.map(x => I('c-' + x.c.h, L(x.c.n), L(x.c.d), [progText(x.r) || Math.round(pct(x.r) * 100) + '%'], false))));
