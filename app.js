@@ -199,10 +199,10 @@ for (const k of ['dc-ent-en', 'dc-ent-pt', 'dc-ent2-en', 'dc-ent2-pt']) LS.del(k
 let entDirty = false;
 async function entity(type, hash, lc) {
   const key = type + ':' + hash, store = entCache[lc];
-  if (store[key]) return store[key];
+  if (store[key] && (store[key].n || !/LoadoutName/.test(type))) return store[key];
   try {
     const d = await bungie(`/Destiny2/Manifest/${type}/${hash >>> 0}/?lc=${lc === 'pt' ? 'pt-br' : 'en'}`, false);
-    const v = { n: d.displayProperties?.name || '', d: d.displayProperties?.description || '', ql: d.setData?.questLineName || '', il: (d.setData?.itemList || []).map(x => x.itemHash), b: d.inventory?.bucketTypeHash || 0, it: d.itemType || 0, tl: d.itemTypeDisplayName || '', su: d.inventory?.stackUniqueLabel || '', ob: d.objectives?.objectiveHashes || [], lh: d.locationHash || 0, lr: (d.locationReleases || []).map(r => [r.destinationHash || 0, r.activityHash || 0]).slice(-1)[0] || null, ic: d.displayProperties?.icon || '', tt: d.inventory?.tierType || 0, dt: d.talentGrid?.hudDamageType || 0 };
+    const v = { n: d.displayProperties?.name || d.name || '', d: d.displayProperties?.description || '', ql: d.setData?.questLineName || '', il: (d.setData?.itemList || []).map(x => x.itemHash), b: d.inventory?.bucketTypeHash || 0, it: d.itemType || 0, tl: d.itemTypeDisplayName || '', su: d.inventory?.stackUniqueLabel || '', ob: d.objectives?.objectiveHashes || [], lh: d.locationHash || 0, lr: (d.locationReleases || []).map(r => [r.destinationHash || 0, r.activityHash || 0]).slice(-1)[0] || null, ic: d.displayProperties?.icon || '', tt: d.inventory?.tierType || 0, dt: d.talentGrid?.hudDamageType || 0 };
     store[key] = v; entDirty = true;
     return v;
   } catch { return { n: '', d: '', ql: '', il: [], b: 0, it: 0, tl: '', su: '', ob: [], lh: 0, lr: null }; }
@@ -1311,7 +1311,7 @@ async function loadLdCtx(i) {
     items.push({ itemHash: it.itemHash, itemInstanceId: it.itemInstanceId, bucketHash: bucket });
     const base = (sk[it.itemInstanceId]?.sockets || []).map(s => ({ ...s }));
     plugs.forEach((h, j) => { if (!h || h === 2166136261 || h === 4294967295) return; base[j] = { plugHash: h, isVisible: true, isEnabled: true }; });
-    sockets[it.itemInstanceId] = { sockets: base.map(s => s || {}) };
+    sockets[it.itemInstanceId] = { sockets: Array.from(base, s => s || {}) };
   }
   // o artefato não faz parte do loadout: mantém o que está equipado agora
   const art = (profile.characterEquipment?.data?.[charId]?.items || []).find(i => i.bucketHash === ARTIFACT_BUCKET);
