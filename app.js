@@ -402,7 +402,7 @@ const colMissing = hashes => { const st = colStates(hashes); return st.length > 
 const metric = h => profile.metrics?.data?.metrics?.[h]?.objectiveProgress?.progress || 0;
 const exoticByName = name => defs.exotics.find(e => e.n[0] === name);
 function srcGroup(s) {
-  const t = (s || '').toLowerCase();
+  const t = (s || '').split(/\.\s/)[0].toLowerCase(); // só a 1ª frase: o resto explica onde começar
   if (/archive/.test(t)) return ['archive', 'Fácil', 'Solo'];
   if (/xûr|xur/.test(t)) return ['xur', 'Fácil', 'Solo'];
   if (/engram/.test(t)) return ['engram', 'Fácil', 'Solo'];
