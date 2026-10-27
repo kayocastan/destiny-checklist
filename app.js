@@ -626,12 +626,12 @@ function buildHTML() {
   if (sub) {
     const ps = plugsOf(sub), t = h => B.en[h]?.tl || '';
     const sup = ps.filter(h => /Super/.test(t(h))), asp = ps.filter(h => /Aspect/.test(t(h))), fr = ps.filter(h => /Fragment/.test(t(h))), ab = ps.filter(h => !sup.includes(h) && !asp.includes(h) && !fr.includes(h));
-    html += `<div class="b-grp"><div class="b-k">${esc(W.subclass)}</div>${row(sub, `<div class="b-perks">${sup.map(h => chip(h, 'mw')).join('')}${ab.map(h => chip(h)).join('')}</div>${asp.length ? `<div class="b-perks"><span class="k">${esc(W.aspects)}</span>${asp.map(h => chip(h)).join('')}</div>` : ''}${fr.length ? `<div class="b-perks"><span class="k">${esc(W.frags)}</span>${fr.map(h => chip(h)).join('')}</div>` : ''}`)}</div>`;
+    html += `<div class="b-grp">${row(sub, `<div class="b-perks">${sup.map(h => chip(h, 'mw')).join('')}${ab.map(h => chip(h)).join('')}</div>${asp.length ? `<div class="b-perks"><span class="k">${esc(W.aspects)}</span>${asp.map(h => chip(h)).join('')}</div>` : ''}${fr.length ? `<div class="b-perks"><span class="k">${esc(W.frags)}</span>${fr.map(h => chip(h)).join('')}</div>` : ''}`)}</div>`;
   }
   const grp = (k, list) => list.length ? `<div class="b-grp"><div class="b-k">${esc(k)}</div>${list.map(i => row(i, `<div class="b-perks">${plugsOf(i).map(h => { const e = B.en[h]; return chip(h, /^Masterworked|^Tier \d/i.test(e.n) || /Intrinsic/i.test(e.tl) ? 'mw' : ''); }).join('')}</div>`)).join('')}</div>` : '';
   html += `<div class="b-cols">${grp(W.weapons, eq.filter(i => [1498876634, 2465295065, 953998645].includes(i.bucketHash)))}${grp(W.armor, eq.filter(i => [3448274439, 3551918588, 14239492, 20886954, 1585787867].includes(i.bucketHash)))}</div>`;
   const cam = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.3l1.4-2h5.6l1.4 2h2.3A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12.8" r="3.4" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>';
-  return `<button class="b-cam" id="sharebtn" type="button" title="${esc(W.share)}" aria-label="${esc(W.share)}">${cam}</button>` + html;
+  return `<div class="b-top"><div class="b-k">${sub ? esc(W.subclass) : ''}</div><button class="b-cam" id="sharebtn" type="button" title="${esc(W.share)}" aria-label="${esc(W.share)}">${cam}</button></div>` + html;
 }
 /* ---------- imagem da build para compartilhar ----------
    Desenha o conteúdo numa tela transparente, anotando os cartões; no fim compõe:
@@ -781,7 +781,15 @@ async function openShare() {
     if (canShare) $('shgo').onclick = () => navigator.share({ files: [file], title: W.shareTitle }).catch(() => {});
   } catch (e) { console.error(e); dlg.innerHTML = `<div class="sh-box"><p class="sh-wait">${esc(W.shareFail)}</p><div class="sh-actions"><button class="reset" id="shclose" type="button">${esc(W.shareClose)}</button></div></div>`; $('shclose').onclick = () => dlg.close(); }
 }
-function renderBuild() { const b = $('build'); if (!b) return; b.hidden = !buildOpen || !OPTS.build; if (!b.hidden) b.innerHTML = buildHTML(); const g = $('gear'); if (OPTS.build && profile) { g.setAttribute('role', 'button'); g.tabIndex = 0; g.setAttribute('aria-expanded', !b.hidden); g.title = u().w.showBuild; if (!g.querySelector('.g-more') && g.children.length) g.insertAdjacentHTML('beforeend', '<span class="g-more" aria-hidden="true"></span>'); } else { g.removeAttribute('role'); g.removeAttribute('tabindex'); g.removeAttribute('aria-expanded'); g.title = ''; g.querySelector('.g-more')?.remove(); } }
+function renderBuild() {
+  const b = $('build'), bb = $('buildbtn'); if (!b) return;
+  const on = OPTS.build && !!profile && !!auth;
+  b.hidden = !buildOpen || !on; if (!b.hidden) b.innerHTML = buildHTML();
+  const g = $('gear'); g.querySelector('.g-more')?.remove();
+  if (bb) { bb.hidden = !on; bb.setAttribute('aria-expanded', !b.hidden); bb.title = u().w.showBuild; bb.setAttribute('aria-label', u().w.showBuild); }
+  if (on) { g.setAttribute('role', 'button'); g.tabIndex = 0; g.setAttribute('aria-expanded', !b.hidden); g.title = u().w.showBuild; }
+  else { g.removeAttribute('role'); g.removeAttribute('tabindex'); g.removeAttribute('aria-expanded'); g.title = ''; }
+}
 function toggleBuild() { if (!OPTS.build || !profile) return; buildOpen = !buildOpen; renderBuild(); }
 
 /* Aba Guardião: o que é para consultar */
@@ -947,6 +955,7 @@ $('list').addEventListener('click', e => {
 $('list').addEventListener('change', e => { const k = e.target.dataset.opt; if (k) { OPTS[k] = e.target.checked; LS.set('dc-opts', OPTS); render(); return; } const id = e.target.dataset.id; if (!id || !member) return; e.target.checked ? marks.add(id) : marks.delete(id); LS.set('dc-marks-' + member.id, [...marks]); update(); renderWeek(); });
 $('week').addEventListener('click', e => { const b = e.target.closest('.wk'); if (!b) return; const w = WK[+b.dataset.wk]; if (w && w.to) jumpTo(w.to[0], w.to[1]); });
 $('gear').addEventListener('click', toggleBuild);
+$('buildbtn').addEventListener('click', toggleBuild);
 $('build').addEventListener('click', e => { if (e.target.closest('#sharebtn')) openShare(); });
 $('gear').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleBuild(); } });
 setInterval(() => { if (document.visibilityState === 'visible') renderWeek(); }, 60000);

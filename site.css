@@ -71,7 +71,7 @@ body{background:radial-gradient(900px 420px at 50% -120px,color-mix(in srgb,var(
 .gh .ldtoggle{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.22);color:#fff}
 .gh .ldtoggle[aria-pressed="true"]{background:linear-gradient(90deg,var(--acc),var(--acc2));border-color:transparent;color:#fff}
 .title-actions{margin-left:auto}
-@media (max-width:620px){.g>span{display:none}.g-sub>span{display:inline}}
+@media (max-width:860px){.g>span{display:none}.g-sub>span{display:inline}}
 @media (max-width:400px){.g-sub>span{display:none}.gh-band{min-height:92px;background-size:auto 92px;padding-left:102px}.gh-band::before{left:92px}}
 .tab[aria-current="true"]{box-shadow:0 1px 2px rgba(0,0,0,.12),inset 0 -2px 0 var(--acc)}
 .tabs{background:color-mix(in srgb,var(--chip) 85%,var(--acc) 15%)}
@@ -159,9 +159,15 @@ body.no-clears .sec-meta .chip.clr{display:none}
 .opts label{display:flex;gap:10px;align-items:center;font-size:14px;cursor:pointer}
 .opts input{width:18px;height:18px;margin:0;accent-color:var(--acc)}
 .gd-wait{color:var(--muted)}
-.build{position:relative}
-.b-cam{position:absolute;top:8px;right:10px;display:grid;place-items:center;width:34px;height:34px;padding:0;border-radius:8px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#b9c3d3;cursor:pointer;transition:color .15s,border-color .15s,background .15s}
-.b-cam:hover{color:#fff;border-color:color-mix(in srgb,var(--acc2) 60%,transparent);background:rgba(255,255,255,.08)}
+.b-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:-4px}
+.b-cam{display:grid;place-items:center;width:34px;height:34px;padding:0;border-radius:8px;border:0;background:linear-gradient(90deg,var(--acc),var(--acc2));color:#0d121c;cursor:pointer;flex:none;transition:filter .15s}
+.b-cam:hover{filter:brightness(1.12)}
+.gh-more{flex:none;display:grid;place-items:center;width:34px;height:34px;padding:0;border-radius:6px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;cursor:pointer;margin-right:auto}
+.gh-more:hover{background:rgba(255,255,255,.14)}
+.gh-more:focus-visible{outline:2px solid var(--acc2);outline-offset:2px}
+.gh-more .chv{width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-2px) rotate(45deg);transition:transform .15s}
+.gh-more[aria-expanded="true"] .chv{transform:translateY(2px) rotate(-135deg)}
+@media (max-width:400px){.gh-more{width:32px;height:32px}}
 .b-cam:focus-visible{outline:2px solid var(--acc2);outline-offset:2px}
 dialog.sh{border:0;padding:0;background:transparent;max-width:min(560px,calc(100vw - 32px));width:100%}
 dialog.sh::backdrop{background:rgba(5,8,14,.78)}
