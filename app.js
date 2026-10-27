@@ -810,7 +810,7 @@ async function start() {
   applyUI();
   const h = readHash();
   try {
-    [cfg, defs, ITEMS] = await Promise.all([fetch('/api/config').then(r => r.json()), fetch('/data/defs.json').then(r => r.json()), fetch('/data/items.json').then(r => r.json()).catch(() => ({}))]);
+    [cfg, defs, ITEMS] = await Promise.all([fetch('/api/config').then(r => r.json()), fetch('/data/defs.json', { cache: 'no-cache' }).then(r => r.json()), fetch('/data/items.json', { cache: 'no-cache' }).then(r => r.json()).catch(() => ({}))]);
   } catch { cfg = { configured: false }; showMessage(`<p class="notice">${esc(u().notConfigured)}</p>`); return; }
   if (h?.error) { render(); $('list').insertAdjacentHTML('afterbegin', `<p class="notice">${esc(u().authError(h.error))}</p>`); return; }
   if (h?.auth) { auth = h.auth; LS.set('dc-auth', auth); }
