@@ -290,3 +290,11 @@ section.vend .vd-body{display:grid;gap:10px;padding:12px 16px 14px}
 .vb u{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2))}
 .pv-s{display:block;font-size:12px;color:var(--muted)}
 .gd td.wn span{min-width:0}
+.vd-x{display:grid;gap:6px}
+.vd-xi{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;background:var(--chip)}
+.vd-xi img{width:36px;height:36px;border-radius:4px;flex:none}
+.vd-xi>div{flex:1;min-width:0}
+.vd-xi b{display:block;font-size:14px}
+.vd-xi small{font-size:12px;color:var(--muted)}
+.vd-xi:not(.miss){opacity:.75}
+.vd-xi.miss{box-shadow:inset 3px 0 0 var(--exotic)}

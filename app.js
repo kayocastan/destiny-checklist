@@ -18,8 +18,8 @@ const UI = {
     hide: 'Ocultar feitos', search: 'Buscar por nome ou origem', refresh: 'Atualizar', logout: 'Sair',
     disclaimer: 'Dados lidos da sua conta pela API oficial da Bungie. Este site não é afiliado à Bungie.',
     loadouts: 'Loadouts', checklist: 'Checklist',
-    tabs: { obj: 'Objetivos', act: 'Atividades', drops: 'Drops', gd: 'Guardião' },
-    subs: { camp: 'Campanhas', raid: 'Incursões', dg: 'Masmorras', tit: 'Títulos', exo: 'Exóticos', cat: 'Catalisadores' },
+    tabs: { obj: 'Objetivos', act: 'Atividades', drops: 'Arsenal', gd: 'Guardião' },
+    subs: { camp: 'Campanhas', raid: 'Incursões', dg: 'Masmorras', tit: 'Títulos', exo: 'Exóticos', cat: 'Catalisadores', vend: 'Vendedores' },
     heroTitle: 'Seu checklist de Destiny 2', heroText: 'Entre com a sua conta Bungie.net para ver o que falta: exóticos, catalisadores, títulos, incursões, masmorras e campanhas, do mais fácil para o mais difícil.',
     heroList: ['O site só lê os seus dados; não altera nada no jogo.', 'Sua senha fica na Bungie; o site nunca vê.', 'As suas marcações ficam salvas neste navegador.'],
     login: 'Entrar com Bungie.net', notConfigured: 'O site ainda não foi configurado: faltam as chaves da Bungie nas variáveis de ambiente da Vercel.',
@@ -54,7 +54,7 @@ const UI = {
       week: 'Esta semana', xurSells: n => `Xûr vende ${n}`, xurSub: (c, h, t) => `${c} moedas${h != null ? ` · você tem ${h}` : ''} · sai em ${t}`,
       featured: 'Em destaque: ', missingEx: n => `${n} ainda falta`, untilReset: 'até o reset', reset: 'Reset semanal', resetSub: t => `em ${t} · terça, 14h (Brasília)`,
       featWeek: 'Em destaque nesta semana', clears: n => n === 1 ? '1 conclusão' : `${n} conclusões`, showBuild: 'Ver a build equipada',
-      find: 'Buscar guardião', findShort: 'Buscar', findPh: 'Nome Bungie (ex.: Fulano#1234)', findHint: 'Digite o nome Bungie completo, como aparece no jogo (ex.: Kayo Castan). O #código é opcional: sem ele aparecem todos com esse nome.', findNone: 'Ninguém com esse nome exato. Confira se o nome está completo, com espaços e acentos.', findErr: 'Não deu para buscar agora. Tente de novo em instantes.', findLoading: 'Buscando…', findLoadingP: 'Carregando a build…', back: 'Voltar', privateP: 'Não deu para ver o equipamento desse guardião agora.', seeBuild: 'Ver a build', vendT: 'Vendedores da semana', vendNote: t => `Banshee-44 e Ada-1 na Torre. Armas com o rolo que está à venda; em dourado as vantagens principais.${t ? ' Muda em ' + t + '.' : ''}`, notOwned: 'Não tem', shaders: (n, o) => o === n ? `Também vende ${n} tonalizadores, e você já tem todos.` : `Também vende ${n} tonalizadores; você tem ${o}.`, vaultT: 'Limpeza do cofre', of: 'de', slots: 'espaços usados', dupExo: 'Exóticos repetidos', dupLeg: 'Lendários repetidos', andMore: n => `E mais ${n}.`, vaultNote: 'Itens iguais guardados mais de uma vez. Para liberar espaço, desmonte as cópias que não usa, no jogo ou no DIM.', vaultClean: 'Nenhum item repetido no cofre.', statsT: 'Estatísticas de jogo', crucible: 'Crisol', eff: 'Eficiência', winsOf: (w, g) => `Vitórias (${w} de ${g})`, bestGame: 'Mais abates numa partida', cleared: 'Atividades concluídas', played: 'Tempo jogado', noTrials: 'Desafios de Osíris: você ainda não jogou.', trialsLine: (g, w, kd) => `Desafios de Osíris: ${g} partidas, ${w} vitórias, K/D ${kd}.`, recentT: 'Esquadrão recente', recentNote: 'Quem jogou no seu esquadrão nas últimas atividades. Toque num nome para ver a build.', recentNone: 'Ninguém no seu esquadrão nas últimas atividades.', together: n => n === 1 ? '1 atividade juntos' : `${n} atividades juntos`, clanTip: 'Toque num nome para ver a build da pessoa.', lastPlayed: d => `jogou ${d}`,
+      find: 'Buscar guardião', findShort: 'Buscar', findPh: 'Nome Bungie (ex.: Fulano#1234)', findHint: 'Digite o nome Bungie completo, como aparece no jogo (ex.: Kayo Castan). O #código é opcional: sem ele aparecem todos com esse nome.', findNone: 'Ninguém com esse nome exato. Confira se o nome está completo, com espaços e acentos.', findErr: 'Não deu para buscar agora. Tente de novo em instantes.', findLoading: 'Buscando…', findLoadingP: 'Carregando a build…', back: 'Voltar', privateP: 'Não deu para ver o equipamento desse guardião agora.', seeBuild: 'Ver a build', vendT: 'Vendedores da semana', vendNote: t => `Xûr, Banshee-44 e Ada-1 na Torre. Armas com o rolo que está à venda; em dourado as vantagens principais.${t ? ' Muda em ' + t + '.' : ''}`, notOwned: 'Não tem', xurLeaves: t => `exóticos · sai em ${t}`, coins: 'moedas', coinsHave: n => `Você tem ${n} Moedas Estranhas.`, xurGone: 'O Xûr não está na Torre agora. Ele volta na sexta, às 14h.', shaders: (n, o) => o === n ? `Também vende ${n} tonalizadores, e você já tem todos.` : `Também vende ${n} tonalizadores; você tem ${o}.`, vaultT: 'Limpeza do cofre', of: 'de', slots: 'espaços usados', dupExo: 'Exóticos repetidos', dupLeg: 'Lendários repetidos', andMore: n => `E mais ${n}.`, vaultNote: 'Itens iguais guardados mais de uma vez. Para liberar espaço, desmonte as cópias que não usa, no jogo ou no DIM.', vaultClean: 'Nenhum item repetido no cofre.', statsT: 'Estatísticas de jogo', crucible: 'Crisol', eff: 'Eficiência', winsOf: (w, g) => `Vitórias (${w} de ${g})`, bestGame: 'Mais abates numa partida', cleared: 'Atividades concluídas', played: 'Tempo jogado', noTrials: 'Desafios de Osíris: você ainda não jogou.', trialsLine: (g, w, kd) => `Desafios de Osíris: ${g} partidas, ${w} vitórias, K/D ${kd}.`, recentT: 'Esquadrão recente', recentNote: 'Quem jogou no seu esquadrão nas últimas atividades. Toque num nome para ver a build.', recentNone: 'Ninguém no seu esquadrão nas últimas atividades.', together: n => n === 1 ? '1 atividade juntos' : `${n} atividades juntos`, clanTip: 'Toque num nome para ver a build da pessoa.', lastPlayed: d => `jogou ${d}`,
       ammo: { 1: 'Munição primária', 2: 'Munição especial', 3: 'Munição pesada' },
       share: 'Gerar imagem para compartilhar', shareMaking: 'Montando a imagem da sua build…', shareAlt: 'Imagem da build equipada', shareBtn: 'Compartilhar', shareDl: 'Baixar imagem', shareClose: 'Fechar', shareTitle: 'Minha build no Destiny 2', shareFail: 'Não deu para gerar a imagem agora. Tente de novo.',
       setT: 'Bônus de conjunto', setPieces: n => n === 1 ? '1 peça' : `${n} peças`, setReq: n => `${n} peças`,
@@ -73,8 +73,8 @@ const UI = {
     hide: 'Hide done', search: 'Search by name or source', refresh: 'Refresh', logout: 'Sign out',
     disclaimer: 'Data read from your account through the official Bungie API. This site is not affiliated with Bungie.',
     loadouts: 'Loadouts', checklist: 'Checklist',
-    tabs: { obj: 'Objectives', act: 'Activities', drops: 'Drops', gd: 'Guardian' },
-    subs: { camp: 'Campaigns', raid: 'Raids', dg: 'Dungeons', tit: 'Titles', exo: 'Exotics', cat: 'Catalysts' },
+    tabs: { obj: 'Objectives', act: 'Activities', drops: 'Arsenal', gd: 'Guardian' },
+    subs: { camp: 'Campaigns', raid: 'Raids', dg: 'Dungeons', tit: 'Titles', exo: 'Exotics', cat: 'Catalysts', vend: 'Vendors' },
     heroTitle: 'Your Destiny 2 checklist', heroText: "Sign in with your Bungie.net account to see what's left: exotics, catalysts, titles, raids, dungeons and campaigns, from easiest to hardest.",
     heroList: ['The site only reads your data; it never changes anything in the game.', 'Your password stays with Bungie; the site never sees it.', 'Your checkmarks are saved in this browser.'],
     login: 'Sign in with Bungie.net', notConfigured: "The site isn't configured yet: the Bungie keys are missing from the Vercel environment variables.",
@@ -109,7 +109,7 @@ const UI = {
       week: 'This week', xurSells: n => `Xûr sells ${n}`, xurSub: (c, h, t) => `${c} coins${h != null ? ` · you have ${h}` : ''} · leaves in ${t}`,
       featured: 'Featured: ', missingEx: n => `${n} still missing`, untilReset: 'until reset', reset: 'Weekly reset', resetSub: t => `in ${t} · Tuesday, 17:00 UTC`,
       featWeek: 'Featured this week', clears: n => n === 1 ? '1 clear' : `${n} clears`, showBuild: 'Show the equipped build',
-      find: 'Find a guardian', findShort: 'Search', findPh: 'Bungie Name (e.g. Someone#1234)', findHint: 'Type the full Bungie Name as it shows in game (e.g. Kayo Castan). The #code is optional: without it you see everyone with that name.', findNone: 'No one with that exact name. Check that the name is complete, with spaces and accents.', findErr: "Couldn't search right now. Try again in a moment.", findLoading: 'Searching…', findLoadingP: 'Loading the build…', back: 'Back', privateP: "Couldn't see this guardian's gear right now.", seeBuild: 'See their build', vendT: "This week's vendors", vendNote: t => `Banshee-44 and Ada-1 in the Tower. Weapons with the roll for sale; main perks in gold.${t ? ' Changes in ' + t + '.' : ''}`, notOwned: 'Not owned', shaders: (n, o) => o === n ? `Also sells ${n} shaders, and you own all of them.` : `Also sells ${n} shaders; you own ${o}.`, vaultT: 'Vault cleanup', of: 'of', slots: 'slots used', dupExo: 'Duplicate exotics', dupLeg: 'Duplicate legendaries', andMore: n => `And ${n} more.`, vaultNote: 'Identical items stored more than once. To free space, dismantle the copies you don\'t use, in game or in DIM.', vaultClean: 'No duplicate items in the vault.', statsT: 'Game stats', crucible: 'Crucible', eff: 'Efficiency', winsOf: (w, g) => `Wins (${w} of ${g})`, bestGame: 'Most kills in a match', cleared: 'Activities cleared', played: 'Time played', noTrials: "Trials of Osiris: you haven't played yet.", trialsLine: (g, w, kd) => `Trials of Osiris: ${g} matches, ${w} wins, K/D ${kd}.`, recentT: 'Recent fireteam', recentNote: 'People in your fireteam in your latest activities. Tap a name to see their build.', recentNone: 'No one in your fireteam in your latest activities.', together: n => n === 1 ? '1 activity together' : `${n} activities together`, clanTip: 'Tap a name to see their build.', lastPlayed: d => `played ${d}`,
+      find: 'Find a guardian', findShort: 'Search', findPh: 'Bungie Name (e.g. Someone#1234)', findHint: 'Type the full Bungie Name as it shows in game (e.g. Kayo Castan). The #code is optional: without it you see everyone with that name.', findNone: 'No one with that exact name. Check that the name is complete, with spaces and accents.', findErr: "Couldn't search right now. Try again in a moment.", findLoading: 'Searching…', findLoadingP: 'Loading the build…', back: 'Back', privateP: "Couldn't see this guardian's gear right now.", seeBuild: 'See their build', vendT: "This week's vendors", vendNote: t => `Xûr, Banshee-44 and Ada-1 in the Tower. Weapons with the roll for sale; main perks in gold.${t ? ' Changes in ' + t + '.' : ''}`, notOwned: 'Not owned', xurLeaves: t => `exotics · leaves in ${t}`, coins: 'coins', coinsHave: n => `You have ${n} Strange Coins.`, xurGone: "Xûr isn't in the Tower right now. He's back Friday at 17:00 UTC.", shaders: (n, o) => o === n ? `Also sells ${n} shaders, and you own all of them.` : `Also sells ${n} shaders; you own ${o}.`, vaultT: 'Vault cleanup', of: 'of', slots: 'slots used', dupExo: 'Duplicate exotics', dupLeg: 'Duplicate legendaries', andMore: n => `And ${n} more.`, vaultNote: 'Identical items stored more than once. To free space, dismantle the copies you don\'t use, in game or in DIM.', vaultClean: 'No duplicate items in the vault.', statsT: 'Game stats', crucible: 'Crucible', eff: 'Efficiency', winsOf: (w, g) => `Wins (${w} of ${g})`, bestGame: 'Most kills in a match', cleared: 'Activities cleared', played: 'Time played', noTrials: "Trials of Osiris: you haven't played yet.", trialsLine: (g, w, kd) => `Trials of Osiris: ${g} matches, ${w} wins, K/D ${kd}.`, recentT: 'Recent fireteam', recentNote: 'People in your fireteam in your latest activities. Tap a name to see their build.', recentNone: 'No one in your fireteam in your latest activities.', together: n => n === 1 ? '1 activity together' : `${n} activities together`, clanTip: 'Tap a name to see their build.', lastPlayed: d => `played ${d}`,
       ammo: { 1: 'Primary ammo', 2: 'Special ammo', 3: 'Heavy ammo' },
       share: 'Make an image to share', shareMaking: 'Putting your build image together…', shareAlt: 'Image of the equipped build', shareBtn: 'Share', shareDl: 'Download image', shareClose: 'Close', shareTitle: 'My Destiny 2 build', shareFail: "Couldn't make the image right now. Please try again.",
       setT: 'Set bonuses', setPieces: n => n === 1 ? '1 piece' : `${n} pieces`, setReq: n => `${n} pieces`,
@@ -136,7 +136,7 @@ let charId = null, tab = LS.get('dc-tab', 'obj'), prevTab = 'obj', query = '';
 const lastSub = LS.get('dc-subs', {});
 let marks = new Set(), SECTIONS = [], LOADOUTS = [], loadedAt = null;
 const openSecs = new Set(), openItems = new Set();
-const GROUPS = [{ id: 'obj', subs: ['obj'] }, { id: 'act', subs: ['camp', 'raid', 'dg', 'tit'] }, { id: 'drops', subs: ['exo', 'cat'] }, { id: 'gd', subs: ['gd'] }];
+const GROUPS = [{ id: 'obj', subs: ['obj'] }, { id: 'act', subs: ['camp', 'raid', 'dg', 'tit'] }, { id: 'drops', subs: ['exo', 'cat', 'vend'] }, { id: 'gd', subs: ['gd'] }];
 const groupOf = t => GROUPS.find(g => g.subs.includes(t));
 // aba salva que não existe mais (ex.: Padrões, que foi retirada) volta para Objetivos
 if (tab !== 'ld' && !groupOf(tab)) { tab = 'obj'; LS.set('dc-tab', 'obj'); }
@@ -231,7 +231,7 @@ async function idbDel(k) { try { const db = await idb(); db.transaction('kv', 'r
 // 201 também em c: a Bungie só manda instâncias (300) dos itens incluídos na mesma resposta
 const PARTS = { id: '200,205', q: '201,301', a: '100,202,800,1100,1400', b: '900', c: '102,201,205,206,300', g: '205,300,305' };
 // parte de que cada aba depende: ela é pedida logo depois do cabeçalho
-const TAB_PART = { obj: 'q', camp: 'q', raid: 'a', dg: 'a', exo: 'a', cat: 'b', tit: 'b', ld: 'c', gd: 'a' };
+const TAB_PART = { vend: 'a', obj: 'q', camp: 'q', raid: 'a', dg: 'a', exo: 'a', cat: 'b', tit: 'b', ld: 'c', gd: 'a' };
 let have = { id: false, q: false, a: false, b: false, c: false, g: false };
 function pickChar() {
   const chars = Object.values(profile.characters?.data || {});
@@ -487,7 +487,7 @@ function build() {
   const contracts = qItems.filter(x => x.isContract).sort((a, b) => b.frac - a.frac);
   const expires = x => { const d = x.it.expirationDate ? new Date(x.it.expirationDate) : null; if (!d || isNaN(d)) return ''; const h = Math.max(0, Math.round((d - Date.now()) / 3600000)); return s.expires(h); };
   out.push(weekSection());
-  out.push(S('obj', 'vendors', '', null, [], { html: true }));
+  out.push(S('vend', 'vendors', '', null, [], { html: true }));
   if (!contracts.length) out.push(S('obj', 'contracts', s.contracts, waiting ? s.loadingQuests : s.noContracts, []));
   // Um painel por vendedor/origem, usando o rótulo oficial do jogo (ex.: "Recompensa da Vanguarda", "Contrato do Sindicato").
   const byVendor = new Map();
@@ -579,7 +579,7 @@ async function loadXur(my) {
     const hs = sales.map(s => s.itemHash);
     const en = await entities('DestinyInventoryItemDefinition', hs, 'en'); if (my !== gen) return;
     const loc = lang === 'pt' ? await entities('DestinyInventoryItemDefinition', hs, 'pt') : en; if (my !== gen) return;
-    XUR = { until: r.vendor?.data?.nextRefreshDate || null, items: sales.filter(s => en[s.itemHash]?.tt === 6).map(s => ({ en: en[s.itemHash].n, n: loc[s.itemHash]?.n || en[s.itemHash].n, cost: (s.costs || []).find(c => c.itemHash === STRANGE_COIN)?.quantity || 0 })) };
+    XUR = { until: r.vendor?.data?.nextRefreshDate || null, items: sales.filter(s => en[s.itemHash]?.tt === 6).map(s => ({ ic: loc[s.itemHash]?.ic || en[s.itemHash].ic, tl: loc[s.itemHash]?.tl || '', en: en[s.itemHash].n, n: loc[s.itemHash]?.n || en[s.itemHash].n, cost: (s.costs || []).find(c => c.itemHash === STRANGE_COIN)?.quantity || 0 })) };
   } catch { XUR = null; }
   if (my === gen) { weekReady.x = true; build(); render(); }
 }
@@ -622,11 +622,11 @@ function weekSection() {
     for (const q of m.availableQuests || []) if (q.status) items.push(I(`wk-${m.milestoneHash}-q`, name, W.wkQuestD, [q.status.completed ? '✓' : q.status.started ? W.wkStarted : W.wkNew], !!q.status.completed));
   }
   const miss = xurMissing();
-  if (miss.length && XUR?.until && Date.parse(XUR.until) > t) for (const x of miss) items.unshift(I('wk-xur-' + x.en, W.xurSells(x.n), W.xurSub(x.cost, have.c ? coins() : null, cd(Date.parse(XUR.until) - t)), [W.xurChip], false));
+  // o Xûr fica em Arsenal → Vendedores
   const f = featured(), feat = [...[...f.raid].map(k => 'raid-' + k), ...[...f.dg].map(k => 'dg-' + k)].map(id => SECTIONS_PREV.find(s => s.id === id)).filter(Boolean);
   const featTxt = feat.length ? ' ' + W.featured + feat.map(s => s.title).join(' · ') + '.' : '';
   const waiting = !(have.a && weekReady.m && weekReady.x);
-  return S('obj', 'week', W.week, (waiting ? u().loadingDefs + ' ' : '') + W.resetNote(cd(nextReset() - t)) + featTxt, items.sort((a, b) => a.auto - b.auto), { weekly: true });
+  return S('obj', 'week', W.week, (waiting ? u().loadingDefs + ' ' : '') + W.resetNote(cd(nextReset() - t)) + featTxt, items.sort((a, b) => a.auto - b.auto), { weekly: true, coll: true });
 }
 const U_CHIP_WEEK = () => u().w.weeklyChip;
 let SECTIONS_PREV = [];
@@ -1030,7 +1030,11 @@ function vendorsHTML() {
     ${v.other.length ? `<table class="vd-t">${v.other.map(o => `<tr><td><b>${esc(o.n)}</b>${o.d ? `<small>${esc(o.d)}</small>` : ''}</td><td class="n">${esc(o.cost || '')}</td></tr>`).join('')}</table>` : ''}
     ${v.sh ? `<p class="vd-note">${esc(W.shaders(v.sh, v.shOwn))}</p>` : ''}`).join('');
   const until = VEND.find(v => v.until)?.until;
-  return `<section data-sec="vendors" class="vend"><div class="sec-head"><div class="sec-title"><div class="sec-name"><h2>${esc(W.vendT)}</h2></div></div><p>${esc(W.vendNote(until ? cd(Date.parse(until) - Date.now()) : ''))}</p></div><div class="vd-body">${body}</div></section>`;
+  const miss = xurMissing().map(x => x.en), xu = XUR && XUR.items.length && (!XUR.until || Date.parse(XUR.until) > Date.now());
+  const xur = xu ? `<div class="vd-k">Xûr · ${esc(W.xurLeaves(cd(Date.parse(XUR.until) - Date.now())))}</div>
+    <div class="vd-x">${XUR.items.map(x => `<div class="vd-xi${miss.includes(x.en) ? ' miss' : ''}">${x.ic ? `<img src="${BNET}${x.ic}" alt="" loading="lazy">` : ''}<div><b>${esc(x.n)}</b><small>${esc(x.tl)}${x.cost ? ` · ${x.cost} ${esc(W.coins)}` : ''}</small></div>${miss.includes(x.en) ? `<span class="chip hot">${esc(W.notOwned)}</span>` : ''}</div>`).join('')}</div>
+    ${have.c ? `<p class="vd-note">${esc(W.coinsHave(coins()))}</p>` : ''}` : `<div class="vd-k">Xûr</div><p class="vd-note">${esc(XUR ? W.xurGone : u().loadingDefs)}</p>`;
+  return `<section data-sec="vendors" class="vend"><div class="sec-head"><div class="sec-title"><div class="sec-name"><h2>${esc(W.vendT)}</h2></div></div><p>${esc(W.vendNote(until ? cd(Date.parse(until) - Date.now()) : ''))}</p></div><div class="vd-body">${xur}${body}</div></section>`;
 }
 
 /* ---------- Limpeza do cofre: espaço usado e itens repetidos (só mostra; desmontar é no jogo) ---------- */
@@ -1103,7 +1107,7 @@ function render() {
   else { st.hidden = true; st.innerHTML = ''; }
   $('ldbtn').setAttribute('aria-pressed', tab === 'ld'); $('ldbtn').textContent = tab === 'ld' ? U.checklist : U.loadouts;
   document.body.classList.toggle('on-ld', tab === 'ld'); document.body.classList.toggle('no-clears', !OPTS.clears);
-  $('overall').hidden = tab === 'gd';
+  $('overall').hidden = tab === 'gd' || tab === 'vend';
   if (tab === 'gd') { $('list').innerHTML = gdHTML(); if (!GD && have.a) loadGuardian(gen); if (!VAULT && have.c) loadVault(gen); return; }
   if (tab === 'ld') {
     showMessage(stage < 1 || !have.c ? `<p class="empty-msg">${esc(U.loadingDefs)}</p>` : LOADOUTS.length ? LOADOUTS.map(l => `<article class="ld"><div class="ld-head"><h2>${esc(l.name)}</h2></div><ul class="items">${l.items.map(n => `<li>${esc(n)}</li>`).join('')}</ul><div class="ld-actions"><a class="ld-btn" href="https://app.destinyitemmanager.com/" target="_blank" rel="noopener">${esc(U.openDim)}</a></div></article>`).join('') : `<p class="empty-msg">${esc(U.noLoadouts)}</p>`);
