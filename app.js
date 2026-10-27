@@ -723,7 +723,9 @@ const STAT_ORDER = [2996146975, 392767087, 1943323491, 1735777505, 144602215, 42
 const imgCache = new Map();
 function loadImg(path) {
   if (!path) return Promise.resolve(null);
-  if (!imgCache.has(path)) imgCache.set(path, fetch(BNET + path, { mode: 'cors' }).then(r => r.ok ? r.blob() : null).then(b => b ? createImageBitmap(b) : null).catch(() => null));
+  const get = u => fetch(u, { mode: 'cors', credentials: 'omit' }).then(r => r.ok ? r.blob() : null).then(b => b ? createImageBitmap(b) : null);
+  // se a cópia guardada não servir (resposta opaca), busca de novo por outro endereço, direto da Bungie
+  if (!imgCache.has(path)) imgCache.set(path, get(BNET + path).catch(() => null).then(im => im || get(BNET + path + '?s=1').catch(() => null)));
   return imgCache.get(path);
 }
 const ELEMENT_ACC = { prismatic: ['#e57ce0', '#5cc6f2'], arc: ['#6fd3ff', '#a8f0ff'], solar: ['#f5a13c', '#ffd36e'], void: ['#b48cff', '#e07cf0'], stasis: ['#6fa8ff', '#b6e4ff'], strand: ['#5fe39a', '#c6ff7a'] };
