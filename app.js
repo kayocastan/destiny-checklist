@@ -53,6 +53,7 @@ const UI = {
       week: 'Esta semana', xurSells: n => `Xûr vende ${n}`, xurSub: (c, h, t) => `${c} moedas${h != null ? ` · você tem ${h}` : ''} · sai em ${t}`,
       featured: 'Em destaque: ', missingEx: n => `${n} ainda falta`, untilReset: 'até o reset', reset: 'Reset semanal', resetSub: t => `em ${t} · terça, 14h (Brasília)`,
       featWeek: 'Em destaque nesta semana', clears: n => n === 1 ? '1 conclusão' : `${n} conclusões`, showBuild: 'Ver a build equipada',
+      ammo: { 1: 'Munição primária', 2: 'Munição especial', 3: 'Munição pesada' },
       share: 'Gerar imagem para compartilhar', shareMaking: 'Montando a imagem da sua build…', shareAlt: 'Imagem da build equipada', shareBtn: 'Compartilhar', shareDl: 'Baixar imagem', shareClose: 'Fechar', shareTitle: 'Minha build no Destiny 2', shareFail: 'Não deu para gerar a imagem agora. Tente de novo.',
       subclass: 'Subclasse', weapons: 'Armas', armor: 'Armadura e mods', aspects: 'Aspectos', frags: 'Fragmentos',
       ranksT: 'Patentes e reputação', gRank: 'Patente de Guardião', pass: 'Passe',
@@ -104,6 +105,7 @@ const UI = {
       week: 'This week', xurSells: n => `Xûr sells ${n}`, xurSub: (c, h, t) => `${c} coins${h != null ? ` · you have ${h}` : ''} · leaves in ${t}`,
       featured: 'Featured: ', missingEx: n => `${n} still missing`, untilReset: 'until reset', reset: 'Weekly reset', resetSub: t => `in ${t} · Tuesday, 17:00 UTC`,
       featWeek: 'Featured this week', clears: n => n === 1 ? '1 clear' : `${n} clears`, showBuild: 'Show the equipped build',
+      ammo: { 1: 'Primary ammo', 2: 'Special ammo', 3: 'Heavy ammo' },
       share: 'Make an image to share', shareMaking: 'Putting your build image together…', shareAlt: 'Image of the equipped build', shareBtn: 'Share', shareDl: 'Download image', shareClose: 'Close', shareTitle: 'My Destiny 2 build', shareFail: "Couldn't make the image right now. Please try again.",
       subclass: 'Subclass', weapons: 'Weapons', armor: 'Armor and mods', aspects: 'Aspects', frags: 'Fragments',
       ranksT: 'Ranks and reputation', gRank: 'Guardian Rank', pass: 'Pass',
@@ -540,6 +542,11 @@ const XUR_VENDOR = 2190858386, STRANGE_COIN = 800069450;
 const RANK_PROGS = [457612306, 3011295063, 1807348350, 689153319, 584850370];
 const COUNT_METRICS = [740213466, 2959623395, 26751835, 3264536674];
 const OPTS = Object.assign({ week: true, clears: true, build: true }, LS.get('dc-opts', {}));
+const AMMO = {};
+/* Tipo de munição: 1 primária (branca), 2 especial (verde), 3 pesada (roxa) */
+const AMMO_COLOR = { 1: '#f2f4f7', 2: '#7fe08f', 3: '#b98cff' };
+const AMMO_PATH = 'M5 14V6.2L8 2l3 4.2V14z';
+const ammoSVG = t => AMMO_COLOR[t] ? `<svg viewBox="0 0 ${t * 7 + 3} 16" height="16" aria-hidden="true">${Array.from({ length: t }, (_, k) => `<path transform="translate(${k * 7 - 3.5} 0)" d="${AMMO_PATH}" fill="${AMMO_COLOR[t]}"/>`).join('')}</svg>` : '';
 let XUR = null, MSN = {}, BUILD = null, buildOpen = false, GD = null, gdLoading = false;
 const rtf = () => { try { return new Intl.RelativeTimeFormat(lang === 'pt' ? 'pt-BR' : 'en', { numeric: 'auto' }); } catch { return null; } };
 function nextReset() { const d = new Date(); d.setUTCHours(17, 0, 0, 0); while (d.getUTCDay() !== 2 || d <= Date.now()) d.setUTCDate(d.getUTCDate() + 1); return d.getTime(); }
@@ -610,6 +617,8 @@ async function loadBuild(my) {
   const all = [...plugs, ...eq.map(i => i.itemHash)];
   const en = await entities('DestinyInventoryItemDefinition', all, 'en'); if (my !== gen) return;
   const loc = lang === 'pt' ? await entities('DestinyInventoryItemDefinition', all, 'pt') : en; if (my !== gen) return;
+  const wh = eq.filter(i => [1498876634, 2465295065, 953998645].includes(i.bucketHash)).map(i => i.itemHash).filter(h => AMMO[h] == null);
+  await Promise.all(wh.map(h => bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${h}/`, false).then(d => { AMMO[h] = d.equippingBlock?.ammoType || 0; }).catch(() => {}))); if (my !== gen) return;
   BUILD = { en, loc }; if (buildOpen) renderBuild();
 }
 const SKIP_NAME = /^(Empty|Default|Upgrade Armor|Locked|No |Restore Defaults|Kill Tracker|Tracker Disabled|Change Energy|Deepsight)/i;
@@ -620,7 +629,7 @@ function buildHTML() {
   const eq = (profile.characterEquipment?.data?.[charId]?.items || []).filter(i => GEAR_BUCKETS.includes(i.bucketHash)).sort((a, b) => GEAR_BUCKETS.indexOf(a.bucketHash) - GEAR_BUCKETS.indexOf(b.bucketHash));
   const chip = (h, cls) => { const d = B.loc[h] || B.en[h] || {}; return `<span class="${cls || ''}">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy">` : ''}${esc(d.n)}</span>`; };
   const plugsOf = i => { const own = B.en[i.itemHash]?.tl || ''; return (sk[i.itemInstanceId]?.sockets || []).filter(s => s.plugHash && s.isVisible !== false).map(s => s.plugHash).filter(h => { const e = B.en[h]; return e && e.n && !SKIP_NAME.test(e.n) && !SKIP_TYPE.test(e.tl) && e.tl !== own; }); };
-  const row = (i, body) => { const d = B.loc[i.itemHash] || {}, pw = inst[i.itemInstanceId]?.primaryStat?.value; return `<div class="b-row${d.tt === 6 ? ' exo' : ''}"><div class="b-name">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy">` : ''}<span>${esc(d.n)}</span><small>${esc(d.tl || '')}${pw && pw > 0 ? ` · <b>${pw}</b>` : ''}</small></div>${body}</div>`; };
+  const row = (i, body) => { const d = B.loc[i.itemHash] || {}, pw = inst[i.itemInstanceId]?.primaryStat?.value; return `<div class="b-row${d.tt === 6 ? ' exo' : ''}"><div class="b-name">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy">` : ''}<span>${esc(d.n)}</span>${AMMO[i.itemHash] ? `<span class="ammo" title="${esc(u().w.ammo[AMMO[i.itemHash]])}" aria-label="${esc(u().w.ammo[AMMO[i.itemHash]])}">${ammoSVG(AMMO[i.itemHash])}</span>` : ''}<small>${esc(d.tl || '')}${pw && pw > 0 ? ` · <b>${pw}</b>` : ''}</small></div>${body}</div>`; };
   const sub = eq.find(i => i.bucketHash === SUB_BUCKET);
   let html = '';
   if (sub) {
@@ -643,7 +652,7 @@ function loadImg(path) {
   if (!imgCache.has(path)) imgCache.set(path, fetch(BNET + path, { mode: 'cors' }).then(r => r.ok ? r.blob() : null).then(b => b ? createImageBitmap(b) : null).catch(() => null));
   return imgCache.get(path);
 }
-async function buildShareCanvas() {
+async function buildShareCanvas(S = 1, MAXH = 4400) {
   const W = u().w, B = BUILD, ch = profile.characters.data[charId], U = u();
   const cs = getComputedStyle(document.documentElement), acc = cs.getPropertyValue('--acc').trim() || '#6fd3ff', acc2 = cs.getPropertyValue('--acc2').trim() || '#a8f0ff';
   try { await Promise.all(['700 40px Rajdhani', '500 20px "IBM Plex Sans"', '600 20px "IBM Plex Sans"', '500 20px "IBM Plex Mono"'].map(f => document.fonts.load(f))); } catch {}
@@ -657,9 +666,9 @@ async function buildShareCanvas() {
   for (const h of STAT_ORDER) paths.add(statDefs[h]?.ic);
   await Promise.all([...paths].filter(Boolean).map(loadImg));
 
-  const Wd = 1080, PAD = 48, IN = PAD + 28, CW = Wd - PAD * 2, MAXH = 4400;
-  const cv = document.createElement('canvas'); cv.width = Wd; cv.height = MAXH;
-  const x = cv.getContext('2d'), cards = [];
+  const Wd = 1080, PAD = 48, IN = PAD + 28, CW = Wd - PAD * 2;
+  const cv = document.createElement('canvas'); cv.width = Wd * S; cv.height = Math.ceil(MAXH * S);
+  const x = cv.getContext('2d'), cards = []; x.scale(S, S); x.imageSmoothingQuality = 'high';
   const F = { d: s => `700 ${s}px Rajdhani, "Arial Narrow", sans-serif`, b: (s, w = 500) => `${w} ${s}px "IBM Plex Sans", system-ui, sans-serif`, m: s => `500 ${s}px "IBM Plex Mono", ui-monospace, monospace` };
   const rr = (c, X, Y, w, h, r) => { c.beginPath(); if (c.roundRect) c.roundRect(X, Y, w, h, r); else c.rect(X, Y, w, h); };
   const icon = (p, X, Y, s, r = 8, ring) => { return loadImg(p).then(im2 => { x.save(); rr(x, X, Y, s, s, r); x.clip(); if (im2) x.drawImage(im2, X, Y, s, s); else { x.fillStyle = 'rgba(255,255,255,.1)'; x.fill(); } x.restore(); if (ring) { x.save(); rr(x, X + 1, Y + 1, s - 2, s - 2, r); x.strokeStyle = ring; x.lineWidth = 2.5; x.stroke(); x.restore(); } }); };
@@ -728,7 +737,8 @@ async function buildShareCanvas() {
     for (const i of wpns) {
       const d = def(i.itemHash), pw = inst[i.itemInstanceId]?.primaryStat?.value, top = y, exo = d.tt === 6;
       await icon(d.ic, IN - 4, top + 24, 96, 10, exo ? 'rgba(243,215,122,.9)' : 'rgba(255,255,255,.28)');
-      text(d.n, IN + 112, top + 64, F.d(46), exo ? GOLD : '#ffffff', 'left', CW - 200);
+      const nw = text(d.n, IN + 112, top + 64, F.d(46), exo ? GOLD : '#ffffff', 'left', CW - 260); const am = AMMO[i.itemHash];
+      if (AMMO_COLOR[am]) { x.save(); x.fillStyle = AMMO_COLOR[am]; for (let k = 0; k < am; k++) { x.save(); x.translate(IN + 112 + nw + 16 + k * 15, top + 30); x.scale(2, 2); x.translate(-5, 0); x.fill(new Path2D(AMMO_PATH)); x.restore(); } x.restore(); }
       text(`${d.tl || ''}${pw > 0 ? '  ·  ✦' + pw : ''}`, IN + 112, top + 100, F.m(22), '#b9c3d3', 'left', CW - 200);
       const end = await chips(plugsOf(i), IN + 112, top + 122, CW - 56 - 112, h => /^Masterworked|^Tier \d/i.test(B.en[h]?.n || '') || /Intrinsic/i.test(B.en[h]?.tl || ''));
       y = Math.max(end, top + 120) + 26; cards.push({ y: top, h: y - top, exo }); y += 14;
@@ -755,29 +765,31 @@ async function buildShareCanvas() {
   y += 40;
 
   // composição final
-  const out = document.createElement('canvas'); out.width = Wd; out.height = Math.min(y, MAXH);
-  const o = out.getContext('2d');
-  o.fillStyle = '#0d121c'; o.fillRect(0, 0, Wd, out.height);
-  const glow = (cx, cy, r, c, a) => { const g = o.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, c); g.addColorStop(1, 'rgba(13,18,28,0)'); o.globalAlpha = a; o.fillStyle = g; o.fillRect(0, 0, Wd, out.height); o.globalAlpha = 1; };
-  glow(Wd * .1, 420, 760, acc, .28); glow(Wd * .95, out.height * .55, 720, acc2, .2); glow(Wd * .3, out.height, 700, acc, .14);
+  const Hh = Math.min(y, MAXH), out = document.createElement('canvas'); out.width = Wd * S; out.height = Math.ceil(Hh * S);
+  const o = out.getContext('2d'); o.scale(S, S);
+  o.fillStyle = '#0d121c'; o.fillRect(0, 0, Wd, Hh);
+  const glow = (cx, cy, r, c, a) => { const g = o.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, c); g.addColorStop(1, 'rgba(13,18,28,0)'); o.globalAlpha = a; o.fillStyle = g; o.fillRect(0, 0, Wd, Hh); o.globalAlpha = 1; };
+  glow(Wd * .1, 420, 760, acc, .28); glow(Wd * .95, Hh * .55, 720, acc2, .2); glow(Wd * .3, Hh, 700, acc, .14);
   for (const c of cards) { rr(o, PAD, c.y, CW, c.h, 18); o.fillStyle = 'rgba(255,255,255,.045)'; o.fill(); }
-  o.drawImage(cv, 0, 0);
+  o.save(); o.setTransform(1, 0, 0, 1, 0, 0); o.drawImage(cv, 0, 0); o.restore();
   for (const c of cards) { rr(o, PAD + 1, c.y + 1, CW - 2, c.h - 2, 18); o.strokeStyle = c.exo ? 'rgba(243,215,122,.5)' : 'rgba(255,255,255,.09)'; o.lineWidth = 2; o.stroke(); }
-  return out;
+  out.logicalH = Hh; return out;
 }
 let shareUrl = null;
 async function openShare() {
   const W = u().w, dlg = $('sharedlg'); if (!dlg || !BUILD) return;
   dlg.innerHTML = `<div class="sh-box"><p class="sh-wait">${esc(W.shareMaking)}</p></div>`; dlg.showModal();
   try {
-    const cv = await buildShareCanvas();
-    const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
+    // 1ª passada mede a altura; a 2ª desenha em 2x (2160 px de largura) para ficar nítida no WhatsApp
+    const h = (await buildShareCanvas(1)).logicalH;
+    const cv = await buildShareCanvas(2, h + 2);
+    const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.95));
     if (shareUrl) URL.revokeObjectURL(shareUrl); shareUrl = URL.createObjectURL(blob);
-    const name = `build-${(u().classes[profile.characters.data[charId].classType] || 'destiny').toLowerCase()}-${new Date().toISOString().slice(0, 10)}.png`;
-    const file = new File([blob], name, { type: 'image/png' });
+    const name = `build-${(u().classes[profile.characters.data[charId].classType] || 'destiny').toLowerCase()}-${new Date().toISOString().slice(0, 10)}.jpg`;
+    const file = new File([blob], name, { type: 'image/jpeg' });
     const canShare = !!(navigator.canShare && navigator.canShare({ files: [file] }));
-    dlg.innerHTML = `<div class="sh-box"><div class="sh-img"><img src="${shareUrl}" alt="${esc(W.shareAlt)}"></div><div class="sh-actions">${canShare ? `<button class="btn" id="shgo" type="button">${esc(W.shareBtn)}</button>` : ''}<a class="${canShare ? 'reset' : 'btn'}" id="shdl" href="${shareUrl}" download="${name}">${esc(W.shareDl)}</a><button class="reset" id="shclose" type="button">${esc(W.shareClose)}</button></div></div>`;
-    $('shclose').onclick = () => dlg.close();
+    dlg.innerHTML = `<div class="sh-box"><button class="sh-x" id="shx" type="button" aria-label="${esc(W.shareClose)}" title="${esc(W.shareClose)}">×</button><div class="sh-img"><img src="${shareUrl}" alt="${esc(W.shareAlt)}"></div><div class="sh-actions">${canShare ? `<button class="btn" id="shgo" type="button">${esc(W.shareBtn)}</button>` : ''}<a class="${canShare ? 'reset' : 'btn'}" id="shdl" href="${shareUrl}" download="${name}">${esc(W.shareDl)}</a><button class="reset" id="shclose" type="button">${esc(W.shareClose)}</button></div></div>`;
+    $('shclose').onclick = () => dlg.close(); $('shx').onclick = () => dlg.close();
     if (canShare) $('shgo').onclick = () => navigator.share({ files: [file], title: W.shareTitle }).catch(() => {});
   } catch (e) { console.error(e); dlg.innerHTML = `<div class="sh-box"><p class="sh-wait">${esc(W.shareFail)}</p><div class="sh-actions"><button class="reset" id="shclose" type="button">${esc(W.shareClose)}</button></div></div>`; $('shclose').onclick = () => dlg.close(); }
 }

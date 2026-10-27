@@ -178,3 +178,11 @@ dialog.sh::backdrop{background:rgba(5,8,14,.78)}
 .sh-actions .reset{text-decoration:none;color:var(--fg);padding:8px 14px}
 .sh-actions a.btn{font-size:16px;padding:8px 16px}
 .sh-wait{margin:8px;color:var(--muted)}
+.sh-box{position:relative}
+.sh-x{position:absolute;top:22px;right:22px;z-index:2;display:grid;place-items:center;width:40px;height:40px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(10,14,22,.72);color:#fff;font-size:26px;line-height:1;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.sh-x:hover{background:rgba(10,14,22,.9)}
+.sh-x:focus-visible{outline:2px solid var(--acc2);outline-offset:2px}
+dialog.sh:has(.sh-img){padding:0}
+.b-name .ammo{flex:none;display:inline-flex;align-items:center;opacity:.95}
+.b-name>span:not(.ammo){flex:0 1 auto}
+.b-name small{margin-left:auto}
