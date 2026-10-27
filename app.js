@@ -554,6 +554,7 @@ const AMMO_PATH = 'M5 14V6.2L8 2l3 4.2V14z';
 const ammoSVG = t => AMMO_COLOR[t] ? `<svg viewBox="0 0 ${t * 7 + 3} 16" height="16" aria-hidden="true">${Array.from({ length: t }, (_, k) => `<path transform="translate(${k * 7 - 3.5} 0)" d="${AMMO_PATH}" fill="${AMMO_COLOR[t]}"/>`).join('')}</svg>` : '';
 let weekReady = { x: false, m: false }, weekT = null;
 function resetChar() { XUR = null; MSN = {}; BUILD = null; GD = null; weekReady = { x: false, m: false }; clearTimeout(weekT); weekT = null; }
+const EMBLEMS = {};
 let XUR = null, MSN = {}, BUILD = null, buildOpen = false, GD = null, gdLoading = false;
 const rtf = () => { try { return new Intl.RelativeTimeFormat(lang === 'pt' ? 'pt-BR' : 'en', { numeric: 'auto' }); } catch { return null; } };
 function nextReset() { const d = new Date(); d.setUTCHours(17, 0, 0, 0); while (d.getUTCDay() !== 2 || d <= Date.now()) d.setUTCDate(d.getUTCDate() + 1); return d.getTime(); }
@@ -676,7 +677,9 @@ async function buildShareCanvas(C, S = 1, MAXH = 4400) {
   const def = h => B.loc[h] || B.en[h] || {};
   const subI = eq.find(i => i.bucketHash === SUB_BUCKET), [acc, acc2] = ELEMENT_ACC[ELEMENTS[B.en[subI?.itemHash]?.dt]] || ELEMENT_ACC.arc;
   const plugsOf = i => { const own = B.en[i.itemHash]?.tl || ''; return (sk[i.itemInstanceId]?.sockets || []).filter(s => s.plugHash && s.isVisible !== false).map(s => s.plugHash).filter(h => { const e = B.en[h]; return e && e.n && !SKIP_NAME.test(e.n) && !SKIP_TYPE.test(e.tl) && e.tl !== own; }); };
-  const paths = new Set([ch.emblemBackgroundPath]);
+  const emDef = EMBLEMS[ch.emblemHash] || (EMBLEMS[ch.emblemHash] = await bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${ch.emblemHash}/`, false).catch(() => ({})));
+  const emWide = emDef.secondarySpecial, emIcon = emDef.displayProperties?.icon;
+  const paths = new Set([ch.emblemBackgroundPath, emWide, emIcon]);
   for (const i of eq) { paths.add(def(i.itemHash).ic); for (const h of plugsOf(i)) paths.add(def(h).ic); }
   for (const h of STAT_ORDER) paths.add(statDefs[h]?.ic);
   await Promise.all([...paths].filter(Boolean).map(loadImg));
@@ -706,15 +709,19 @@ async function buildShareCanvas(C, S = 1, MAXH = 4400) {
   };
 
   // cabeçalho com o emblema
-  const HH = 240, em = await loadImg(ch.emblemBackgroundPath);
+  // Cabeçalho: a arte larga do emblema vira um fundo desfocado (ela é pequena demais para ficar nítida ampliada)
+  // e o ícone do emblema aparece em tamanho que não estoura
+  const HH = 240, wide = await loadImg(emWide), eic = await loadImg(emIcon), em = wide || eic ? null : await loadImg(ch.emblemBackgroundPath);
   x.fillStyle = '#1b2232'; x.fillRect(0, 0, Wd, HH);
-  if (em) { const s = HH / em.height; x.drawImage(em, 0, 0, em.width * s, HH); }
+  if (wide) { const s = Math.max(Wd / wide.width, HH / wide.height) * 1.08, w = wide.width * s, h = wide.height * s; const t = document.createElement('canvas'); t.width = Math.max(8, Math.round(w / 14)); t.height = Math.max(4, Math.round(h / 14)); const tc = t.getContext('2d'); tc.imageSmoothingQuality = 'high'; tc.drawImage(wide, 0, 0, t.width, t.height); x.save(); x.imageSmoothingQuality = 'high'; x.drawImage(t, (Wd - w) / 2, (HH - h) / 2, w, h); x.restore(); }
+  else if (em) { const s = HH / em.height; x.drawImage(em, 0, 0, em.width * s, HH); }
   const og = x.createLinearGradient(0, 0, Wd, 0); og.addColorStop(0, 'rgba(14,18,28,0)'); og.addColorStop(.22, 'rgba(14,18,28,.5)'); og.addColorStop(.6, 'rgba(14,18,28,.78)'); og.addColorStop(1, 'rgba(14,18,28,.94)'); x.fillStyle = og; x.fillRect(0, 0, Wd, HH);
   const sub = eq.find(i => i.bucketHash === SUB_BUCKET), sd = sub ? def(sub.itemHash) : {};
   const el = ELEMENTS[B.en[sub?.itemHash]?.dt] || '';
   const elName = { prismatic: ['Prismatic', 'Prismático'], arc: ['Arc', 'Arco'], solar: ['Solar', 'Solar'], void: ['Void', 'Vácuo'], stasis: ['Stasis', 'Estase'], strand: ['Strand', 'Filamento'] }[el];
   const cls = U.classes[ch.classType] || '';
-  const hx = em ? 270 : PAD;
+  let hx = em ? 270 : PAD;
+  if (eic) { x.save(); x.fillStyle = 'rgba(0,0,0,.35)'; x.shadowColor = 'rgba(0,0,0,.5)'; x.shadowBlur = 18; rr(x, PAD, (HH - 112) / 2, 112, 112, 12); x.fill(); x.restore(); await icon(emIcon, PAD, (HH - 112) / 2, 112, 12, 'rgba(255,255,255,.35)'); hx = PAD + 112 + 30; }
   text((C.name || '').toUpperCase(), hx, 100, F.m(24), '#c3ccda', 'left', 560);
   { const tt = charTitle(cls, sd.n), mw = Wd - hx - 290; let fs = 70; x.font = F.d(fs); while (x.measureText(tt).width > mw && fs > 34) { fs -= 2; x.font = F.d(fs); } text(tt, hx - 3, 170, F.d(fs), '#ffffff', 'left', mw); }
   text(String(ch.light), Wd - PAD, 160, F.d(96), GOLD, 'right');
@@ -751,7 +758,7 @@ async function buildShareCanvas(C, S = 1, MAXH = 4400) {
     y = label(W.weapons, y) + 16;
     for (const i of wpns) {
       const d = def(i.itemHash), pw = inst[i.itemInstanceId]?.primaryStat?.value, top = y, exo = d.tt === 6;
-      await icon(d.ic, IN - 4, top + 24, 96, 10, exo ? 'rgba(243,215,122,.9)' : 'rgba(255,255,255,.28)');
+      await icon(d.ic, IN - 4, top + 26, 88, 10, exo ? 'rgba(243,215,122,.9)' : 'rgba(255,255,255,.28)');
       const nw = text(d.n, IN + 112, top + 64, F.d(46), exo ? GOLD : '#ffffff', 'left', CW - 260); const am = AMMO[i.itemHash];
       if (AMMO_COLOR[am]) { x.save(); x.fillStyle = AMMO_COLOR[am]; for (let k = 0; k < am; k++) { x.save(); x.translate(IN + 112 + nw + 16 + k * 15, top + 30); x.scale(2, 2); x.translate(-5, 0); x.fill(new Path2D(AMMO_PATH)); x.restore(); } x.restore(); }
       text(`${d.tl || ''}${pw > 0 ? '  ·  ✦' + pw : ''}`, IN + 112, top + 100, F.m(22), '#b9c3d3', 'left', CW - 200);
@@ -790,7 +797,7 @@ async function buildShareCanvas(C, S = 1, MAXH = 4400) {
   for (const c of cards) { rr(o, PAD + 1, c.y + 1, CW - 2, c.h - 2, 18); o.strokeStyle = c.exo ? 'rgba(243,215,122,.5)' : 'rgba(255,255,255,.09)'; o.lineWidth = 2; o.stroke(); }
   out.logicalH = Hh; return out;
 }
-let shareUrl = null;
+let shareUrl = null, pngUrl = null;
 async function openShare(C) {
   const W = u().w, dlg = $('sharedlg'); if (!dlg || !C?.B) return;
   dlg.innerHTML = `<div class="sh-box"><p class="sh-wait">${esc(W.shareMaking)}</p></div>`; dlg.showModal();
@@ -798,12 +805,13 @@ async function openShare(C) {
     // 1ª passada mede a altura; a 2ª desenha em 2x (2160 px de largura) para ficar nítida no WhatsApp
     const h = (await buildShareCanvas(C, 1)).logicalH;
     const cv = await buildShareCanvas(C, 2, h + 2);
-    const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.95));
+    const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.95)), png = await new Promise(r => cv.toBlob(r, 'image/png'));
+    if (pngUrl) URL.revokeObjectURL(pngUrl); pngUrl = URL.createObjectURL(png || blob);
     if (shareUrl) URL.revokeObjectURL(shareUrl); shareUrl = URL.createObjectURL(blob);
     const name = `build-${String(C.name || '').replace(/#\d+$/, '').replace(/[^a-z0-9]+/gi, '-').toLowerCase() || 'destiny'}-${(u().classes[C.p.characters.data[C.cid].classType] || '').toLowerCase()}-${new Date().toISOString().slice(0, 10)}.jpg`;
     const file = new File([blob], name, { type: 'image/jpeg' });
     const canShare = !!(navigator.canShare && navigator.canShare({ files: [file] }));
-    dlg.innerHTML = `<div class="sh-box"><button class="sh-x" id="shx" type="button" aria-label="${esc(W.shareClose)}" title="${esc(W.shareClose)}">×</button><div class="sh-img"><img src="${shareUrl}" alt="${esc(W.shareAlt)}"></div><div class="sh-actions">${canShare ? `<button class="btn" id="shgo" type="button">${esc(W.shareBtn)}</button>` : ''}<a class="${canShare ? 'reset' : 'btn'}" id="shdl" href="${shareUrl}" download="${name}">${esc(W.shareDl)}</a></div></div>`;
+    dlg.innerHTML = `<div class="sh-box"><button class="sh-x" id="shx" type="button" aria-label="${esc(W.shareClose)}" title="${esc(W.shareClose)}">×</button><div class="sh-img"><img src="${shareUrl}" alt="${esc(W.shareAlt)}"></div><div class="sh-actions">${canShare ? `<button class="btn" id="shgo" type="button">${esc(W.shareBtn)}</button>` : ''}<a class="${canShare ? 'reset' : 'btn'}" id="shdl" href="${pngUrl}" download="${name.replace(/\.jpg$/, png ? '.png' : '.jpg')}">${esc(W.shareDl)}</a></div></div>`;
     $('shx').onclick = () => dlg.close();
     if (canShare) $('shgo').onclick = () => navigator.share({ files: [file], title: W.shareTitle }).catch(() => {});
   } catch (e) { console.error(e); dlg.innerHTML = `<div class="sh-box sh-err"><button class="sh-x" id="shx" type="button" aria-label="${esc(W.shareClose)}" title="${esc(W.shareClose)}">×</button><p class="sh-wait">${esc(W.shareFail)}</p></div>`; $('shx').onclick = () => dlg.close(); }
