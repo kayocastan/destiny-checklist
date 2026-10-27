@@ -707,7 +707,7 @@ async function buildShareCanvas(S = 1, MAXH = 4400) {
   const cls = U.classes[ch.classType] || '', who = String(member.name || '').replace(/#\d+$/, '');
   const hx = em ? 270 : PAD;
   text((member.name || '').toUpperCase(), hx, 100, F.m(24), '#c3ccda', 'left', 560);
-  text(charTitle(cls, sd.n), hx - 3, 170, F.d(70), '#ffffff', 'left', Wd - hx - 280);
+  { const tt = charTitle(cls, sd.n), mw = Wd - hx - 290; let fs = 70; x.font = F.d(fs); while (x.measureText(tt).width > mw && fs > 34) { fs -= 2; x.font = F.d(fs); } text(tt, hx - 3, 170, F.d(fs), '#ffffff', 'left', mw); }
   text(String(ch.light), Wd - PAD, 160, F.d(96), GOLD, 'right');
   x.font = F.d(96); const pwW = x.measureText(String(ch.light)).width; text('✦', Wd - PAD - pwW - 8, 120, F.d(40), GOLD, 'right');
   text(U.power.toUpperCase(), Wd - PAD, 196, F.m(20), '#c3ccda', 'right');
@@ -847,6 +847,19 @@ function gdHTML() {
 }
 
 /* Título do cabeçalho: subclasse + classe ("Titã Combatente" / "Striker Titan"); se o nome da subclasse já traz a classe ("Titã Prismático"), usa só ele */
+/* Ajusta o tamanho do título para caber numa linha (nomes longos, como os do Caçador) */
+function fitTitle() {
+  const h = $('title'), eb = $('eyebrow'); if (!h || !h.dataset.full) return;
+  const over = () => h.scrollWidth > h.clientWidth + 1;
+  const shrink = min => { let fs = parseFloat(getComputedStyle(h).fontSize) || 40; while (over() && fs > min) { fs -= 1; h.style.fontSize = fs + 'px'; } };
+  h.style.fontSize = ''; h.classList.remove('two'); h.textContent = h.dataset.full; eb.textContent = eb.dataset.base || '';
+  shrink(26); if (!over()) return;
+  // não coube: a classe vai para a linha pequena e o título fica só com a subclasse
+  h.style.fontSize = ''; h.textContent = h.dataset.short; if (h.dataset.short !== h.dataset.full) eb.textContent = `${h.dataset.cls} · ${eb.dataset.base}`;
+  shrink(20); if (over()) h.classList.add('two');
+}
+addEventListener('resize', () => fitTitle());
+try { document.fonts.ready.then(() => fitTitle()); } catch {}
 function charTitle(cls, sn) { if (!sn) return cls; if (sn.toLowerCase().includes(cls.toLowerCase())) return sn; return lang === 'pt' ? `${cls} ${sn}` : `${sn} ${cls}`; }
 /* ---------- renderização ---------- */
 /* Tema claro/escuro: segue o sistema até a pessoa escolher; a escolha fica salva neste navegador */
@@ -869,7 +882,7 @@ function render() {
   renderWeek(); renderBuild();
   if (!cfg) return;
   if (!logged) {
-    $('title').textContent = 'Destiny Checklist'; document.title = 'Destiny Checklist'; $('eyebrow').textContent = 'Destiny 2'; renderGuardian(null);
+    delete $('title').dataset.full; $('title').style.fontSize = ''; $('title').classList.remove('two'); $('title').textContent = 'Destiny Checklist'; document.title = 'Destiny Checklist'; $('eyebrow').textContent = 'Destiny 2'; renderGuardian(null);
     $('subtabs').hidden = true;
     if (auth) return; // carregando
     const U = u();
@@ -882,9 +895,9 @@ function render() {
   const mx = maxPower(ch.classType);
   const sub = (profile.characterEquipment?.data?.[charId]?.items || []).find(i => i.bucketHash === SUB_BUCKET), sn = sub && gearDefs[sub.itemHash]?.n;
   const ttl = charTitle(cls, sn);
-  $('title').textContent = ttl; $('title').title = `${U.races[ch.raceType] || ''} ${cls}`; document.title = ttl + ' · Destiny Checklist';
+  Object.assign($('title').dataset, { full: ttl, short: sn || cls, cls }); $('title').textContent = ttl; $('title').title = `${U.races[ch.raceType] || ''} ${cls}`; document.title = ttl + ' · Destiny Checklist';
   renderGuardian(ch);
-  $('eyebrow').textContent = member.name || ''; $('eyebrow').title = member.name || '';
+  $('eyebrow').dataset.base = member.name || ''; $('eyebrow').textContent = member.name || ''; $('eyebrow').title = member.name || ''; fitTitle();
   $('ghpw').hidden = false; $('pwv').textContent = ch.light; $('pwmax').textContent = mx && mx > ch.light ? `${U.max} ${mx}` : U.power;
   $('chars').innerHTML = Object.values(profile.characters.data).map(c => `<button class="char" type="button" data-char="${c.characterId}" aria-pressed="${c.characterId === charId}">${esc(U.classes[c.classType])}<span class="pw">${c.light}</span></button>`).join('');
   $('chars').hidden = Object.keys(profile.characters.data).length < 2;

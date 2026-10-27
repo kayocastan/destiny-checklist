@@ -200,5 +200,9 @@ dialog.sh:has(.sh-img){padding:0}
 .gd-grid{grid-template-columns:repeat(auto-fit,minmax(min(130px,100%),1fr))}
 /* Linha de cima do cabeçalho em duas linhas: raça e classe; nome da conta menor embaixo */
 .gh .eyebrow{font-size:11px;line-height:1.3}
-.gh h1{margin-top:2px;overflow-wrap:anywhere}
-@media (max-width:480px){.gh h1{font-size:clamp(24px,7.4vw,32px);line-height:1.05}}
+.gh h1{margin-top:2px}
+.gh h1{white-space:nowrap;overflow:hidden;text-overflow:clip;line-height:1.05}
+@media (max-width:480px){.gh h1{font-size:clamp(24px,7.4vw,32px)}}
+.gh-id{flex:1 1 auto;min-width:0}
+.gh-pw{flex:none}
+.gh h1.two{white-space:normal;line-height:1}
