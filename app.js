@@ -1463,7 +1463,7 @@ if ('serviceWorker' in navigator) addEventListener('load', () => navigator.servi
 })();
 async function openPublic(name) {
   FD.q = name; FD.results = null; openFind();
-  $('finddlg').addEventListener('close', () => { if (new URLSearchParams(location.search).has('jogador')) history.replaceState(null, '', location.pathname + location.hash); }, { once: true });
+  history.replaceState(null, '', location.pathname + location.hash); // o endereço volta a ser o do site; quem abriu continua vendo a build
   try { const r = await searchPlayers(name); if (r.length === 1) showPlayer(r[0]); else { FD.results = r; renderFind(); } } catch { FD.status = 'error'; renderFind(); }
 }
 })();
