@@ -349,6 +349,7 @@ async function hydrate(doneMsg) {
   build(); render();
   await loadGear(my); if (my !== gen) return; // cabeçalho e cor primeiro
   GD = null; VAULT = null; if (have.g) loadBuild(my); loadXur(my); if (have.a) loadVendors(my); if (have.a) loadMilestones(my); if (tab === 'gd' && have.a) loadGuardian(my);
+  if (tab === 'ld' && have.c) loadLoadouts(my); // na aba Loadouts, os nomes não esperam as missões
   if (!weekT) weekT = setTimeout(() => { weekReady.x = weekReady.m = true; if (my === gen) { build(); render(); } }, 6000);
   status(u().loadingDefs);
   const quests = [];
@@ -367,7 +368,7 @@ async function hydrate(doneMsg) {
 /* Nomes dos loadouts e dos itens deles (precisa da parte de equipamentos). */
 async function loadLoadouts(my, quiet) {
   const p = profile, inst = instanceMap(), ldItems = [], ldNames = [];
-  for (const l of p.characterLoadouts?.data?.[charId]?.loadouts || []) { ldNames.push(l.nameHash); for (const i of l.items || []) if (inst[i.itemInstanceId]) ldItems.push(inst[i.itemInstanceId]); }
+  for (const l of p.characterLoadouts?.data?.[charId]?.loadouts || []) { if (l.nameHash !== 2166136261) ldNames.push(l.nameHash); for (const i of l.items || []) if (inst[i.itemInstanceId]) ldItems.push(inst[i.itemInstanceId]); }
   const ln = await entities('DestinyLoadoutNameDefinition', ldNames, lang); if (my !== gen) return;
   const it = await entities('DestinyInventoryItemDefinition', ldItems, lang); if (my !== gen) return;
   loadoutNames = ln; itemNames = it;
@@ -1150,7 +1151,7 @@ function render() {
   $('overall').hidden = tab === 'gd' || tab === 'vend';
   if (tab === 'gd') { $('list').innerHTML = gdHTML(); if (!GD && have.a) loadGuardian(gen); if (!VAULT && have.c) loadVault(gen); return; }
   if (tab === 'ld') {
-    showMessage(stage < 1 || !have.c ? `<p class="empty-msg">${esc(U.loadingDefs)}</p>` : LOADOUTS.length ? ldListHTML() : `<p class="empty-msg">${esc(U.noLoadouts)}</p>`);
+    showMessage(!have.c ? `<p class="empty-msg">${esc(U.loadingDefs)}</p>` : LOADOUTS.length ? ldListHTML() : `<p class="empty-msg">${esc(U.noLoadouts)}</p>`);
     if (have.c && LOADOUTS.length) ensureLdCtx();
     $('ovcount').textContent = U.ld(LOADOUTS.length); $('ovbar').style.width = '0';
     return;
