@@ -428,3 +428,6 @@ button.ldc:focus-visible{outline:2px solid var(--arc);outline-offset:2px}
 .fd-svok{font:600 13px/1 var(--body);padding:8px 14px;border-radius:8px;border:0;cursor:pointer;background:linear-gradient(90deg,var(--a1),var(--a2));color:#0d121c}
 .fd-svok:disabled{cursor:default;background:rgba(255,255,255,.08);color:#9fb0c6}
 .fd-svok:focus-visible{outline:2px solid var(--a2);outline-offset:2px}
+/* gerando a imagem da build */
+.sh-wait.wait{justify-content:center;flex-direction:column;gap:14px;padding:36px 16px;text-align:center}
+.sh-wait.wait::before{width:30px;height:30px;border-width:3px}
