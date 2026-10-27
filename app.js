@@ -229,7 +229,7 @@ async function idbDel(k) { try { const db = await idb(); db.transaction('kv', 'r
 // id: personagens e equipados (cabeçalho e cor da subclasse, sempre primeiro) · q: missões e contratos
 // a: coleções, métricas, marcos e elogios · b: triunfos · c: inventário, instâncias e loadouts · g: encaixes do equipamento (build)
 // 201 também em c: a Bungie só manda instâncias (300) dos itens incluídos na mesma resposta
-const PARTS = { id: '200,205', q: '201,301', a: '100,104,202,800,1100,1400', b: '900', c: '102,201,205,206,300', g: '205,300,305' };
+const PARTS = { id: '200,205', q: '201,301', a: '100,202,800,1100,1400', b: '900', c: '102,201,205,206,300', g: '205,300,305' };
 // parte de que cada aba depende: ela é pedida logo depois do cabeçalho
 const TAB_PART = { vend: 'a', obj: 'q', camp: 'q', raid: 'a', dg: 'a', exo: 'a', cat: 'b', tit: 'b', ld: 'c', gd: 'a' };
 let have = { id: false, q: false, a: false, b: false, c: false, g: false };
@@ -556,6 +556,7 @@ const XUR_VENDOR = 2190858386, STRANGE_COIN = 800069450;
 const RANK_PROGS = [457612306, 3011295063, 1807348350, 689153319, 584850370];
 const COUNT_METRICS = [740213466, 2959623395, 26751835, 3264536674];
 const OPTS = Object.assign({ week: true, clears: true, build: true }, LS.get('dc-opts', {}));
+const ARTIFACT_BUCKET = 1506418338;
 const AMMO = {};
 /* Tipo de munição: 1 primária (branca), 2 especial (verde), 3 pesada (roxa) */
 const AMMO_COLOR = { 1: '#f2f4f7', 2: '#7fe08f', 3: '#b98cff' };
@@ -662,15 +663,15 @@ async function fetchBuild(p, cid) {
   const eq = p.characterEquipment?.data?.[cid]?.items || [], sk = p.itemComponents?.sockets?.data;
   if (!sk || !eq.length) return null;
   const plugs = []; for (const i of eq) for (const s of sk[i.itemInstanceId]?.sockets || []) if (s.plugHash && s.isVisible !== false) plugs.push(s.plugHash);
-  // artefato sazonal: vantagens ativas deste personagem (marcos/progressões, componente 202) e o nome do artefato (104)
-  const sa = p.characterProgressions?.data?.[cid]?.seasonalArtifact, artH = p.profileProgression?.data?.seasonalArtifact?.artifactHash;
-  const artPerks = (sa?.tiers || []).flatMap(t => (t.items || []).filter(i => i.isActive).map(i => i.itemHash));
-  const all = [...plugs, ...eq.map(i => i.itemHash), ...artPerks, ...(artH ? [artH] : [])];
+  const all = [...plugs, ...eq.map(i => i.itemHash)];
   const en = await entities('DestinyInventoryItemDefinition', all, 'en');
   const loc = lang === 'pt' ? await entities('DestinyInventoryItemDefinition', all, 'pt') : en;
   const wh = eq.filter(i => [1498876634, 2465295065, 953998645].includes(i.bucketHash)).map(i => i.itemHash).filter(h => AMMO[h] == null);
   await Promise.all(wh.map(h => bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${h}/`, false).then(d => { AMMO[h] = d.equippingBlock?.ammoType || 0; }).catch(() => {})));
-  return { en, loc, sets: await armorSets(eq), art: artPerks.length ? { h: artH, perks: artPerks } : null };
+  // artefato: desde Monumento do Triunfo é um item equipado (7 artefatos para escolher); as vantagens escolhidas são os encaixes dele
+  const ai = eq.find(i => i.bucketHash === ARTIFACT_BUCKET);
+  const artPerks = ai ? (sk[ai.itemInstanceId]?.sockets || []).map(x => x.plugHash).filter(h => h && en[h]?.n && !SKIP_NAME.test(en[h].n) && !/Empty|Default/i.test(en[h].n)) : [];
+  return { en, loc, sets: await armorSets(eq), art: ai && artPerks.length ? { h: ai.itemHash, perks: artPerks } : null };
 }
 async function loadBuild(my) {
   const b = await fetchBuild(profile, charId); if (my !== gen || !b) return;
@@ -1279,7 +1280,7 @@ async function doSearch(q) {
 async function showPlayer(sel) {
   const my = ++FD.seq; FD.cmp = false; FD.sel = sel; FD.p = null; FD.B = null; FD.cid = null; FD.status = 'loading'; renderFind();
   try {
-    const p = await bungie(`/Destiny2/${sel.type}/Profile/${sel.id}/?components=104,200,202,205,300,305`, false); if (my !== FD.seq) return;
+    const p = await bungie(`/Destiny2/${sel.type}/Profile/${sel.id}/?components=200,205,300,305`, false); if (my !== FD.seq) return;
     FD.p = p; const chars = Object.values(p.characters?.data || {}).sort((a, b) => new Date(b.dateLastPlayed) - new Date(a.dateLastPlayed));
     FD.cid = chars[0]?.characterId || null; FD.status = ''; renderFind();
     if (FD.cid) { FD.B = await fetchBuild(p, FD.cid); if (my === FD.seq) renderFind(); }
