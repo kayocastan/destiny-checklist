@@ -53,7 +53,7 @@ const UI = {
       week: 'Esta semana', xurSells: n => `Xûr vende ${n}`, xurSub: (c, h, t) => `${c} moedas${h != null ? ` · você tem ${h}` : ''} · sai em ${t}`,
       featured: 'Em destaque: ', missingEx: n => `${n} ainda falta`, untilReset: 'até o reset', reset: 'Reset semanal', resetSub: t => `em ${t} · terça, 14h (Brasília)`,
       featWeek: 'Em destaque nesta semana', clears: n => n === 1 ? '1 conclusão' : `${n} conclusões`, showBuild: 'Ver a build equipada',
-      find: 'Buscar guardião', findShort: 'Buscar', findPh: 'Nome Bungie (ex.: Fulano#1234)', findHint: 'Digite pelo menos 3 letras do nome Bungie. Com o código (#1234) vai direto.', findNone: 'Ninguém encontrado com esse nome.', findErr: 'Não deu para buscar agora. Tente de novo em instantes.', findLoading: 'Buscando…', findLoadingP: 'Carregando a build…', back: 'Voltar', privateP: 'Não deu para ver o equipamento desse guardião agora.', seeBuild: 'Ver a build', clanTip: 'Toque num nome para ver a build da pessoa.', lastPlayed: d => `jogou ${d}`,
+      find: 'Buscar guardião', findShort: 'Buscar', findPh: 'Nome Bungie (ex.: Fulano#1234)', findHint: 'Digite o nome Bungie completo, como aparece no jogo (ex.: Kayo Castan). O #código é opcional: sem ele aparecem todos com esse nome.', findNone: 'Ninguém com esse nome exato. Confira se o nome está completo, com espaços e acentos.', findErr: 'Não deu para buscar agora. Tente de novo em instantes.', findLoading: 'Buscando…', findLoadingP: 'Carregando a build…', back: 'Voltar', privateP: 'Não deu para ver o equipamento desse guardião agora.', seeBuild: 'Ver a build', clanTip: 'Toque num nome para ver a build da pessoa.', lastPlayed: d => `jogou ${d}`,
       ammo: { 1: 'Munição primária', 2: 'Munição especial', 3: 'Munição pesada' },
       share: 'Gerar imagem para compartilhar', shareMaking: 'Montando a imagem da sua build…', shareAlt: 'Imagem da build equipada', shareBtn: 'Compartilhar', shareDl: 'Baixar imagem', shareClose: 'Fechar', shareTitle: 'Minha build no Destiny 2', shareFail: 'Não deu para gerar a imagem agora. Tente de novo.',
       subclass: 'Subclasse', weapons: 'Armas', armor: 'Armadura e mods', aspects: 'Aspectos', frags: 'Fragmentos',
@@ -106,7 +106,7 @@ const UI = {
       week: 'This week', xurSells: n => `Xûr sells ${n}`, xurSub: (c, h, t) => `${c} coins${h != null ? ` · you have ${h}` : ''} · leaves in ${t}`,
       featured: 'Featured: ', missingEx: n => `${n} still missing`, untilReset: 'until reset', reset: 'Weekly reset', resetSub: t => `in ${t} · Tuesday, 17:00 UTC`,
       featWeek: 'Featured this week', clears: n => n === 1 ? '1 clear' : `${n} clears`, showBuild: 'Show the equipped build',
-      find: 'Find a guardian', findShort: 'Search', findPh: 'Bungie Name (e.g. Someone#1234)', findHint: 'Type at least 3 letters of the Bungie Name. With the code (#1234) it goes straight to them.', findNone: 'No one found with that name.', findErr: "Couldn't search right now. Try again in a moment.", findLoading: 'Searching…', findLoadingP: 'Loading the build…', back: 'Back', privateP: "Couldn't see this guardian's gear right now.", seeBuild: 'See their build', clanTip: 'Tap a name to see their build.', lastPlayed: d => `played ${d}`,
+      find: 'Find a guardian', findShort: 'Search', findPh: 'Bungie Name (e.g. Someone#1234)', findHint: 'Type the full Bungie Name as it shows in game (e.g. Kayo Castan). The #code is optional: without it you see everyone with that name.', findNone: 'No one with that exact name. Check that the name is complete, with spaces and accents.', findErr: "Couldn't search right now. Try again in a moment.", findLoading: 'Searching…', findLoadingP: 'Loading the build…', back: 'Back', privateP: "Couldn't see this guardian's gear right now.", seeBuild: 'See their build', clanTip: 'Tap a name to see their build.', lastPlayed: d => `played ${d}`,
       ammo: { 1: 'Primary ammo', 2: 'Special ammo', 3: 'Heavy ammo' },
       share: 'Make an image to share', shareMaking: 'Putting your build image together…', shareAlt: 'Image of the equipped build', shareBtn: 'Share', shareDl: 'Download image', shareClose: 'Close', shareTitle: 'My Destiny 2 build', shareFail: "Couldn't make the image right now. Please try again.",
       subclass: 'Subclass', weapons: 'Weapons', armor: 'Armor and mods', aspects: 'Aspects', frags: 'Fragments',
@@ -1022,10 +1022,8 @@ async function searchPlayers(q) {
     if (!r?.length) return [];
     const p = pickMembership(r); return [{ name: fullName(p.bungieGlobalDisplayName, p.bungieGlobalDisplayNameCode), type: p.membershipType, id: p.membershipId }];
   }
-  // A busca da Bungie casa palavras inteiras ("Kayo Cast" não acha "Kayo Castan"): sem resultado, busca pela 1ª palavra e filtra aqui
-  const pages = async (term, n) => { const out = []; for (let i = 0; i < n; i++) { const r = await bungiePost(`/User/Search/GlobalName/${i}/`, { displayNamePrefix: term }); out.push(...(r?.searchResults || [])); if (!r?.hasMore) break; } return out; };
-  let list = await pages(q, 2);
-  if (!list.length && /\s/.test(q)) { const ql = q.toLowerCase(); list = (await pages(q.split(/\s+/)[0], 5)).filter(x => (x.bungieGlobalDisplayName || '').toLowerCase().startsWith(ql)); }
+  // A busca da Bungie só acha o nome completo (sem o #código) e traz todo mundo com esse nome
+  const list = []; for (let i = 0; i < 3; i++) { const r = await bungiePost(`/User/Search/GlobalName/${i}/`, { displayNamePrefix: q }); list.push(...(r?.searchResults || [])); if (!r?.hasMore) break; }
   return list.filter(x => x.destinyMemberships?.length).slice(0, 25).map(x => { const p = pickMembership(x.destinyMemberships); return { name: fullName(x.bungieGlobalDisplayName, x.bungieGlobalDisplayNameCode), type: p.membershipType, id: p.membershipId }; });
 }
 const FD = { q: '', results: null, status: '', sel: null, p: null, cid: null, B: null, seq: 0 };
@@ -1061,7 +1059,7 @@ function renderFind() {
 const fdCtx = () => ({ p: FD.p, cid: FD.cid, B: FD.B, name: FD.sel?.name || '' });
 async function doSearch(q) {
   const my = ++FD.seq; FD.sel = null;
-  if (q.length < 3 && !q.includes('#')) { FD.results = null; FD.status = ''; renderFind(); return; }
+  if (q.length < 2 && !q.includes('#')) { FD.results = null; FD.status = ''; renderFind(); return; }
   FD.status = 'loading'; renderFind();
   try { const r = await searchPlayers(q); if (my !== FD.seq) return; FD.results = r; FD.status = ''; }
   catch { if (my !== FD.seq) return; FD.status = 'error'; }
@@ -1080,7 +1078,7 @@ async function pickFdChar(cid) {
   const my = ++FD.seq; FD.cid = cid; FD.B = null; renderFind();
   const b = await fetchBuild(FD.p, cid); if (my === FD.seq) { FD.B = b; renderFind(); }
 }
-$('finddlg').addEventListener('input', e => { if (e.target.id !== 'fdq') return; FD.q = e.target.value.trim(); clearTimeout(fdTimer); fdTimer = setTimeout(() => doSearch(FD.q), 350); });
+$('finddlg').addEventListener('input', e => { if (e.target.id !== 'fdq') return; FD.q = e.target.value.trim(); clearTimeout(fdTimer); fdTimer = setTimeout(() => doSearch(FD.q), 600); });
 $('finddlg').addEventListener('keydown', e => { if (e.target.id === 'fdq' && e.key === 'Enter') { clearTimeout(fdTimer); doSearch(FD.q); } });
 $('finddlg').addEventListener('click', e => {
   const d = $('finddlg');
