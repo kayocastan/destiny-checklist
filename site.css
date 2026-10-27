@@ -378,3 +378,5 @@ section.vend.collapsed .sec-head{border-bottom:0}
 .fd-who .fd-fav[aria-pressed="true"]{color:#f3d77a}
 .fav-p .sq-n small{font-family:var(--mono);font-weight:500;color:var(--muted);margin-left:2px}
 .cl-p.fav-p::before{background:#d9b84a}
+/* "Esta semana" recolhido: a descrição continua à mostra */
+section.wk-sec.collapsed:not(.q-open) .sec-head>p{display:block}
