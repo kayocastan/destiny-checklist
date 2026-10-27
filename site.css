@@ -369,3 +369,12 @@ section.vend.collapsed .sec-head{border-bottom:0}
 /* comparação no celular: nada passa da largura da tela */
 .fd-src>*,.fd-box>*,#fdbody>*,.fd-hero>*{min-width:0}
 @media (max-width:480px){.fd-act{flex-wrap:wrap;row-gap:8px}.fd-act-k{flex-basis:100%}.fd-act .fd-ib.fd-fav{margin-left:auto}}
+/* estrela de favoritar ao lado do nome do guardião */
+.fd-who{display:flex;align-items:center;gap:6px}
+.fd-who>span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.fd-who .fd-fav{all:unset;flex:none;display:grid;place-items:center;width:26px;height:26px;border-radius:7px;color:#c3ccda;cursor:pointer}
+.fd-who .fd-fav:hover{background:rgba(255,255,255,.1);color:#fff}
+.fd-who .fd-fav:focus-visible{outline:2px solid var(--a2)}
+.fd-who .fd-fav[aria-pressed="true"]{color:#f3d77a}
+.fav-p .sq-n small{font-family:var(--mono);font-weight:500;color:var(--muted);margin-left:2px}
+.cl-p.fav-p::before{background:#d9b84a}
