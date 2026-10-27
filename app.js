@@ -904,7 +904,7 @@ async function openShare(C) {
   const W = u().w, dlg = $('sharedlg'); if (!dlg || !C?.B) return;
   dlg.innerHTML = `<div class="sh-box"><p class="sh-wait wait" role="status">${esc(W.shareMaking)}</p></div>`; dlg.showModal();
   // deixa a janela com o indicador aparecer antes de começar a desenhar
-  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  await new Promise(r => { requestAnimationFrame(() => requestAnimationFrame(r)); setTimeout(r, 80); }); // rAF não roda com a aba em segundo plano
   try {
     // 1ª passada mede a altura; a 2ª desenha em 2x (2160 px de largura) para ficar nítida no WhatsApp
     const h = (await buildShareCanvas(C, 1)).logicalH;
