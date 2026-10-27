@@ -1032,7 +1032,7 @@ function vendorsHTML() {
   const until = VEND.find(v => v.until)?.until;
   const miss = xurMissing().map(x => x.en), xu = XUR && XUR.items.length && (!XUR.until || Date.parse(XUR.until) > Date.now());
   const xur = xu ? `<div class="vd-k">Xûr · ${esc(W.xurLeaves(cd(Date.parse(XUR.until) - Date.now())))}</div>
-    <div class="vd-x">${XUR.items.map(x => `<div class="vd-xi${miss.includes(x.en) ? ' miss' : ''}">${x.ic ? `<img src="${BNET}${x.ic}" alt="" loading="lazy">` : ''}<div><b>${esc(x.n)}</b><small>${esc(x.tl)}${x.cost ? ` · ${x.cost} ${esc(W.coins)}` : ''}</small></div>${miss.includes(x.en) ? `<span class="chip hot">${esc(W.notOwned)}</span>` : ''}</div>`).join('')}</div>
+    <div class="vd-x">${XUR.items.filter(x => { const e = exoticByName(x.en), cls = profile.characters.data[charId].classType; return e && (e.t === 'w' || e.c === cls); }).map(x => `<div class="vd-xi${miss.includes(x.en) ? ' miss' : ''}">${x.ic ? `<img src="${BNET}${x.ic}" alt="" loading="lazy">` : ''}<div><b>${esc(x.n)}</b><small>${esc(x.tl)}${x.cost ? ` · ${x.cost} ${esc(W.coins)}` : ''}</small></div>${miss.includes(x.en) ? `<span class="chip hot">${esc(W.notOwned)}</span>` : ''}</div>`).join('')}</div>
     ${have.c ? `<p class="vd-note">${esc(W.coinsHave(coins()))}</p>` : ''}` : `<div class="vd-k">Xûr</div><p class="vd-note">${esc(XUR ? W.xurGone : u().loadingDefs)}</p>`;
   return `<section data-sec="vendors" class="vend"><div class="sec-head"><div class="sec-title"><div class="sec-name"><h2>${esc(W.vendT)}</h2></div></div><p>${esc(W.vendNote(until ? cd(Date.parse(until) - Date.now()) : ''))}</p></div><div class="vd-body">${xur}${body}</div></section>`;
 }
