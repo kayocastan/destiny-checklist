@@ -788,8 +788,8 @@ async function openShare() {
     const name = `build-${(u().classes[profile.characters.data[charId].classType] || 'destiny').toLowerCase()}-${new Date().toISOString().slice(0, 10)}.jpg`;
     const file = new File([blob], name, { type: 'image/jpeg' });
     const canShare = !!(navigator.canShare && navigator.canShare({ files: [file] }));
-    dlg.innerHTML = `<div class="sh-box"><button class="sh-x" id="shx" type="button" aria-label="${esc(W.shareClose)}" title="${esc(W.shareClose)}">×</button><div class="sh-img"><img src="${shareUrl}" alt="${esc(W.shareAlt)}"></div><div class="sh-actions">${canShare ? `<button class="btn" id="shgo" type="button">${esc(W.shareBtn)}</button>` : ''}<a class="${canShare ? 'reset' : 'btn'}" id="shdl" href="${shareUrl}" download="${name}">${esc(W.shareDl)}</a><button class="reset" id="shclose" type="button">${esc(W.shareClose)}</button></div></div>`;
-    $('shclose').onclick = () => dlg.close(); $('shx').onclick = () => dlg.close();
+    dlg.innerHTML = `<div class="sh-box"><button class="sh-x" id="shx" type="button" aria-label="${esc(W.shareClose)}" title="${esc(W.shareClose)}">×</button><div class="sh-img"><img src="${shareUrl}" alt="${esc(W.shareAlt)}"></div><div class="sh-actions">${canShare ? `<button class="btn" id="shgo" type="button">${esc(W.shareBtn)}</button>` : ''}<a class="${canShare ? 'reset' : 'btn'}" id="shdl" href="${shareUrl}" download="${name}">${esc(W.shareDl)}</a></div></div>`;
+    $('shx').onclick = () => dlg.close();
     if (canShare) $('shgo').onclick = () => navigator.share({ files: [file], title: W.shareTitle }).catch(() => {});
   } catch (e) { console.error(e); dlg.innerHTML = `<div class="sh-box"><p class="sh-wait">${esc(W.shareFail)}</p><div class="sh-actions"><button class="reset" id="shclose" type="button">${esc(W.shareClose)}</button></div></div>`; $('shclose').onclick = () => dlg.close(); }
 }

@@ -186,3 +186,4 @@ dialog.sh:has(.sh-img){padding:0}
 .b-name .ammo{flex:none;display:inline-flex;align-items:center;opacity:.95}
 .b-name>span:not(.ammo){flex:0 1 auto}
 .b-name small{margin-left:auto}
+.sh-err{padding-right:64px}.sh-err .sh-x{top:10px;right:10px}
