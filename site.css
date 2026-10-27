@@ -366,3 +366,6 @@ section.vend.collapsed .sec-head{border-bottom:0}
 .fd-src-l .char{flex:none;white-space:nowrap}
 .fd-pad{padding:12px 14px}
 @media (max-width:420px){.fd-act{gap:6px}.fd-act .fd-ib{height:34px;min-width:34px}.fd-act .fd-ib.fd-fav,.fd-act .fd-ib.fd-link,.fd-act .fd-ib.fd-cmpbtn,.fd-act .fd-ib.fd-cam{width:34px;height:34px}}
+/* comparação no celular: nada passa da largura da tela */
+.fd-src>*,.fd-box>*,#fdbody>*,.fd-hero>*{min-width:0}
+@media (max-width:480px){.fd-act{flex-wrap:wrap;row-gap:8px}.fd-act-k{flex-basis:100%}.fd-act .fd-ib.fd-fav{margin-left:auto}}
