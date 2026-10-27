@@ -579,7 +579,9 @@ async function loadXur(my) {
     const hs = sales.map(s => s.itemHash);
     const en = await entities('DestinyInventoryItemDefinition', hs, 'en'); if (my !== gen) return;
     const loc = lang === 'pt' ? await entities('DestinyInventoryItemDefinition', hs, 'pt') : en; if (my !== gen) return;
-    XUR = { until: r.vendor?.data?.nextRefreshDate || null, items: sales.filter(s => en[s.itemHash]?.tt === 6).map(s => ({ ic: loc[s.itemHash]?.ic || en[s.itemHash].ic, tl: loc[s.itemHash]?.tl || '', en: en[s.itemHash].n, n: loc[s.itemHash]?.n || en[s.itemHash].n, cost: (s.costs || []).find(c => c.itemHash === STRANGE_COIN)?.quantity || 0 })) };
+    // o Xûr vai embora no reset de terça; a data de "renovação" da API (sexta) não é a saída dele
+    const nr = Date.parse(r.vendor?.data?.nextRefreshDate || '') || Infinity;
+    XUR = { until: new Date(Math.min(nr, nextReset())).toISOString(), items: sales.filter(s => en[s.itemHash]?.tt === 6).map(s => ({ ic: loc[s.itemHash]?.ic || en[s.itemHash].ic, tl: loc[s.itemHash]?.tl || '', en: en[s.itemHash].n, n: loc[s.itemHash]?.n || en[s.itemHash].n, cost: (s.costs || []).find(c => c.itemHash === STRANGE_COIN)?.quantity || 0 })) };
   } catch { XUR = null; }
   if (my === gen) { weekReady.x = true; build(); render(); }
 }
