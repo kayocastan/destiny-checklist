@@ -54,7 +54,7 @@ const UI = {
       week: 'Esta semana', xurSells: n => `Xûr vende ${n}`, xurSub: (c, h, t) => `${c} moedas${h != null ? ` · você tem ${h}` : ''} · sai em ${t}`,
       featured: 'Em destaque: ', missingEx: n => `${n} ainda falta`, untilReset: 'até o reset', reset: 'Reset semanal', resetSub: t => `em ${t} · terça, 14h (Brasília)`,
       featWeek: 'Em destaque nesta semana', clears: n => n === 1 ? '1 conclusão' : `${n} conclusões`, showBuild: 'Ver a build equipada',
-      find: 'Buscar guardião', findShort: 'Buscar', findPh: 'Nome Bungie (ex.: Fulano#1234)', findHint: 'Digite o nome Bungie completo, como aparece no jogo (ex.: Kayo Castan). O #código é opcional: sem ele aparecem todos com esse nome.', findNone: 'Ninguém com esse nome exato. Confira se o nome está completo, com espaços e acentos.', findErr: 'Não deu para buscar agora. Tente de novo em instantes.', findLoading: 'Buscando…', findLoadingP: 'Carregando a build…', back: 'Voltar', privateP: 'Não deu para ver o equipamento desse guardião agora.', seeBuild: 'Ver a build', vendT: 'Vendedores da semana', vendNote: t => `Xûr, Banshee-44 e Ada-1 na Torre. Armas com o rolo que está à venda; em dourado as vantagens principais.${t ? ' Muda em ' + t + '.' : ''}`, notOwned: 'Não tem', xurSub2: (n, t, c) => `${n} exóticos para ${c} · sai em ${t}`, xurGoneShort: 'Fora da Torre até sexta', missN: n => n === 1 ? '1 que falta' : `${n} que faltam`, nWeapons: n => n === 1 ? '1 arma' : `${n} armas`, nOther: n => n === 1 ? '1 item' : `${n} itens`, changesIn: t => `muda em ${t}`, perksGold: 'Em dourado, as duas vantagens principais do rolo à venda.', xurLeaves: t => `exóticos · sai em ${t}`, coins: 'moedas', coinsHave: n => `Você tem ${n} Moedas Estranhas.`, xurGone: 'O Xûr não está na Torre agora. Ele volta na sexta, às 14h.', shaders: (n, o) => o === n ? `Também vende ${n} tonalizadores, e você já tem todos.` : `Também vende ${n} tonalizadores; você tem ${o}.`, vaultT: 'Limpeza do cofre', of: 'de', slots: 'espaços usados', dupExo: 'Exóticos repetidos', dupLeg: 'Lendários repetidos', andMore: n => `E mais ${n}.`, vaultNote: 'Itens iguais guardados mais de uma vez. Para liberar espaço, desmonte as cópias que não usa, no jogo ou no DIM.', vaultClean: 'Nenhum item repetido no cofre.', statsT: 'Estatísticas de jogo', crucible: 'Crisol', eff: 'Eficiência', winsOf: (w, g) => `Vitórias (${w} de ${g})`, bestGame: 'Mais abates numa partida', cleared: 'Atividades concluídas', played: 'Tempo jogado', noTrials: 'Desafios de Osíris: você ainda não jogou.', trialsLine: (g, w, kd) => `Desafios de Osíris: ${g} partidas, ${w} vitórias, K/D ${kd}.`, recentT: 'Esquadrão recente', recentNote: 'Quem jogou no seu esquadrão nas últimas atividades. Toque num nome para ver a build.', recentNone: 'Ninguém no seu esquadrão nas últimas atividades.', together: n => n === 1 ? '1 atividade juntos' : `${n} atividades juntos`, clanTip: 'Toque num nome para ver a build da pessoa.', lastPlayed: d => `jogou ${d}`,
+      find: 'Buscar guardião', findShort: 'Buscar', findPh: 'Nome Bungie (ex.: Fulano#1234)', findHint: 'Digite o nome Bungie completo, como aparece no jogo (ex.: Kayo Castan). O #código é opcional: sem ele aparecem todos com esse nome.', findNone: 'Ninguém com esse nome exato. Confira se o nome está completo, com espaços e acentos.', findErr: 'Não deu para buscar agora. Tente de novo em instantes.', findLoading: 'Buscando…', findLoadingP: 'Carregando a build…', back: 'Voltar', privateP: 'Não deu para ver o equipamento desse guardião agora.', seeBuild: 'Ver a build', compare: 'Comparar com a minha', toDim: 'Levar esta build para o DIM (abre como loadout para salvar)', backBuild: 'Voltar para a build', you: 'Você', abilities: 'Habilidades', exoArmor: 'Armadura exótica', lgHave: 'diferente, e você tem', lgMiss: 'diferente, e você não tem', lgSame: 'igual nas duas', vendT: 'Vendedores da semana', vendNote: t => `Xûr, Banshee-44 e Ada-1 na Torre. Armas com o rolo que está à venda; em dourado as vantagens principais.${t ? ' Muda em ' + t + '.' : ''}`, notOwned: 'Não tem', xurSub2: (n, t, c) => `${n} exóticos para ${c} · sai em ${t}`, xurGoneShort: 'Fora da Torre até sexta', missN: n => n === 1 ? '1 que falta' : `${n} que faltam`, nWeapons: n => n === 1 ? '1 arma' : `${n} armas`, nOther: n => n === 1 ? '1 item' : `${n} itens`, changesIn: t => `muda em ${t}`, perksGold: 'Em dourado, as duas vantagens principais do rolo à venda.', xurLeaves: t => `exóticos · sai em ${t}`, coins: 'moedas', coinsHave: n => `Você tem ${n} Moedas Estranhas.`, xurGone: 'O Xûr não está na Torre agora. Ele volta na sexta, às 14h.', shaders: (n, o) => o === n ? `Também vende ${n} tonalizadores, e você já tem todos.` : `Também vende ${n} tonalizadores; você tem ${o}.`, vaultT: 'Limpeza do cofre', of: 'de', slots: 'espaços usados', dupExo: 'Exóticos repetidos', dupLeg: 'Lendários repetidos', andMore: n => `E mais ${n}.`, vaultNote: 'Itens iguais guardados mais de uma vez. Para liberar espaço, desmonte as cópias que não usa, no jogo ou no DIM.', vaultClean: 'Nenhum item repetido no cofre.', statsT: 'Estatísticas de jogo', crucible: 'Crisol', eff: 'Eficiência', winsOf: (w, g) => `Vitórias (${w} de ${g})`, bestGame: 'Mais abates numa partida', cleared: 'Atividades concluídas', played: 'Tempo jogado', noTrials: 'Desafios de Osíris: você ainda não jogou.', trialsLine: (g, w, kd) => `Desafios de Osíris: ${g} partidas, ${w} vitórias, K/D ${kd}.`, recentT: 'Esquadrão recente', recentNote: 'Quem jogou no seu esquadrão nas últimas atividades. Toque num nome para ver a build.', recentNone: 'Ninguém no seu esquadrão nas últimas atividades.', together: n => n === 1 ? '1 atividade juntos' : `${n} atividades juntos`, clanTip: 'Toque num nome para ver a build da pessoa.', lastPlayed: d => `jogou ${d}`,
       ammo: { 1: 'Munição primária', 2: 'Munição especial', 3: 'Munição pesada' },
       share: 'Gerar imagem para compartilhar', shareMaking: 'Montando a imagem da sua build…', shareAlt: 'Imagem da build equipada', shareBtn: 'Compartilhar', shareDl: 'Baixar imagem', shareClose: 'Fechar', shareTitle: 'Minha build no Destiny 2', shareFail: 'Não deu para gerar a imagem agora. Tente de novo.',
       setT: 'Bônus de conjunto', setPieces: n => n === 1 ? '1 peça' : `${n} peças`, setReq: n => `${n} peças`,
@@ -109,7 +109,7 @@ const UI = {
       week: 'This week', xurSells: n => `Xûr sells ${n}`, xurSub: (c, h, t) => `${c} coins${h != null ? ` · you have ${h}` : ''} · leaves in ${t}`,
       featured: 'Featured: ', missingEx: n => `${n} still missing`, untilReset: 'until reset', reset: 'Weekly reset', resetSub: t => `in ${t} · Tuesday, 17:00 UTC`,
       featWeek: 'Featured this week', clears: n => n === 1 ? '1 clear' : `${n} clears`, showBuild: 'Show the equipped build',
-      find: 'Find a guardian', findShort: 'Search', findPh: 'Bungie Name (e.g. Someone#1234)', findHint: 'Type the full Bungie Name as it shows in game (e.g. Kayo Castan). The #code is optional: without it you see everyone with that name.', findNone: 'No one with that exact name. Check that the name is complete, with spaces and accents.', findErr: "Couldn't search right now. Try again in a moment.", findLoading: 'Searching…', findLoadingP: 'Loading the build…', back: 'Back', privateP: "Couldn't see this guardian's gear right now.", seeBuild: 'See their build', vendT: "This week's vendors", vendNote: t => `Xûr, Banshee-44 and Ada-1 in the Tower. Weapons with the roll for sale; main perks in gold.${t ? ' Changes in ' + t + '.' : ''}`, notOwned: 'Not owned', xurSub2: (n, t, c) => `${n} exotics for ${c} · leaves in ${t}`, xurGoneShort: 'Away until Friday', missN: n => `${n} missing`, nWeapons: n => n === 1 ? '1 weapon' : `${n} weapons`, nOther: n => n === 1 ? '1 item' : `${n} items`, changesIn: t => `changes in ${t}`, perksGold: 'In gold, the two main perks of the roll for sale.', xurLeaves: t => `exotics · leaves in ${t}`, coins: 'coins', coinsHave: n => `You have ${n} Strange Coins.`, xurGone: "Xûr isn't in the Tower right now. He's back Friday at 17:00 UTC.", shaders: (n, o) => o === n ? `Also sells ${n} shaders, and you own all of them.` : `Also sells ${n} shaders; you own ${o}.`, vaultT: 'Vault cleanup', of: 'of', slots: 'slots used', dupExo: 'Duplicate exotics', dupLeg: 'Duplicate legendaries', andMore: n => `And ${n} more.`, vaultNote: 'Identical items stored more than once. To free space, dismantle the copies you don\'t use, in game or in DIM.', vaultClean: 'No duplicate items in the vault.', statsT: 'Game stats', crucible: 'Crucible', eff: 'Efficiency', winsOf: (w, g) => `Wins (${w} of ${g})`, bestGame: 'Most kills in a match', cleared: 'Activities cleared', played: 'Time played', noTrials: "Trials of Osiris: you haven't played yet.", trialsLine: (g, w, kd) => `Trials of Osiris: ${g} matches, ${w} wins, K/D ${kd}.`, recentT: 'Recent fireteam', recentNote: 'People in your fireteam in your latest activities. Tap a name to see their build.', recentNone: 'No one in your fireteam in your latest activities.', together: n => n === 1 ? '1 activity together' : `${n} activities together`, clanTip: 'Tap a name to see their build.', lastPlayed: d => `played ${d}`,
+      find: 'Find a guardian', findShort: 'Search', findPh: 'Bungie Name (e.g. Someone#1234)', findHint: 'Type the full Bungie Name as it shows in game (e.g. Kayo Castan). The #code is optional: without it you see everyone with that name.', findNone: 'No one with that exact name. Check that the name is complete, with spaces and accents.', findErr: "Couldn't search right now. Try again in a moment.", findLoading: 'Searching…', findLoadingP: 'Loading the build…', back: 'Back', privateP: "Couldn't see this guardian's gear right now.", seeBuild: 'See their build', compare: 'Compare with mine', toDim: 'Take this build to DIM (opens as a loadout to save)', backBuild: 'Back to the build', you: 'You', abilities: 'Abilities', exoArmor: 'Exotic armor', lgHave: 'different, and you have it', lgMiss: "different, and you don't have it", lgSame: 'same on both', vendT: "This week's vendors", vendNote: t => `Xûr, Banshee-44 and Ada-1 in the Tower. Weapons with the roll for sale; main perks in gold.${t ? ' Changes in ' + t + '.' : ''}`, notOwned: 'Not owned', xurSub2: (n, t, c) => `${n} exotics for ${c} · leaves in ${t}`, xurGoneShort: 'Away until Friday', missN: n => `${n} missing`, nWeapons: n => n === 1 ? '1 weapon' : `${n} weapons`, nOther: n => n === 1 ? '1 item' : `${n} items`, changesIn: t => `changes in ${t}`, perksGold: 'In gold, the two main perks of the roll for sale.', xurLeaves: t => `exotics · leaves in ${t}`, coins: 'coins', coinsHave: n => `You have ${n} Strange Coins.`, xurGone: "Xûr isn't in the Tower right now. He's back Friday at 17:00 UTC.", shaders: (n, o) => o === n ? `Also sells ${n} shaders, and you own all of them.` : `Also sells ${n} shaders; you own ${o}.`, vaultT: 'Vault cleanup', of: 'of', slots: 'slots used', dupExo: 'Duplicate exotics', dupLeg: 'Duplicate legendaries', andMore: n => `And ${n} more.`, vaultNote: 'Identical items stored more than once. To free space, dismantle the copies you don\'t use, in game or in DIM.', vaultClean: 'No duplicate items in the vault.', statsT: 'Game stats', crucible: 'Crucible', eff: 'Efficiency', winsOf: (w, g) => `Wins (${w} of ${g})`, bestGame: 'Most kills in a match', cleared: 'Activities cleared', played: 'Time played', noTrials: "Trials of Osiris: you haven't played yet.", trialsLine: (g, w, kd) => `Trials of Osiris: ${g} matches, ${w} wins, K/D ${kd}.`, recentT: 'Recent fireteam', recentNote: 'People in your fireteam in your latest activities. Tap a name to see their build.', recentNone: 'No one in your fireteam in your latest activities.', together: n => n === 1 ? '1 activity together' : `${n} activities together`, clanTip: 'Tap a name to see their build.', lastPlayed: d => `played ${d}`,
       ammo: { 1: 'Primary ammo', 2: 'Special ammo', 3: 'Heavy ammo' },
       share: 'Make an image to share', shareMaking: 'Putting your build image together…', shareAlt: 'Image of the equipped build', shareBtn: 'Share', shareDl: 'Download image', shareClose: 'Close', shareTitle: 'My Destiny 2 build', shareFail: "Couldn't make the image right now. Please try again.",
       setT: 'Set bonuses', setPieces: n => n === 1 ? '1 piece' : `${n} pieces`, setReq: n => `${n} pieces`,
@@ -671,7 +671,7 @@ async function fetchBuild(p, cid) {
 }
 async function loadBuild(my) {
   const b = await fetchBuild(profile, charId); if (my !== gen || !b) return;
-  BUILD = b; if (buildOpen) renderBuild();
+  BUILD = b; if (buildOpen) renderBuild(); if (FD.cmp) renderFind();
 }
 /* Bônus de conjunto da armadura: conta as peças equipadas de cada conjunto e marca os bônus ativos */
 const SETOF = {}, SETDEF = {};
@@ -1249,9 +1249,10 @@ function renderFind() {
       const r = rtf(), ago = ch.dateLastPlayed && r ? (() => { const d = (Date.parse(ch.dateLastPlayed) - Date.now()) / 1000, a = Math.abs(d); return a < 3600 ? r.format(Math.round(d / 60), 'minute') : a < 86400 ? r.format(Math.round(d / 3600), 'hour') : r.format(Math.round(d / 86400), 'day'); })() : '';
       body = `<div class="fd-hero" style="--a1:${a1};--a2:${a2}"><div class="fd-band"${ch.emblemBackgroundPath ? ` style="background-image:url('${BNET}${ch.emblemBackgroundPath}')"` : ''}><div class="fd-id"><div class="fd-who">${esc(FD.sel.name)}</div><div class="fd-ttl">${esc(charTitle(u().classes[ch.classType] || '', sn))}</div></div><div class="fd-pw"><b>${ch.light}</b><span>${esc(ago ? W.lastPlayed(ago) : u().power)}</span></div></div>
         ${chars.length > 1 ? `<div class="fd-chars">${chars.map(c => `<button type="button" class="char" data-fdc="${c.characterId}" aria-pressed="${c.characterId === FD.cid}">${esc(u().classes[c.classType])}<span class="pw">${c.light}</span></button>`).join('')}</div>` : ''}
-        <div class="build fd-build">${FD.B ? buildHTML(fdCtx()) : `<p class="b-note">${esc(W.findLoadingP)}</p>`}</div></div>`;
+        ${FD.B ? `<div class="fd-act"><button type="button" class="fd-cmpbtn">${CMP_ICON}${esc(W.compare)}</button><a class="fd-dim" href="${esc(dimLink(fdCtx()))}" target="_blank" rel="noopener" title="${esc(W.toDim)}" aria-label="${esc(W.toDim)}">${EXPORT_ICON}DIM</a></div>` : ''}
+        ${FD.cmp && FD.B && BUILD ? compareHTML(ownCtx(), fdCtx()) : `<div class="build fd-build">${FD.B ? buildHTML(fdCtx()) : `<p class="b-note">${esc(W.findLoadingP)}</p>`}</div>`}</div>`;
     }
-    b.innerHTML = `<button type="button" class="reset fd-back">← ${esc(W.back)}</button>${body}`;
+    b.innerHTML = `<button type="button" class="reset fd-back">← ${esc(FD.cmp ? W.backBuild : W.back)}</button>${body}`;
     return;
   }
   const res = FD.results;
@@ -1267,7 +1268,7 @@ async function doSearch(q) {
   renderFind();
 }
 async function showPlayer(sel) {
-  const my = ++FD.seq; FD.sel = sel; FD.p = null; FD.B = null; FD.cid = null; FD.status = 'loading'; renderFind();
+  const my = ++FD.seq; FD.cmp = false; FD.sel = sel; FD.p = null; FD.B = null; FD.cid = null; FD.status = 'loading'; renderFind();
   try {
     const p = await bungie(`/Destiny2/${sel.type}/Profile/${sel.id}/?components=200,205,300,305`, false); if (my !== FD.seq) return;
     FD.p = p; const chars = Object.values(p.characters?.data || {}).sort((a, b) => new Date(b.dateLastPlayed) - new Date(a.dateLastPlayed));
@@ -1276,7 +1277,7 @@ async function showPlayer(sel) {
   } catch { if (my !== FD.seq) return; FD.status = ''; FD.p = {}; renderFind(); }
 }
 async function pickFdChar(cid) {
-  const my = ++FD.seq; FD.cid = cid; FD.B = null; renderFind();
+  const my = ++FD.seq; FD.cmp = false; FD.cid = cid; FD.B = null; renderFind();
   const b = await fetchBuild(FD.p, cid); if (my === FD.seq) { FD.B = b; renderFind(); }
 }
 $('finddlg').addEventListener('input', e => { if (e.target.id !== 'fdq') return; FD.q = e.target.value.trim(); clearTimeout(fdTimer); fdTimer = setTimeout(() => doSearch(FD.q), 600); });
@@ -1284,12 +1285,85 @@ $('finddlg').addEventListener('keydown', e => { if (e.target.id === 'fdq' && e.k
 $('finddlg').addEventListener('click', e => {
   const d = $('finddlg');
   if (e.target === d || e.target.closest('.fd-x')) { d.close(); return; }
-  if (e.target.closest('.fd-back')) { FD.sel = null; FD.seq++; renderFind(); return; }
+  if (e.target.closest('.fd-back')) { if (FD.cmp) { FD.cmp = false; renderFind(); return; } FD.sel = null; FD.seq++; renderFind(); return; }
+  if (e.target.closest('.fd-cmpbtn')) { if (!BUILD && have.g) loadBuild(gen); FD.cmp = true; renderFind(); loadCmpOwnership(); $('finddlg').querySelector('.fd-box').scrollTop = 0; return; }
   const r = e.target.closest('[data-fdr]'); if (r) { const x = FD.results[+r.dataset.fdr]; if (x) showPlayer(x); return; }
   const c = e.target.closest('[data-fdc]'); if (c && c.dataset.fdc !== FD.cid) { pickFdChar(c.dataset.fdc); return; }
   if (e.target.closest('.b-cam')) openShare(fdCtx());
 });
 $('list').addEventListener('click', e => { const b = e.target.closest('.cl-p'); if (b && b.dataset.mid) { FD.q = ''; FD.results = null; openFind({ name: b.dataset.name, type: +b.dataset.mt, id: b.dataset.mid }); } });
+
+
+/* ---------- comparar builds e levar para o DIM ---------- */
+const CMP_ICON = '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M3 6h10M3 6l3-3M3 6l3 3M17 14H7M17 14l-3-3M17 14l-3 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const EXPORT_ICON = '<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><path d="M11 3h6v6M17 3l-8 8M8 4H4v12h12v-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const WEAPON_B = [1498876634, 2465295065, 953998645], ARMOR_B = [3448274439, 3551918588, 14239492, 20886954, 1585787867];
+function buildParts(C) {
+  const B = C.B, eq = C.p.characterEquipment?.data?.[C.cid]?.items || [], sk = C.p.itemComponents?.sockets?.data || {};
+  const plugs = i => (sk[i.itemInstanceId]?.sockets || []).filter(s => s.plugHash && s.isVisible !== false).map(s => s.plugHash).filter(h => { const e = B.en[h]; return e?.n && !SKIP_NAME.test(e.n) && !SKIP_TYPE.test(e.tl); });
+  const sub = eq.find(i => i.bucketHash === SUB_BUCKET), ps = sub ? plugs(sub) : [], t = h => B.en[h]?.tl || '';
+  return {
+    sub: sub?.itemHash, sup: ps.filter(h => /Super/.test(t(h))), asp: ps.filter(h => /Aspect/.test(t(h))), fr: ps.filter(h => /Fragment/.test(t(h))),
+    ab: ps.filter(h => !/Super|Aspect|Fragment/.test(t(h))),
+    w: WEAPON_B.map(b => eq.find(i => i.bucketHash === b)?.itemHash || 0),
+    xa: eq.filter(i => ARMOR_B.includes(i.bucketHash)).map(i => i.itemHash).find(h => B.en[h]?.tt === 6) || 0,
+    sets: (B.sets || []).map(s => s.n + ' · ' + s.c),
+  };
+}
+// Algo da build do outro que você também pode usar: aspectos/fragmentos/habilidades pelos seus conjuntos de encaixes; armas e armaduras pela sua coleção
+function iOwnPlug(h) {
+  const has = list => (list || []).some(p => p.plugItemHash === h && p.canInsert !== false);
+  for (const list of Object.values(profile.profilePlugSets?.data?.plugs || {})) if (has(list)) return true;
+  for (const c of Object.values(profile.characterPlugSets?.data || {})) for (const list of Object.values(c.plugs || {})) if (has(list)) return true;
+  return false;
+}
+function iOwnItem(h) { const c = COLL[h]; if (c === undefined) return null; return c ? colAcquired([c]) : null; }
+async function loadCmpOwnership() {
+  const P = buildParts(fdCtx()), need = [...P.w, P.xa].filter(h => h && COLL[h] === undefined);
+  if (!need.length) return;
+  await Promise.all(need.map(h => bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${h}/`, false).then(d => { COLL[h] = d.collectibleHash || 0; }).catch(() => { COLL[h] = 0; })));
+  if (FD.cmp) renderFind();
+}
+function compareHTML(A, Bc) {
+  const W = u().w, a = buildParts(A), b = buildParts(Bc);
+  const nmA = h => A.B.loc[h]?.n || A.B.en[h]?.n || '', nmB = h => Bc.B.loc[h]?.n || Bc.B.en[h]?.n || '';
+  const icA = h => A.B.loc[h]?.ic || A.B.en[h]?.ic, icB = h => Bc.B.loc[h]?.ic || Bc.B.en[h]?.ic;
+  const cell = (h, nm, ic, cls) => h ? `<span class="${cls}">${ic(h) ? `<img src="${BNET}${ic(h)}" alt="" loading="lazy">` : ''}${esc(nm(h))}</span>` : `<span class="${cls} none">—</span>`;
+  const own = (h, kind) => { const o = kind === 'plug' ? iOwnPlug(h) : iOwnItem(h); return o === true ? 'have' : o === false ? 'miss' : 'unk'; };
+  const row = (ha, hb, kind, exA, exB) => {
+    if (ha && hb && ha === hb) return `<div class="cmp-row same">${cell(ha, nmA, icA, 'mine' + (exA ? ' ex' : ''))}${cell(hb, nmB, icB, 'theirs' + (exB ? ' ex' : ''))}</div>`;
+    return `<div class="cmp-row diff">${cell(ha, nmA, icA, 'mine' + (exA ? ' ex' : ''))}${cell(hb, nmB, icB, 'theirs ' + (hb ? own(hb, kind) : '') + (exB ? ' ex' : ''))}</div>`;
+  };
+  // alinha listas (aspectos, fragmentos): iguais primeiro, depois o resto lado a lado
+  const pairs = (la, lb) => { const same = la.filter(h => lb.includes(h)), ra = la.filter(h => !lb.includes(h)), rb = lb.filter(h => !la.includes(h)), out = same.map(h => [h, h]); for (let i = 0; i < Math.max(ra.length, rb.length); i++) out.push([ra[i] || 0, rb[i] || 0]); return out; };
+  const grp = (t, rows) => rows ? `<div class="cmp-r"><div class="cmp-k">${esc(t)}</div>${rows}</div>` : '';
+  const exW = (C, h) => C.B.en[h]?.tt === 6;
+  const chA = A.p.characters.data[A.cid], chB = Bc.p.characters.data[Bc.cid];
+  const ttlA = charTitle(u().classes[chA.classType] || '', A.B.loc[a.sub]?.n), ttlB = charTitle(u().classes[chB.classType] || '', Bc.B.loc[b.sub]?.n);
+  const [ca] = ELEMENT_ACC[ELEMENTS[A.B.en[a.sub]?.dt]] || ELEMENT_ACC.arc, [cb] = ELEMENT_ACC[ELEMENTS[Bc.B.en[b.sub]?.dt]] || ELEMENT_ACC.arc;
+  return `<div class="cmp">
+    <div class="cmp-h"><div style="--c:${ca}"><small>${esc(W.you)} · ${esc(String(A.name).replace(/#\d+$/, ''))}</small><b>${esc(ttlA)}</b></div><div style="--c:${cb}"><small>${esc(String(Bc.name).replace(/#\d+$/, ''))}</small><b>${esc(ttlB)}</b></div></div>
+    ${grp('Super', row(a.sup[0], b.sup[0], 'plug'))}
+    ${grp(W.abilities, pairs(a.ab, b.ab).map(([x, y]) => row(x, y, 'plug')).join(''))}
+    ${grp(W.aspects, pairs(a.asp, b.asp).map(([x, y]) => row(x, y, 'plug')).join(''))}
+    ${grp(W.frags, pairs(a.fr, b.fr).map(([x, y]) => row(x, y, 'plug')).join(''))}
+    ${grp(W.weapons, a.w.map((h, k) => row(h, b.w[k], 'item', exW(A, h), exW(Bc, b.w[k]))).join(''))}
+    ${grp(W.exoArmor, row(a.xa, b.xa, 'item', true, true))}
+    ${a.sets.length || b.sets.length ? grp(W.setT, `<div class="cmp-row ${a.sets.join() === b.sets.join() ? 'same' : 'diff'}"><span class="mine">${esc(a.sets.join(', ') || '—')}</span><span class="theirs">${esc(b.sets.join(', ') || '—')}</span></div>`) : ''}
+    <p class="cmp-leg"><span class="lg have"></span>${esc(W.lgHave)} <span class="lg miss"></span>${esc(W.lgMiss)} <span class="lg same">=</span>${esc(W.lgSame)}</p></div>`;
+}
+function dimLink(C) {
+  const eq = C.p.characterEquipment?.data?.[C.cid]?.items || [], sk = C.p.itemComponents?.sockets?.data || {}, ch = C.p.characters.data[C.cid], B = C.B;
+  const equipped = [], mods = [];
+  for (const i of eq) {
+    if (i.bucketHash === SUB_BUCKET) { const so = {}; (sk[i.itemInstanceId]?.sockets || []).forEach((s, k) => { if (s.plugHash && s.isVisible !== false && !SKIP_NAME.test(B.en[s.plugHash]?.n || '')) so[k] = s.plugHash; }); equipped.push({ hash: i.itemHash, socketOverrides: so }); }
+    else if (WEAPON_B.includes(i.bucketHash)) equipped.push({ hash: i.itemHash });
+    else if (ARMOR_B.includes(i.bucketHash)) { equipped.push({ hash: i.itemHash }); for (const s of sk[i.itemInstanceId]?.sockets || []) { const e = B.en[s.plugHash]; if (s.plugHash && e && /Mod$/.test(e.tl) && !SKIP_NAME.test(e.n) && !/Empty|Default/i.test(e.n)) mods.push(s.plugHash); } }
+  }
+  const sn = B.loc[eq.find(i => i.bucketHash === SUB_BUCKET)?.itemHash]?.n;
+  const lo = { name: `${String(C.name).replace(/#\d+$/, '')} · ${charTitle(u().classes[ch.classType] || '', sn)}`, classType: ch.classType, clearSpace: false, equipped, unequipped: [], parameters: { mods } };
+  return 'https://app.destinyitemmanager.com/loadouts?loadout=' + encodeURIComponent(JSON.stringify(lo));
+}
 
 /* ---------- início ---------- */
 async function start() {
@@ -1302,6 +1376,8 @@ async function start() {
     showMessage(`<p class="notice">${esc(e.message === 'maintenance' ? u().maintenance : u().apiError(e.message))}</p>`);
   }
 }
+// instala como app (ícone na tela inicial, abre sem a barra do navegador e funciona sem internet)
+if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
 (async function init() {
   if (LS.get('dc-hide2', false)) { $('hide').checked = true; document.body.classList.add('hide-done'); }
   applyUI();
