@@ -1016,7 +1016,7 @@ async function loadVendors(my) {
     } catch { out[vi] = { name: vname, failed: true }; }
   }));
   vendLoading = false; if (cid !== charId) return;
-  VEND = out.filter(Boolean); if (tab === 'obj') { build(); render(); }
+  VEND = out.filter(Boolean); if (tab === 'vend') render();
 }
 const COLL = {};
 const EL_COLOR = { 1: '#d5dbe6', 2: 'var(--arc)', 3: 'var(--solar)', 4: '#b48cff', 6: '#6fa8ff', 7: 'var(--done)' };
