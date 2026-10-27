@@ -345,3 +345,24 @@ section.vend.collapsed .sec-head{border-bottom:0}
 .fd-act .fd-dim{margin-left:0;padding:0 10px}
 .cmp-leg .li{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}.cmp-leg .lg{margin-right:0}
 .fd-act .fd-ib.fd-cmpbtn,.fd-act .fd-ib.fd-cam{display:inline-grid;place-items:center;padding:0;width:36px;height:36px;gap:0}
+
+/* favoritos, link público e comparar com loadouts */
+.b-top .b-k{margin-right:auto}
+.b-link{display:grid;place-items:center;width:34px;height:34px;padding:0;border-radius:8px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#e6ebf2;cursor:pointer;flex:none;position:relative}
+.b-link:hover{background:rgba(255,255,255,.14)}
+.b-link:focus-visible{outline:2px solid var(--acc2);outline-offset:2px}
+.fd-act .fd-ib.fd-fav,.fd-act .fd-ib.fd-link{display:inline-grid;place-items:center;padding:0;width:36px;height:36px;gap:0;position:relative}
+.fd-act .fd-ib.fd-fav[aria-pressed="true"]{color:#f3d77a;border-color:rgba(243,215,122,.55);background:rgba(243,215,122,.12)}
+.fd-act-k{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fd-ib.ok,.b-link.ok{color:#7be0a0;border-color:rgba(123,224,160,.6)}
+[data-tip]::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);right:0;white-space:nowrap;font:600 11.5px/1 var(--mono);padding:6px 8px;border-radius:6px;background:#1c2433;color:#e6ebf2;border:1px solid rgba(255,255,255,.15);pointer-events:none;z-index:3}
+.fd-k{font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:2px 2px 8px}
+.fd-favs{margin-bottom:14px}
+.fd-star{color:#d9b84a;margin-right:4px;font-size:13px}
+.fd-pub{margin:10px 14px 0;font-size:12.5px;color:#b9c3d3;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.05);border:1px dashed rgba(255,255,255,.18)}
+.fd-src{display:grid;gap:8px;padding:12px 14px 0}
+.fd-src-l{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.fd-src-l::-webkit-scrollbar{display:none}
+.fd-src-l .char{flex:none;white-space:nowrap}
+.fd-pad{padding:12px 14px}
+@media (max-width:420px){.fd-act{gap:6px}.fd-act .fd-ib{height:34px;min-width:34px}.fd-act .fd-ib.fd-fav,.fd-act .fd-ib.fd-link,.fd-act .fd-ib.fd-cmpbtn,.fd-act .fd-ib.fd-cam{width:34px;height:34px}}
