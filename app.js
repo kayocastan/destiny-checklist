@@ -53,6 +53,7 @@ const UI = {
       week: 'Esta semana', xurSells: n => `Xûr vende ${n}`, xurSub: (c, h, t) => `${c} moedas${h != null ? ` · você tem ${h}` : ''} · sai em ${t}`,
       featured: 'Em destaque: ', missingEx: n => `${n} ainda falta`, untilReset: 'até o reset', reset: 'Reset semanal', resetSub: t => `em ${t} · terça, 14h (Brasília)`,
       featWeek: 'Em destaque nesta semana', clears: n => n === 1 ? '1 conclusão' : `${n} conclusões`, showBuild: 'Ver a build equipada',
+      find: 'Buscar guardião', findShort: 'Buscar', findPh: 'Nome Bungie (ex.: Fulano#1234)', findHint: 'Digite pelo menos 3 letras do nome Bungie. Com o código (#1234) vai direto.', findNone: 'Ninguém encontrado com esse nome.', findErr: 'Não deu para buscar agora. Tente de novo em instantes.', findLoading: 'Buscando…', findLoadingP: 'Carregando a build…', back: 'Voltar', privateP: 'Não deu para ver o equipamento desse guardião agora.', seeBuild: 'Ver a build', clanTip: 'Toque num nome para ver a build da pessoa.', lastPlayed: d => `jogou ${d}`,
       ammo: { 1: 'Munição primária', 2: 'Munição especial', 3: 'Munição pesada' },
       share: 'Gerar imagem para compartilhar', shareMaking: 'Montando a imagem da sua build…', shareAlt: 'Imagem da build equipada', shareBtn: 'Compartilhar', shareDl: 'Baixar imagem', shareClose: 'Fechar', shareTitle: 'Minha build no Destiny 2', shareFail: 'Não deu para gerar a imagem agora. Tente de novo.',
       subclass: 'Subclasse', weapons: 'Armas', armor: 'Armadura e mods', aspects: 'Aspectos', frags: 'Fragmentos',
@@ -105,6 +106,7 @@ const UI = {
       week: 'This week', xurSells: n => `Xûr sells ${n}`, xurSub: (c, h, t) => `${c} coins${h != null ? ` · you have ${h}` : ''} · leaves in ${t}`,
       featured: 'Featured: ', missingEx: n => `${n} still missing`, untilReset: 'until reset', reset: 'Weekly reset', resetSub: t => `in ${t} · Tuesday, 17:00 UTC`,
       featWeek: 'Featured this week', clears: n => n === 1 ? '1 clear' : `${n} clears`, showBuild: 'Show the equipped build',
+      find: 'Find a guardian', findShort: 'Search', findPh: 'Bungie Name (e.g. Someone#1234)', findHint: 'Type at least 3 letters of the Bungie Name. With the code (#1234) it goes straight to them.', findNone: 'No one found with that name.', findErr: "Couldn't search right now. Try again in a moment.", findLoading: 'Searching…', findLoadingP: 'Loading the build…', back: 'Back', privateP: "Couldn't see this guardian's gear right now.", seeBuild: 'See their build', clanTip: 'Tap a name to see their build.', lastPlayed: d => `played ${d}`,
       ammo: { 1: 'Primary ammo', 2: 'Special ammo', 3: 'Heavy ammo' },
       share: 'Make an image to share', shareMaking: 'Putting your build image together…', shareAlt: 'Image of the equipped build', shareBtn: 'Share', shareDl: 'Download image', shareClose: 'Close', shareTitle: 'My Destiny 2 build', shareFail: "Couldn't make the image right now. Please try again.",
       subclass: 'Subclass', weapons: 'Weapons', armor: 'Armor and mods', aspects: 'Aspects', frags: 'Fragments',
@@ -616,23 +618,29 @@ function secMeta(sec) {
 }
 
 /* Build equipada: abre ao tocar nos ícones do cabeçalho */
-async function loadBuild(my) {
-  const eq = profile.characterEquipment?.data?.[charId]?.items || [], sk = profile.itemComponents?.sockets?.data;
-  if (!sk || !eq.length) return;
+/* Nomes, ícones e munição de tudo que o personagem tem equipado (serve para você e para quem você buscar) */
+async function fetchBuild(p, cid) {
+  const eq = p.characterEquipment?.data?.[cid]?.items || [], sk = p.itemComponents?.sockets?.data;
+  if (!sk || !eq.length) return null;
   const plugs = []; for (const i of eq) for (const s of sk[i.itemInstanceId]?.sockets || []) if (s.plugHash && s.isVisible !== false) plugs.push(s.plugHash);
   const all = [...plugs, ...eq.map(i => i.itemHash)];
-  const en = await entities('DestinyInventoryItemDefinition', all, 'en'); if (my !== gen) return;
-  const loc = lang === 'pt' ? await entities('DestinyInventoryItemDefinition', all, 'pt') : en; if (my !== gen) return;
+  const en = await entities('DestinyInventoryItemDefinition', all, 'en');
+  const loc = lang === 'pt' ? await entities('DestinyInventoryItemDefinition', all, 'pt') : en;
   const wh = eq.filter(i => [1498876634, 2465295065, 953998645].includes(i.bucketHash)).map(i => i.itemHash).filter(h => AMMO[h] == null);
-  await Promise.all(wh.map(h => bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${h}/`, false).then(d => { AMMO[h] = d.equippingBlock?.ammoType || 0; }).catch(() => {}))); if (my !== gen) return;
-  BUILD = { en, loc }; if (buildOpen) renderBuild();
+  await Promise.all(wh.map(h => bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${h}/`, false).then(d => { AMMO[h] = d.equippingBlock?.ammoType || 0; }).catch(() => {})));
+  return { en, loc };
 }
+async function loadBuild(my) {
+  const b = await fetchBuild(profile, charId); if (my !== gen || !b) return;
+  BUILD = b; if (buildOpen) renderBuild();
+}
+const ownCtx = () => ({ p: profile, cid: charId, B: BUILD, name: member?.name || '' });
 const SKIP_NAME = /^(Empty|Default|Upgrade Armor|Locked|No |Restore Defaults|Kill Tracker|Tracker Disabled|Change Energy|Deepsight)/i;
 const SKIP_TYPE = /Shader|Ornament|Memento|Tracker|Flair|Emote|Transmat|Projection/i;
-function buildHTML() {
-  const W = u().w, B = BUILD; if (!B) return `<p class="b-note">${esc(u().loadingDefs)}</p>`;
-  const inst = profile.itemComponents?.instances?.data || {}, sk = profile.itemComponents?.sockets?.data || {};
-  const eq = (profile.characterEquipment?.data?.[charId]?.items || []).filter(i => GEAR_BUCKETS.includes(i.bucketHash)).sort((a, b) => GEAR_BUCKETS.indexOf(a.bucketHash) - GEAR_BUCKETS.indexOf(b.bucketHash));
+function buildHTML(C = ownCtx()) {
+  const W = u().w, B = C.B; if (!B) return `<p class="b-note">${esc(u().loadingDefs)}</p>`;
+  const inst = C.p.itemComponents?.instances?.data || {}, sk = C.p.itemComponents?.sockets?.data || {};
+  const eq = (C.p.characterEquipment?.data?.[C.cid]?.items || []).filter(i => GEAR_BUCKETS.includes(i.bucketHash)).sort((a, b) => GEAR_BUCKETS.indexOf(a.bucketHash) - GEAR_BUCKETS.indexOf(b.bucketHash));
   const chip = (h, cls) => { const d = B.loc[h] || B.en[h] || {}; return `<span class="${cls || ''}">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy">` : ''}${esc(d.n)}</span>`; };
   const plugsOf = i => { const own = B.en[i.itemHash]?.tl || ''; return (sk[i.itemInstanceId]?.sockets || []).filter(s => s.plugHash && s.isVisible !== false).map(s => s.plugHash).filter(h => { const e = B.en[h]; return e && e.n && !SKIP_NAME.test(e.n) && !SKIP_TYPE.test(e.tl) && e.tl !== own; }); };
   const row = (i, body) => { const d = B.loc[i.itemHash] || {}, pw = inst[i.itemInstanceId]?.primaryStat?.value; return `<div class="b-row${d.tt === 6 ? ' exo' : ''}"><div class="b-name">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy">` : ''}<span>${esc(d.n)}</span>${AMMO[i.itemHash] ? `<span class="ammo" title="${esc(u().w.ammo[AMMO[i.itemHash]])}" aria-label="${esc(u().w.ammo[AMMO[i.itemHash]])}">${ammoSVG(AMMO[i.itemHash])}</span>` : ''}<small>${esc(d.tl || '')}${pw && pw > 0 ? ` · <b>${pw}</b>` : ''}</small></div>${body}</div>`; };
@@ -646,7 +654,7 @@ function buildHTML() {
   const grp = (k, list) => list.length ? `<div class="b-grp"><div class="b-k">${esc(k)}</div>${list.map(i => row(i, `<div class="b-perks">${plugsOf(i).map(h => { const e = B.en[h]; return chip(h, /^Masterworked|^Tier \d/i.test(e.n) || /Intrinsic/i.test(e.tl) ? 'mw' : ''); }).join('')}</div>`)).join('')}</div>` : '';
   html += `<div class="b-cols">${grp(W.weapons, eq.filter(i => [1498876634, 2465295065, 953998645].includes(i.bucketHash)))}${grp(W.armor, eq.filter(i => [3448274439, 3551918588, 14239492, 20886954, 1585787867].includes(i.bucketHash)))}</div>`;
   const cam = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.3l1.4-2h5.6l1.4 2h2.3A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12.8" r="3.4" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>';
-  return `<div class="b-top"><div class="b-k">${sub ? esc(W.subclass) : ''}</div><button class="b-cam" id="sharebtn" type="button" title="${esc(W.share)}" aria-label="${esc(W.share)}">${cam}</button></div>` + html;
+  return `<div class="b-top"><div class="b-k">${sub ? esc(W.subclass) : ''}</div><button class="b-cam" type="button" title="${esc(W.share)}" aria-label="${esc(W.share)}">${cam}</button></div>` + html;
 }
 /* ---------- imagem da build para compartilhar ----------
    Desenha o conteúdo numa tela transparente, anotando os cartões; no fim compõe:
@@ -658,14 +666,15 @@ function loadImg(path) {
   if (!imgCache.has(path)) imgCache.set(path, fetch(BNET + path, { mode: 'cors' }).then(r => r.ok ? r.blob() : null).then(b => b ? createImageBitmap(b) : null).catch(() => null));
   return imgCache.get(path);
 }
-async function buildShareCanvas(S = 1, MAXH = 4400) {
-  const W = u().w, B = BUILD, ch = profile.characters.data[charId], U = u();
-  const cs = getComputedStyle(document.documentElement), acc = cs.getPropertyValue('--acc').trim() || '#6fd3ff', acc2 = cs.getPropertyValue('--acc2').trim() || '#a8f0ff';
+const ELEMENT_ACC = { prismatic: ['#e57ce0', '#5cc6f2'], arc: ['#6fd3ff', '#a8f0ff'], solar: ['#f5a13c', '#ffd36e'], void: ['#b48cff', '#e07cf0'], stasis: ['#6fa8ff', '#b6e4ff'], strand: ['#5fe39a', '#c6ff7a'] };
+async function buildShareCanvas(C, S = 1, MAXH = 4400) {
+  const W = u().w, B = C.B, ch = C.p.characters.data[C.cid], U = u();
   try { await Promise.all(['700 40px Rajdhani', '500 20px "IBM Plex Sans"', '600 20px "IBM Plex Sans"', '500 20px "IBM Plex Mono"'].map(f => document.fonts.load(f))); } catch {}
   const statDefs = await entities('DestinyStatDefinition', STAT_ORDER, lang);
-  const eq = (profile.characterEquipment?.data?.[charId]?.items || []).filter(i => GEAR_BUCKETS.includes(i.bucketHash)).sort((a, b) => GEAR_BUCKETS.indexOf(a.bucketHash) - GEAR_BUCKETS.indexOf(b.bucketHash));
-  const inst = profile.itemComponents?.instances?.data || {}, sk = profile.itemComponents?.sockets?.data || {};
+  const eq = (C.p.characterEquipment?.data?.[C.cid]?.items || []).filter(i => GEAR_BUCKETS.includes(i.bucketHash)).sort((a, b) => GEAR_BUCKETS.indexOf(a.bucketHash) - GEAR_BUCKETS.indexOf(b.bucketHash));
+  const inst = C.p.itemComponents?.instances?.data || {}, sk = C.p.itemComponents?.sockets?.data || {};
   const def = h => B.loc[h] || B.en[h] || {};
+  const subI = eq.find(i => i.bucketHash === SUB_BUCKET), [acc, acc2] = ELEMENT_ACC[ELEMENTS[B.en[subI?.itemHash]?.dt]] || ELEMENT_ACC.arc;
   const plugsOf = i => { const own = B.en[i.itemHash]?.tl || ''; return (sk[i.itemInstanceId]?.sockets || []).filter(s => s.plugHash && s.isVisible !== false).map(s => s.plugHash).filter(h => { const e = B.en[h]; return e && e.n && !SKIP_NAME.test(e.n) && !SKIP_TYPE.test(e.tl) && e.tl !== own; }); };
   const paths = new Set([ch.emblemBackgroundPath]);
   for (const i of eq) { paths.add(def(i.itemHash).ic); for (const h of plugsOf(i)) paths.add(def(h).ic); }
@@ -702,11 +711,11 @@ async function buildShareCanvas(S = 1, MAXH = 4400) {
   if (em) { const s = HH / em.height; x.drawImage(em, 0, 0, em.width * s, HH); }
   const og = x.createLinearGradient(0, 0, Wd, 0); og.addColorStop(0, 'rgba(14,18,28,0)'); og.addColorStop(.22, 'rgba(14,18,28,.5)'); og.addColorStop(.6, 'rgba(14,18,28,.78)'); og.addColorStop(1, 'rgba(14,18,28,.94)'); x.fillStyle = og; x.fillRect(0, 0, Wd, HH);
   const sub = eq.find(i => i.bucketHash === SUB_BUCKET), sd = sub ? def(sub.itemHash) : {};
-  const el = ELEMENTS[gearDefs[sub?.itemHash]?.dt] || '';
+  const el = ELEMENTS[B.en[sub?.itemHash]?.dt] || '';
   const elName = { prismatic: ['Prismatic', 'Prismático'], arc: ['Arc', 'Arco'], solar: ['Solar', 'Solar'], void: ['Void', 'Vácuo'], stasis: ['Stasis', 'Estase'], strand: ['Strand', 'Filamento'] }[el];
-  const cls = U.classes[ch.classType] || '', who = String(member.name || '').replace(/#\d+$/, '');
+  const cls = U.classes[ch.classType] || '';
   const hx = em ? 270 : PAD;
-  text((member.name || '').toUpperCase(), hx, 100, F.m(24), '#c3ccda', 'left', 560);
+  text((C.name || '').toUpperCase(), hx, 100, F.m(24), '#c3ccda', 'left', 560);
   { const tt = charTitle(cls, sd.n), mw = Wd - hx - 290; let fs = 70; x.font = F.d(fs); while (x.measureText(tt).width > mw && fs > 34) { fs -= 2; x.font = F.d(fs); } text(tt, hx - 3, 170, F.d(fs), '#ffffff', 'left', mw); }
   text(String(ch.light), Wd - PAD, 160, F.d(96), GOLD, 'right');
   x.font = F.d(96); const pwW = x.measureText(String(ch.light)).width; text('✦', Wd - PAD - pwW - 8, 120, F.d(40), GOLD, 'right');
@@ -782,16 +791,16 @@ async function buildShareCanvas(S = 1, MAXH = 4400) {
   out.logicalH = Hh; return out;
 }
 let shareUrl = null;
-async function openShare() {
-  const W = u().w, dlg = $('sharedlg'); if (!dlg || !BUILD) return;
+async function openShare(C) {
+  const W = u().w, dlg = $('sharedlg'); if (!dlg || !C?.B) return;
   dlg.innerHTML = `<div class="sh-box"><p class="sh-wait">${esc(W.shareMaking)}</p></div>`; dlg.showModal();
   try {
     // 1ª passada mede a altura; a 2ª desenha em 2x (2160 px de largura) para ficar nítida no WhatsApp
-    const h = (await buildShareCanvas(1)).logicalH;
-    const cv = await buildShareCanvas(2, h + 2);
+    const h = (await buildShareCanvas(C, 1)).logicalH;
+    const cv = await buildShareCanvas(C, 2, h + 2);
     const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.95));
     if (shareUrl) URL.revokeObjectURL(shareUrl); shareUrl = URL.createObjectURL(blob);
-    const name = `build-${(u().classes[profile.characters.data[charId].classType] || 'destiny').toLowerCase()}-${new Date().toISOString().slice(0, 10)}.jpg`;
+    const name = `build-${String(C.name || '').replace(/#\d+$/, '').replace(/[^a-z0-9]+/gi, '-').toLowerCase() || 'destiny'}-${(u().classes[C.p.characters.data[C.cid].classType] || '').toLowerCase()}-${new Date().toISOString().slice(0, 10)}.jpg`;
     const file = new File([blob], name, { type: 'image/jpeg' });
     const canShare = !!(navigator.canShare && navigator.canShare({ files: [file] }));
     dlg.innerHTML = `<div class="sh-box"><button class="sh-x" id="shx" type="button" aria-label="${esc(W.shareClose)}" title="${esc(W.shareClose)}">×</button><div class="sh-img"><img src="${shareUrl}" alt="${esc(W.shareAlt)}"></div><div class="sh-actions">${canShare ? `<button class="btn" id="shgo" type="button">${esc(W.shareBtn)}</button>` : ''}<a class="${canShare ? 'reset' : 'btn'}" id="shdl" href="${shareUrl}" download="${name}">${esc(W.shareDl)}</a></div></div>`;
@@ -819,7 +828,7 @@ async function loadGuardian(my) {
     entities('DestinyMetricDefinition', COUNT_METRICS, lang).then(d => { out.metricNames = d; }),
     (async () => { const h = profile.profile?.data?.currentSeasonPassHash; if (!h) return; const d = await bungie(`/Destiny2/Manifest/DestinySeasonPassDefinition/${h}/?lc=${lang === 'pt' ? 'pt-br' : 'en'}`, false); const p = profile.characterProgressions?.data?.[charId]?.progressions?.[d.rewardProgressionHash]; if (p) out.pass = { n: d.displayProperties?.name || '', lvl: p.level, a: p.progressToNextLevel, b: p.nextLevelAt }; })(),
     (async () => { const r = await bungie(`/Destiny2/${member.type}/Account/${member.id}/Character/${charId}/Stats/UniqueWeapons/`); const v = (w, k) => w.values?.[k]?.basic?.value || 0; const top = (r.weapons || []).map(w => ({ h: w.referenceId, k: v(w, 'uniqueWeaponKills'), p: v(w, 'uniqueWeaponKillsPrecisionKills') })).sort((a, b) => b.k - a.k).slice(0, 6); const n = await entities('DestinyInventoryItemDefinition', top.map(w => w.h), lang); out.weapons = top.map(w => ({ ...w, n: n[w.h]?.n || '', ic: n[w.h]?.ic || '' })); })(),
-    (async () => { const g = await bungie(`/GroupV2/User/${member.type}/${member.id}/0/1/`); const grp = g.results?.[0]?.group; if (!grp) { out.clan = { none: true }; return; } const m = await bungie(`/GroupV2/${grp.groupId}/Members/?currentpage=1`); const list = (m.results || []).filter(x => x.destinyUserInfo?.membershipId !== member.id).map(x => ({ n: x.destinyUserInfo?.bungieGlobalDisplayName || x.destinyUserInfo?.displayName || '?', on: !!x.isOnline, t: (x.lastOnlineStatusChange || 0) * 1000 })).sort((a, b) => (b.on - a.on) || (b.t - a.t)); out.clan = { name: grp.name, list }; })(),
+    (async () => { const g = await bungie(`/GroupV2/User/${member.type}/${member.id}/0/1/`); const grp = g.results?.[0]?.group; if (!grp) { out.clan = { none: true }; return; } const m = await bungie(`/GroupV2/${grp.groupId}/Members/?currentpage=1`); const list = (m.results || []).filter(x => x.destinyUserInfo?.membershipId !== member.id).map(x => { const d = x.destinyUserInfo || {}; return { n: d.bungieGlobalDisplayName || d.displayName || '?', full: d.bungieGlobalDisplayName ? `${d.bungieGlobalDisplayName}#${String(d.bungieGlobalDisplayNameCode || 0).padStart(4, '0')}` : (d.displayName || ''), mt: d.membershipType, mid: d.membershipId, on: !!x.isOnline, t: (x.lastOnlineStatusChange || 0) * 1000 }; }).sort((a, b) => (b.on - a.on) || (b.t - a.t)); out.clan = { name: grp.name, list }; })(),
     (async () => { const c = profile.profileCommendations?.data; if (!c) return; out.comm = c; const ks = Object.keys(c.commendationNodePercentagesByHash || {}).map(Number); if (ks.length) out.commNames = await entities('DestinySocialCommendationNodeDefinition', ks, lang); })(),
   ];
   await Promise.allSettled(tasks);
@@ -841,7 +850,7 @@ function gdHTML() {
   const c = G?.comm;
   const comm = `<article class="gd"><div class="gd-head"><h2>${esc(W.commT)}</h2></div>${!G ? wait : c ? `<div class="gd-grid">${st(fmtN(c.totalScore), W.commScore)}${Object.entries(c.commendationNodePercentagesByHash || {}).filter(([h]) => G.commNames[h]?.n).sort((a, b) => b[1] - a[1]).map(([h, v]) => st(v + '%', G.commNames[h].n, v)).join('')}</div>` : `<p>${esc(W.unavailable)}</p>`}</article>`;
   const r = rtf(), ago = t => t && r ? (() => { const d = (t - Date.now()) / 1000; const a = Math.abs(d); return a < 3600 ? r.format(Math.round(d / 60), 'minute') : a < 86400 ? r.format(Math.round(d / 3600), 'hour') : r.format(Math.round(d / 86400), 'day'); })() : '';
-  const clan = `<article class="gd"><div class="gd-head"><h2>${esc(G?.clan?.name || W.clanT)}</h2></div>${!G ? wait : G.clan?.none ? `<p>${esc(W.noClan)}</p>` : G.clan ? `<p>${esc(W.clanNote(G.clan.list.filter(x => x.on).length))}</p><div class="cl">${G.clan.list.slice(0, 12).map(x => `<span class="${x.on ? 'on' : ''}">${esc(x.n)}${x.on ? '' : ` · ${esc(ago(x.t))}`}</span>`).join('')}</div>` : `<p>${esc(W.unavailable)}</p>`}</article>`;
+  const clan = `<article class="gd"><div class="gd-head"><h2>${esc(G?.clan?.name || W.clanT)}</h2></div>${!G ? wait : G.clan?.none ? `<p>${esc(W.noClan)}</p>` : G.clan ? `<p>${esc(W.clanNote(G.clan.list.filter(x => x.on).length))}</p><div class="cl">${G.clan.list.slice(0, 12).map(x => `<button type="button" class="cl-p${x.on ? ' on' : ''}" data-mt="${x.mt}" data-mid="${esc(x.mid)}" data-name="${esc(x.full)}" title="${esc(W.seeBuild)}">${esc(x.n)}${x.on ? '' : ` · ${esc(ago(x.t))}`}</button>`).join('')}</div><p class="gd-tip">${esc(W.clanTip)}</p>` : `<p>${esc(W.unavailable)}</p>`}</article>`;
   const opts = `<article class="gd"><div class="gd-head"><h2>${esc(W.optsT)}</h2></div><p>${esc(W.optsNote)}</p><div class="opts">${[['week', W.optWeek], ['clears', W.optClears], ['build', W.optBuild]].map(([k, t]) => `<label><input type="checkbox" data-opt="${k}"${OPTS[k] ? ' checked' : ''}> ${esc(t)}</label>`).join('')}</div></article>`;
   return `<div class="panel">${ranks}${clears}${wp}${comm}${clan}${opts}</div>`;
 }
@@ -899,8 +908,9 @@ function render() {
   renderGuardian(ch);
   $('eyebrow').dataset.base = member.name || ''; $('eyebrow').textContent = member.name || ''; $('eyebrow').title = member.name || ''; fitTitle();
   $('ghpw').hidden = false; $('pwv').textContent = ch.light; $('pwmax').textContent = mx && mx > ch.light ? `${U.max} ${mx}` : U.power;
-  $('chars').innerHTML = Object.values(profile.characters.data).map(c => `<button class="char" type="button" data-char="${c.characterId}" aria-pressed="${c.characterId === charId}">${esc(U.classes[c.classType])}<span class="pw">${c.light}</span></button>`).join('');
-  $('chars').hidden = Object.keys(profile.characters.data).length < 2;
+  const many = Object.keys(profile.characters.data).length > 1;
+  $('chars').innerHTML = (many ? Object.values(profile.characters.data).map(c => `<button class="char" type="button" data-char="${c.characterId}" aria-pressed="${c.characterId === charId}">${esc(U.classes[c.classType])}<span class="pw">${c.light}</span></button>`).join('') : '') + `<button class="char findbtn" type="button" id="findbtn" title="${esc(U.w.find)}" aria-label="${esc(U.w.find)}">${FIND_ICON}<span>${esc(U.w.findShort)}</span></button>`;
+  $('chars').hidden = false;
   $('tabs').innerHTML = GROUPS.map(g => `<button class="tab" type="button" data-group="${g.id}" aria-current="${groupOf(tab)?.id === g.id}">${esc(U.tabs[g.id])}</button>`).join('');
   const g = groupOf(tab), st = $('subtabs');
   if (g && g.subs.length > 1) { st.hidden = false; st.innerHTML = g.subs.map(id => `<button class="sub" type="button" data-sub="${id}" aria-pressed="${id === tab}">${esc(U.subs[id])}</button>`).join(''); }
@@ -968,7 +978,7 @@ function filter() {
 function go(t) { tab = t; const g = groupOf(t); if (g) { lastSub[g.id] = t; LS.set('dc-subs', lastSub); } LS.set('dc-tab', t); render(); }
 $('tabs').addEventListener('click', e => { const b = e.target.closest('.tab'); if (!b) return; const g = GROUPS.find(x => x.id === b.dataset.group); go(lastSub[g.id] || g.subs[0]); });
 $('subtabs').addEventListener('click', e => { const b = e.target.closest('.sub'); if (b) go(b.dataset.sub); });
-$('chars').addEventListener('click', e => { const b = e.target.closest('.char'); if (!b || b.dataset.char === charId) return; charId = b.dataset.char; LS.set('dc-char-' + member.id, charId); resetChar(); buildOpen && renderBuild(); hydrate(); });
+$('chars').addEventListener('click', e => { if (e.target.closest('#findbtn')) { openFind(); return; } const b = e.target.closest('.char'); if (!b || b.dataset.char === charId) return; charId = b.dataset.char; LS.set('dc-char-' + member.id, charId); resetChar(); buildOpen && renderBuild(); hydrate(); });
 $('ldbtn').addEventListener('click', () => { if (tab === 'ld') go(prevTab || 'obj'); else { prevTab = tab; go('ld'); } });
 $('themebtn').addEventListener('click', () => { const t = curTheme() === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = t; LS.set('dc-theme', t); applyTheme(); });
 try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme); } catch {}
@@ -989,9 +999,95 @@ $('list').addEventListener('change', e => { const k = e.target.dataset.opt; if (
 $('week').addEventListener('click', e => { const b = e.target.closest('.wk'); if (!b) return; const w = WK[+b.dataset.wk]; if (w && w.to) jumpTo(w.to[0], w.to[1]); });
 $('gear').addEventListener('click', toggleBuild);
 $('buildbtn').addEventListener('click', toggleBuild);
-$('build').addEventListener('click', e => { if (e.target.closest('#sharebtn')) openShare(); });
+$('build').addEventListener('click', e => { if (e.target.closest('.b-cam')) openShare(ownCtx()); });
 $('gear').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleBuild(); } });
 setInterval(() => { if (document.visibilityState === 'visible') renderWeek(); }, 60000);
+
+
+/* ---------- buscar outro guardião e ver a build dele ---------- */
+const FIND_ICON = '<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+async function bungiePost(path, body) {
+  const r = await fetch(API + path, { method: 'POST', headers: { 'X-API-Key': cfg.apiKey, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => null);
+  if (!j) throw new Error(`HTTP ${r.status}`);
+  if (j.ErrorCode !== 1) throw new Error(j.Message || j.ErrorStatus);
+  return j.Response;
+}
+const pickMembership = list => list.find(m => m.crossSaveOverride && m.crossSaveOverride === m.membershipType) || list.find(m => !m.crossSaveOverride) || list[0];
+const fullName = (n, c) => `${n}#${String(c || 0).padStart(4, '0')}`;
+async function searchPlayers(q) {
+  const m = q.match(/^(.+?)\s*#\s*(\d{1,4})$/);
+  if (m) {
+    const r = await bungiePost('/Destiny2/SearchDestinyPlayerByBungieName/-1/', { displayName: m[1].trim(), displayNameCode: +m[2] });
+    if (!r?.length) return [];
+    const p = pickMembership(r); return [{ name: fullName(p.bungieGlobalDisplayName, p.bungieGlobalDisplayNameCode), type: p.membershipType, id: p.membershipId }];
+  }
+  const r = await bungiePost('/User/Search/GlobalName/0/', { displayNamePrefix: q });
+  return (r?.searchResults || []).filter(x => x.destinyMemberships?.length).slice(0, 20).map(x => { const p = pickMembership(x.destinyMemberships); return { name: fullName(x.bungieGlobalDisplayName, x.bungieGlobalDisplayNameCode), type: p.membershipType, id: p.membershipId }; });
+}
+const FD = { q: '', results: null, status: '', sel: null, p: null, cid: null, B: null, seq: 0 };
+let fdTimer = null;
+function openFind(sel) {
+  const d = $('finddlg'), W = u().w;
+  d.innerHTML = `<div class="fd-box"><button class="sh-x fd-x" type="button" aria-label="${esc(W.shareClose)}" title="${esc(W.shareClose)}">×</button><h2 class="fd-t">${esc(W.find)}</h2><input class="search fd-q" id="fdq" type="search" autocomplete="off" spellcheck="false" placeholder="${esc(W.findPh)}" aria-label="${esc(W.find)}" value="${esc(FD.q)}"><div id="fdbody"></div></div>`;
+  if (!d.open) d.showModal();
+  if (sel) showPlayer(sel); else { renderFind(); setTimeout(() => $('fdq')?.focus(), 30); }
+}
+function renderFind() {
+  const W = u().w, b = $('fdbody'); if (!b) return;
+  if (FD.sel) {
+    const p = FD.p, chars = p ? Object.values(p.characters?.data || {}).sort((a, b) => new Date(b.dateLastPlayed) - new Date(a.dateLastPlayed)) : [];
+    const ch = p?.characters?.data?.[FD.cid];
+    let body;
+    if (FD.status === 'loading') body = `<p class="fd-msg">${esc(W.findLoadingP)}</p>`;
+    else if (!ch) body = `<p class="fd-msg">${esc(W.privateP)}</p>`;
+    else {
+      const eq = p.characterEquipment?.data?.[FD.cid]?.items || [], sub = eq.find(i => i.bucketHash === SUB_BUCKET), sn = FD.B?.loc?.[sub?.itemHash]?.n;
+      const el = ELEMENTS[FD.B?.en?.[sub?.itemHash]?.dt] || '', [a1, a2] = ELEMENT_ACC[el] || ELEMENT_ACC.arc;
+      const r = rtf(), ago = ch.dateLastPlayed && r ? (() => { const d = (Date.parse(ch.dateLastPlayed) - Date.now()) / 1000, a = Math.abs(d); return a < 3600 ? r.format(Math.round(d / 60), 'minute') : a < 86400 ? r.format(Math.round(d / 3600), 'hour') : r.format(Math.round(d / 86400), 'day'); })() : '';
+      body = `<div class="fd-hero" style="--a1:${a1};--a2:${a2}"><div class="fd-band"${ch.emblemBackgroundPath ? ` style="background-image:url('${BNET}${ch.emblemBackgroundPath}')"` : ''}><div class="fd-id"><div class="fd-who">${esc(FD.sel.name)}</div><div class="fd-ttl">${esc(charTitle(u().classes[ch.classType] || '', sn))}</div></div><div class="fd-pw"><b>${ch.light}</b><span>${esc(ago ? W.lastPlayed(ago) : u().power)}</span></div></div>
+        ${chars.length > 1 ? `<div class="fd-chars">${chars.map(c => `<button type="button" class="char" data-fdc="${c.characterId}" aria-pressed="${c.characterId === FD.cid}">${esc(u().classes[c.classType])}<span class="pw">${c.light}</span></button>`).join('')}</div>` : ''}
+        <div class="build fd-build">${FD.B ? buildHTML(fdCtx()) : `<p class="b-note">${esc(W.findLoadingP)}</p>`}</div></div>`;
+    }
+    b.innerHTML = `<button type="button" class="reset fd-back">← ${esc(W.back)}</button>${body}`;
+    return;
+  }
+  const res = FD.results;
+  b.innerHTML = FD.status === 'loading' ? `<p class="fd-msg">${esc(W.findLoading)}</p>` : FD.status === 'error' ? `<p class="fd-msg">${esc(W.findErr)}</p>` : res == null ? `<p class="fd-msg">${esc(W.findHint)}</p>` : !res.length ? `<p class="fd-msg">${esc(W.findNone)}</p>` : `<ul class="fd-res">${res.map((x, i) => { const k = x.name.lastIndexOf('#'); return `<li><button type="button" data-fdr="${i}"><span>${esc(x.name.slice(0, k))}</span><small>${esc(x.name.slice(k))}</small></button></li>`; }).join('')}</ul>`;
+}
+const fdCtx = () => ({ p: FD.p, cid: FD.cid, B: FD.B, name: FD.sel?.name || '' });
+async function doSearch(q) {
+  const my = ++FD.seq; FD.sel = null;
+  if (q.length < 3 && !q.includes('#')) { FD.results = null; FD.status = ''; renderFind(); return; }
+  FD.status = 'loading'; renderFind();
+  try { const r = await searchPlayers(q); if (my !== FD.seq) return; FD.results = r; FD.status = ''; }
+  catch { if (my !== FD.seq) return; FD.status = 'error'; }
+  renderFind();
+}
+async function showPlayer(sel) {
+  const my = ++FD.seq; FD.sel = sel; FD.p = null; FD.B = null; FD.cid = null; FD.status = 'loading'; renderFind();
+  try {
+    const p = await bungie(`/Destiny2/${sel.type}/Profile/${sel.id}/?components=200,205,300,305`, false); if (my !== FD.seq) return;
+    FD.p = p; const chars = Object.values(p.characters?.data || {}).sort((a, b) => new Date(b.dateLastPlayed) - new Date(a.dateLastPlayed));
+    FD.cid = chars[0]?.characterId || null; FD.status = ''; renderFind();
+    if (FD.cid) { FD.B = await fetchBuild(p, FD.cid); if (my === FD.seq) renderFind(); }
+  } catch { if (my !== FD.seq) return; FD.status = ''; FD.p = {}; renderFind(); }
+}
+async function pickFdChar(cid) {
+  const my = ++FD.seq; FD.cid = cid; FD.B = null; renderFind();
+  const b = await fetchBuild(FD.p, cid); if (my === FD.seq) { FD.B = b; renderFind(); }
+}
+$('finddlg').addEventListener('input', e => { if (e.target.id !== 'fdq') return; FD.q = e.target.value.trim(); clearTimeout(fdTimer); fdTimer = setTimeout(() => doSearch(FD.q), 350); });
+$('finddlg').addEventListener('keydown', e => { if (e.target.id === 'fdq' && e.key === 'Enter') { clearTimeout(fdTimer); doSearch(FD.q); } });
+$('finddlg').addEventListener('click', e => {
+  const d = $('finddlg');
+  if (e.target === d || e.target.closest('.fd-x')) { d.close(); return; }
+  if (e.target.closest('.fd-back')) { FD.sel = null; FD.seq++; renderFind(); return; }
+  const r = e.target.closest('[data-fdr]'); if (r) { const x = FD.results[+r.dataset.fdr]; if (x) showPlayer(x); return; }
+  const c = e.target.closest('[data-fdc]'); if (c && c.dataset.fdc !== FD.cid) { pickFdChar(c.dataset.fdc); return; }
+  if (e.target.closest('.b-cam')) openShare(fdCtx());
+});
+$('list').addEventListener('click', e => { const b = e.target.closest('.cl-p'); if (b && b.dataset.mid) { FD.q = ''; FD.results = null; openFind({ name: b.dataset.name, type: +b.dataset.mt, id: b.dataset.mid }); } });
 
 /* ---------- início ---------- */
 async function start() {
