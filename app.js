@@ -1359,7 +1359,7 @@ async function openLoadout(i) {
   const C = await getLdCtx(i); if (!C) return;
   openCtx({ name: `${(member?.name || '').replace(/#\d+$/, '')} · ${C.name}`, note: 'Loadout' }, { ...C, name: C.name });
 }
-async function getLdCtx(i) { try { await loadLdCtx(i); } catch {} return LDCTX[charId + ':' + i + ':' + lang] || null; }
+async function getLdCtx(i) { const k = charId + ':' + i + ':' + lang; try { await loadLdCtx(i); } catch {} if (!LDCTX[k]) LDCTX[k] = { p: null, B: null, name: '' }; return LDCTX[k].B ? LDCTX[k] : null; }
 /* comparar com um dos seus loadouts salvos no jogo, além da build equipada */
 const LDCTX = {};
 function cmpSrcHTML() {
