@@ -1307,7 +1307,7 @@ $('list').addEventListener('click', e => { const b = e.target.closest('.cl-p'); 
 /* ---------- comparar builds e levar para o DIM ---------- */
 const CLOSE_ICON = '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 const CAM_ICON = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.3l1.4-2h5.6l1.4 2h2.3A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12.8" r="3.4" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>';
-const CMP_ICON = '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M3 6h10M3 6l3-3M3 6l3 3M17 14H7M17 14l-3-3M17 14l-3 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const CMP_ICON = '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M16 7H4M4 7l3-3M4 7l3 3M4 13h12M16 13l-3-3M16 13l-3 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const EXPORT_ICON = '<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><path d="M11 3h6v6M17 3l-8 8M8 4H4v12h12v-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const WEAPON_B = [1498876634, 2465295065, 953998645], ARMOR_B = [3448274439, 3551918588, 14239492, 20886954, 1585787867];
 function buildParts(C) {
