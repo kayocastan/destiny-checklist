@@ -28,7 +28,7 @@ const UI = {
     maintenance: 'A API da Bungie está em manutenção agora. Tente de novo em alguns minutos.',
     noChars: 'Nenhum personagem de Destiny 2 encontrado nesta conta.',
     done1: (n, t) => `${n} de ${t} feitos`, dg: (n, t) => `${n} de ${t} masmorras concluídas`, raid: (n, t) => `${n} de ${t} incursões concluídas`,
-    tit: (n, t) => `${n} de ${t} títulos conquistados`, camp: n => `${n} campanha${n === 1 ? '' : 's'} em andamento`, campDone: (n, t) => `${n} de ${t} campanhas concluídas em todas as dificuldades`, ld: n => `${n} loadout${n === 1 ? '' : 's'} no jogo`,
+    tit: (n, t) => `${n} de ${t} títulos conquistados`, camp: n => `${n} campanha${n === 1 ? '' : 's'} em andamento`, xm: (n, t) => `${n} de ${t} missões exóticas concluídas`, campDone: (n, t) => `${n} de ${t} campanhas concluídas em todas as dificuldades`, ld: n => `${n} loadout${n === 1 ? '' : 's'} no jogo`,
     panels: (n, sh) => n === 1 ? '1 painel concluído ' + (sh ? 'aparecendo.' : 'oculto.') : `${n} painéis concluídos ${sh ? 'aparecendo.' : 'ocultos.'}`,
     show: 'Mostrar', hideDone: 'Ocultar concluídos',
     s: {
@@ -38,7 +38,7 @@ const UI = {
       nearCats: 'Catalisadores quase prontos', nearCatsNote: 'Já passaram da metade.',
       nearTitles: 'Títulos quase prontos', nearTitlesNote: 'Faltam poucos triunfos.',
       noCamp: 'Nenhuma campanha em andamento no registro deste personagem. Campanhas concluídas não aparecem.',
-      campNote: (a, b) => `Passo ${a} de ${b}.`, campStep: n => `Passo atual: ${n}`, campNormal: 'Concluir a campanha', campNotStarted: 'Não iniciada', campLeg: 'Todas as missões no Lendário', campMaster: 'Uma missão no Mestre', campIn: 'Em andamento.', campAll: 'Concluída em todas as dificuldades.', campLegLeft: 'Concluída; falta o Lendário.', campMasterLeft: 'Lendário feito; falta o Mestre.', campNone: 'Ainda não concluída.', current: 'Passo atual',
+      campNote: (a, b) => `Passo ${a} de ${b}.`, campStep: n => `Passo atual: ${n}`, xmClear: n => `Concluir ${n}`, xmTri: 'Triunfos da missão', campNormal: 'Concluir a campanha', campNotStarted: 'Não iniciada', campLeg: 'Todas as missões no Lendário', campMaster: 'Uma missão no Mestre', campIn: 'Em andamento.', campAll: 'Concluída em todas as dificuldades.', campLegLeft: 'Concluída; falta o Lendário.', campMasterLeft: 'Lendário feito; falta o Mestre.', campNone: 'Ainda não concluída.', current: 'Passo atual',
       clear: n => `Concluir ${n}`, exotic: n => `Exótico: ${n}`,
       wpn: 'Armas exóticas', armor: c => `Armaduras exóticas de ${c}`,
       catProg: 'Em progresso', catProgNote: 'Catalisador obtido; use a arma para completar.',
@@ -83,7 +83,7 @@ const UI = {
     maintenance: 'The Bungie API is down for maintenance. Try again in a few minutes.',
     noChars: 'No Destiny 2 characters found on this account.',
     done1: (n, t) => `${n} of ${t} done`, dg: (n, t) => `${n} of ${t} dungeons cleared`, raid: (n, t) => `${n} of ${t} raids cleared`,
-    tit: (n, t) => `${n} of ${t} titles earned`, camp: n => `${n} campaign${n === 1 ? '' : 's'} in progress`, campDone: (n, t) => `${n} of ${t} campaigns done on every difficulty`, ld: n => `${n} in-game loadout${n === 1 ? '' : 's'}`,
+    tit: (n, t) => `${n} of ${t} titles earned`, camp: n => `${n} campaign${n === 1 ? '' : 's'} in progress`, xm: (n, t) => `${n} of ${t} exotic missions cleared`, campDone: (n, t) => `${n} of ${t} campaigns done on every difficulty`, ld: n => `${n} in-game loadout${n === 1 ? '' : 's'}`,
     panels: (n, sh) => `${n} completed panel${n === 1 ? '' : 's'} ${sh ? 'shown.' : 'hidden.'}`,
     show: 'Show', hideDone: 'Hide completed',
     s: {
@@ -93,7 +93,7 @@ const UI = {
       nearCats: 'Catalysts almost done', nearCatsNote: 'Already past halfway.',
       nearTitles: 'Titles almost done', nearTitlesNote: 'Only a few triumphs left.',
       noCamp: 'No campaign in progress in this character\'s quest log. Finished campaigns are not shown.',
-      campNote: (a, b) => `Step ${a} of ${b}.`, campStep: n => `Current step: ${n}`, campNormal: 'Finish the campaign', campNotStarted: 'Not started', campLeg: 'All missions on Legendary', campMaster: 'One mission on Master', campIn: 'In progress.', campAll: 'Done on every difficulty.', campLegLeft: 'Done; Legendary is left.', campMasterLeft: 'Legendary done; Master is left.', campNone: 'Not finished yet.', current: 'Current step',
+      campNote: (a, b) => `Step ${a} of ${b}.`, campStep: n => `Current step: ${n}`, xmClear: n => `Complete ${n}`, xmTri: 'Mission triumphs', campNormal: 'Finish the campaign', campNotStarted: 'Not started', campLeg: 'All missions on Legendary', campMaster: 'One mission on Master', campIn: 'In progress.', campAll: 'Done on every difficulty.', campLegLeft: 'Done; Legendary is left.', campMasterLeft: 'Legendary done; Master is left.', campNone: 'Not finished yet.', current: 'Current step',
       clear: n => `Complete ${n}`, exotic: n => `Exotic: ${n}`,
       wpn: 'Exotic weapons', armor: c => `${c} exotic armor`,
       catProg: 'In progress', catProgNote: 'Catalyst obtained; use the weapon to finish it.',
@@ -489,7 +489,6 @@ function build() {
   const expires = x => { const d = x.it.expirationDate ? new Date(x.it.expirationDate) : null; if (!d || isNaN(d)) return ''; const h = Math.max(0, Math.round((d - Date.now()) / 3600000)); return s.expires(h); };
   out.push(weekSection());
   out.push(S('vend', 'vendors', '', null, [], { html: true }));
-  out.push(S('xm', 'xmissions', '', null, [], { html: true }));
   if (!contracts.length) out.push(S('obj', 'contracts', s.contracts, waiting ? s.loadingQuests : s.noContracts, []));
   // Um painel por vendedor/origem, usando o rótulo oficial do jogo (ex.: "Recompensa da Vanguarda", "Contrato do Sindicato").
   const byVendor = new Map();
@@ -525,6 +524,23 @@ function build() {
   for (const x of camps.filter(x => !used.has(x))) {
     const idx = Math.max(0, x.q.il.indexOf(x.it.itemHash)) + 1, tot = x.q.il.length || 1;
     out.push(S('camp', 'cp-' + x.it.itemHash, x.qd.ql || x.q.ql, s.campNote(idx, tot), [I('cp-' + x.it.itemHash, x.qd.n || x.q.n, x.qd.d, [`${idx}/${tot}`], false)]));
+  }
+  // Atividades: missões exóticas, uma seção por missão (como as masmorras); triunfos num item que abre a lista
+  for (const m of defs.xmissions || []) {
+    const o = ACTH?.x?.[m.k], items = [I(`xm-${m.k}-clear`, s.xmClear(L(m.n)), m.note ? L(m.note) : null, [], !!o?.c)];
+    (m.w || []).forEach((n, i) => {
+      const e = exoticByName(n); if (!e) return; const has = colAcquired(e.h);
+      items.push(I(`xm-${m.k}-w${i}`, L(e.n), L(e.s), [U.chip['Exótico']], has));
+      const c = defs.cats.find(x => x.n[0] === n + ' Catalyst'), cs = c && recState(c.h);
+      if (has && c && recOK) items.push(I(`xm-${m.k}-c${i}`, L(c.n), L(c.d), [progText(cs) || (cs ? Math.round(pct(cs) * 100) + '%' : '')].filter(Boolean), recDone(cs)));
+    });
+    const recs = recOK ? (m.r || []).map(h => [h, recState(h)]).filter(([, st]) => st) : [];
+    if (recs.length) {
+      const rd = recs.filter(([, st]) => recDone(st)).length;
+      const lines = recs.map(([h, st]) => `${recDone(st) ? '✓' : '○'} ${XMREC?.[h]?.n || '…'}${XMREC?.[h]?.d && !recDone(st) ? ' — ' + XMREC[h].d : ''}`).join('\n');
+      items.push(I(`xm-${m.k}-tri`, s.xmTri, lines, [`${rd}/${recs.length}`], rd === recs.length, { tri: true }));
+    }
+    out.push(S('xm', 'xm-' + m.k, L(m.n), '', items, { firstIsClear: true, xm: m }));
   }
   // Atividades: incursões e masmorras
   for (const [kind, list] of [['raid', defs.raids], ['dg', defs.dungeons]]) {
@@ -1173,7 +1189,7 @@ function render() {
   else { st.hidden = true; st.innerHTML = ''; }
   $('ldbtn').setAttribute('aria-pressed', tab === 'ld'); $('ldbtn').textContent = tab === 'ld' ? U.checklist : U.loadouts;
   document.body.classList.toggle('on-ld', tab === 'ld'); document.body.classList.toggle('no-clears', !OPTS.clears);
-  $('overall').hidden = tab === 'gd' || tab === 'vend' || tab === 'xm';
+  $('overall').hidden = tab === 'gd' || tab === 'vend';
   if (tab === 'vend' && !VEND && have.a && member) loadVendors(gen);
   if (tab === 'gd') { $('list').innerHTML = gdHTML(); if (!GD && have.a) loadGuardian(gen); if (!VAULT && have.c) loadVault(gen); return; }
   if (tab === 'ld') {
@@ -1189,15 +1205,16 @@ function render() {
   const wkBar = tab === 'exo' && have.a ? (() => { const n = weekExo().size; return `<div class="wkx"><button type="button" class="char wkx-b" id="wkxbtn" aria-pressed="${WKX.on}" title="${esc(U.w.wkExoTip)}">★ ${esc(U.w.wkExo(n))}</button></div><p class="empty-msg" id="wkxnone" hidden>${esc(U.w.wkExoNone)}</p>`; })() : '';
   if (tab === 'obj' && have.a && member) loadSession();
   if ((tab === 'raid' || tab === 'dg' || tab === 'xm') && have.a && member) loadActHist();
+  if (tab === 'xm') loadXmRec();
   $('list').innerHTML = `<div class="panel">${tab === 'obj' ? sessHTML() : ''}${wkBar}${secs.map(sec => {
     if (sec.html) return sec.id === 'vendors' ? vendorsHTML() : sec.id === 'xmissions' ? xmHTML() : '';
     if (sec.empty) return `<p class="empty-msg${/…$/.test(sec.note || '') ? ' wait' : ''}">${esc(sec.note)}</p>`;
     if (!sec.items.length) return `<section data-sec="${sec.id}"><div class="sec-head"><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2></div></div><p>${esc(sec.note)}</p></div></section>`;
     const keep = true, coll = sec.coll || ((tab === 'exo' || tab === 'cat') && sec.items?.length) || (keep && secDone(sec)), open = openSecs.has(sec.id);
-    const act = sec.camp || (sec.kind && (sec.kind === 'raid' ? defs.raids : defs.dungeons).find(x => x.k === sec.key));
+    const act = sec.camp || sec.xm || (sec.kind && (sec.kind === 'raid' ? defs.raids : defs.dungeons).find(x => x.k === sec.key));
     return `<section data-sec="${sec.id}"${act?.img ? ` style="--act-img:url('${BNET}${act.img}')"` : ''} class="${keep ? 'keep' : ''}${act?.img ? ' act-img' : ''}${sec.weekly ? ' wk-sec' : ''}${coll ? ` coll${open ? '' : ' collapsed'}` : ''}">
       <div class="sec-head"${coll ? ` data-coll="${sec.id}" role="button" tabindex="0" aria-expanded="${open}"` : ''}><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2>${sec.kind ? secMeta(sec) : ''}</div><span class="count" data-sc="${sec.id}"></span>${coll ? '<span class="chev" aria-hidden="true"></span>' : ''}</div>
-      ${sec.note ? `<p>${esc(sec.note)}</p>` : ''}${sec.kind ? actStrip(sec) : ''}<div class="sec-bar"><i data-sb="${sec.id}"></i></div></div>
+      ${sec.note ? `<p>${esc(sec.note)}</p>` : ''}${sec.kind ? actStrip(sec) : sec.xm ? xmStrip(sec.xm) : ''}<div class="sec-bar"><i data-sb="${sec.id}"></i></div></div>
       <ul>${sec.items.map(i => {
         const cid = 'c-' + i.id.replace(/[^a-z0-9]+/gi, '-'), first = i.c[0], rest = i.c.slice(1), more = !!(i.d || rest.length || i.loc);
         const head = `<span class="t">${esc(i.t)}</span>${first ? `<span class="chip ${chipClass(first)}">${esc(first)}</span>` : ''}`;
@@ -1223,7 +1240,7 @@ function update() {
   if (bar) { bar.hidden = full === 0; const sh = document.body.classList.contains('show-complete'); $('donetxt').textContent = U.panels(full, sh); $('togglecomplete').textContent = sh ? U.hideDone : U.show; }
   const secs = SECTIONS.filter(x => x.tab === tab && !x.empty && !x.html);
   let n, t, label;
-  if (tab === 'raid' || tab === 'dg') { t = secs.length; n = secs.filter(x => isDone(x.items[0])).length; label = U[tab](n, t); }
+  if (tab === 'raid' || tab === 'dg' || tab === 'xm') { t = secs.length; n = secs.filter(x => isDone(x.items[0])).length; label = U[tab](n, t); }
   else if (tab === 'tit') { t = secs.length; n = secs.filter(x => x.items.every(isDone)).length; label = U.tit(n, t); }
   else if (tab === 'camp') { const cs = secs.filter(x => x.camp); t = cs.length; n = cs.filter(x => x.items.every(isDone)).length; label = U.campDone(n, t); }
   else { const items = secs.flatMap(x => x.items); t = items.length; n = items.filter(isDone).length; label = U.done1(n, t); }
@@ -1645,10 +1662,18 @@ async function loadActHist() {
     if (member?.id !== mid) return;
     ACTH = { t: Date.now(), d: D, x: XD }; try { LS.set(key, ACTH); } catch {}
   } finally { acthBusy = false; }
+  if (tab === 'xm') build();
   if (tab === 'raid' || tab === 'dg' || tab === 'xm') render();
 }
 const fmtDur = ms => { const s = Math.round(ms / 1000), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(x).padStart(2, '0'); };
 const fmtDate = t => new Date(t).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+function xmStrip(m) {
+  const W = u().w, o = ACTH?.x?.[m.k];
+  if (!o) return ACTH?.x || !have.a ? '' : `<div class="ah"><p class="ah-wait wait">${esc(u().loadingDefs)}</p></div>`;
+  if (!o.c) return '';
+  const kd = (o.k / Math.max(1, o.d)).toFixed(1).replace('.', lang === 'en' ? '.' : ',');
+  return `<div class="ah"><div class="ah-fast"><small>${esc(W.ahFast)}</small><b>${o.fast ? fmtDur(o.fast) : '—'}</b></div><div class="ah-rows"><div class="ah-row"><span>${esc(W.xmClears)}</span><b>${o.c}</b></div></div><div class="ah-kd">${esc(W.ahKD(o.k, o.d, kd))}</div></div>`;
+}
 function actStrip(sec) {
   const W = u().w, o = ACTH?.d?.[sec.key], a = (sec.kind === 'raid' ? defs.raids : defs.dungeons).find(x => x.k === sec.key);
   if (!o) return ACTH || !have.a ? '' : `<div class="ah"><p class="ah-wait wait">${esc(u().loadingDefs)}</p></div>`;
@@ -1664,27 +1689,7 @@ function actStrip(sec) {
 
 /* ---------- missões exóticas: conclusões, tempo mais rápido, arma/catalisador e triunfos ---------- */
 let XMREC = null;
-function xmHTML() {
-  const W = u().w, X = ACTH?.x || null, list = defs.xmissions || [];
-  if (!XMREC && have.b) { XMREC = {}; entities('DestinyRecordDefinition', list.flatMap(m => m.r || []), lang).then(d => { XMREC = d; if (tab === 'xm') render(); }); }
-  const own = n => { const e = exoticByName(n); return e ? colAcquired(e.h) : null; };
-  const cat = n => { const c = defs.cats.find(x => x.n[0] === n + ' Catalyst'); if (!c) return null; const st = recState(c.h); return st ? recDone(st) : null; };
-  const done = list.filter(m => X?.[m.k]?.c).length, tot = list.reduce((t, m) => t + (X?.[m.k]?.c || 0), 0);
-  const card = m => {
-    const o = X?.[m.k], c = o?.c || 0, kd = o ? (o.k / Math.max(1, o.d)).toFixed(1).replace('.', lang === 'en' ? '.' : ',') : '';
-    const recs = (m.r || []).map(h => [h, recState(h)]).filter(([, s]) => s), rd = recs.filter(([, s]) => recDone(s)).length, left = recs.filter(([, s]) => !recDone(s)).map(([h]) => XMREC?.[h]?.n).filter(Boolean);
-    const ws = (m.w || []).map(n => { const e = exoticByName(n), has = own(n), ct = has ? cat(n) : null; return `<span class="xm-w${has ? ' own' : has === false ? ' miss' : ''}">${has ? '✓' : '○'} ${esc(e ? L(e.n) : n)}${ct === false ? ` <i>· ${esc(W.xmCat)}</i>` : ''}</span>`; }).join('') + (m.note ? `<span class="xm-w">· ${esc(L(m.note))}</span>` : '');
-    return `<div class="xm${c ? '' : ' none'}" style="--xm-img:url('${BNET}${m.img}')"><div class="xm-in">
-      <div class="xm-h"><b>${esc(L(m.n))}</b><span class="xm-c">${c ? c + '×' : esc(W.xmNot)}</span></div>
-      ${c && o.fast ? `<div class="ah-fast"><small>${esc(W.ahFast)}</small><b>${fmtDur(o.fast)}</b></div><div class="ah-kd">${esc(W.ahKD(o.k, o.d, kd))}</div>` : !X && have.a ? `<p class="ah-wait wait">${esc(u().loadingDefs)}</p>` : ''}
-      ${recs.length ? `<div class="xm-t"><span>${esc(W.xmTri)} <b>${rd}/${recs.length}</b></span><i><u style="width:${rd / recs.length * 100}%"></u></i>${left.length ? `<small>${esc(W.xmLeft)}: ${esc(left.slice(0, 3).join(', '))}${left.length > 3 ? '…' : ''}</small>` : ''}</div>` : ''}
-      ${ws ? `<div class="xm-ws">${ws}</div>` : ''}</div></div>`;
-  };
-  const order = [...list].sort((a, b) => (!!(X?.[b.k]?.c) - !!(X?.[a.k]?.c)));
-  return `<section class="keep xm-sec"><div class="sec-head"><div class="sec-title"><div class="sec-name"><h2>${esc(W.xmT)}</h2></div></div><p>${esc(W.xmNote)}</p>
-    ${X ? `<div class="dh-sum"><div><b>${done} ${esc(W.of)} ${list.length}</b><span>${esc(W.xmDone)}</span></div><div><b>${tot}</b><span>${esc(W.xmClears)}</span></div><div><b>${list.length - done}</b><span>${esc(W.xmLeftN)}</span></div></div>` : ''}</div>
-    <div class="xm-g">${order.map(card).join('')}</div></section>`;
-}
+function loadXmRec() { if (XMREC || !have.b) return; XMREC = {}; entities('DestinyRecordDefinition', (defs.xmissions || []).flatMap(m => m.r || []), lang).then(d => { XMREC = d; if (tab === 'xm') { build(); render(); } }); }
 
 /* ---------- sua última sessão: até 3 destaques, o resto recolhido ---------- */
 let SESSION = null, sessBusy = false;
