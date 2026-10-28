@@ -44,5 +44,11 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/status",
+      "destination": "/status.html"
+    }
   ]
 }

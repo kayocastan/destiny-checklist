@@ -3,6 +3,10 @@ main = "src/index.js"
 compatibility_date = "2025-09-01"
 workers_dev = true
 
+[vars]
+OWNER = "9967831"        # conta Bungie do dono (vê o painel de uso)
+ACCOUNT_ID = "__ACCOUNT_ID__"
+
 [[d1_databases]]
 binding = "DB"
 database_name = "dni"

@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Uso do servidor · DPI</title>
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="/styles.css">
+<style>
+  :root{--good:var(--done);--warn:#b07a00;--crit:var(--hard);--bar:var(--arc)}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--warn:#e8b43c}}
+  :root[data-theme="dark"]{--warn:#e8b43c}
+  *{box-sizing:border-box}
+  body{margin:0}
+  h1{font-size:34px}
+  .sub{color:var(--muted);margin:4px 0 0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;gap:6px;min-width:0}
+  .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .v{font-family:var(--display);font-weight:700;font-size:30px;line-height:1.05;font-variant-numeric:tabular-nums}
+  .v small{font-family:var(--body);font-weight:500;font-size:13px;color:var(--muted)}
+  .meter{height:8px;border-radius:4px;background:var(--chip);overflow:hidden}
+  .meter i{display:block;height:100%;border-radius:4px;background:var(--good)}
+  .st{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center}
+  .st b{font-weight:600}
+  .st .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .good .meter i,.good .dot{background:var(--good)} .warn .meter i,.warn .dot{background:var(--warn)} .crit .meter i,.crit .dot{background:var(--crit)}
+  section{display:grid;gap:10px}
+  h2{font-family:var(--display);font-size:22px;margin:6px 0 0}
+  .chart{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;position:relative}
+  .bars{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:2px;align-items:end;height:160px;border-bottom:1px solid var(--line)}
+  .bars .b{position:relative;height:100%;display:flex;align-items:flex-end;cursor:default}
+  .bars .b i{display:block;width:100%;background:var(--bar);border-radius:4px 4px 0 0;min-height:2px}
+  .bars .b:hover i,.bars .b:focus i{filter:brightness(1.15)}
+  .xl{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:2px;font-family:var(--mono);font-size:11px;color:var(--muted);text-align:center;margin-top:6px}
+  .tip{position:absolute;pointer-events:none;background:var(--fg);color:var(--bg);font-size:12.5px;padding:6px 9px;border-radius:6px;white-space:nowrap;transform:translate(-50%,-100%);opacity:0;transition:opacity .1s}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
+  th,td{text-align:right;padding:6px 8px;border-bottom:1px solid var(--line)} th:first-child,td:first-child{text-align:left}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:500}
+  details{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 16px}
+  summary{cursor:pointer;font-weight:600}
+  .links{display:flex;flex-wrap:wrap;gap:8px}
+  .links a{display:inline-flex;padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg);text-decoration:none;font-size:14px}
+  .links a:hover{border-color:var(--arc)}
+  .note{color:var(--muted);font-size:13px;margin:0}
+  .msg{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
+  button.r{font:inherit;font-size:14px;padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+  .top{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="top">
+    <div><div class="eyebrow">DPI · painel do servidor</div><h1>Uso e limites</h1><p class="sub" id="when">Carregando…</p></div>
+    <button class="r" id="reload" type="button">Atualizar</button>
+  </div>
+  <div id="out"><p class="msg wait" role="status">Carregando os números…</p></div>
+  <section>
+    <h2>Atalhos</h2>
+    <div class="links">
+      <a href="https://dash.cloudflare.com/" target="_blank" rel="noopener">Cloudflare (servidor e banco)</a>
+      <a href="https://vercel.com/dashboard" target="_blank" rel="noopener">Vercel (site e uso)</a>
+      <a href="https://www.bungie.net/en/Application" target="_blank" rel="noopener">Portal de apps da Bungie</a>
+      <a href="/">Voltar ao site</a>
+    </div>
+    <p class="note">Os limites diários da Cloudflare zeram às 00:00 UTC (21h de Brasília). Se algum estourar, o site volta a buscar os nomes direto na Bungie e a sincronização espera a virada.</p>
+  </section>
+</main>
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const LS = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+try { const t = LS.get('dc-theme', null); if (t) document.documentElement.dataset.theme = t; } catch {}
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const nf = n => new Intl.NumberFormat('pt-BR').format(Math.round(n || 0));
+const bytes = b => b == null ? '—' : b < 1024 ? b + ' B' : b < 1048576 ? (b / 1024).toFixed(1).replace('.', ',') + ' KB' : (b / 1048576).toFixed(1).replace('.', ',') + ' MB';
+const LIM = { req: 100000, read: 5000000, write: 100000, size: 500 * 1048576, cpu: 10 };
+const level = p => p >= .85 ? ['crit', 'Perto do limite'] : p >= .6 ? ['warn', 'Atenção'] : ['good', 'Tranquilo'];
+async function token() {
+  let a = LS.get('dc-auth', null); if (!a) return null;
+  if (a.access_expires - Date.now() > 60000) return a.access_token;
+  const r = await fetch('/api/refresh', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: a.refresh_token }) });
+  if (!r.ok) return null; a = { ...a, ...(await r.json()) }; LS.set('dc-auth', a); return a.access_token;
+}
+function meterCard(k, used, max, fmt, extra) {
+  const p = max ? Math.min(1, (used || 0) / max) : 0, [cls, txt] = level(p);
+  return `<div class="card ${cls}"><div class="k">${esc(k)}</div><div class="v">${fmt(used)} <small>de ${fmt(max)}</small></div>
+    <div class="meter" role="img" aria-label="${Math.round(p * 100)}% do limite"><i style="width:${Math.max(p * 100, 1).toFixed(1)}%"></i></div>
+    <div class="st"><span class="dot"></span><b>${txt}</b> · ${(p * 100).toFixed(p < .01 ? 2 : 1).replace('.', ',')}%${extra ? ' · ' + extra : ''}</div></div>`;
+}
+const tile = (k, v, sub) => `<div class="card"><div class="k">${esc(k)}</div><div class="v">${v}</div>${sub ? `<div class="st">${sub}</div>` : ''}</div>`;
+function render(d) {
+  const today = new Date().toISOString().slice(0, 10), W = d.cf.workers || [], D = d.cf.d1 || [];
+  const wT = W.filter(x => x.dimensions.date === today), dT = D.filter(x => x.dimensions.date === today);
+  const sum = (l, f) => l.reduce((a, x) => a + (f(x) || 0), 0);
+  const req = sum(wT, x => x.sum.requests), err = sum(wT, x => x.sum.errors), rd = sum(dT, x => x.sum.rowsRead), wr = sum(dT, x => x.sum.rowsWritten);
+  const cpu = wT.length ? Math.max(...wT.map(x => x.quantiles?.cpuTimeP99 || 0)) : 0;
+  const cfOk = !d.cf.error;
+  let h = '<section><h2>Hoje (dia UTC)</h2><div class="grid">';
+  h += cfOk ? meterCard('Pedidos ao servidor', req, LIM.req, nf, err ? `${nf(err)} com erro` : 'sem erros') : tile('Pedidos ao servidor', '—', 'Sem acesso ao Analytics da Cloudflare');
+  h += cfOk ? meterCard('Leituras do banco (linhas)', rd, LIM.read, nf) : '';
+  h += cfOk ? meterCard('Gravações do banco (linhas)', wr, LIM.write, nf) : '';
+  h += cfOk ? meterCard('Tempo de CPU (pior caso)', cpu, LIM.cpu, v => (v || 0).toFixed(1).replace('.', ',') + ' ms', 'limite por pedido') : '';
+  h += '</div></section>';
+  h += '<section><h2>Banco</h2><div class="grid">';
+  h += meterCard('Tamanho do banco', d.db.size, LIM.size, bytes);
+  h += tile('Pessoas sincronizadas', nf(d.db.users), `${nf(d.db.active1)} nas últimas 24h · ${nf(d.db.active7)} em 7 dias`);
+  h += tile('Nomes guardados', nf(d.db.defs), `${bytes(d.db.defsBytes)} · servem a todos os visitantes`);
+  h += tile('Dados sincronizados', bytes(d.db.kvBytes), `${nf(d.db.kvRows)} registros`);
+  h += '</div></section>';
+  if (cfOk) {
+    const days = []; for (let i = 6; i >= 0; i--) days.push(new Date(Date.now() - i * 864e5).toISOString().slice(0, 10));
+    const rows = days.map(day => { const w = W.filter(x => x.dimensions.date === day), x = D.filter(y => y.dimensions.date === day); return { day, req: sum(w, y => y.sum.requests), err: sum(w, y => y.sum.errors), rd: sum(x, y => y.sum.rowsRead), wr: sum(x, y => y.sum.rowsWritten) }; });
+    const max = Math.max(1, ...rows.map(r => r.req)), lbl = s => s.slice(8, 10) + '/' + s.slice(5, 7);
+    h += `<section><h2>Pedidos ao servidor · 7 dias</h2><div class="chart" id="chart"><div class="bars">${rows.map((r, i) => `<div class="b" tabindex="0" data-i="${i}" aria-label="${lbl(r.day)}: ${nf(r.req)} pedidos"><i style="height:${(r.req / max * 100).toFixed(1)}%"></i></div>`).join('')}</div><div class="xl">${rows.map(r => `<span>${lbl(r.day)}</span>`).join('')}</div><div class="tip" id="tip"></div></div>
+      <details><summary>Ver em tabela</summary><table><thead><tr><th>Dia</th><th>Pedidos</th><th>Erros</th><th>Linhas lidas</th><th>Linhas gravadas</th></tr></thead><tbody>${rows.map(r => `<tr><td>${lbl(r.day)}</td><td>${nf(r.req)}</td><td>${nf(r.err)}</td><td>${nf(r.rd)}</td><td>${nf(r.wr)}</td></tr>`).join('')}</tbody></table></details></section>`;
+    $('out').innerHTML = h;
+    const ch = $('chart'), tip = $('tip');
+    const show = b => { const r = rows[+b.dataset.i], bb = b.getBoundingClientRect(), cb = ch.getBoundingClientRect(); tip.innerHTML = `<b>${lbl(r.day)}</b> · ${nf(r.req)} pedidos${r.err ? ` · ${nf(r.err)} erros` : ''}`; tip.style.left = (bb.left - cb.left + bb.width / 2) + 'px'; tip.style.top = (bb.top - cb.top + bb.height * (1 - r.req / max) - 6) + 'px'; tip.style.opacity = 1; };
+    ch.querySelectorAll('.b').forEach(b => { b.addEventListener('mouseenter', () => show(b)); b.addEventListener('focus', () => show(b)); b.addEventListener('mouseleave', () => tip.style.opacity = 0); b.addEventListener('blur', () => tip.style.opacity = 0); });
+  } else {
+    h += `<p class="msg">Os números diários (pedidos, leituras, gravações) vêm do Analytics da Cloudflare, que ainda não está liberado: ${esc(d.cf.error)}. Crie um token só de leitura (<i>Account Analytics: Read</i>) e guarde no GitHub como <code>CF_ANALYTICS_TOKEN</code>.</p>`;
+    $('out').innerHTML = h;
+  }
+  $('when').textContent = 'Atualizado às ' + new Date(d.at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+}
+async function load() {
+  $('out').innerHTML = '<p class="msg wait" role="status">Carregando os números…</p>';
+  try {
+    const [cfg, api] = await Promise.all([fetch('/api/config').then(r => r.json()), fetch('/data/api.json', { cache: 'no-cache' }).then(r => r.json())]);
+    const t = await token();
+    if (!t) { $('out').innerHTML = '<p class="msg">Entre no site com a sua conta Bungie primeiro e depois volte aqui.</p>'; $('when').textContent = ''; return; }
+    const r = await fetch(api.api + '/stats', { headers: { Authorization: 'Bearer ' + t, 'X-API-Key': cfg.apiKey } });
+    if (r.status === 403) { $('out').innerHTML = '<p class="msg">Este painel é só para o dono do site.</p>'; $('when').textContent = ''; return; }
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    render(await r.json());
+  } catch (e) { $('out').innerHTML = `<p class="msg">Não foi possível carregar agora (${esc(e.message)}). Tente de novo em instantes.</p>`; $('when').textContent = ''; }
+}
+$('reload').addEventListener('click', load);
+load();
+})();
+</script>
+</body>
+</html>

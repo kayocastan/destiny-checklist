@@ -102,6 +102,40 @@ async function sync(req, env) {
   return json(req, { ok: stm.length });
 }
 
+/* Painel de uso (só para o dono do site): números do banco + Analytics da Cloudflare dos últimos 7 dias. */
+async function cfGraph(env, query, variables) {
+  if (!env.CF_TOKEN) return { error: 'sem token de Analytics' };
+  const r = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: { Authorization: 'Bearer ' + env.CF_TOKEN, 'Content-Type': 'application/json' }, body: JSON.stringify({ query, variables }) });
+  const j = await r.json().catch(() => null);
+  if (!j || j.errors?.length) return { error: j?.errors?.[0]?.message || 'HTTP ' + r.status };
+  return j.data;
+}
+async function stats(req, env) {
+  const uid = await who(req, env);
+  if (!uid) return json(req, { error: 'auth' }, 401);
+  if (uid !== String(env.OWNER)) return json(req, { error: 'forbidden' }, 403);
+  const now = Date.now(), day = 864e5;
+  const [defs, users, act7, act1, kvSize, defsBy] = await Promise.all([
+    env.DB.prepare('SELECT COUNT(*) n, SUM(LENGTH(v)) b FROM defs').first(),
+    env.DB.prepare('SELECT COUNT(DISTINCT uid) n FROM kv').first(),
+    env.DB.prepare('SELECT COUNT(DISTINCT uid) n FROM kv WHERE t > ?').bind(now - 7 * day).first(),
+    env.DB.prepare('SELECT COUNT(DISTINCT uid) n FROM kv WHERE t > ?').bind(now - day).first(),
+    env.DB.prepare('SELECT SUM(LENGTH(v)) b, COUNT(*) n FROM kv').first(),
+    env.DB.prepare("SELECT substr(k, 1, instr(k, ':') - 1) t, COUNT(*) n FROM defs GROUP BY 1 ORDER BY 2 DESC").all(),
+  ]);
+  const size = (await env.DB.prepare('SELECT 1').run()).meta?.size_after || null;
+  const since = new Date(now - 7 * day).toISOString().slice(0, 10), until = new Date(now + day).toISOString().slice(0, 10);
+  const cf = await cfGraph(env, `query($a: String!, $s: Date!, $u: Date!, $w: String!) { viewer { accounts(filter: { accountTag: $a }) {
+    workers: workersInvocationsAdaptive(limit: 100, filter: { date_geq: $s, date_leq: $u, scriptName: $w }) { sum { requests errors subrequests } quantiles { cpuTimeP50 cpuTimeP99 } dimensions { date } }
+    d1: d1AnalyticsAdaptiveGroups(limit: 100, filter: { date_geq: $s, date_leq: $u }) { sum { readQueries writeQueries rowsRead rowsWritten } dimensions { date } }
+  } } }`, { a: env.ACCOUNT_ID, s: since, u: until, w: 'dni-api' });
+  return json(req, {
+    at: now,
+    db: { size, defs: defs?.n || 0, defsBytes: defs?.b || 0, users: users?.n || 0, active7: act7?.n || 0, active1: act1?.n || 0, kvBytes: kvSize?.b || 0, kvRows: kvSize?.n || 0, byType: defsBy.results || [] },
+    cf: cf.error ? { error: cf.error } : { workers: cf.viewer?.accounts?.[0]?.workers || [], d1: cf.viewer?.accounts?.[0]?.d1 || [] },
+  });
+}
+
 export default {
   async fetch(req, env) {
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(req) });
@@ -109,6 +143,7 @@ export default {
     try {
       if (path === '/defs' && req.method === 'POST') return await defs(req, env);
       if (path === '/sync' && (req.method === 'GET' || req.method === 'PUT')) return await sync(req, env);
+      if (path === '/stats' && req.method === 'GET') return await stats(req, env);
       if (path === '/') return json(req, { ok: true, service: 'dni-api' });
       return json(req, { error: 'not found' }, 404);
     } catch (e) {

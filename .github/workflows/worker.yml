@@ -28,6 +28,7 @@ jobs:
           if [ -z "$id" ]; then npx wrangler d1 create dni; id=$(npx wrangler d1 list --json | node -e 'const l=JSON.parse(require("fs").readFileSync(0));process.stdout.write(l.find(x=>x.name==="dni").uuid)'); fi
           echo "id do banco: $id"
           sed -i "s/__DB_ID__/$id/" wrangler.toml
+          sed -i "s/__ACCOUNT_ID__/$CLOUDFLARE_ACCOUNT_ID/" wrangler.toml
       - name: Tabelas
         run: npx wrangler d1 migrations apply dni --remote
       - name: Subdomínio workers.dev (cria se a conta ainda não tiver)
@@ -45,6 +46,11 @@ jobs:
           echo "SUB=$sub" >> $GITHUB_ENV
       - name: Publica
         run: npx wrangler deploy
+      - name: Token de Analytics (painel de uso), se existir
+        env:
+          CF_ANALYTICS_TOKEN: ${{ secrets.CF_ANALYTICS_TOKEN }}
+        run: |
+          if [ -n "$CF_ANALYTICS_TOKEN" ]; then printf '%s' "$CF_ANALYTICS_TOKEN" | npx wrangler secret put CF_TOKEN; else echo "CF_ANALYTICS_TOKEN não configurado: o painel mostra só os números do banco"; fi
       - name: Grava o endereço do servidor no site
         working-directory: .
         run: |
