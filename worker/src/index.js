@@ -1,4 +1,4 @@
-/* Servidor do site (Cloudflare Worker + banco D1).
+/* Servidor do site DPI (Cloudflare Worker + banco D1).
    /defs  – nomes e dados resumidos de definições da Bungie, guardados para todos os visitantes.
    /sync  – favoritos, builds salvas, marcações e preferências de cada pessoa, ligados à conta Bungie.
    A chave da API da Bungie é pública (o site já a entrega ao navegador); o navegador a envia em X-API-Key. */
