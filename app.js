@@ -28,7 +28,7 @@ const UI = {
     maintenance: 'A API da Bungie está em manutenção agora. Tente de novo em alguns minutos.',
     noChars: 'Nenhum personagem de Destiny 2 encontrado nesta conta.',
     done1: (n, t) => `${n} de ${t} feitos`, dg: (n, t) => `${n} de ${t} masmorras concluídas`, raid: (n, t) => `${n} de ${t} incursões concluídas`,
-    tit: (n, t) => `${n} de ${t} títulos conquistados`, camp: n => `${n} campanha${n === 1 ? '' : 's'} em andamento`, ld: n => `${n} loadout${n === 1 ? '' : 's'} no jogo`,
+    tit: (n, t) => `${n} de ${t} títulos conquistados`, camp: n => `${n} campanha${n === 1 ? '' : 's'} em andamento`, campDone: (n, t) => `${n} de ${t} campanhas concluídas em todas as dificuldades`, ld: n => `${n} loadout${n === 1 ? '' : 's'} no jogo`,
     panels: (n, sh) => n === 1 ? '1 painel concluído ' + (sh ? 'aparecendo.' : 'oculto.') : `${n} painéis concluídos ${sh ? 'aparecendo.' : 'ocultos.'}`,
     show: 'Mostrar', hideDone: 'Ocultar concluídos',
     s: {
@@ -38,7 +38,7 @@ const UI = {
       nearCats: 'Catalisadores quase prontos', nearCatsNote: 'Já passaram da metade.',
       nearTitles: 'Títulos quase prontos', nearTitlesNote: 'Faltam poucos triunfos.',
       noCamp: 'Nenhuma campanha em andamento no registro deste personagem. Campanhas concluídas não aparecem.',
-      campNote: (a, b) => `Passo ${a} de ${b}.`, current: 'Passo atual',
+      campNote: (a, b) => `Passo ${a} de ${b}.`, campStep: n => `Passo atual: ${n}`, campNormal: 'Concluir a campanha', campNotStarted: 'Não iniciada', campLeg: 'Todas as missões no Lendário', campMaster: 'Uma missão no Mestre', campIn: 'Em andamento.', campAll: 'Concluída em todas as dificuldades.', campLegLeft: 'Concluída; falta a dificuldade maior.', campNone: 'Ainda não concluída.', current: 'Passo atual',
       clear: n => `Concluir ${n}`, exotic: n => `Exótico: ${n}`,
       wpn: 'Armas exóticas', armor: c => `Armaduras exóticas de ${c}`,
       catProg: 'Em progresso', catProgNote: 'Catalisador obtido; use a arma para completar.',
@@ -83,7 +83,7 @@ const UI = {
     maintenance: 'The Bungie API is down for maintenance. Try again in a few minutes.',
     noChars: 'No Destiny 2 characters found on this account.',
     done1: (n, t) => `${n} of ${t} done`, dg: (n, t) => `${n} of ${t} dungeons cleared`, raid: (n, t) => `${n} of ${t} raids cleared`,
-    tit: (n, t) => `${n} of ${t} titles earned`, camp: n => `${n} campaign${n === 1 ? '' : 's'} in progress`, ld: n => `${n} in-game loadout${n === 1 ? '' : 's'}`,
+    tit: (n, t) => `${n} of ${t} titles earned`, camp: n => `${n} campaign${n === 1 ? '' : 's'} in progress`, campDone: (n, t) => `${n} of ${t} campaigns done on every difficulty`, ld: n => `${n} in-game loadout${n === 1 ? '' : 's'}`,
     panels: (n, sh) => `${n} completed panel${n === 1 ? '' : 's'} ${sh ? 'shown.' : 'hidden.'}`,
     show: 'Show', hideDone: 'Hide completed',
     s: {
@@ -93,7 +93,7 @@ const UI = {
       nearCats: 'Catalysts almost done', nearCatsNote: 'Already past halfway.',
       nearTitles: 'Titles almost done', nearTitlesNote: 'Only a few triumphs left.',
       noCamp: 'No campaign in progress in this character\'s quest log. Finished campaigns are not shown.',
-      campNote: (a, b) => `Step ${a} of ${b}.`, current: 'Current step',
+      campNote: (a, b) => `Step ${a} of ${b}.`, campStep: n => `Current step: ${n}`, campNormal: 'Finish the campaign', campNotStarted: 'Not started', campLeg: 'All missions on Legendary', campMaster: 'One mission on Master', campIn: 'In progress.', campAll: 'Done on every difficulty.', campLegLeft: 'Done; the harder difficulty is left.', campNone: 'Not finished yet.', current: 'Current step',
       clear: n => `Complete ${n}`, exotic: n => `Exotic: ${n}`,
       wpn: 'Exotic weapons', armor: c => `${c} exotic armor`,
       catProg: 'In progress', catProgNote: 'Catalyst obtained; use the weapon to finish it.',
@@ -504,14 +504,24 @@ function build() {
   const sealStats = !recOK ? [] : defs.seals.map(se => { const recs = se.r.filter(r => { const st = recState(r[0]); return !st || !(st.state & 16); }); const done = recs.filter(r => recDone(recState(r[0]))).length; return { se, recs, done, total: recs.length }; }).filter(x => x.total);
   const near = sealStats.filter(x => x.done < x.total && x.done / x.total >= 0.7 && x.se.tier < 5).sort((a, b) => b.done / b.total - a.done / a.total).slice(0, 5);
   if (near.length) out.push(S('obj', 'neartitles', s.nearTitles, s.nearTitlesNote, near.map(x => I('nt-' + x.se.cr, L(x.se.t), L(x.se.ds), [`${x.done}/${x.total}`], false))));
-  // Campanhas
-  const camps = qItems.filter(x => x.isCamp);
-  if (camps.length) {
-    for (const x of camps) {
-      const idx = Math.max(0, x.q.il.indexOf(x.it.itemHash)) + 1, tot = x.q.il.length || 1;
-      out.push(S('camp', 'cp-' + x.it.itemHash, x.qd.ql || x.q.ql, s.campNote(idx, tot), [I('cp-' + x.it.itemHash, x.qd.n || x.q.n, x.qd.d, [`${idx}/${tot}`], false)]));
-    }
-  } else out.push(S('camp', 'nocamp', '', waiting ? s.loadingQuests : s.noCamp, [], { empty: true }));
+  // Campanhas: cada expansão com Normal, Lendário e Mestre (pelos triunfos), e o passo atual quando ainda está no registro
+  const camps = qItems.filter(x => x.isCamp), used = new Set();
+  for (const c of defs.camps || []) {
+    const re = new RegExp(c.re, 'i'), q = camps.find(x => re.test(x.q.ql)); if (q) used.add(q);
+    const st = h => h ? recState(h) : null, ok = h => recDone(st(h));
+    const legDone = recOK && ok(c.rL), normDone = recOK && (ok(c.rN) || legDone);
+    const items = [];
+    if (q) { const idx = Math.max(0, q.q.il.indexOf(q.it.itemHash)) + 1, tot = q.q.il.length || 1; items.push(I('cp-' + q.it.itemHash, s.campStep(q.qd.n || q.q.n), q.qd.d, [`${idx}/${tot}`], false)); }
+    else items.push(I('cpn-' + c.k, s.campNormal, null, [normDone ? '' : s.campNotStarted].filter(Boolean), normDone));
+    const parts = (c.parts || []).map(h => progText(st(h))).filter(Boolean), lp = progText(st(c.rL));
+    items.push(I('cpl-' + c.k, s.campLeg, L(c.where), [lp || parts.join(' · ') || U.chip['Difícil']].filter(Boolean), legDone));
+    if (c.rM) items.push(I('cpm-' + c.k, s.campMaster, L(c.where), [U.chip['Muito difícil']], recOK && ok(c.rM)));
+    out.push(S('camp', 'cpx-' + c.k, L(c.n), q ? s.campIn : normDone ? (legDone ? s.campAll : s.campLegLeft) : s.campNone, items, { camp: c }));
+  }
+  for (const x of camps.filter(x => !used.has(x))) {
+    const idx = Math.max(0, x.q.il.indexOf(x.it.itemHash)) + 1, tot = x.q.il.length || 1;
+    out.push(S('camp', 'cp-' + x.it.itemHash, x.qd.ql || x.q.ql, s.campNote(idx, tot), [I('cp-' + x.it.itemHash, x.qd.n || x.q.n, x.qd.d, [`${idx}/${tot}`], false)]));
+  }
   // Atividades: incursões e masmorras
   for (const [kind, list] of [['raid', defs.raids], ['dg', defs.dungeons]]) {
     for (const a of list) {
@@ -1180,7 +1190,7 @@ function render() {
     if (sec.empty) return `<p class="empty-msg${/…$/.test(sec.note || '') ? ' wait' : ''}">${esc(sec.note)}</p>`;
     if (!sec.items.length) return `<section data-sec="${sec.id}"><div class="sec-head"><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2></div></div><p>${esc(sec.note)}</p></div></section>`;
     const keep = true, coll = sec.coll || ((tab === 'exo' || tab === 'cat') && sec.items?.length) || (keep && secDone(sec)), open = openSecs.has(sec.id);
-    const act = sec.kind && (sec.kind === 'raid' ? defs.raids : defs.dungeons).find(x => x.k === sec.key);
+    const act = sec.camp || (sec.kind && (sec.kind === 'raid' ? defs.raids : defs.dungeons).find(x => x.k === sec.key));
     return `<section data-sec="${sec.id}"${act?.img ? ` style="--act-img:url('${BNET}${act.img}')"` : ''} class="${keep ? 'keep' : ''}${act?.img ? ' act-img' : ''}${sec.weekly ? ' wk-sec' : ''}${coll ? ` coll${open ? '' : ' collapsed'}` : ''}">
       <div class="sec-head"${coll ? ` data-coll="${sec.id}" role="button" tabindex="0" aria-expanded="${open}"` : ''}><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2>${sec.kind ? secMeta(sec) : ''}</div><span class="count" data-sc="${sec.id}"></span>${coll ? '<span class="chev" aria-hidden="true"></span>' : ''}</div>
       ${sec.note ? `<p>${esc(sec.note)}</p>` : ''}${sec.kind ? actStrip(sec) : ''}<div class="sec-bar"><i data-sb="${sec.id}"></i></div></div>
@@ -1211,7 +1221,7 @@ function update() {
   let n, t, label;
   if (tab === 'raid' || tab === 'dg') { t = secs.length; n = secs.filter(x => isDone(x.items[0])).length; label = U[tab](n, t); }
   else if (tab === 'tit') { t = secs.length; n = secs.filter(x => x.items.every(isDone)).length; label = U.tit(n, t); }
-  else if (tab === 'camp') { t = secs.length; n = 0; label = U.camp(t); }
+  else if (tab === 'camp') { const cs = secs.filter(x => x.camp); t = cs.length; n = cs.filter(x => x.items.every(isDone)).length; label = U.campDone(n, t); }
   else { const items = secs.flatMap(x => x.items); t = items.length; n = items.filter(isDone).length; label = U.done1(n, t); }
   $('ovcount').textContent = label; $('ovbar').style.width = (t ? n / t * 100 : 0) + '%';
 }
