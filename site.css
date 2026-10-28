@@ -537,7 +537,7 @@ li.is-done .chip.exo{opacity:.7}
 .lv-dot{width:9px;height:9px;border-radius:50%;background:#f0566a;box-shadow:0 0 0 0 rgba(240,86,106,.6);animation:lvp 1.8s infinite;flex:none}
 @keyframes lvp{70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
 @media (prefers-reduced-motion:reduce){.lv-dot{animation:none}}
-.lv-l{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:8px}
+.lv-l{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(220px,100%),1fr));gap:8px}
 .lv-c{all:unset;box-sizing:border-box;display:grid;gap:7px;padding:0 0 9px;border-radius:10px;overflow:hidden;cursor:pointer;background:var(--surface);border:1px solid var(--line);box-shadow:inset 3px 0 0 var(--a1),0 6px 18px -12px rgba(0,0,0,.35);min-width:0}
 .lv-c:hover{border-color:var(--a1)}
 .lv-c:focus-visible{outline:2px solid var(--a1);outline-offset:2px}
