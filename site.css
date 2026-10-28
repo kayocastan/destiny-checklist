@@ -513,3 +513,9 @@ li.is-done .chip.exo{opacity:.7}
 .lsbtn:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .lshint{margin:-12px 4px 0;font-size:12.5px;color:var(--muted)}
 @media (max-width:480px){.lsearch{gap:6px;padding-left:10px}.lsearch input{font-size:14px}.lsbtn{font-size:15px;padding:6px 11px}}
+/* cabeçalho da tela inicial mais fino; nome da atividade no canto direito */
+.gh.landing .gh-band{min-height:124px;padding:44px 16px 14px}
+.gh.landing .gh-id{position:static}
+.gh.landing .gh-id>*{position:relative;z-index:1}
+.gh.landing .gh-cap{position:absolute;z-index:1;right:16px;bottom:15px;margin:0;max-width:38%;text-align:right;font-size:11.5px;line-height:1.3}
+@media (max-width:480px){.gh.landing .gh-band{min-height:132px}.gh.landing .gh-id{padding-right:34%}}
