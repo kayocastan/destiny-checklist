@@ -537,8 +537,9 @@ function build() {
     const recs = recOK ? (m.r || []).map(h => [h, recState(h)]).filter(([, st]) => st) : [];
     if (recs.length) {
       const rd = recs.filter(([, st]) => recDone(st)).length;
-      const lines = recs.map(([h, st]) => `${recDone(st) ? '✓' : '○'} ${XMREC?.[h]?.n || '…'}${XMREC?.[h]?.d && !recDone(st) ? ' — ' + XMREC[h].d : ''}`).join('\n');
-      items.push(I(`xm-${m.k}-tri`, s.xmTri, lines, [`${rd}/${recs.length}`], rd === recs.length, { tri: true }));
+      // pendentes primeiro, com a descrição; os feitos embaixo, em verde
+      const tl = recs.map(([h, st]) => ({ ok: recDone(st), n: XMREC?.[h]?.n || '…', d: XMREC?.[h]?.d || '' })).sort((a, b) => a.ok - b.ok);
+      items.push(I(`xm-${m.k}-tri`, s.xmTri, tl.map(x => x.n).join(' '), [`${rd}/${recs.length}`], rd === recs.length, { tl }));
     }
     out.push(S('xm', 'xm-' + m.k, L(m.n), '', items, { firstIsClear: true, xm: m }));
   }
@@ -1218,7 +1219,7 @@ function render() {
       <ul>${sec.items.map(i => {
         const cid = 'c-' + i.id.replace(/[^a-z0-9]+/gi, '-'), first = i.c[0], rest = i.c.slice(1), more = !!(i.d || rest.length || i.loc);
         const head = `<span class="t">${esc(i.t)}</span>${first ? `<span class="chip ${chipClass(first)}">${esc(first)}</span>` : ''}`;
-        return `<li data-li="${esc(i.id)}" data-search="${esc([i.t, i.d, i.loc, ...i.c, sec.title].join(' ').toLowerCase())}"><div class="row"><label class="ck" for="${cid}"><input type="checkbox" id="${cid}" data-id="${esc(i.id)}" aria-label="${esc(i.t)}"${i.auto ? ' checked disabled' : ''}></label>${more ? `<button class="it" type="button" aria-expanded="false">${head}<span class="chev" aria-hidden="true"></span></button>` : `<span class="it">${head}</span>`}</div>${more ? `<div class="more">${i.loc ? `<div class="loc"><span class="loc-k">${esc(U.where)}</span> ${esc(i.loc)}</div>` : ''}${i.d ? `<div class="d">${esc(i.d)}</div>` : ''}${rest.length ? `<div class="chips">${rest.map(x => `<span class="chip ${chipClass(x)}">${esc(x)}</span>`).join('')}</div>` : ''}</div>` : ''}</li>`;
+        return `<li data-li="${esc(i.id)}" data-search="${esc([i.t, i.d, i.loc, ...i.c, sec.title].join(' ').toLowerCase())}"><div class="row"><label class="ck" for="${cid}"><input type="checkbox" id="${cid}" data-id="${esc(i.id)}" aria-label="${esc(i.t)}"${i.auto ? ' checked disabled' : ''}></label>${more ? `<button class="it" type="button" aria-expanded="false">${head}<span class="chev" aria-hidden="true"></span></button>` : `<span class="it">${head}</span>`}</div>${more ? `<div class="more">${i.loc ? `<div class="loc"><span class="loc-k">${esc(U.where)}</span> ${esc(i.loc)}</div>` : ''}${i.tl ? `<ul class="tl">${i.tl.map(x => `<li class="${x.ok ? 'ok' : ''}"><span class="tl-i" aria-label="${x.ok ? '✓' : '○'}">${x.ok ? '✓' : ''}</span><div><b>${esc(x.n)}</b>${x.d && !x.ok ? `<small>${esc(x.d)}</small>` : ''}</div></li>`).join('')}</ul>` : i.d ? `<div class="d">${esc(i.d)}</div>` : ''}${rest.length ? `<div class="chips">${rest.map(x => `<span class="chip ${chipClass(x)}">${esc(x)}</span>`).join('')}</div>` : ''}</div>` : ''}</li>`;
       }).join('')}</ul></section>`;
   }).join('')}<p class="donebar" id="donebar" hidden><span id="donetxt"></span><button class="reset" id="togglecomplete" type="button"></button></p></div>`;
   document.querySelectorAll('#list li[data-li]').forEach(li => { if (openItems.has(li.dataset.li)) { li.classList.add('open'); li.querySelector('button.it')?.setAttribute('aria-expanded', 'true'); } });
@@ -1258,8 +1259,8 @@ let itemIndex = null;
 function findItem(id) { if (!itemIndex || itemIndex.v !== SECTIONS) { itemIndex = { v: SECTIONS, m: new Map() }; for (const s of SECTIONS) for (const i of s.items) itemIndex.m.set(i.id, i); } return itemIndex.m.get(id); }
 function filter() {
   const q = query.trim().toLowerCase(), wk = tab === 'exo' && WKX.on ? weekExo() : null;
-  document.querySelectorAll('#list li').forEach(li => li.classList.toggle('no-match', (!!q && !li.dataset.search.includes(q)) || (!!wk && !wk.has(li.dataset.li))));
-  document.querySelectorAll('#list section').forEach(sec => { sec.classList.toggle('empty', (!!q || !!wk) && !sec.querySelector('li:not(.no-match)')); sec.classList.toggle('q-open', !!q || !!wk); });
+  document.querySelectorAll('#list li[data-li]').forEach(li => li.classList.toggle('no-match', (!!q && !li.dataset.search.includes(q)) || (!!wk && !wk.has(li.dataset.li))));
+  document.querySelectorAll('#list section').forEach(sec => { sec.classList.toggle('empty', (!!q || !!wk) && !sec.querySelector('li[data-li]:not(.no-match)')); sec.classList.toggle('q-open', !!q || !!wk); });
   const wn = $('wkxnone'); if (wn) wn.hidden = !wk || wk.size > 0;
 }
 

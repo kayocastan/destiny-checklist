@@ -479,3 +479,12 @@ section.ss{padding:14px 16px;display:grid;gap:10px;border-color:color-mix(in srg
 @media (max-width:420px){.xm-g{padding:10px;gap:8px}}
 /* textos com várias linhas (ex.: lista de triunfos da missão) */
 .more .d{white-space:pre-line}
+/* lista de triunfos dentro de um item: pendentes em destaque, feitos em verde */
+.tl{list-style:none;margin:2px 0 0;padding:0;display:grid;gap:6px}
+.tl li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:10px;align-items:start;padding:8px 10px;border-radius:8px;background:var(--chip);border:0}
+.tl-i{width:18px;height:18px;margin-top:1px;border-radius:50%;border:2px solid var(--muted);display:grid;place-items:center;font-size:11px;font-weight:700;line-height:1}
+.tl b{display:block;font-size:13.5px;font-weight:600;color:var(--fg,var(--text,inherit))}
+.tl small{display:block;font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.4}
+.tl li.ok{background:color-mix(in srgb,var(--done) 10%,transparent)}
+.tl li.ok .tl-i{border-color:var(--done);background:var(--done);color:var(--surface)}
+.tl li.ok b{color:var(--done)}
