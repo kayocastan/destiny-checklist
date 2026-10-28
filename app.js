@@ -1,4 +1,4 @@
-/* Destiny Checklist — lê a conta Bungie.net da pessoa e monta o checklist.
+/* DPI · Destiny Parallel Interface — lê a conta Bungie.net da pessoa e monta o checklist.
    Tudo roda no navegador; o servidor só troca o código do login pelos tokens. */
 (() => {
 'use strict';
@@ -970,7 +970,7 @@ async function buildShareCanvas(C, S = 1, MAXH = 4400) {
   }
   // rodapé
   x.fillStyle = 'rgba(255,255,255,.12)'; x.fillRect(PAD, y, CW, 2); y += 46;
-  text('destiny-checklist.vercel.app', PAD, y, F.m(22), '#c3ccda');
+  text('DPI · ' + location.host, PAD, y, F.m(22), '#c3ccda');
   text(new Date().toLocaleDateString(lang === 'pt' ? 'pt-BR' : 'en-US', { day: '2-digit', month: 'short', year: 'numeric' }), Wd - PAD, y, F.m(22), '#8f9bb0', 'right');
   y += 40;
 
@@ -1220,7 +1220,7 @@ function render() {
   renderWeek(); renderBuild();
   if (!cfg) return;
   if (!logged) {
-    delete $('title').dataset.full; $('title').style.fontSize = ''; $('title').classList.remove('two'); $('title').textContent = 'Destiny Checklist'; document.title = 'Destiny Checklist'; $('eyebrow').textContent = 'Destiny 2'; renderGuardian(null);
+    delete $('title').dataset.full; $('title').style.fontSize = ''; $('title').classList.remove('two'); $('title').textContent = 'DPI'; document.title = 'DPI · Destiny Parallel Interface'; $('eyebrow').textContent = 'Destiny Parallel Interface'; renderGuardian(null);
     $('subtabs').hidden = true;
     if (auth) return; // carregando
     const U = u();
@@ -1233,7 +1233,7 @@ function render() {
   const mx = maxPower(ch.classType);
   const sub = (profile.characterEquipment?.data?.[charId]?.items || []).find(i => i.bucketHash === SUB_BUCKET), sn = sub && gearDefs[sub.itemHash]?.n;
   const ttl = charTitle(cls, sn);
-  Object.assign($('title').dataset, { full: ttl, short: sn || cls, cls }); $('title').textContent = ttl; $('title').title = `${U.races[ch.raceType] || ''} ${cls}`; document.title = ttl + ' · Destiny Checklist';
+  Object.assign($('title').dataset, { full: ttl, short: sn || cls, cls }); $('title').textContent = ttl; $('title').title = `${U.races[ch.raceType] || ''} ${cls}`; document.title = ttl + ' · DPI';
   renderGuardian(ch);
   $('eyebrow').dataset.base = member.name || ''; $('eyebrow').textContent = member.name || ''; $('eyebrow').title = member.name || ''; fitTitle();
   $('ghpw').hidden = false; $('pwv').textContent = ch.light; $('pwmax').textContent = mx && mx > ch.light ? `${U.max} ${mx}` : U.power;
@@ -1428,7 +1428,7 @@ function favsHTML() {
 const playerLink = name => `${location.origin}/?jogador=${encodeURIComponent(name)}`;
 async function copyLink(name, btn) {
   const url = playerLink(name);
-  try { if (navigator.share && matchMedia('(pointer:coarse)').matches) { await navigator.share({ title: name + ' · Destiny Checklist', url }); return; } } catch (e) { if (e?.name === 'AbortError') return; }
+  try { if (navigator.share && matchMedia('(pointer:coarse)').matches) { await navigator.share({ title: name + ' · DPI', url }); return; } } catch (e) { if (e?.name === 'AbortError') return; }
   try { await navigator.clipboard.writeText(url); } catch { prompt('', url); return; }
   if (btn) { btn.classList.add('ok'); btn.dataset.tip = u().w.linkOk; setTimeout(() => { btn.classList.remove('ok'); delete btn.dataset.tip; }, 1600); }
 }

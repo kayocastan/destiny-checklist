@@ -1,4 +1,4 @@
-# Destiny Checklist
+# DPI · Destiny Parallel Interface
 
 Site que lê a conta Bungie.net de quem entrar e monta um checklist de Destiny 2: missões em andamento, campanhas, incursões, masmorras, títulos, exóticos e catalisadores que faltam, do mais fácil para o mais difícil. Tem versão em português e inglês com os nomes oficiais do jogo.
 
