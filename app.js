@@ -35,8 +35,8 @@ const UI = {
     loadouts: 'Loadouts', checklist: 'Checklist',
     tabs: { obj: 'Objetivos', act: 'Atividades', drops: 'Arsenal', gd: 'Guardião' },
     subs: { camp: 'Campanhas', raid: 'Incursões', dg: 'Masmorras', xm: 'Missões exóticas', tit: 'Títulos', exo: 'Exóticos', cat: 'Catalisadores', vend: 'Vendedores' },
-    heroTitle: 'Seu checklist de Destiny 2', heroText: 'Entre com a sua conta Bungie.net para ver o que falta: exóticos, catalisadores, títulos, incursões, masmorras e campanhas, do mais fácil para o mais difícil.',
-    heroList: ['O site só lê os seus dados; não altera nada no jogo.', 'Sua senha fica na Bungie; o site nunca vê.', 'As suas marcações ficam salvas neste navegador.'],
+    heroTitle: 'Central do Guardião', heroText: 'Entre com a sua conta Bungie.net para verificar seus objetivos, acompanhar a rotação semanal, completar seu arsenal exótico e compartilhar suas builds.', lsQ: 'Buscar guardião: Nome#1234', lsBtn: 'Buscar', lsHint: 'Veja a build equipada de qualquer jogador, sem precisar entrar.',
+    heroList: ['O site só lê os seus dados; não altera nada no jogo.', 'Sua senha fica na Bungie; o site nunca vê.', 'Marcações, favoritos e builds salvas sincronizam entre celular e PC.'],
     login: 'Entrar com Bungie.net', notConfigured: 'O site ainda não foi configurado: faltam as chaves da Bungie nas variáveis de ambiente da Vercel.',
     loading: 'Carregando sua conta…', loadingDefs: 'Buscando nomes de missões e itens…', loadingPlaces: 'Buscando locais das missões…', cached: t => `Mostrando dados das ${t}; atualizando…`, updated: t => `Atualizado às ${t}`,
     authError: m => `Não deu para entrar: ${m}. Tente de novo.`, apiError: m => `Erro ao falar com a Bungie: ${m}`,
@@ -90,8 +90,8 @@ const UI = {
     loadouts: 'Loadouts', checklist: 'Checklist',
     tabs: { obj: 'Objectives', act: 'Activities', drops: 'Arsenal', gd: 'Guardian' },
     subs: { camp: 'Campaigns', raid: 'Raids', dg: 'Dungeons', xm: 'Exotic missions', tit: 'Titles', exo: 'Exotics', cat: 'Catalysts', vend: 'Vendors' },
-    heroTitle: 'Your Destiny 2 checklist', heroText: "Sign in with your Bungie.net account to see what's left: exotics, catalysts, titles, raids, dungeons and campaigns, from easiest to hardest.",
-    heroList: ['The site only reads your data; it never changes anything in the game.', 'Your password stays with Bungie; the site never sees it.', 'Your checkmarks are saved in this browser.'],
+    heroTitle: 'Guardian Hub', heroText: 'Sign in with your Bungie.net account to check your goals, follow the weekly rotation, complete your exotic arsenal and share your builds.', lsQ: 'Search guardian: Name#1234', lsBtn: 'Search', lsHint: "See any player's equipped build, no sign-in needed.",
+    heroList: ['The site only reads your data; it never changes anything in the game.', 'Your password stays with Bungie; the site never sees it.', 'Checkmarks, favorites and saved builds sync between phone and PC.'],
     login: 'Sign in with Bungie.net', notConfigured: "The site isn't configured yet: the Bungie keys are missing from the Vercel environment variables.",
     loading: 'Loading your account…', loadingDefs: 'Fetching quest and item names…', loadingPlaces: 'Fetching quest locations…', cached: t => `Showing data from ${t}; updating…`, updated: t => `Updated at ${t}`,
     authError: m => `Couldn't sign in: ${m}. Please try again.`, apiError: m => `Error talking to Bungie: ${m}`,
@@ -423,8 +423,19 @@ async function loadGear(my) {
   const gd = await entities('DestinyInventoryItemDefinition', eq, lang); if (my !== gen) return;
   gearDefs = gd; render();
 }
+/* Tela inicial sem login: cabeçalho com a imagem de uma incursão ou masmorra (troca a cada visita) */
+let LAND = null;
+function landing(on) {
+  const gh = $('gh'), cap = $('ghcap'); gh.classList.toggle('landing', !!on);
+  if (!on) { cap.hidden = true; return; }
+  if (!LAND) { const pool = [...(defs?.raids || []), ...(defs?.dungeons || [])].filter(x => x.img); LAND = pool[Math.floor(Math.random() * pool.length)] || null; }
+  if (!LAND) return;
+  $('ghband').style.backgroundImage = `url("${BNET}${LAND.img}")`;
+  cap.textContent = L(LAND.n); cap.hidden = false;
+}
 function renderGuardian(ch) {
   const gh = $('gh');
+  if (ch) landing(false);
   if (!ch) { gh.classList.add('noemb'); $('ghband').style.backgroundImage = ''; $('gear').innerHTML = ''; $('ghpw').hidden = true; delete document.documentElement.dataset.el; return; }
   gh.classList.toggle('noemb', !ch.emblemBackgroundPath);
   $('ghband').style.backgroundImage = ch.emblemBackgroundPath ? `url("${BNET}${ch.emblemBackgroundPath}")` : '';
@@ -1236,12 +1247,13 @@ function render() {
   renderWeek(); renderBuild();
   if (!cfg) return;
   if (!logged) {
-    delete $('title').dataset.full; $('title').style.fontSize = ''; $('title').classList.remove('two'); $('title').textContent = 'DPI'; document.title = 'DPI · Destiny Parallel Interface'; $('eyebrow').textContent = 'Destiny Parallel Interface'; renderGuardian(null);
+    delete $('title').dataset.full; $('title').style.fontSize = ''; $('title').classList.remove('two'); $('title').textContent = 'Destiny Parallel Interface'; document.title = 'DPI · Destiny Parallel Interface'; $('eyebrow').textContent = 'Destiny 2'; renderGuardian(null); landing(!auth);
     $('subtabs').hidden = true;
     if (auth) return; // carregando
     const U = u();
-    showMessage(`<section class="hero"><h2>${esc(U.heroTitle)}</h2><p>${esc(U.heroText)}</p>${cfg.configured ? `<button class="btn" id="loginbtn" type="button">${esc(U.login)}</button>` : `<p class="notice">${esc(U.notConfigured)}</p>`}<ul>${U.heroList.map(x => `<li>${esc(x)}</li>`).join('')}</ul></section>`);
+    showMessage(`<form class="lsearch" id="lsearch" role="search"><svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input type="search" id="lsq" placeholder="${esc(U.lsQ)}" aria-label="${esc(U.lsQ)}" autocomplete="off" spellcheck="false"><button class="lsbtn" type="submit">${esc(U.lsBtn)}</button></form><p class="lshint">${esc(U.lsHint)}</p><section class="hero"><h2>${esc(U.heroTitle)}</h2><p>${esc(U.heroText)}</p>${cfg.configured ? `<button class="btn" id="loginbtn" type="button">${esc(U.login)}</button>` : `<p class="notice">${esc(U.notConfigured)}</p>`}<ul>${U.heroList.map(x => `<li>${esc(x)}</li>`).join('')}</ul></section>`);
     const b = $('loginbtn'); if (b) b.onclick = login;
+    $('lsearch').onsubmit = e => { e.preventDefault(); const q = $('lsq').value.trim(); if (q) openPublic(q); };
     return;
   }
   const U = u(), ch = profile.characters.data[charId];

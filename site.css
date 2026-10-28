@@ -493,3 +493,23 @@ section.ss{padding:14px 16px;display:grid;gap:10px;border-color:color-mix(in srg
 .chip.exo{color:var(--exotic);font-weight:600;background:color-mix(in srgb,var(--exotic) 14%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--exotic) 45%,transparent)}
 li.is-done .chip.exo{opacity:.7}
 .tl-p{font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--exotic);margin-left:4px}
+
+/* ---------- Tela inicial sem login ---------- */
+.gh.landing{position:relative}
+.gh.landing .gh-band{min-height:160px;align-items:flex-end;padding:56px 16px 14px;background-size:cover;background-position:center 30%}
+.gh.landing .gh-band::before{left:0;background:linear-gradient(180deg,rgba(16,21,29,.1) 0%,rgba(16,21,29,.5) 55%,rgba(16,21,29,.92) 100%),linear-gradient(90deg,rgba(16,21,29,.7),transparent 70%)}
+.gh.landing h1{white-space:normal;font-size:clamp(26px,5.6vw,36px);line-height:1.02;text-shadow:0 2px 14px rgba(0,0,0,.6)}
+.gh.landing .eyebrow{color:#cfd7e3}
+.gh-cap{font-size:12px;color:#b9c3d3;margin-top:5px;text-shadow:0 1px 6px rgba(0,0,0,.6)}
+.gh.landing .gh-strip{position:absolute;top:8px;right:8px;border:0;background:none;padding:0}
+.gh.landing .themetoggle,.gh.landing .langtoggle{background:rgba(10,14,20,.55);backdrop-filter:blur(4px)}
+.lsearch{display:flex;gap:8px;align-items:center;padding:6px 6px 6px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);box-shadow:inset 3px 0 0 color-mix(in srgb,var(--acc) 70%,transparent),0 6px 18px -12px rgba(0,0,0,.35)}
+.lsearch svg{flex:none;color:var(--muted)}
+.lsearch input{flex:1;min-width:0;font:inherit;font-size:15px;border:0;background:none;color:var(--fg);padding:6px 2px;outline:none}
+.lsearch input::placeholder{color:var(--muted)}
+.lsearch:focus-within{border-color:var(--acc)}
+.lsbtn{flex:none;font-family:var(--display);font-weight:700;font-size:16px;letter-spacing:.02em;padding:7px 14px;border-radius:8px;cursor:pointer;background:color-mix(in srgb,var(--acc) 16%,transparent);color:var(--acc);border:1px solid color-mix(in srgb,var(--acc) 45%,transparent)}
+.lsbtn:hover{background:color-mix(in srgb,var(--acc) 26%,transparent)}
+.lsbtn:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.lshint{margin:-12px 4px 0;font-size:12.5px;color:var(--muted)}
+@media (max-width:480px){.lsearch{gap:6px;padding-left:10px}.lsearch input{font-size:14px}.lsbtn{font-size:15px;padding:6px 11px}}
