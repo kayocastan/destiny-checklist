@@ -38,7 +38,7 @@ const UI = {
       nearCats: 'Catalisadores quase prontos', nearCatsNote: 'Já passaram da metade.',
       nearTitles: 'Títulos quase prontos', nearTitlesNote: 'Faltam poucos triunfos.',
       noCamp: 'Nenhuma campanha em andamento no registro deste personagem. Campanhas concluídas não aparecem.',
-      campNote: (a, b) => `Passo ${a} de ${b}.`, campStep: n => `Passo atual: ${n}`, xmClear: n => `Concluir ${n}`, xmTri: 'Triunfos da missão', campNormal: 'Concluir a campanha', campNotStarted: 'Não iniciada', campLeg: 'Todas as missões no Lendário', campMaster: 'Uma missão no Mestre', campIn: 'Em andamento.', campAll: 'Concluída em todas as dificuldades.', campLegLeft: 'Concluída; falta o Lendário.', campMasterLeft: 'Lendário feito; falta o Mestre.', campNone: 'Ainda não concluída.', current: 'Passo atual',
+      campNote: (a, b) => `Passo ${a} de ${b}.`, campStep: n => `Passo atual: ${n}`, xmClear: n => `Concluir ${n}`, xmTri: 'Triunfos da missão', raidTri: 'Triunfos da incursão', dgTri: 'Triunfos da masmorra', campNormal: 'Concluir a campanha', campNotStarted: 'Não iniciada', campLeg: 'Todas as missões no Lendário', campMaster: 'Uma missão no Mestre', campIn: 'Em andamento.', campAll: 'Concluída em todas as dificuldades.', campLegLeft: 'Concluída; falta o Lendário.', campMasterLeft: 'Lendário feito; falta o Mestre.', campNone: 'Ainda não concluída.', current: 'Passo atual',
       clear: n => `Concluir ${n}`, exotic: n => `Exótico: ${n}`,
       wpn: 'Armas exóticas', armor: c => `Armaduras exóticas de ${c}`,
       catProg: 'Em progresso', catProgNote: 'Catalisador obtido; use a arma para completar.',
@@ -93,7 +93,7 @@ const UI = {
       nearCats: 'Catalysts almost done', nearCatsNote: 'Already past halfway.',
       nearTitles: 'Titles almost done', nearTitlesNote: 'Only a few triumphs left.',
       noCamp: 'No campaign in progress in this character\'s quest log. Finished campaigns are not shown.',
-      campNote: (a, b) => `Step ${a} of ${b}.`, campStep: n => `Current step: ${n}`, xmClear: n => `Complete ${n}`, xmTri: 'Mission triumphs', campNormal: 'Finish the campaign', campNotStarted: 'Not started', campLeg: 'All missions on Legendary', campMaster: 'One mission on Master', campIn: 'In progress.', campAll: 'Done on every difficulty.', campLegLeft: 'Done; Legendary is left.', campMasterLeft: 'Legendary done; Master is left.', campNone: 'Not finished yet.', current: 'Current step',
+      campNote: (a, b) => `Step ${a} of ${b}.`, campStep: n => `Current step: ${n}`, xmClear: n => `Complete ${n}`, xmTri: 'Mission triumphs', raidTri: 'Raid triumphs', dgTri: 'Dungeon triumphs', campNormal: 'Finish the campaign', campNotStarted: 'Not started', campLeg: 'All missions on Legendary', campMaster: 'One mission on Master', campIn: 'In progress.', campAll: 'Done on every difficulty.', campLegLeft: 'Done; Legendary is left.', campMasterLeft: 'Legendary done; Master is left.', campNone: 'Not finished yet.', current: 'Current step',
       clear: n => `Complete ${n}`, exotic: n => `Exotic: ${n}`,
       wpn: 'Exotic weapons', armor: c => `${c} exotic armor`,
       catProg: 'In progress', catProgNote: 'Catalyst obtained; use the weapon to finish it.',
@@ -549,6 +549,11 @@ function build() {
       const items = [I(`${kind}-${a.k}-clear`, s.clear(L(a.n)), null, [U.chip[a.d]], a.m && metric(a.m) > 0)];
       const ex = a.x && exoticByName(a.x);
       if (ex) items.push(I(`${kind}-${a.k}-x`, s.exotic(L(ex.n)), L(ex.s), [U.chip['Exótico']], colAcquired(ex.h), { isEx: true, exName: L(ex.n) }));
+      // triunfos da atividade (lista pronta no defs.json), num item que abre a lista
+      if (recOK && a.tr?.length) {
+        const tl = a.tr.map(([h, n, d]) => ({ st: recState(h), n: L(n), d: L(d) })).filter(x => x.st && !(x.st.state & 16) && x.n).map(x => { const ok = recDone(x.st); return { ok, n: x.n, d: x.d, pr: ok ? '' : progText(x.st) }; });
+        if (tl.length) { const rd = tl.filter(x => x.ok).length; tl.sort((p, q) => p.ok - q.ok); items.push(I(`${kind}-${a.k}-tri`, kind === 'raid' ? s.raidTri : s.dgTri, tl.map(x => x.n).join(' '), [`${rd}/${tl.length}`], rd === tl.length, { tl })); }
+      }
       out.push(S(kind, `${kind}-${a.k}`, L(a.n), L([a.note[1], a.note[0]]), items, { firstIsClear: true, kind, key: a.k, metric: a.m }));
     }
   }
@@ -1219,7 +1224,7 @@ function render() {
       <ul>${sec.items.map(i => {
         const cid = 'c-' + i.id.replace(/[^a-z0-9]+/gi, '-'), first = i.c[0], rest = i.c.slice(1), more = !!(i.d || rest.length || i.loc);
         const head = `<span class="t">${esc(i.t)}</span>${first ? `<span class="chip ${chipClass(first)}">${esc(first)}</span>` : ''}`;
-        return `<li data-li="${esc(i.id)}" data-search="${esc([i.t, i.d, i.loc, ...i.c, sec.title].join(' ').toLowerCase())}"><div class="row"><label class="ck" for="${cid}"><input type="checkbox" id="${cid}" data-id="${esc(i.id)}" aria-label="${esc(i.t)}"${i.auto ? ' checked disabled' : ''}></label>${more ? `<button class="it" type="button" aria-expanded="false">${head}<span class="chev" aria-hidden="true"></span></button>` : `<span class="it">${head}</span>`}</div>${more ? `<div class="more">${i.loc ? `<div class="loc"><span class="loc-k">${esc(U.where)}</span> ${esc(i.loc)}</div>` : ''}${i.tl ? `<ul class="tl">${i.tl.map(x => `<li class="${x.ok ? 'ok' : ''}"><span class="tl-i" aria-label="${x.ok ? '✓' : '○'}">${x.ok ? '✓' : ''}</span><div><b>${esc(x.n)}</b>${x.d && !x.ok ? `<small>${esc(x.d)}</small>` : ''}</div></li>`).join('')}</ul>` : i.d ? `<div class="d">${esc(i.d)}</div>` : ''}${rest.length ? `<div class="chips">${rest.map(x => `<span class="chip ${chipClass(x)}">${esc(x)}</span>`).join('')}</div>` : ''}</div>` : ''}</li>`;
+        return `<li data-li="${esc(i.id)}" data-search="${esc([i.t, i.d, i.loc, ...i.c, sec.title].join(' ').toLowerCase())}"><div class="row"><label class="ck" for="${cid}"><input type="checkbox" id="${cid}" data-id="${esc(i.id)}" aria-label="${esc(i.t)}"${i.auto ? ' checked disabled' : ''}></label>${more ? `<button class="it" type="button" aria-expanded="false">${head}<span class="chev" aria-hidden="true"></span></button>` : `<span class="it">${head}</span>`}</div>${more ? `<div class="more">${i.loc ? `<div class="loc"><span class="loc-k">${esc(U.where)}</span> ${esc(i.loc)}</div>` : ''}${i.tl ? `<ul class="tl">${i.tl.map(x => `<li class="${x.ok ? 'ok' : ''}"><span class="tl-i" aria-label="${x.ok ? '✓' : '○'}">${x.ok ? '✓' : ''}</span><div><b>${esc(x.n)}${x.pr ? ` <span class="tl-p">${esc(x.pr)}</span>` : ''}</b>${x.d && !x.ok ? `<small>${esc(x.d)}</small>` : ''}</div></li>`).join('')}</ul>` : i.d ? `<div class="d">${esc(i.d)}</div>` : ''}${rest.length ? `<div class="chips">${rest.map(x => `<span class="chip ${chipClass(x)}">${esc(x)}</span>`).join('')}</div>` : ''}</div>` : ''}</li>`;
       }).join('')}</ul></section>`;
   }).join('')}<p class="donebar" id="donebar" hidden><span id="donetxt"></span><button class="reset" id="togglecomplete" type="button"></button></p></div>`;
   document.querySelectorAll('#list li[data-li]').forEach(li => { if (openItems.has(li.dataset.li)) { li.classList.add('open'); li.querySelector('button.it')?.setAttribute('aria-expanded', 'true'); } });
