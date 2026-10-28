@@ -488,3 +488,6 @@ section.ss{padding:14px 16px;display:grid;gap:10px;border-color:color-mix(in srg
 .tl li.ok{background:color-mix(in srgb,var(--done) 10%,transparent)}
 .tl li.ok .tl-i{border-color:var(--done);background:var(--done);color:var(--surface)}
 .tl li.ok b{color:var(--done)}
+/* selo "Exótico" dourado, para chamar atenção */
+.chip.exo{color:var(--exotic);font-weight:600;background:color-mix(in srgb,var(--exotic) 14%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--exotic) 45%,transparent)}
+li.is-done .chip.exo{opacity:.7}
