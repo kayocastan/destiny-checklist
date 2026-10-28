@@ -1611,8 +1611,8 @@ async function loadActHist() {
     const agg = (await Promise.all(chars.map(c => bungie(`/Destiny2/${member.type}/Account/${member.id}/Character/${c}/Stats/AggregateActivityStats/`, false).then(r => r.activities || []).catch(() => [])))).flat();
     const runs = (await Promise.all(chars.flatMap(c => [82, 4].map(m => bungie(`/Destiny2/${member.type}/Account/${member.id}/Character/${c}/Stats/Activities/?count=250&mode=${m}`, false).then(r => (r.activities || []).map(a => ({ ...a, _m: m }))).catch(() => []))))).flat();
     const modeOf = {}; for (const r of runs) modeOf[r.activityDetails.directorActivityHash || r.activityDetails.referenceId] = r._m;
-    const played = agg.filter(a => (a.values?.activitySecondsPlayed?.basic?.value || 0) > 0).map(a => a.activityHash);
-    const map = await mapActs([...new Set([...played, ...Object.keys(modeOf).map(Number)])], h => modeOf[h]);
+    // só as atividades que são incursão/masmorra: as da lista conhecida e as que aparecem no histórico desses modos
+    const map = await mapActs([...new Set(Object.keys(modeOf).map(Number))], h => modeOf[h]); Object.assign(map, actKeys(), map);
     const D = {}, get = k => (D[k] = D[k] || { c: 0, fast: 0, k: 0, d: 0, tries: 0, first: null, fastRun: null });
     for (const a of agg) { const m = map[a.activityHash]; if (!m) continue; const v = x => a.values?.[x]?.basic?.value || 0, o = get(m.k); o.c += v('activityCompletions'); o.k += v('activityKills'); o.d += v('activityDeaths'); const f = v('fastestCompletionMsForActivity'); if (f > 0 && (!o.fast || f < o.fast)) o.fast = f; }
     for (const r of runs) {
