@@ -448,6 +448,8 @@ const colAcquired = hashes => colStates(hashes).some(s => !(s & 1));
 const colMissing = hashes => { const st = colStates(hashes); return st.length > 0 && !st.some(s => !(s & 1)) && st.some(s => !(s & 4)); };
 const metric = h => profile.metrics?.data?.metrics?.[h]?.objectiveProgress?.progress || 0;
 const exoticByName = name => defs.exotics.find(e => e.n[0] === name);
+// arma de um catalisador cujo nome não bate exato (ex.: "Jade Rabbit" → "The Jade Rabbit", "Skyburner" → "Skyburner's Oath")
+const catWeapon = k => { if (!k) return null; const n = s => s.toLowerCase().replace(/^the\s+/, '').replace(/[^a-z0-9]/g, ''); const kk = n(k); return defs.exotics.find(e => e.t === 'w' && n(e.n[0]) === kk) || defs.exotics.find(e => e.t === 'w' && n(e.n[0]).startsWith(kk)) || defs.exotics.find(e => e.t === 'w' && n(e.n[0]).includes(kk)) || null; };
 function srcGroup(s) {
   const t = (s || '').split(/\.\s/)[0].toLowerCase(); // só a 1ª frase: o resto explica onde começar
   if (/archive/.test(t)) return ['archive', 'Fácil', 'Solo'];
@@ -577,7 +579,7 @@ function build() {
   }
   // Drops: catalisadores
   const catRows = !recOK ? [] : defs.cats.map(c => ({ c, r: recState(c.h) })).filter(x => x.r && !(x.r.state & 16));
-  const catSrc = c => { const k = c.n[0].replace(/ Catalyst$/, ''); if (defs.catsrc[k]) return defs.catsrc[k][lang === 'pt' ? 0 : 1]; const e = exoticByName(k); return e ? u().w.weaponFrom + ' ' + L(e.s).replace(/^(Fonte|Source):\s*/, '') : ''; };
+  const catSrc = c => { const k = c.n[0].replace(/ Catalyst$/, ''); if (defs.catsrc[k]) return defs.catsrc[k][lang === 'pt' ? 0 : 1]; const e = catWeapon(k); return e ? u().w.weaponFrom + ' ' + L(e.s).replace(/^(Fonte|Source):\s*/, '') : ''; };
   const prog = catRows.filter(x => !recDone(x.r) && pct(x.r) > 0).sort((a, b) => pct(b.r) - pct(a.r));
   const fresh = catRows.filter(x => !recDone(x.r) && pct(x.r) === 0);
   if (prog.length) out.push(S('cat', 'cat-prog', s.catProg, s.catProgNote, prog.map(x => I('c-' + x.c.h, L(x.c.n), L(x.c.d), [progText(x.r) || Math.round(pct(x.r) * 100) + '%'], false))));
