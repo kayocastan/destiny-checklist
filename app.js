@@ -211,9 +211,9 @@ async function entity(type, hash, lc, needPc) {
 }
 function saveEnt() { if (entDirty) { LS.set('dc-ent4-en', entCache.en); LS.set('dc-ent4-pt', entCache.pt); entDirty = false; } }
 async function pool(list, fn, n) { let i = 0; await Promise.all(Array.from({ length: Math.min(n, list.length) }, async () => { while (i < list.length) await fn(list[i++]); })); }
-async function entities(type, hashes, lc) {
+async function entities(type, hashes, lc, needPc) {
   const out = {};
-  await pool([...new Set(hashes)], async h => { out[h] = await entity(type, h, lc); }, 6);
+  await pool([...new Set(hashes)], async h => { out[h] = await entity(type, h, lc, needPc); }, 6);
   saveEnt();
   return out;
 }
@@ -448,6 +448,8 @@ const colAcquired = hashes => colStates(hashes).some(s => !(s & 1));
 const colMissing = hashes => { const st = colStates(hashes); return st.length > 0 && !st.some(s => !(s & 1)) && st.some(s => !(s & 4)); };
 const metric = h => profile.metrics?.data?.metrics?.[h]?.objectiveProgress?.progress || 0;
 const exoticByName = name => defs.exotics.find(e => e.n[0] === name);
+// item à venda (Xûr): pelo colecionável, que não depende do idioma; o nome (inglês ou português) fica de reserva
+const exoOf = x => (x.c && defs.exotics.find(e => e.h.includes(x.c))) || defs.exotics.find(e => e.n.includes(x.n));
 // arma de um catalisador cujo nome não bate exato (ex.: "Jade Rabbit" → "The Jade Rabbit", "Skyburner" → "Skyburner's Oath")
 const catWeapon = k => { if (!k) return null; const n = s => s.toLowerCase().replace(/^the\s+/, '').replace(/[^a-z0-9]/g, ''); const kk = n(k); return defs.exotics.find(e => e.t === 'w' && n(e.n[0]) === kk) || defs.exotics.find(e => e.t === 'w' && n(e.n[0]).startsWith(kk)) || defs.exotics.find(e => e.t === 'w' && n(e.n[0]).includes(kk)) || null; };
 function srcGroup(s) {
@@ -632,10 +634,10 @@ async function loadXur(my) {
     const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/Character/${charId}/Vendors/${XUR_VENDOR}/?components=400,402`);
     const sales = Object.values(r.sales?.data || {});
     const hs = sales.map(s => s.itemHash);
-    const [en, lp] = await Promise.all([entities('DestinyInventoryItemDefinition', hs, 'en'), lang === 'pt' ? entities('DestinyInventoryItemDefinition', hs, 'pt') : null]); if (my !== gen) return;
-    const loc = lp || en;
+    const loc = await entities('DestinyInventoryItemDefinition', hs, lang === 'pt' ? 'pt' : 'en', true); if (my !== gen) return;
+    const exo = sales.filter(s => loc[s.itemHash]?.tt === 6); await Promise.all(exo.map(s => idef(s.itemHash))); if (my !== gen) return;
     // o Xûr vai embora no reset de terça; a data de "renovação" da API (sexta) não é a saída dele
-    XUR = { k: charId + lang, at: Date.now(), until: new Date(xurLeaves()).toISOString(), items: sales.filter(s => en[s.itemHash]?.tt === 6).map(s => ({ ic: loc[s.itemHash]?.ic || en[s.itemHash].ic, tl: loc[s.itemHash]?.tl || '', en: en[s.itemHash].n, n: loc[s.itemHash]?.n || en[s.itemHash].n, cost: (s.costs || []).find(c => c.itemHash === STRANGE_COIN)?.quantity || 0 })) };
+    XUR = { k: charId + lang, at: Date.now(), until: new Date(xurLeaves()).toISOString(), items: exo.map(s => ({ h: s.itemHash, c: IDEF[s.itemHash]?.c || 0, ic: loc[s.itemHash]?.ic, tl: loc[s.itemHash]?.tl || '', n: loc[s.itemHash]?.n || '', cost: (s.costs || []).find(c => c.itemHash === STRANGE_COIN)?.quantity || 0 })) };
   } catch { XUR = null; }
   if (my === gen) { weekReady.x = true; build(); render(); }
 }
@@ -643,22 +645,23 @@ const coins = () => { let n = 0; for (const it of profile.profileInventory?.data
 function xurMissing() {
   if (!XUR || !have.a) return [];
   const cls = profile.characters.data[charId].classType;
-  return XUR.items.filter(x => { const e = exoticByName(x.en); return e && (e.t === 'w' || e.c === cls) && colMissing(e.h); });
+  return XUR.items.filter(x => { const e = exoOf(x); return e && (e.t === 'w' || e.c === cls) && colMissing(e.h); });
 }
 /* Rotação: incursões e masmorras com desafios ativos nos marcos do personagem */
 async function loadMilestones(my) {
   const ms = profile.characterProgressions?.data?.[charId]?.milestones; if (!ms) { weekReady.m = true; build(); render(); return; }
   const hs = Object.keys(ms).map(Number), acts = Object.values(ms).flatMap(m => (m.activities || []).filter(a => (a.challenges || []).length).map(a => a.activityHash));
-  const [d, dp, an] = await Promise.all([entities('DestinyMilestoneDefinition', hs, 'en'), lang === 'pt' ? entities('DestinyMilestoneDefinition', hs, 'pt') : null, entities('DestinyActivityDefinition', acts, lang)]); if (my !== gen) return;
-  const dl = dp || d; ACTN = an;
+  const [d, an] = await Promise.all([entities('DestinyMilestoneDefinition', hs, lang), entities('DestinyActivityDefinition', acts, lang)]); if (my !== gen) return;
+  const dl = d; ACTN = an;
   MSN = d; MSL = dl; weekReady.m = true; build(); render();
 }
 function featured() {
   const ms = profile.characterProgressions?.data?.[charId]?.milestones || {}, out = { raid: new Set(), dg: new Set(), ends: null };
   for (const m of Object.values(ms)) {
-    const name = (MSN[m.milestoneHash]?.n || '').toLowerCase(); if (!name) continue;
-    if (!(m.activities || []).some(a => (a.challenges || []).length)) continue;
-    for (const [kind, list] of [['raid', defs.raids], ['dg', defs.dungeons]]) { const a = list.find(x => x.n[0].toLowerCase() === name); if (a) { out[kind].add(a.k); if (m.endDate) out.ends = Math.min(out.ends || Infinity, Date.parse(m.endDate)); } }
+    const name = (MSN[m.milestoneHash]?.n || '').toLowerCase(), ah = (m.activities || []).filter(a => (a.challenges || []).length).map(a => a.activityHash);
+    if (!ah.length) continue;
+    // pela atividade (não depende do idioma); o nome fica de reserva
+    for (const [kind, list] of [['raid', defs.raids], ['dg', defs.dungeons]]) { const a = list.find(x => (x.ah || []).some(h => ah.includes(h))) || (name && list.find(x => x.n.some(n => n.toLowerCase() === name))); if (a) { out[kind].add(a.k); if (m.endDate) out.ends = Math.min(out.ends || Infinity, Date.parse(m.endDate)); } }
   }
   return out;
 }
@@ -1095,20 +1098,21 @@ async function loadVendors(my) {
       for (const [i] of sales) for (const sk of r.itemComponents?.sockets?.data?.[i]?.sockets || []) if (sk.plugHash && sk.isVisible !== false) plugs.push(sk.plugHash);
       const costH = sales.flatMap(([, x]) => (x.costs || []).map(c => c.itemHash));
       const all = [...hs, ...plugs, ...costH];
-      const [en, lp] = await Promise.all([entities('DestinyInventoryItemDefinition', all, 'en'), lang === 'pt' ? entities('DestinyInventoryItemDefinition', all, 'pt') : null]), loc = lp || en;
+      const loc = await entities('DestinyInventoryItemDefinition', all, lang === 'pt' ? 'pt' : 'en', true), en = loc;
       // coleção: só as armas e tonalizadores precisam (poucos itens)
-      const need = hs.filter(h => (en[h]?.it === 3 || /Shader/.test(en[h]?.tl || '')) && COLL[h] === undefined);
+      const need = hs.filter(h => (en[h]?.it === 3 || en[h]?.st === 20) && COLL[h] === undefined);
       await Promise.all(need.map(h => idef(h).then(d => { COLL[h] = d.c; })));
       const weapons = [], other = []; let sh = 0, shOwn = 0;
       for (const [i, x] of sales) {
         const e = en[x.itemHash], d = loc[x.itemHash]; if (!e?.n || !e.tl) continue;
         const owned = COLL[x.itemHash] ? colAcquired([COLL[x.itemHash]]) : null;
-        if (/Shader/.test(e.tl)) { sh++; if (owned) shOwn++; continue; }
-        if (/Material|Faction Reward|Currency|Engram$/i.test(e.tl) || e.tt < 5 && e.it !== 3) continue;
+        if (e.st === 20) { sh++; if (owned) shOwn++; continue; }
+        // materiais (0), moedas (1), engramas (8) e recompensas de facção (20 sem subtipo) ficam de fora
+        if (e.it === 0 || e.it === 1 || e.it === 8 || (e.it === 20 && !e.st) || e.tt < 5 && e.it !== 3) continue;
         const cost = (x.costs || []).map(c => `${fmtN(c.quantity)} ${loc[c.itemHash]?.n || ''}`.trim()).join(' + ');
         if (e.it === 3) {
-          const ps = (r.itemComponents?.sockets?.data?.[i]?.sockets || []).filter(sk => sk.plugHash && sk.isVisible !== false).map(sk => sk.plugHash).filter(h => { const pe = en[h]; return pe?.n && !SKIP_NAME.test(pe.n) && !SKIP_TYPE.test(pe.tl) && !/Empty|Default/i.test(pe.n); });
-          const kind = h => { const pe = en[h]; return /Intrinsic/i.test(pe.tl) ? 'k' : /Trait/i.test(pe.tl) ? 'tr' : /^Tier \d|^Masterworked/i.test(pe.n) ? 'mw' : ''; };
+          const ps = (r.itemComponents?.sockets?.data?.[i]?.sockets || []).filter(sk => sk.plugHash && sk.isVisible !== false).map(sk => sk.plugHash).filter(h => pShow(en[h]));
+          const kind = h => { const pc = en[h]?.pc || ''; return /intrinsics/.test(pc) ? 'k' : /^(frames|origins)$/.test(pc) ? 'tr' : /masterworks/.test(pc) ? 'mw' : ''; };
           weapons.push({ n: d.n, tl: d.tl, ic: d.ic, dt: e.dt, owned, perks: ps.map(h => ({ n: loc[h]?.n || en[h].n, ic: loc[h]?.ic || en[h].ic, k: kind(h) })), cost });
         } else other.push({ n: d.n, d: (d.d || '').replace(/\{var:\d+\}/g, '…').split('\n')[0], ic: d.ic, cost });
       }
@@ -1125,12 +1129,12 @@ function vendorsHTML() {
   // cada vendedor é um painel próprio, fechado por padrão; abre ao tocar
   const card = (id, title, sub, chip, body) => { const open = openSecs.has(id); return `<section data-sec="${id}" class="vend keep coll${open ? '' : ' collapsed'}"><div class="sec-head" data-coll="${id}" role="button" tabindex="0" aria-expanded="${open}"><div class="sec-title"><div class="sec-name"><h2>${esc(title)}</h2><div class="sec-sub${/…$/.test(sub || '') ? ' wait' : ''}">${esc(sub)}</div></div>${chip ? `<span class="chip hot">${esc(chip)}</span>` : ''}<span class="chev" aria-hidden="true"></span></div></div><div class="vd-body">${body}</div></section>`; };
   // Xûr
-  const cls = profile.characters.data[charId].classType, miss = xurMissing().map(x => x.en);
+  const cls = profile.characters.data[charId].classType, miss = xurMissing().map(x => x.h);
   const xu = XUR && XUR.items.length && (!XUR.until || Date.parse(XUR.until) > now);
-  const xItems = xu ? XUR.items.filter(x => { const e = exoticByName(x.en); return e && (e.t === 'w' || e.c === cls); }) : [];
-  const xMiss = xItems.filter(x => miss.includes(x.en)).length;
+  const xItems = xu ? XUR.items.filter(x => { const e = exoOf(x); return e && (e.t === 'w' || e.c === cls); }) : [];
+  const xMiss = xItems.filter(x => miss.includes(x.h)).length;
   const xur = card('vd-xur', 'Xûr', xu ? W.xurSub2(xItems.length, cd(Date.parse(XUR.until) - now), u().classes[cls]) : (XUR ? W.xurGoneShort : u().loadingDefs), xMiss ? W.missN(xMiss) : '',
-    xu ? `<div class="vd-x">${xItems.map(x => `<div class="vd-xi${miss.includes(x.en) ? ' miss' : ''}">${x.ic ? `<img src="${BNET}${x.ic}" alt="" loading="lazy">` : ''}<div><b>${esc(x.n)}</b><small>${esc(x.tl)}${x.cost ? ` · ${x.cost} ${esc(W.coins)}` : ''}</small></div>${miss.includes(x.en) ? `<span class="chip hot">${esc(W.notOwned)}</span>` : ''}</div>`).join('')}</div>${have.c ? `<p class="vd-note">${esc(W.coinsHave(coins()))}</p>` : ''}` : `<p class="vd-note">${esc(XUR ? W.xurGone : u().loadingDefs)}</p>`);
+    xu ? `<div class="vd-x">${xItems.map(x => `<div class="vd-xi${miss.includes(x.h) ? ' miss' : ''}">${x.ic ? `<img src="${BNET}${x.ic}" alt="" loading="lazy">` : ''}<div><b>${esc(x.n)}</b><small>${esc(x.tl)}${x.cost ? ` · ${x.cost} ${esc(W.coins)}` : ''}</small></div>${miss.includes(x.h) ? `<span class="chip hot">${esc(W.notOwned)}</span>` : ''}</div>`).join('')}</div>${have.c ? `<p class="vd-note">${esc(W.coinsHave(coins()))}</p>` : ''}` : `<p class="vd-note">${esc(XUR ? W.xurGone : u().loadingDefs)}</p>`);
   if (!VEND) return xur + VENDORS.map(([, n], k) => card('vd-' + k, n, u().loadingDefs, '', '')).join('');
   const others = VEND.map((v, k) => {
     if (v.failed) return card('vd-' + k, v.name, W.unavailable, '', '');
@@ -1277,7 +1281,7 @@ const WKX = { on: false };
 function weekExo() {
   const f = featured(), out = new Set();
   for (const [kind, list] of [['raid', defs.raids], ['dg', defs.dungeons]]) for (const a of list) if (f[kind].has(a.k) && a.x) { const e = exoticByName(a.x); if (e && colMissing(e.h)) out.add('x-' + e.h[0]); }
-  if (XUR?.until && Date.parse(XUR.until) > Date.now()) for (const x of xurMissing()) { const e = exoticByName(x.en); if (e) out.add('x-' + e.h[0]); }
+  if (XUR?.until && Date.parse(XUR.until) > Date.now()) for (const x of xurMissing()) { const e = exoOf(x); if (e) out.add('x-' + e.h[0]); }
   return out;
 }
 let itemIndex = null;
