@@ -9,6 +9,21 @@ const LS = {
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} if (LS.hook) LS.hook(k); },
   del(k) { try { localStorage.removeItem(k); } catch {} },
 };
+/* ---------- troca de endereço: destiny-checklist.vercel.app → destinyparallel.vercel.app ----------
+   O endereço antigo repassa o retorno do login e, quando a Bungie passa a recusar a chave nele (erro 2107),
+   envia o que falta sincronizar e leva a pessoa ao novo com login, preferências e marcações (#move=).
+   No endereço novo, #move= só preenche o que ainda não existe aqui. */
+const OLD_HOST = 'destiny-checklist.vercel.app', NEW_ORIGIN = 'https://destinyparallel.vercel.app';
+const LEAVING = location.host === OLD_HOST && /[#&]auth(_error)?=/.test(location.hash);
+if (LEAVING) location.replace(NEW_ORIGIN + location.pathname + location.search + location.hash);
+(() => {
+  if (!location.hash.startsWith('#move=')) return;
+  try {
+    const o = JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(6).replace(/-/g, '+').replace(/_/g, '/')))));
+    for (const [k, v] of Object.entries(o)) if (/^dc-/.test(k) && typeof v === 'string' && localStorage.getItem(k) == null) localStorage.setItem(k, v);
+  } catch {}
+  history.replaceState(null, '', location.pathname + location.search);
+})();
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -187,6 +202,7 @@ async function bungie(path, needAuth = true) {
   const r = await fetch(API + path, { headers });
   const j = await r.json().catch(() => null);
   if (!j) throw new Error(`HTTP ${r.status}`);
+  if (j.ErrorCode === 2107 && location.host === OLD_HOST) { moveToNew(); throw new Error('moving'); }
   if (j.ErrorCode === 5) throw new Error('maintenance');
   if (j.ErrorCode === 99 || j.ErrorCode === 22) { logout(); throw new Error('auth'); }
   if (j.ErrorCode !== 1) throw new Error(j.Message || j.ErrorStatus);
@@ -1357,6 +1373,7 @@ async function bungiePost(path, body) {
   const r = await fetch(API + path, { method: 'POST', headers: { 'X-API-Key': cfg.apiKey, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   const j = await r.json().catch(() => null);
   if (!j) throw new Error(`HTTP ${r.status}`);
+  if (j.ErrorCode === 2107 && location.host === OLD_HOST) { moveToNew(); throw new Error('moving'); }
   if (j.ErrorCode !== 1) throw new Error(j.Message || j.ErrorStatus);
   return j.Response;
 }
@@ -1832,7 +1849,7 @@ async function syncPull() {
       } else if (local != null && (!rv || lt > rv.t)) { if (!lt) SY.t[n] = Date.now(); SY.dirty.add(n); }
     }
     SY.applying = false; try { localStorage.setItem('dc-synct', JSON.stringify(SY.t)); } catch {}
-    if (SY.dirty.size) syncPush();
+    if (SY.dirty.size) await syncPush();
     if (changed) {
       marks = new Set(LS.get('dc-marks-' + member.id, [])); Object.assign(OPTS, LS.get('dc-opts', {}));
       const hd = LS.get('dc-hide2', false); $('hide').checked = hd; document.body.classList.toggle('hide-done', hd);
@@ -1850,11 +1867,22 @@ async function syncPush(keepalive) {
 }
 // ao sair da aba envia o que falta; ao voltar (depois de 1 min) busca o que mudou em outro aparelho
 document.addEventListener('visibilitychange', () => { if (document.hidden) syncPush(true); else if (Date.now() - SY.pulled > 60000) syncPull(); });
+let moving = false;
+async function moveToNew() {
+  if (moving) return; moving = true;
+  showMessage(`<p class="loading wait">${esc(lang === 'pt' ? 'O site mudou de endereço: levando você para destinyparallel.vercel.app…' : 'The site has moved: taking you to destinyparallel.vercel.app…')}</p>`);
+  try { await Promise.race([syncPull(), new Promise(r => setTimeout(r, 6000))]); } catch {}
+  const keep = {};
+  for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (/^dc-(auth|member|lang|theme|tab|subs|opts|hide2|favs|builds|el|marks-\d+|char-\d+)$/.test(k)) keep[k] = localStorage.getItem(k); }
+  const pay = btoa(unescape(encodeURIComponent(JSON.stringify(keep)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  location.replace(NEW_ORIGIN + location.pathname + location.search + '#move=' + pay);
+}
 async function start() {
   try {
     status(u().loading);
     await loadAccount();
   } catch (e) {
+    if (e.message === 'moving') return;
     if (e.message === 'auth') { status(''); render(); return; }
     status('');
     showMessage(`<p class="notice">${esc(e.message === 'maintenance' ? u().maintenance : u().apiError(e.message))}</p>`);
@@ -1863,6 +1891,7 @@ async function start() {
 // instala como app (ícone na tela inicial, abre sem a barra do navegador e funciona sem internet)
 if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
 (async function init() {
+  if (LEAVING) return;
   if (LS.get('dc-hide2', false)) { $('hide').checked = true; document.body.classList.add('hide-done'); }
   applyUI();
   const h = readHash();
@@ -1871,6 +1900,7 @@ if ('serviceWorker' in navigator) addEventListener('load', () => navigator.servi
   } catch { cfg = { configured: false }; showMessage(`<p class="notice">${esc(u().notConfigured)}</p>`); return; }
   if (h?.error) { render(); $('list').insertAdjacentHTML('afterbegin', `<p class="notice">${esc(u().authError(h.error))}</p>`); return; }
   if (h?.auth) { auth = h.auth; LS.set('dc-auth', auth); }
+  if (location.host === OLD_HOST && !auth) bungie('/GlobalAlerts/', false).catch(() => {});
   const pub = new URLSearchParams(location.search).get('jogador') || new URLSearchParams(location.search).get('player');
   if (auth) { render(); if (pub) openPublic(pub); await start(); if ($('finddlg').open) renderFind(); } else { render(); if (pub) openPublic(pub); }
 })();

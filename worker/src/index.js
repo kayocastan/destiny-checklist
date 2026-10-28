@@ -19,14 +19,24 @@ const cors = req => ({
 });
 const json = (req, body, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', ...cors(req) } });
 
+// A chave da Bungie só vale para o endereço configurado no portal (Origin Header). Durante a troca de endereço
+// do site, tenta o endereço de quem pediu e depois os conhecidos; o que funcionar fica lembrado.
+const SITES = ['https://destinyparallel.vercel.app', 'https://destiny-checklist.vercel.app'];
+let goodOrigin = null;
 async function bungie(req, path, token) {
-  const headers = { 'X-API-Key': req.headers.get('X-API-Key') || '' };
-  const origin = req.headers.get('Origin'); if (origin) headers.Origin = origin; // a chave da Bungie é restrita ao domínio do site
-  if (token) headers.Authorization = 'Bearer ' + token;
-  const r = await fetch(BUNGIE + path, { headers });
-  const j = await r.json().catch(() => null);
-  if (!j || j.ErrorCode !== 1) { const e = new Error(j?.Message || 'HTTP ' + r.status); e.code = j?.ErrorCode; throw e; }
-  return j.Response;
+  const mine = req.headers.get('Origin'), tries = [...new Set([goodOrigin, mine, ...SITES].filter(Boolean))];
+  let last;
+  for (const origin of tries) {
+    const headers = { 'X-API-Key': req.headers.get('X-API-Key') || '', Origin: origin };
+    if (token) headers.Authorization = 'Bearer ' + token;
+    const r = await fetch(BUNGIE + path, { headers });
+    const j = await r.json().catch(() => null);
+    if (j?.ErrorCode === 2107) { last = j; continue; } // endereço não bate com a chave: tenta o próximo
+    if (!j || j.ErrorCode !== 1) { const e = new Error(j?.Message || 'HTTP ' + r.status); e.code = j?.ErrorCode; throw e; }
+    goodOrigin = origin;
+    return j.Response;
+  }
+  const e = new Error(last?.Message || 'origin'); e.code = 2107; throw e;
 }
 
 // mesmo formato que o site guarda no navegador
@@ -52,7 +62,7 @@ async function defs(req, env) {
       // conjunto de armadura: já vem com os bônus resolvidos (nome, descrição, ícone e peças necessárias)
       if (t === SET) out[x] = { n: d.displayProperties?.name || '', perks: (await Promise.all((d.setPerks || []).map(p => bungie(req, `/Destiny2/Manifest/DestinySandboxPerkDefinition/${p.sandboxPerkHash}/?lc=${L}`).then(sp => ({ c: p.requiredSetCount, n: sp.displayProperties?.name || '', d: sp.displayProperties?.description || '', ic: sp.displayProperties?.icon || '' })).catch(() => null)))).filter(Boolean).sort((a, b) => a.c - b.c) };
       else out[x] = compact(t, d); fresh.push([key(x), JSON.stringify(out[x])]); }
-    catch (e) { if (e.code === 2101 || e.code === 2102) throw e; } // chave da API recusada: não adianta continuar
+    catch (e) { if (e.code === 2101 || e.code === 2102 || e.code === 2107) throw e; } // chave da API recusada: não adianta continuar
   }));
   if (fresh.length) await env.DB.prepare(`INSERT OR REPLACE INTO defs (k, v, t) VALUES ${fresh.map(() => '(?, ?, ?)').join(',')}`).bind(...fresh.flatMap(([k, v]) => [k, v, now])).run();
   return json(req, { d: out });
