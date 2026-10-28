@@ -162,6 +162,7 @@ body.no-clears .sec-meta .chip.clr{display:none}
 .b-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:-4px}
 .b-cam{display:grid;place-items:center;width:34px;height:34px;padding:0;border-radius:8px;border:0;background:linear-gradient(90deg,var(--acc),var(--acc2));color:#0d121c;cursor:pointer;flex:none;transition:filter .15s}
 .b-cam:hover{filter:brightness(1.12)}
+.b-cam:disabled{opacity:.4;cursor:default;filter:none}
 .gh-more{flex:none;display:grid;place-items:center;width:34px;height:34px;padding:0;border-radius:6px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;cursor:pointer;margin-right:auto}
 .gh-more:hover{background:rgba(255,255,255,.14)}
 .gh-more:focus-visible{outline:2px solid var(--acc2);outline-offset:2px}

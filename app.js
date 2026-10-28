@@ -201,19 +201,20 @@ async function entity(type, hash, lc) {
   const key = type + ':' + hash, store = entCache[lc];
   if (store[key] && (store[key].n || !/LoadoutName/.test(type))) return store[key];
   try {
-    const d = await bungie(`/Destiny2/Manifest/${type}/${hash >>> 0}/?lc=${lc === 'pt' ? 'pt-br' : 'en'}`, false);
+    const url = `/Destiny2/Manifest/${type}/${hash >>> 0}/?lc=${lc === 'pt' ? 'pt-br' : 'en'}`;
+    const d = await bungie(url, false).catch(() => new Promise(r => setTimeout(r, 700)).then(() => bungie(url, false)));
+    if (lc === 'en' && type === 'DestinyInventoryItemDefinition' && !IDEF[hash]) { IDEF[hash] = { a: d.equippingBlock?.ammoType || 0, s: d.equippingBlock?.equipableItemSetHash || 0, c: d.collectibleHash || 0 }; clearTimeout(idefT); idefT = setTimeout(() => { try { LS.set('dc-idef1', IDEF); } catch {} }, 500); }
     const v = { n: d.displayProperties?.name || d.name || '', d: d.displayProperties?.description || '', ql: d.setData?.questLineName || '', il: (d.setData?.itemList || []).map(x => x.itemHash), b: d.inventory?.bucketTypeHash || 0, it: d.itemType || 0, tl: d.itemTypeDisplayName || '', su: d.inventory?.stackUniqueLabel || '', ob: d.objectives?.objectiveHashes || [], lh: d.locationHash || 0, lr: (d.locationReleases || []).map(r => [r.destinationHash || 0, r.activityHash || 0]).slice(-1)[0] || null, ic: d.displayProperties?.icon || '', tt: d.inventory?.tierType || 0, dt: d.talentGrid?.hudDamageType || 0 };
     store[key] = v; entDirty = true;
     return v;
   } catch { return { n: '', d: '', ql: '', il: [], b: 0, it: 0, tl: '', su: '', ob: [], lh: 0, lr: null }; }
 }
+function saveEnt() { if (entDirty) { LS.set('dc-ent4-en', entCache.en); LS.set('dc-ent4-pt', entCache.pt); entDirty = false; } }
+async function pool(list, fn, n) { let i = 0; await Promise.all(Array.from({ length: Math.min(n, list.length) }, async () => { while (i < list.length) await fn(list[i++]); })); }
 async function entities(type, hashes, lc) {
-  const list = [...new Set(hashes)];
   const out = {};
-  let i = 0;
-  const worker = async () => { while (i < list.length) { const h = list[i++]; out[h] = await entity(type, h, lc); } };
-  await Promise.all(Array.from({ length: 6 }, worker));
-  if (entDirty) { LS.set('dc-ent4-en', entCache.en); LS.set('dc-ent4-pt', entCache.pt); entDirty = false; }
+  await pool([...new Set(hashes)], async h => { out[h] = await entity(type, h, lc); }, 6);
+  saveEnt();
   return out;
 }
 
@@ -712,22 +713,32 @@ function secMeta(sec) {
 
 /* Build equipada: abre ao tocar nos ícones do cabeçalho */
 /* Nomes, ícones e munição de tudo que o personagem tem equipado (serve para você e para quem você buscar) */
-async function fetchBuild(p, cid) {
+/* Build de qualquer contexto. Os nomes chegam aos poucos: primeiro os itens (onProg desenha uma prévia),
+   depois os encaixes em paralelo; o nome em português só é buscado para o que aparece na tela. */
+async function fetchBuild(p, cid, onProg) {
   const eq = p.characterEquipment?.data?.[cid]?.items || [], sk = p.itemComponents?.sockets?.data;
   if (!sk || !eq.length) return null;
-  const plugs = []; for (const i of eq) for (const s of sk[i.itemInstanceId]?.sockets || []) if (s.plugHash && s.isVisible !== false) plugs.push(s.plugHash);
-  const all = [...plugs, ...eq.map(i => i.itemHash)];
-  const en = await entities('DestinyInventoryItemDefinition', all, 'en');
-  const loc = lang === 'pt' ? await entities('DestinyInventoryItemDefinition', all, 'pt') : en;
-  const wh = eq.filter(i => [1498876634, 2465295065, 953998645].includes(i.bucketHash)).map(i => i.itemHash).filter(h => AMMO[h] == null);
-  await Promise.all(wh.map(h => idef(h).then(d => { AMMO[h] = d.a; })));
+  const T = 'DestinyInventoryItemDefinition', pt = lang === 'pt';
+  const items = [...new Set(eq.map(i => i.itemHash))], iset = new Set(items);
+  const plugs = []; for (const i of eq) for (const s of sk[i.itemInstanceId]?.sockets || []) if (s.plugHash && s.isVisible !== false && !iset.has(s.plugHash)) plugs.push(s.plugHash);
+  const en = {}, loc = pt ? {} : en, B = { en, loc, sets: [], art: null, partial: true };
+  let tick = null; const bump = () => { if (onProg && !tick) tick = setTimeout(() => { tick = null; if (B.partial) onProg(B); }, 250); };
+  const shows = e => e?.n && !SKIP_NAME.test(e.n) && !SKIP_TYPE.test(e.tl);
+  const one = async h => { const e = en[h] = await entity(T, h, 'en'); if (pt && (iset.has(h) || shows(e))) loc[h] = await entity(T, h, 'pt'); bump(); };
+  await pool(items, one, 12);
+  const wh = eq.filter(i => WEAPON_B.includes(i.bucketHash)).map(i => i.itemHash).filter(h => AMMO[h] == null);
+  const side = Promise.all([armorSets(eq).then(v => { B.sets = v; }), ...wh.map(h => idef(h).then(d => { AMMO[h] = d.a; }))]);
+  if (onProg) onProg(B);
+  await pool([...new Set(plugs)], one, 16);
+  await side; saveEnt();
   // artefato: desde Monumento do Triunfo é um item equipado (7 artefatos para escolher); as vantagens escolhidas são os encaixes dele
   const ai = eq.find(i => i.bucketHash === ARTIFACT_BUCKET);
   const artPerks = ai ? (sk[ai.itemInstanceId]?.sockets || []).map(x => x.plugHash).filter(h => h && en[h]?.n && !SKIP_NAME.test(en[h].n) && !/Empty|Default/i.test(en[h].n)) : [];
-  return { en, loc, sets: await armorSets(eq), art: ai && artPerks.length ? { h: ai.itemHash, perks: artPerks } : null };
+  B.art = ai && artPerks.length ? { h: ai.itemHash, perks: artPerks } : null; B.partial = false;
+  return B;
 }
 async function loadBuild(my) {
-  const b = await fetchBuild(profile, charId); if (my !== gen || !b) return;
+  const b = await fetchBuild(profile, charId, x => { if (my === gen && buildOpen) { BUILD = x; renderBuild(); } }); if (my !== gen || !b) return;
   BUILD = b; if (buildOpen) renderBuild(); if (FD.cmp) renderFind();
 }
 /* Bônus de conjunto da armadura: conta as peças equipadas de cada conjunto e marca os bônus ativos */
@@ -741,12 +752,10 @@ async function armorSets(eq) {
   const lc = lang === 'pt' ? 'pt-br' : 'en', arm = eq.filter(i => [3448274439, 3551918588, 14239492, 20886954, 1585787867].includes(i.bucketHash));
   await Promise.all(arm.filter(i => SETOF[i.itemHash] === undefined).map(i => idef(i.itemHash).then(d => { SETOF[i.itemHash] = d.s; })));
   const count = {}; for (const i of arm) { const h = SETOF[i.itemHash]; if (h) count[h] = (count[h] || 0) + 1; }
-  const out = [];
-  for (const [h, n] of Object.entries(count)) {
-    const key = h + ':' + lc;
-    if (!SETDEF[key]) { const v = await setDef(h, lc); if (!v) continue; SETDEF[key] = v; }
-    out.push({ n: SETDEF[key].n, count: n, perks: SETDEF[key].perks.map(p => ({ ...p, on: n >= p.c })) });
-  }
+  const out = (await Promise.all(Object.entries(count).map(async ([h, n]) => {
+    const key = h + ':' + lc, v = SETDEF[key] || await setDef(h, lc);
+    return v ? { n: v.n, count: n, perks: v.perks.map(p => ({ ...p, on: n >= p.c })) } : null;
+  }))).filter(Boolean);
   return out.sort((a, b) => b.count - a.count);
 }
 const ownCtx = () => ({ p: profile, cid: charId, B: BUILD, name: member?.name || '' });
@@ -771,7 +780,7 @@ function buildHTML(C = ownCtx()) {
   html += `<div class="b-cols">${grp(W.weapons, eq.filter(i => [1498876634, 2465295065, 953998645].includes(i.bucketHash)))}<div>${grp(W.armor, eq.filter(i => [3448274439, 3551918588, 14239492, 20886954, 1585787867].includes(i.bucketHash)))}${sets ? `<div class="b-grp b-sets"><div class="b-k">${esc(W.setT)}</div>${sets}</div>` : ''}</div></div>`;
   if (B.art) html += `<div class="b-grp"><div class="b-k">${esc(W.artT)}${B.art.h && B.loc[B.art.h]?.n ? ' · ' + esc(B.loc[B.art.h].n) : ''}</div><div class="b-row"><div class="b-perks">${B.art.perks.map(h => chip(h)).join('')}</div></div></div>`;
   const cam = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.3l1.4-2h5.6l1.4 2h2.3A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12.8" r="3.4" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>';
-  return `<div class="b-top"><div class="b-k">${sub ? esc(W.subclass) : ''}</div><button class="b-link b-save" type="button" aria-pressed="${!!savedKey(C)}" title="${esc(savedKey(C) ? W.unsaveB : W.saveB)}" aria-label="${esc(savedKey(C) ? W.unsaveB : W.saveB)}">${SAVE_ICON(!!savedKey(C))}</button><button class="b-link" type="button" title="${esc(W.myLink)}" aria-label="${esc(W.myLink)}">${LINK_ICON}</button><button class="b-cam" type="button" title="${esc(W.share)}" aria-label="${esc(W.share)}">${cam}</button></div>` + html;
+  return `<div class="b-top"><div class="b-k">${sub ? esc(W.subclass) : ''}</div><button class="b-link b-save" type="button" aria-pressed="${!!savedKey(C)}" title="${esc(savedKey(C) ? W.unsaveB : W.saveB)}" aria-label="${esc(savedKey(C) ? W.unsaveB : W.saveB)}">${SAVE_ICON(!!savedKey(C))}</button><button class="b-link" type="button" title="${esc(W.myLink)}" aria-label="${esc(W.myLink)}">${LINK_ICON}</button><button class="b-cam" type="button" title="${esc(W.share)}" aria-label="${esc(W.share)}"${B.partial ? ' disabled' : ''}>${cam}</button></div>` + html + (B.partial ? `<p class="b-note wait" role="status">${esc(u().loadingDefs)}</p>` : '');
 }
 /* ---------- imagem da build para compartilhar ----------
    Desenha o conteúdo numa tela transparente, anotando os cartões; no fim compõe:
@@ -1433,7 +1442,7 @@ async function openSaved(i) {
   const x = savedList()[i]; if (!x) return;
   const note = u().w.savedOn(new Date(x.at).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR', { day: '2-digit', month: '2-digit' }));
   openCtx({ name: x.title ? `${x.name} · ${x.title}` : x.name, note, k: x.k }, { p: x.p, cid: x.cid, B: null });
-  const my = FD.seq, B = await fetchBuild(x.p, x.cid); if (my === FD.seq) { FD.B = B; renderFind(); }
+  const my = FD.seq, B = await fetchBuild(x.p, x.cid, b => { if (my === FD.seq) { FD.B = b; renderFind(); } }); if (my === FD.seq) { FD.B = B; renderFind(); }
 }
 async function openLoadout(i) {
   const C = await getLdCtx(i); if (!C) return;
@@ -1499,12 +1508,12 @@ async function showPlayer(sel) {
     const p = await bungie(`/Destiny2/${sel.type}/Profile/${sel.id}/?components=200,205,300,305`, false); if (my !== FD.seq) return;
     FD.p = p; const chars = Object.values(p.characters?.data || {}).sort((a, b) => new Date(b.dateLastPlayed) - new Date(a.dateLastPlayed));
     FD.cid = chars[0]?.characterId || null; FD.status = ''; renderFind();
-    if (FD.cid) { FD.B = await fetchBuild(p, FD.cid); if (my === FD.seq) { renderFind(); touchFav(); } }
+    if (FD.cid) { const B = await fetchBuild(p, FD.cid, b => { if (my === FD.seq) { FD.B = b; renderFind(); } }); if (my === FD.seq) { FD.B = B; renderFind(); touchFav(); } }
   } catch { if (my !== FD.seq) return; FD.status = ''; FD.p = {}; renderFind(); }
 }
 async function pickFdChar(cid) {
   const my = ++FD.seq; FD.cmp = false; FD.cid = cid; FD.B = null; renderFind();
-  const b = await fetchBuild(FD.p, cid); if (my === FD.seq) { FD.B = b; renderFind(); }
+  const b = await fetchBuild(FD.p, cid, x => { if (my === FD.seq) { FD.B = x; renderFind(); } }); if (my === FD.seq) { FD.B = b; renderFind(); }
 }
 $('finddlg').addEventListener('input', e => {
   const sv = e.target.closest('.fd-sv');
