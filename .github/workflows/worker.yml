@@ -1,0 +1,56 @@
+name: Servidor (Cloudflare)
+on:
+  push:
+    branches: [main]
+    paths: ['worker/**', '.github/workflows/worker.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: worker
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    defaults:
+      run:
+        working-directory: worker
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - name: Banco D1 (cria se ainda não existir)
+        run: |
+          id=$(npx wrangler d1 list --json | node -e 'const l=JSON.parse(require("fs").readFileSync(0));const d=l.find(x=>x.name==="dni");process.stdout.write(d?d.uuid:"")')
+          if [ -z "$id" ]; then npx wrangler d1 create dni; id=$(npx wrangler d1 list --json | node -e 'const l=JSON.parse(require("fs").readFileSync(0));process.stdout.write(l.find(x=>x.name==="dni").uuid)'); fi
+          echo "id do banco: $id"
+          sed -i "s/__DB_ID__/$id/" wrangler.toml
+      - name: Tabelas
+        run: npx wrangler d1 migrations apply dni --remote
+      - name: Subdomínio workers.dev (cria se a conta ainda não tiver)
+        run: |
+          api="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/subdomain"
+          sub=$(curl -s -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$api" | node -e 'const j=JSON.parse(require("fs").readFileSync(0));process.stdout.write(j.result&&j.result.subdomain||"")')
+          if [ -z "$sub" ]; then
+            for name in dni-site dni-destiny dni-$(date +%s); do
+              r=$(curl -s -X PUT -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "Content-Type: application/json" --data "{\"subdomain\":\"$name\"}" "$api")
+              sub=$(echo "$r" | node -e 'const j=JSON.parse(require("fs").readFileSync(0));process.stdout.write(j.success&&j.result.subdomain||"")')
+              [ -n "$sub" ] && break
+            done
+          fi
+          echo "subdomínio: $sub"
+          echo "SUB=$sub" >> $GITHUB_ENV
+      - name: Publica
+        run: npx wrangler deploy
+      - name: Grava o endereço do servidor no site
+        working-directory: .
+        run: |
+          url="https://dni-api.$SUB.workers.dev"
+          echo "{\"api\":\"$url\"}" > data/api.json
+          if ! git diff --quiet -- data/api.json 2>/dev/null || [ -z "$(git ls-files data/api.json)" ]; then
+            git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+            git add data/api.json && git commit -m "Endereço do servidor: $url" && git push
+          fi
