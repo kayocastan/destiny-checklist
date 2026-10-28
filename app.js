@@ -214,7 +214,7 @@ function saveEnt() { if (entDirty) { LS.set('dc-ent4-en', entCache.en); LS.set('
 async function pool(list, fn, n) { let i = 0; await Promise.all(Array.from({ length: Math.min(n, list.length) }, async () => { while (i < list.length) await fn(list[i++]); })); }
 /* Nomes em lote pelo servidor: um pedido para até 25 itens, guardados lá para todos os visitantes.
    O que o servidor não responder (fora do ar, limite do dia) é buscado direto na Bungie, como antes. */
-const SRV_TYPES = new Set(['DestinyInventoryItemDefinition', 'DestinyObjectiveDefinition', 'DestinyLocationDefinition', 'DestinyActivityDefinition', 'DestinyMilestoneDefinition', 'DestinyLoadoutNameDefinition', 'DestinyRecordDefinition', 'DestinyCollectibleDefinition', 'DestinyPresentationNodeDefinition']);
+const SRV_TYPES = new Set(['DestinyInventoryItemDefinition', 'DestinyObjectiveDefinition', 'DestinyLocationDefinition', 'DestinyActivityDefinition', 'DestinyMilestoneDefinition', 'DestinyLoadoutNameDefinition', 'DestinyRecordDefinition', 'DestinyCollectibleDefinition', 'DestinyPresentationNodeDefinition', 'DestinyDestinationDefinition']);
 let srvDown = 0;
 const entOk = (type, v, needPc) => v && (v.n || !/LoadoutName/.test(type)) && (!needPc || v.pc !== undefined);
 async function entities(type, hashes, lc, needPc, onChunk) {
@@ -335,7 +335,7 @@ async function prepareLocations(defsEn) {
   const locs = await entities('DestinyLocationDefinition', locHashes, 'en');
   const dests = [], acts = [];
   for (const l of Object.values(locs)) if (l.lr) { if (l.lr[0]) dests.push(l.lr[0]); if (l.lr[1]) acts.push(l.lr[1]); }
-  const dN = await entities('DestinyDestinationDefinition', dests, lang), aN = await entities('DestinyActivityDefinition', acts, lang);
+  const [dN, aN] = await Promise.all([entities('DestinyDestinationDefinition', dests, lang), entities('DestinyActivityDefinition', acts, lang)]);
   questLoc = {};
   const quests = Object.entries(questInfo.en);
   for (const [h, d] of quests) {
@@ -766,9 +766,14 @@ async function loadBuild(my) {
 }
 /* Bônus de conjunto da armadura: conta as peças equipadas de cada conjunto e marca os bônus ativos */
 const SETOF = {}, SETDEF = LS.get('dc-sets1', {}), SETDEF_P = new Map();
+// pelo servidor, que já devolve o conjunto com os bônus resolvidos (um pedido em vez de 3 a 5)
+async function setSrv(h, lc) {
+  if (!APIW || Date.now() < srvDown) return null;
+  try { const r = await fetch(APIW + '/defs', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-API-Key': cfg.apiKey }, body: JSON.stringify({ t: 'DestinyEquipableItemSetDefinition', lc: lc === 'en' ? 'en' : 'pt', h: [h] }) }); if (!r.ok) return null; const v = (await r.json()).d?.[h]; return v && v.n ? v : null; } catch { return null; }
+}
 function setDef(h, lc) {
   const key = h + ':' + lc;
-  if (!SETDEF_P.has(key)) SETDEF_P.set(key, (async () => { try { const d = await bungie(`/Destiny2/Manifest/DestinyEquipableItemSetDefinition/${h}/?lc=${lc}`, false); const perks = await Promise.all((d.setPerks || []).map(p => bungie(`/Destiny2/Manifest/DestinySandboxPerkDefinition/${p.sandboxPerkHash}/?lc=${lc}`, false).then(sp => ({ c: p.requiredSetCount, n: sp.displayProperties?.name || '', d: sp.displayProperties?.description || '', ic: sp.displayProperties?.icon || '' })).catch(() => null))); const v = { n: d.displayProperties?.name || '', perks: perks.filter(Boolean).sort((a, b) => a.c - b.c) }; SETDEF[key] = v; try { LS.set('dc-sets1', SETDEF); } catch {} return v; } catch { SETDEF_P.delete(key); return null; } })());
+  if (!SETDEF_P.has(key)) SETDEF_P.set(key, (async () => { try { const sv = await setSrv(h, lc); if (sv) { SETDEF[key] = sv; try { LS.set('dc-sets1', SETDEF); } catch {} return sv; } const d = await bungie(`/Destiny2/Manifest/DestinyEquipableItemSetDefinition/${h}/?lc=${lc}`, false); const perks = await Promise.all((d.setPerks || []).map(p => bungie(`/Destiny2/Manifest/DestinySandboxPerkDefinition/${p.sandboxPerkHash}/?lc=${lc}`, false).then(sp => ({ c: p.requiredSetCount, n: sp.displayProperties?.name || '', d: sp.displayProperties?.description || '', ic: sp.displayProperties?.icon || '' })).catch(() => null))); const v = { n: d.displayProperties?.name || '', perks: perks.filter(Boolean).sort((a, b) => a.c - b.c) }; SETDEF[key] = v; try { LS.set('dc-sets1', SETDEF); } catch {} return v; } catch { SETDEF_P.delete(key); return null; } })());
   return SETDEF_P.get(key);
 }
 async function armorSets(eq) {

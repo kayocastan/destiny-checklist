@@ -3,7 +3,8 @@
    /sync  – favoritos, builds salvas, marcações e preferências de cada pessoa, ligados à conta Bungie.
    A chave da API da Bungie é pública (o site já a entrega ao navegador); o navegador a envia em X-API-Key. */
 const BUNGIE = 'https://www.bungie.net/Platform';
-const TYPES = new Set(['DestinyInventoryItemDefinition', 'DestinyObjectiveDefinition', 'DestinyLocationDefinition', 'DestinyActivityDefinition', 'DestinyMilestoneDefinition', 'DestinyLoadoutNameDefinition', 'DestinyRecordDefinition', 'DestinyCollectibleDefinition', 'DestinyPresentationNodeDefinition']);
+const TYPES = new Set(['DestinyInventoryItemDefinition', 'DestinyObjectiveDefinition', 'DestinyLocationDefinition', 'DestinyActivityDefinition', 'DestinyMilestoneDefinition', 'DestinyLoadoutNameDefinition', 'DestinyRecordDefinition', 'DestinyCollectibleDefinition', 'DestinyPresentationNodeDefinition', 'DestinyDestinationDefinition', 'DestinyEquipableItemSetDefinition']);
+const SET = 'DestinyEquipableItemSetDefinition';
 const SYNC_KEYS = /^(favs|builds|opts|hide2|marks-\d{1,25})$/;
 const MAX_BATCH = 25;              // até 25 busca na Bungie por pedido (o plano grátis permite 50 subpedidos)
 const DEF_TTL = 30 * 864e5;        // nomes guardados são renovados depois de 30 dias
@@ -38,7 +39,7 @@ function compact(type, d) {
 async function defs(req, env) {
   const { t, lc, h } = await req.json().catch(() => ({}));
   if (!TYPES.has(t) || !['en', 'pt'].includes(lc) || !Array.isArray(h)) return json(req, { error: 'bad request' }, 400);
-  const hashes = [...new Set(h.map(x => Number(x) >>> 0).filter(Boolean))].slice(0, MAX_BATCH);
+  const hashes = [...new Set(h.map(x => Number(x) >>> 0).filter(Boolean))].slice(0, t === SET ? 8 : MAX_BATCH); // conjunto = 1 + bônus (até ~5 buscas)
   const key = x => `${t}:${lc}:${x}`, out = {}, now = Date.now();
   if (hashes.length) {
     const rows = await env.DB.prepare(`SELECT k, v, t FROM defs WHERE k IN (${hashes.map(() => '?').join(',')})`).bind(...hashes.map(key)).all();
@@ -46,7 +47,11 @@ async function defs(req, env) {
   }
   const miss = hashes.filter(x => !out[x]), fresh = [];
   await Promise.all(miss.map(async x => {
-    try { const d = await bungie(req, `/Destiny2/Manifest/${t}/${x}/?lc=${lc === 'pt' ? 'pt-br' : 'en'}`); out[x] = compact(t, d); fresh.push([key(x), JSON.stringify(out[x])]); }
+    try {
+      const L = lc === 'pt' ? 'pt-br' : 'en', d = await bungie(req, `/Destiny2/Manifest/${t}/${x}/?lc=${L}`);
+      // conjunto de armadura: já vem com os bônus resolvidos (nome, descrição, ícone e peças necessárias)
+      if (t === SET) out[x] = { n: d.displayProperties?.name || '', perks: (await Promise.all((d.setPerks || []).map(p => bungie(req, `/Destiny2/Manifest/DestinySandboxPerkDefinition/${p.sandboxPerkHash}/?lc=${L}`).then(sp => ({ c: p.requiredSetCount, n: sp.displayProperties?.name || '', d: sp.displayProperties?.description || '', ic: sp.displayProperties?.icon || '' })).catch(() => null)))).filter(Boolean).sort((a, b) => a.c - b.c) };
+      else out[x] = compact(t, d); fresh.push([key(x), JSON.stringify(out[x])]); }
     catch (e) { if (e.code === 2101 || e.code === 2102) throw e; } // chave da API recusada: não adianta continuar
   }));
   if (fresh.length) await env.DB.prepare(`INSERT OR REPLACE INTO defs (k, v, t) VALUES ${fresh.map(() => '(?, ?, ?)').join(',')}`).bind(...fresh.flatMap(([k, v]) => [k, v, now])).run();
