@@ -197,14 +197,14 @@ LS.del('dc-ent3-en'); LS.del('dc-ent3-pt');
 const entCache = { en: LS.get('dc-ent4-en', {}), pt: LS.get('dc-ent4-pt', {}) };
 for (const k of ['dc-ent-en', 'dc-ent-pt', 'dc-ent2-en', 'dc-ent2-pt']) LS.del(k);
 let entDirty = false;
-async function entity(type, hash, lc) {
+async function entity(type, hash, lc, needPc) {
   const key = type + ':' + hash, store = entCache[lc];
-  if (store[key] && (store[key].n || !/LoadoutName/.test(type))) return store[key];
+  if (store[key] && (store[key].n || !/LoadoutName/.test(type)) && (!needPc || store[key].pc !== undefined)) return store[key];
   try {
     const url = `/Destiny2/Manifest/${type}/${hash >>> 0}/?lc=${lc === 'pt' ? 'pt-br' : 'en'}`;
     const d = await bungie(url, false).catch(() => new Promise(r => setTimeout(r, 700)).then(() => bungie(url, false)));
-    if (lc === 'en' && type === 'DestinyInventoryItemDefinition' && !IDEF[hash]) { IDEF[hash] = { a: d.equippingBlock?.ammoType || 0, s: d.equippingBlock?.equipableItemSetHash || 0, c: d.collectibleHash || 0 }; clearTimeout(idefT); idefT = setTimeout(() => { try { LS.set('dc-idef1', IDEF); } catch {} }, 500); }
-    const v = { n: d.displayProperties?.name || d.name || '', d: d.displayProperties?.description || '', ql: d.setData?.questLineName || '', il: (d.setData?.itemList || []).map(x => x.itemHash), b: d.inventory?.bucketTypeHash || 0, it: d.itemType || 0, tl: d.itemTypeDisplayName || '', su: d.inventory?.stackUniqueLabel || '', ob: d.objectives?.objectiveHashes || [], lh: d.locationHash || 0, lr: (d.locationReleases || []).map(r => [r.destinationHash || 0, r.activityHash || 0]).slice(-1)[0] || null, ic: d.displayProperties?.icon || '', tt: d.inventory?.tierType || 0, dt: d.talentGrid?.hudDamageType || 0 };
+    if (type === 'DestinyInventoryItemDefinition' && !IDEF[hash]) { IDEF[hash] = { a: d.equippingBlock?.ammoType || 0, s: d.equippingBlock?.equipableItemSetHash || 0, c: d.collectibleHash || 0 }; clearTimeout(idefT); idefT = setTimeout(() => { try { LS.set('dc-idef1', IDEF); } catch {} }, 500); }
+    const v = { n: d.displayProperties?.name || d.name || '', d: d.displayProperties?.description || '', ql: d.setData?.questLineName || '', il: (d.setData?.itemList || []).map(x => x.itemHash), b: d.inventory?.bucketTypeHash || 0, it: d.itemType || 0, tl: d.itemTypeDisplayName || '', su: d.inventory?.stackUniqueLabel || '', ob: d.objectives?.objectiveHashes || [], lh: d.locationHash || 0, lr: (d.locationReleases || []).map(r => [r.destinationHash || 0, r.activityHash || 0]).slice(-1)[0] || null, ic: d.displayProperties?.icon || '', tt: d.inventory?.tierType || 0, dt: d.talentGrid?.hudDamageType || 0, ...(type === 'DestinyInventoryItemDefinition' ? { pc: d.plug?.plugCategoryIdentifier || '', st: d.itemSubType || 0, tr: (d.traitIds || []).includes('item.plug.aspect') ? 'a' : (d.traitIds || []).includes('item.plug.fragment') ? 'f' : '' } : {}) };
     store[key] = v; entDirty = true;
     return v;
   } catch { return { n: '', d: '', ql: '', il: [], b: 0, it: 0, tl: '', su: '', ob: [], lh: 0, lr: null }; }
@@ -355,8 +355,8 @@ async function hydrate(doneMsg) {
   status(u().loadingDefs);
   const quests = [];
   for (const inv of Object.values(p.characterInventories?.data || {})) for (const it of inv.items || []) if (it.bucketHash === QUEST_BUCKET) quests.push(it.itemHash);
-  const qEn = await entities('DestinyInventoryItemDefinition', quests, 'en'); if (my !== gen) return;
-  const qLang = lang === 'pt' ? await entities('DestinyInventoryItemDefinition', quests, 'pt') : qEn; if (my !== gen) return;
+  const [qEn, qPt] = await Promise.all([entities('DestinyInventoryItemDefinition', quests, 'en'), lang === 'pt' ? entities('DestinyInventoryItemDefinition', quests, 'pt') : null]); if (my !== gen) return;
+  const qLang = qPt || qEn;
   questInfo = { en: qEn, pt: qLang };
   stage = 1;
   if (have.c) await loadLoadouts(my, true); if (my !== gen) return;
@@ -370,8 +370,7 @@ async function hydrate(doneMsg) {
 async function loadLoadouts(my, quiet) {
   const p = profile, inst = instanceMap(), ldItems = [], ldNames = [];
   for (const l of p.characterLoadouts?.data?.[charId]?.loadouts || []) { if (l.nameHash !== 2166136261) ldNames.push(l.nameHash); for (const i of l.items || []) if (inst[i.itemInstanceId]) ldItems.push(inst[i.itemInstanceId]); }
-  const ln = await entities('DestinyLoadoutNameDefinition', ldNames, lang); if (my !== gen) return;
-  const it = await entities('DestinyInventoryItemDefinition', ldItems, lang); if (my !== gen) return;
+  const [ln, it] = await Promise.all([entities('DestinyLoadoutNameDefinition', ldNames, lang), entities('DestinyInventoryItemDefinition', ldItems, lang)]); if (my !== gen) return;
   loadoutNames = ln; itemNames = it;
   if (!quiet) { build(); render(); }
 }
@@ -633,8 +632,8 @@ async function loadXur(my) {
     const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/Character/${charId}/Vendors/${XUR_VENDOR}/?components=400,402`);
     const sales = Object.values(r.sales?.data || {});
     const hs = sales.map(s => s.itemHash);
-    const en = await entities('DestinyInventoryItemDefinition', hs, 'en'); if (my !== gen) return;
-    const loc = lang === 'pt' ? await entities('DestinyInventoryItemDefinition', hs, 'pt') : en; if (my !== gen) return;
+    const [en, lp] = await Promise.all([entities('DestinyInventoryItemDefinition', hs, 'en'), lang === 'pt' ? entities('DestinyInventoryItemDefinition', hs, 'pt') : null]); if (my !== gen) return;
+    const loc = lp || en;
     // o Xûr vai embora no reset de terça; a data de "renovação" da API (sexta) não é a saída dele
     XUR = { k: charId + lang, at: Date.now(), until: new Date(xurLeaves()).toISOString(), items: sales.filter(s => en[s.itemHash]?.tt === 6).map(s => ({ ic: loc[s.itemHash]?.ic || en[s.itemHash].ic, tl: loc[s.itemHash]?.tl || '', en: en[s.itemHash].n, n: loc[s.itemHash]?.n || en[s.itemHash].n, cost: (s.costs || []).find(c => c.itemHash === STRANGE_COIN)?.quantity || 0 })) };
   } catch { XUR = null; }
@@ -650,9 +649,8 @@ function xurMissing() {
 async function loadMilestones(my) {
   const ms = profile.characterProgressions?.data?.[charId]?.milestones; if (!ms) { weekReady.m = true; build(); render(); return; }
   const hs = Object.keys(ms).map(Number), acts = Object.values(ms).flatMap(m => (m.activities || []).filter(a => (a.challenges || []).length).map(a => a.activityHash));
-  const d = await entities('DestinyMilestoneDefinition', hs, 'en'); if (my !== gen) return;
-  const dl = lang === 'pt' ? await entities('DestinyMilestoneDefinition', hs, 'pt') : d; if (my !== gen) return;
-  ACTN = await entities('DestinyActivityDefinition', acts, lang); if (my !== gen) return;
+  const [d, dp, an] = await Promise.all([entities('DestinyMilestoneDefinition', hs, 'en'), lang === 'pt' ? entities('DestinyMilestoneDefinition', hs, 'pt') : null, entities('DestinyActivityDefinition', acts, lang)]); if (my !== gen) return;
+  const dl = dp || d; ACTN = an;
   MSN = d; MSL = dl; weekReady.m = true; build(); render();
 }
 function featured() {
@@ -718,13 +716,13 @@ function secMeta(sec) {
 async function fetchBuild(p, cid, onProg) {
   const eq = p.characterEquipment?.data?.[cid]?.items || [], sk = p.itemComponents?.sockets?.data;
   if (!sk || !eq.length) return null;
-  const T = 'DestinyInventoryItemDefinition', pt = lang === 'pt';
+  const T = 'DestinyInventoryItemDefinition', L = lang === 'pt' ? 'pt' : 'en';
   const items = [...new Set(eq.map(i => i.itemHash))], iset = new Set(items);
   const plugs = []; for (const i of eq) for (const s of sk[i.itemInstanceId]?.sockets || []) if (s.plugHash && s.isVisible !== false && !iset.has(s.plugHash)) plugs.push(s.plugHash);
-  const en = {}, loc = pt ? {} : en, B = { en, loc, sets: [], art: null, partial: true };
+  // um idioma só (o do site): a classificação dos encaixes não depende do nome em inglês
+  const en = {}, B = { en, loc: en, sets: [], art: null, partial: true };
   let tick = null; const bump = () => { if (onProg && !tick) tick = setTimeout(() => { tick = null; if (B.partial) onProg(B); }, 250); };
-  const shows = e => e?.n && !SKIP_NAME.test(e.n) && !SKIP_TYPE.test(e.tl);
-  const one = async h => { const e = en[h] = await entity(T, h, 'en'); if (pt && (iset.has(h) || shows(e))) loc[h] = await entity(T, h, 'pt'); bump(); };
+  const one = async h => { en[h] = await entity(T, h, L, true); bump(); };
   await pool(items, one, 12);
   const wh = eq.filter(i => WEAPON_B.includes(i.bucketHash)).map(i => i.itemHash).filter(h => AMMO[h] == null);
   const side = Promise.all([armorSets(eq).then(v => { B.sets = v; }), ...wh.map(h => idef(h).then(d => { AMMO[h] = d.a; }))]);
@@ -733,7 +731,7 @@ async function fetchBuild(p, cid, onProg) {
   await side; saveEnt();
   // artefato: desde Monumento do Triunfo é um item equipado (7 artefatos para escolher); as vantagens escolhidas são os encaixes dele
   const ai = eq.find(i => i.bucketHash === ARTIFACT_BUCKET);
-  const artPerks = ai ? (sk[ai.itemInstanceId]?.sockets || []).map(x => x.plugHash).filter(h => h && en[h]?.n && !SKIP_NAME.test(en[h].n) && !/Empty|Default/i.test(en[h].n)) : [];
+  const artPerks = ai ? (sk[ai.itemInstanceId]?.sockets || []).map(x => x.plugHash).filter(h => h && pShow(en[h])) : [];
   B.art = ai && artPerks.length ? { h: ai.itemHash, perks: artPerks } : null; B.partial = false;
   return B;
 }
@@ -761,21 +759,30 @@ async function armorSets(eq) {
 const ownCtx = () => ({ p: profile, cid: charId, B: BUILD, name: member?.name || '' });
 const SKIP_NAME = /^(Empty|Default|Upgrade Armor|Locked|No |Restore Defaults|Kill Tracker|Tracker Disabled|Change Energy|Deepsight)/i;
 const SKIP_TYPE = /Shader|Ornament|Memento|Tracker|Flair|Emote|Transmat|Projection/i;
+/* Classificação dos encaixes sem depender do idioma: categoria do encaixe (plugCategoryIdentifier), subtipo e traços.
+   Os nomes de encaixes vazios/padrão ficam nas duas línguas porque alguns só se distinguem pelo nome. */
+const PSKIP = /skins|shader|emote|hologram|spawnfx|trackers|kill_vfx|mod_empty|empty_socket|transfusers|tiering\.plugs\.mods\.enhancers|^v460\.plugs\.armor\.masterworks|ornament/;
+const SKIP_PT = /^(Soquete de mod vazio|Aprimorar (Armadura|Fantasma)$|Efeito Padrão|Sem Projeção|Tonalizador padrão|Ornamento padrão|Rastreador)|\bvazi[oa]$/i;
+const pShow = e => !!e?.n && !(e.pc && PSKIP.test(e.pc)) && e.st !== 20 && e.st !== 21 && !SKIP_NAME.test(e.n) && !SKIP_PT.test(e.n) && (e.pc !== undefined || !SKIP_TYPE.test(e.tl));
+const pKind = e => !e ? '' : /\.supers$/.test(e.pc) ? 'sup' : e.tr === 'a' || /\.(aspects|totems)$/.test(e.pc) ? 'asp' : e.tr === 'f' || /(fragments|trinkets)$/.test(e.pc) ? 'fr' : '';
+const pMw = e => /masterworks|intrinsics/.test(e?.pc || '');
+const pIntr = e => /intrinsics/.test(e?.pc || '');
+const pArmorMod = e => /^enhancements\.(?!ghosts)|armor_tiering/.test(e?.pc || '');
 function buildHTML(C = ownCtx()) {
   const W = u().w, B = C.B; if (!B) return `<p class="b-note wait" role="status">${esc(u().loadingDefs)}</p>`;
   const inst = C.p.itemComponents?.instances?.data || {}, sk = C.p.itemComponents?.sockets?.data || {};
   const eq = (C.p.characterEquipment?.data?.[C.cid]?.items || []).filter(i => GEAR_BUCKETS.includes(i.bucketHash)).sort((a, b) => GEAR_BUCKETS.indexOf(a.bucketHash) - GEAR_BUCKETS.indexOf(b.bucketHash));
   const chip = (h, cls) => { const d = B.loc[h] || B.en[h] || {}; return `<span class="${cls || ''}">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy">` : ''}${esc(d.n)}</span>`; };
-  const plugsOf = i => { const own = B.en[i.itemHash]?.tl || ''; return (sk[i.itemInstanceId]?.sockets || []).filter(s => s.plugHash && s.isVisible !== false).map(s => s.plugHash).filter(h => { const e = B.en[h]; return e && e.n && !SKIP_NAME.test(e.n) && !SKIP_TYPE.test(e.tl) && e.tl !== own; }); };
+  const plugsOf = i => { const own = B.en[i.itemHash]?.tl || ''; return (sk[i.itemInstanceId]?.sockets || []).filter(s => s.plugHash && s.isVisible !== false).map(s => s.plugHash).filter(h => { const e = B.en[h]; return pShow(e) && e.tl !== own; }); };
   const row = (i, body) => { const d = B.loc[i.itemHash] || {}, pw = i.bucketHash === SUB_BUCKET ? 0 : inst[i.itemInstanceId]?.primaryStat?.value; return `<div class="b-row${d.tt === 6 ? ' exo' : ''}"><div class="b-name">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy">` : ''}<span>${esc(d.n)}</span>${AMMO[i.itemHash] ? `<span class="ammo" title="${esc(u().w.ammo[AMMO[i.itemHash]])}" aria-label="${esc(u().w.ammo[AMMO[i.itemHash]])}">${ammoSVG(AMMO[i.itemHash])}</span>` : ''}<small>${esc(d.tl || '')}${pw && pw > 0 ? ` · <b>${pw}</b>` : ''}</small></div>${body}</div>`; };
   const sub = eq.find(i => i.bucketHash === SUB_BUCKET);
   let html = '';
   if (sub) {
-    const ps = plugsOf(sub), t = h => B.en[h]?.tl || '';
-    const sup = ps.filter(h => /Super/.test(t(h))), asp = ps.filter(h => /Aspect/.test(t(h))), fr = ps.filter(h => /Fragment/.test(t(h))), ab = ps.filter(h => !sup.includes(h) && !asp.includes(h) && !fr.includes(h));
+    const ps = plugsOf(sub), t = h => pKind(B.en[h]);
+    const sup = ps.filter(h => t(h) === 'sup'), asp = ps.filter(h => t(h) === 'asp'), fr = ps.filter(h => t(h) === 'fr'), ab = ps.filter(h => !t(h));
     html += `<div class="b-grp">${row(sub, `<div class="b-perks">${sup.map(h => chip(h, 'mw')).join('')}${ab.map(h => chip(h)).join('')}</div>${asp.length ? `<div class="b-perks"><span class="k">${esc(W.aspects)}</span>${asp.map(h => chip(h)).join('')}</div>` : ''}${fr.length ? `<div class="b-perks"><span class="k">${esc(W.frags)}</span>${fr.map(h => chip(h)).join('')}</div>` : ''}`)}</div>`;
   }
-  const grp = (k, list) => list.length ? `<div class="b-grp"><div class="b-k">${esc(k)}</div>${list.map(i => row(i, `<div class="b-perks">${plugsOf(i).map(h => { const e = B.en[h]; return chip(h, /^Masterworked|^Tier \d/i.test(e.n) || /Intrinsic/i.test(e.tl) ? 'mw' : ''); }).join('')}</div>`)).join('')}</div>` : '';
+  const grp = (k, list) => list.length ? `<div class="b-grp"><div class="b-k">${esc(k)}</div>${list.map(i => row(i, `<div class="b-perks">${plugsOf(i).map(h => { const e = B.en[h]; return chip(h, pMw(e) ? 'mw' : ''); }).join('')}</div>`)).join('')}</div>` : '';
   const sets = (B.sets || []).map(st => `<div class="b-set"><div class="b-set-h"><b>${esc(st.n)}</b><small>${esc(W.setPieces(st.count))}</small></div>${st.perks.map(pk => `<div class="b-set-p${pk.on ? ' on' : ''}"><span class="b-set-c">${esc(W.setReq(pk.c))}</span><span><b>${esc(pk.n)}</b>${pk.d ? `<small>${esc(pk.d)}</small>` : ''}</span></div>`).join('')}</div>`).join('');
   html += `<div class="b-cols">${grp(W.weapons, eq.filter(i => [1498876634, 2465295065, 953998645].includes(i.bucketHash)))}<div>${grp(W.armor, eq.filter(i => [3448274439, 3551918588, 14239492, 20886954, 1585787867].includes(i.bucketHash)))}${sets ? `<div class="b-grp b-sets"><div class="b-k">${esc(W.setT)}</div>${sets}</div>` : ''}</div></div>`;
   if (B.art) html += `<div class="b-grp"><div class="b-k">${esc(W.artT)}${B.art.h && B.loc[B.art.h]?.n ? ' · ' + esc(B.loc[B.art.h].n) : ''}</div><div class="b-row"><div class="b-perks">${B.art.perks.map(h => chip(h)).join('')}</div></div></div>`;
@@ -803,7 +810,7 @@ async function buildShareCanvas(C, S = 1, MAXH = 4400) {
   const inst = C.p.itemComponents?.instances?.data || {}, sk = C.p.itemComponents?.sockets?.data || {};
   const def = h => B.loc[h] || B.en[h] || {};
   const subI = eq.find(i => i.bucketHash === SUB_BUCKET), [acc, acc2] = ELEMENT_ACC[ELEMENTS[B.en[subI?.itemHash]?.dt]] || ELEMENT_ACC.arc;
-  const plugsOf = i => { const own = B.en[i.itemHash]?.tl || ''; return (sk[i.itemInstanceId]?.sockets || []).filter(s => s.plugHash && s.isVisible !== false).map(s => s.plugHash).filter(h => { const e = B.en[h]; return e && e.n && !SKIP_NAME.test(e.n) && !SKIP_TYPE.test(e.tl) && e.tl !== own; }); };
+  const plugsOf = i => { const own = B.en[i.itemHash]?.tl || ''; return (sk[i.itemInstanceId]?.sockets || []).filter(s => s.plugHash && s.isVisible !== false).map(s => s.plugHash).filter(h => { const e = B.en[h]; return pShow(e) && e.tl !== own; }); };
   const emDef = EMBLEMS[ch.emblemHash] || (EMBLEMS[ch.emblemHash] = await bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${ch.emblemHash}/`, false).catch(() => ({})));
   const emWide = emDef.secondarySpecial, emIcon = emDef.displayProperties?.icon;
   const paths = new Set([ch.emblemBackgroundPath, emWide, emIcon]);
@@ -859,8 +866,8 @@ async function buildShareCanvas(C, S = 1, MAXH = 4400) {
 
   // subclasse
   if (sub) {
-    const ps = plugsOf(sub), t = h => B.en[h]?.tl || '';
-    const sup = ps.filter(h => /Super/.test(t(h))), asp = ps.filter(h => /Aspect/.test(t(h))), fr = ps.filter(h => /Fragment/.test(t(h))), ab = ps.filter(h => !sup.includes(h) && !asp.includes(h) && !fr.includes(h));
+    const ps = plugsOf(sub), t = h => pKind(B.en[h]);
+    const sup = ps.filter(h => t(h) === 'sup'), asp = ps.filter(h => t(h) === 'asp'), fr = ps.filter(h => t(h) === 'fr'), ab = ps.filter(h => !t(h));
     y = label(W.subclass, y) + 16; const top = y; y += 28;
     await icon(sd.ic, IN, y, 104, 52);
     text(sd.n, IN + 128, y + 50, F.d(58), '#ffffff', 'left', CW - 190);
@@ -889,7 +896,7 @@ async function buildShareCanvas(C, S = 1, MAXH = 4400) {
       const nw = text(d.n, IN + 112, top + 64, F.d(46), exo ? GOLD : '#ffffff', 'left', CW - 260); const am = AMMO[i.itemHash];
       if (AMMO_COLOR[am]) { x.save(); x.fillStyle = AMMO_COLOR[am]; for (let k = 0; k < am; k++) { x.save(); x.translate(IN + 112 + nw + 16 + k * 15, top + 30); x.scale(2, 2); x.translate(-5, 0); x.fill(new Path2D(AMMO_PATH)); x.restore(); } x.restore(); }
       text(`${d.tl || ''}${pw > 0 ? '  ·  ✦' + pw : ''}`, IN + 112, top + 100, F.m(22), '#b9c3d3', 'left', CW - 200);
-      const end = await chips(plugsOf(i), IN + 112, top + 122, CW - 56 - 112, h => /^Masterworked|^Tier \d/i.test(B.en[h]?.n || '') || /Intrinsic/i.test(B.en[h]?.tl || ''));
+      const end = await chips(plugsOf(i), IN + 112, top + 122, CW - 56 - 112, h => pMw(B.en[h]));
       y = Math.max(end, top + 120) + 26; cards.push({ y: top, h: y - top, exo }); y += 14;
     }
     y += 40;
@@ -902,7 +909,7 @@ async function buildShareCanvas(C, S = 1, MAXH = 4400) {
       const d = def(i.itemHash), exo = d.tt === 6, top = y, ps = plugsOf(i);
       await icon(d.ic, IN - 4, top + 20, 76, 8, exo ? 'rgba(243,215,122,.9)' : 'rgba(255,255,255,.28)');
       text(d.n, IN + 92, top + 54, F.b(29, 600), exo ? GOLD : '#ffffff', 'left', CW - 140);
-      const end = await chips(ps, IN + 92, top + 70, CW - 56 - 92, h => /Intrinsic/i.test(B.en[h]?.tl || ''), true);
+      const end = await chips(ps, IN + 92, top + 70, CW - 56 - 92, h => pIntr(B.en[h]), true);
       y = Math.max(end, top + 96) + 22; cards.push({ y: top, h: y - top, exo }); y += 12;
     }
     y += 30;
@@ -1088,7 +1095,7 @@ async function loadVendors(my) {
       for (const [i] of sales) for (const sk of r.itemComponents?.sockets?.data?.[i]?.sockets || []) if (sk.plugHash && sk.isVisible !== false) plugs.push(sk.plugHash);
       const costH = sales.flatMap(([, x]) => (x.costs || []).map(c => c.itemHash));
       const all = [...hs, ...plugs, ...costH];
-      const en = await entities('DestinyInventoryItemDefinition', all, 'en'), loc = lang === 'pt' ? await entities('DestinyInventoryItemDefinition', all, 'pt') : en;
+      const [en, lp] = await Promise.all([entities('DestinyInventoryItemDefinition', all, 'en'), lang === 'pt' ? entities('DestinyInventoryItemDefinition', all, 'pt') : null]), loc = lp || en;
       // coleção: só as armas e tonalizadores precisam (poucos itens)
       const need = hs.filter(h => (en[h]?.it === 3 || /Shader/.test(en[h]?.tl || '')) && COLL[h] === undefined);
       await Promise.all(need.map(h => idef(h).then(d => { COLL[h] = d.c; })));
@@ -1145,7 +1152,7 @@ async function loadVault(my) {
   const items = (profile.profileInventory?.data?.items || []).filter(i => i.bucketHash === VAULT_BUCKET);
   const cnt = {}; for (const i of items) if (i.itemInstanceId) cnt[i.itemHash] = (cnt[i.itemHash] || 0) + 1;
   const dupH = Object.keys(cnt).filter(h => cnt[h] > 1).map(Number);
-  const en = await entities('DestinyInventoryItemDefinition', dupH, 'en'), loc = lang === 'pt' ? await entities('DestinyInventoryItemDefinition', dupH, 'pt') : en; if (my !== gen) return;
+  const loc = await entities('DestinyInventoryItemDefinition', dupH, lang === 'pt' ? 'pt' : 'en'), en = loc; if (my !== gen) return;
   const row = h => ({ n: loc[h]?.n || en[h]?.n || '', tl: loc[h]?.tl || '', ic: loc[h]?.ic || '', c: cnt[h], tt: en[h]?.tt, it: en[h]?.it });
   const dups = dupH.map(row).filter(x => x.n && (x.it === 2 || x.it === 3)).sort((a, b) => b.c - a.c || a.n.localeCompare(b.n));
   VAULT = { used: items.length, max: 600, exo: dups.filter(x => x.tt === 6), leg: dups.filter(x => x.tt !== 6) };
@@ -1290,7 +1297,7 @@ $('chars').addEventListener('click', e => { if (e.target.closest('#findbtn')) { 
 $('ldbtn').addEventListener('click', () => { if (tab === 'ld') go(prevTab || 'obj'); else { prevTab = tab; go('ld'); } });
 $('themebtn').addEventListener('click', () => { const t = curTheme() === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = t; LS.set('dc-theme', t); applyTheme(); });
 try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme); } catch {}
-$('langbtn').addEventListener('click', () => { lang = lang === 'en' ? 'pt' : 'en'; LS.set('dc-lang', lang); GD = null; VEND = null; XUR = null; if (profile) hydrate(); else render(); });
+$('langbtn').addEventListener('click', () => { lang = lang === 'en' ? 'pt' : 'en'; LS.set('dc-lang', lang); for (const k in SVCTX) delete SVCTX[k]; GD = null; VEND = null; XUR = null; if (profile) hydrate(); else render(); });
 $('refresh').addEventListener('click', () => { GD = null; VAULT = null; VEND = null; XUR = null; start(); });
 $('logout').addEventListener('click', logout);
 $('hide').addEventListener('change', e => { document.body.classList.toggle('hide-done', e.target.checked); LS.set('dc-hide2', e.target.checked); });
@@ -1550,11 +1557,11 @@ const EXPORT_ICON = '<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden
 const WEAPON_B = [1498876634, 2465295065, 953998645], ARMOR_B = [3448274439, 3551918588, 14239492, 20886954, 1585787867];
 function buildParts(C) {
   const B = C.B, eq = C.p.characterEquipment?.data?.[C.cid]?.items || [], sk = C.p.itemComponents?.sockets?.data || {};
-  const plugs = i => (sk[i.itemInstanceId]?.sockets || []).filter(s => s.plugHash && s.isVisible !== false).map(s => s.plugHash).filter(h => { const e = B.en[h]; return e?.n && !SKIP_NAME.test(e.n) && !SKIP_TYPE.test(e.tl); });
-  const sub = eq.find(i => i.bucketHash === SUB_BUCKET), ps = sub ? plugs(sub) : [], t = h => B.en[h]?.tl || '';
+  const plugs = i => (sk[i.itemInstanceId]?.sockets || []).filter(s => s.plugHash && s.isVisible !== false).map(s => s.plugHash).filter(h => pShow(B.en[h]));
+  const sub = eq.find(i => i.bucketHash === SUB_BUCKET), ps = sub ? plugs(sub) : [], t = h => pKind(B.en[h]);
   return {
-    sub: sub?.itemHash, sup: ps.filter(h => /Super/.test(t(h))), asp: ps.filter(h => /Aspect/.test(t(h))), fr: ps.filter(h => /Fragment/.test(t(h))),
-    ab: ps.filter(h => !/Super|Aspect|Fragment/.test(t(h))),
+    sub: sub?.itemHash, sup: ps.filter(h => t(h) === 'sup'), asp: ps.filter(h => t(h) === 'asp'), fr: ps.filter(h => t(h) === 'fr'),
+    ab: ps.filter(h => !t(h)),
     w: WEAPON_B.map(b => eq.find(i => i.bucketHash === b)?.itemHash || 0),
     xa: eq.filter(i => ARMOR_B.includes(i.bucketHash)).map(i => i.itemHash).find(h => B.en[h]?.tt === 6) || 0,
     sets: (B.sets || []).map(s => s.n + ' · ' + s.count),
@@ -1608,9 +1615,9 @@ function dimLink(C) {
   const eq = C.p.characterEquipment?.data?.[C.cid]?.items || [], sk = C.p.itemComponents?.sockets?.data || {}, ch = C.p.characters.data[C.cid], B = C.B;
   const equipped = [], mods = [];
   for (const i of eq) {
-    if (i.bucketHash === SUB_BUCKET) { const so = {}; (sk[i.itemInstanceId]?.sockets || []).forEach((s, k) => { if (s.plugHash && s.isVisible !== false && !SKIP_NAME.test(B.en[s.plugHash]?.n || '')) so[k] = s.plugHash; }); equipped.push({ hash: i.itemHash, socketOverrides: so }); }
+    if (i.bucketHash === SUB_BUCKET) { const so = {}; (sk[i.itemInstanceId]?.sockets || []).forEach((s, k) => { if (s.plugHash && s.isVisible !== false && !SKIP_NAME.test(B.en[s.plugHash]?.n || '') && !SKIP_PT.test(B.en[s.plugHash]?.n || '')) so[k] = s.plugHash; }); equipped.push({ hash: i.itemHash, socketOverrides: so }); }
     else if (WEAPON_B.includes(i.bucketHash)) equipped.push({ hash: i.itemHash });
-    else if (ARMOR_B.includes(i.bucketHash)) { equipped.push({ hash: i.itemHash }); for (const s of sk[i.itemInstanceId]?.sockets || []) { const e = B.en[s.plugHash]; if (s.plugHash && e && /Mod$/.test(e.tl) && !SKIP_NAME.test(e.n) && !/Empty|Default/i.test(e.n)) mods.push(s.plugHash); } }
+    else if (ARMOR_B.includes(i.bucketHash)) { equipped.push({ hash: i.itemHash }); for (const s of sk[i.itemInstanceId]?.sockets || []) { const e = B.en[s.plugHash]; if (s.plugHash && e && pArmorMod(e) && pShow(e)) mods.push(s.plugHash); } }
   }
   const sn = B.loc[eq.find(i => i.bucketHash === SUB_BUCKET)?.itemHash]?.n;
   const lo = { name: `${String(C.name).replace(/#\d+$/, '')} · ${charTitle(u().classes[ch.classType] || '', sn)}`, classType: ch.classType, clearSpace: false, equipped, unequipped: [], parameters: { mods } };
