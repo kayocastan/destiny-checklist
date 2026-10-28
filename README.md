@@ -20,8 +20,8 @@ Site que lê a conta Bungie.net de quem entrar e monta um checklist de Destiny 2
 ### 1. Registrar o aplicativo na Bungie
 1. Acesse https://www.bungie.net/en/Application e clique em **Create New App**.
 2. Preencha:
-   - **Application Name**: Destiny Checklist (ou outro nome)
-   - **Website**: o endereço do site na Vercel (ex.: `https://destiny-checklist.vercel.app`)
+   - **Application Name**: DPI (ou outro nome)
+   - **Website**: o endereço do site na Vercel (ex.: `https://destinyparallel.vercel.app`)
    - **OAuth Client Type**: **Confidential**
    - **Redirect URL**: `https://SEU-ENDERECO.vercel.app/api/callback`
    - **Scope**: marque apenas **Read your Destiny 2 information (Vault, Inventory, and Vendors)...**
