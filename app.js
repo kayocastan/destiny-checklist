@@ -32,7 +32,7 @@ const UI = {
   pt: {
     hide: 'Ocultar feitos', search: 'Buscar por nome ou origem', refresh: 'Atualizar', logout: 'Sair',
     disclaimer: 'Dados lidos da sua conta pela API oficial da Bungie. Este site não é afiliado à Bungie.',
-    loadouts: 'Loadouts', checklist: 'Central', outQ: 'Confirmar?',
+    loadouts: 'Loadouts', checklist: 'Central', outQ: 'Confirmar?', liveT: 'Ao vivo', liveYou: 'você', liveSince: t => `desde ${t}`, livePriv: 'Build privada', liveTap: 'Toque para ver a build completa',
     tabs: { obj: 'Objetivos', act: 'Atividades', drops: 'Arsenal', gd: 'Guardião' },
     subs: { camp: 'Campanhas', raid: 'Incursões', dg: 'Masmorras', xm: 'Missões exóticas', tit: 'Títulos', exo: 'Exóticos', cat: 'Catalisadores', vend: 'Vendedores' },
     heroTitle: 'Central do Guardião', heroText: 'Entre com a sua conta Bungie.net para verificar seus objetivos, acompanhar a rotação semanal, completar seu arsenal exótico e compartilhar suas builds.', lsQ: 'Buscar guardião: Nome#1234', lsBtn: 'Buscar', lsHint: 'Veja a build equipada de qualquer jogador, sem precisar entrar.',
@@ -87,7 +87,7 @@ const UI = {
   en: {
     hide: 'Hide done', search: 'Search by name or source', refresh: 'Refresh', logout: 'Sign out',
     disclaimer: 'Data read from your account through the official Bungie API. This site is not affiliated with Bungie.',
-    loadouts: 'Loadouts', checklist: 'Hub', outQ: 'Confirm?',
+    loadouts: 'Loadouts', checklist: 'Hub', outQ: 'Confirm?', liveT: 'Live', liveYou: 'you', liveSince: t => `since ${t}`, livePriv: 'Private build', liveTap: 'Tap to see the full build',
     tabs: { obj: 'Objectives', act: 'Activities', drops: 'Arsenal', gd: 'Guardian' },
     subs: { camp: 'Campaigns', raid: 'Raids', dg: 'Dungeons', xm: 'Exotic missions', tit: 'Titles', exo: 'Exotics', cat: 'Catalysts', vend: 'Vendors' },
     heroTitle: 'Guardian Hub', heroText: 'Sign in with your Bungie.net account to check your goals, follow the weekly rotation, complete your exotic arsenal and share your builds.', lsQ: 'Search guardian: Name#1234', lsBtn: 'Search', lsHint: "See any player's equipped build, no sign-in needed.",
@@ -185,7 +185,7 @@ function login() {
   try { sessionStorage.setItem('dc-state', st); } catch {}
   location.href = `https://www.bungie.net/${lang === 'pt' ? 'pt-br' : 'en'}/OAuth/Authorize?client_id=${encodeURIComponent(cfg.clientId)}&response_type=code&state=${st}`;
 }
-function logout() { resetChar(); buildOpen = false; if (member) idbDel('profile-' + member.id); LS.del('dc-auth'); LS.del('dc-member'); LS.del('dc-synct'); SY.t = {}; SY.dirty.clear(); LS.del('dc-el'); auth = null; profile = null; member = null; render(); }
+function logout() { resetChar(); buildOpen = false; if (member) idbDel('profile-' + member.id); LS.del('dc-auth'); LS.del('dc-member'); LS.del('dc-synct'); SY.t = {}; SY.dirty.clear(); clearInterval(LIVE.timer); LIVE.timer = null; LIVE.on = false; LIVE.mem = []; LS.del('dc-el'); auth = null; profile = null; member = null; render(); }
 async function token() {
   if (!auth) throw new Error('auth');
   if (auth.access_expires - Date.now() > 60000) return auth.access_token;
@@ -1244,7 +1244,7 @@ function render() {
   applyUI();
   const logged = !!(auth && profile);
   for (const id of ['tabs', 'overall', 'chars', 'ldbtn', 'refresh', 'logout']) $(id).hidden = !logged;
-  renderWeek(); renderBuild();
+  renderWeek(); renderBuild(); renderLive();
   if (!cfg) return;
   if (!logged) {
     delete $('title').dataset.full; $('title').style.fontSize = ''; $('title').classList.remove('two'); $('title').textContent = 'Destiny Parallel Interface'; document.title = 'DPI · Destiny Parallel Interface'; $('eyebrow').textContent = 'Destiny 2'; renderGuardian(null); landing(!auth);
@@ -1892,10 +1892,75 @@ async function moveToNew() {
   const pay = btoa(unescape(encodeURIComponent(JSON.stringify(keep)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   location.replace(NEW_ORIGIN + location.pathname + location.search + '#move=' + pay);
 }
+/* ---------- Ao vivo: o fireteam em que você está agora e a build de cada um ----------
+   Lê o grupo pela sua conta (componente 1000) a cada 60 s com a aba aberta; a build de cada membro é pública
+   (mesmos dados da busca de guardião). Fora do jogo, a faixa some. */
+const LIVE = { on: false, act: '', since: null, mem: [], seq: 0, timer: null, types: LS.get('dc-mtype', {}), busy: false };
+async function memType(id) {
+  if (LIVE.types[id]) return LIVE.types[id];
+  if (id === member?.id) return member.type;
+  try { const r = await bungie(`/User/GetMembershipsById/${id}/254/`, false); const m = r.destinyMemberships || []; const pick = m.find(x => x.membershipId === id) || m[0]; if (pick) { LIVE.types[id] = pick.membershipType; LS.set('dc-mtype', LIVE.types); return pick.membershipType; } } catch {}
+  return null;
+}
+async function liveMember(id, prev) {
+  const type = await memType(id); if (!type) return null;
+  const p = await bungie(`/Destiny2/${type}/Profile/${id}/?components=100,200,205,300,305`, false);
+  const chars = Object.values(p.characters?.data || {}).sort((a, b) => new Date(b.dateLastPlayed) - new Date(a.dateLastPlayed)), ch = chars[0]; if (!ch) return null;
+  const u0 = p.profile?.data?.userInfo || {}, name = u0.bungieGlobalDisplayName ? fullName(u0.bungieGlobalDisplayName, u0.bungieGlobalDisplayNameCode) : (u0.displayName || '');
+  const eq = p.characterEquipment?.data?.[ch.characterId]?.items || [], sig = eq.map(i => i.itemHash).join('.');
+  const B = prev && prev.sig === sig && prev.cid === ch.characterId && prev.B ? prev.B : (eq.length && p.itemComponents?.sockets?.data ? await fetchBuild(p, ch.characterId) : null);
+  return { id, type, name, p, cid: ch.characterId, ch, sig, B, priv: !eq.length || !p.itemComponents?.sockets?.data };
+}
+async function livePoll() {
+  if (LIVE.busy || !auth || !member || document.hidden) return; LIVE.busy = true; const my = ++LIVE.seq;
+  try {
+    const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=1000,204`);
+    const t = r.profileTransitoryData?.data, party = t?.partyMembers || [];
+    if (!t || !party.length) { LIVE.on = false; LIVE.mem = []; renderLive(); return; }
+    const act = Object.values(r.characterActivities?.data || {}).sort((a, b) => new Date(b.dateActivityStarted) - new Date(a.dateActivityStarted))[0];
+    LIVE.since = t.currentActivity?.startTime || act?.dateActivityStarted || null;
+    if (act?.currentActivityHash) { const a = await entities('DestinyActivityDefinition', [act.currentActivityHash], lang); LIVE.act = a[act.currentActivityHash]?.n || ''; } else LIVE.act = '';
+    // você primeiro, depois o resto do grupo
+    const ids = [...new Set([member.id, ...party.map(x => x.membershipId)])];
+    const old = Object.fromEntries(LIVE.mem.map(m => [m.id, m]));
+    const mem = (await Promise.all(ids.map(id => liveMember(id, old[id]).catch(() => old[id] || null)))).filter(Boolean);
+    if (my !== LIVE.seq) return;
+    LIVE.on = true; LIVE.mem = mem; renderLive();
+  } catch { /* fora do ar ou sem permissão: tenta de novo no próximo ciclo */ }
+  finally { LIVE.busy = false; }
+}
+function liveStart() { clearInterval(LIVE.timer); livePoll(); LIVE.timer = setInterval(livePoll, 60000); }
+document.addEventListener('visibilitychange', () => { if (!document.hidden && LIVE.timer) livePoll(); });
+function renderLive() {
+  const el = $('live'); if (!el) return;
+  if (!(auth && profile) || !LIVE.on || !LIVE.mem.length) { el.hidden = true; el.innerHTML = ''; return; }
+  const U = u(), W = U.w, tm = LIVE.since ? new Date(LIVE.since).toLocaleTimeString(lang === 'en' ? 'en-US' : 'pt-BR', { hour: '2-digit', minute: '2-digit' }) : '';
+  const card = (m, i) => {
+    const B = m.B, eq = m.p.characterEquipment?.data?.[m.cid]?.items || [], d = h => (B && (B.loc[h] || B.en[h])) || {};
+    const sub = eq.find(x => x.bucketHash === SUB_BUCKET), el2 = B && sub ? ELEMENTS[B.en[sub.itemHash]?.dt] : null, [a1, a2] = ELEMENT_ACC[el2] || ELEMENT_ACC.arc;
+    const exo = B ? eq.filter(x => x.bucketHash !== SUB_BUCKET && B.en[x.itemHash]?.tt === 6) : [];
+    const ws = B ? WEAPON_B.map(b => eq.find(x => x.bucketHash === b)).filter(Boolean) : [];
+    const ic = (x, cls = '') => { const v = d(x.itemHash); return v.ic ? `<img class="${cls}" src="${BNET}${v.ic}" alt="" title="${esc(v.n || '')}" loading="lazy">` : ''; };
+    const nm = m.name.replace(/#\d+$/, ''), you = m.id === member.id;
+    return `<button class="lv-c" type="button" data-lv="${i}" style="--a1:${a1};--a2:${a2}" title="${esc(U.liveTap)}">
+      <span class="lv-b" style="background-image:url('${BNET}${m.ch.emblemBackgroundPath || ''}')"><span class="lv-n"><b>${esc(nm)}</b>${you ? `<small>${esc(U.liveYou)}</small>` : ''}</span><span class="lv-pw">${m.ch.light}</span></span>
+      <span class="lv-g">${sub ? ic(sub, 'lv-sub') : ''}<span class="lv-cls">${esc((sub && d(sub.itemHash).n) || U.classes[m.ch.classType] || '')}</span>${m.priv ? `<span class="lv-priv">${esc(U.livePriv)}</span>` : `<span class="lv-w">${ws.map(x => ic(x, B.en[x.itemHash]?.tt === 6 ? 'ex' : '')).join('')}${exo.filter(x => !WEAPON_B.includes(x.bucketHash)).map(x => ic(x, 'ex')).join('')}</span>`}</span>
+      ${exo.length ? `<span class="lv-x">${exo.map(x => esc(d(x.itemHash).n || '')).join(' · ')}</span>` : ''}</button>`;
+  };
+  el.innerHTML = `<div class="lv-h"><span class="lv-dot" aria-hidden="true"></span><b>${esc(U.liveT)}</b>${LIVE.act ? `<span>${esc(LIVE.act)}</span>` : ''}${tm ? `<small>${esc(U.liveSince(tm))}</small>` : ''}</div><div class="lv-l">${LIVE.mem.map(card).join('')}</div>`;
+  el.hidden = false;
+}
+$('live').addEventListener('click', e => {
+  const b = e.target.closest('[data-lv]'); if (!b) return; const m = LIVE.mem[+b.dataset.lv]; if (!m) return;
+  FD.q = ''; FD.results = null;
+  openCtx({ name: m.name, type: m.type, id: m.id }, { p: m.p, cid: m.cid, B: m.B });
+  if (!m.B && !m.priv) fetchBuild(m.p, m.cid).then(B => { m.B = B; if (FD.sel?.id === m.id) { FD.B = B; renderFind(); } });
+});
 async function start() {
   try {
     status(u().loading);
     await loadAccount();
+    liveStart();
   } catch (e) {
     if (e.message === 'moving') return;
     if (e.message === 'auth') { status(''); render(); return; }
