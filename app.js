@@ -6,7 +6,7 @@ const API = 'https://www.bungie.net/Platform';
 const QUEST_BUCKET = 1345459588;
 const LS = {
   get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
-  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} if (LS.hook) LS.hook(k); },
   del(k) { try { localStorage.removeItem(k); } catch {} },
 };
 const $ = id => document.getElementById(id);
@@ -131,6 +131,7 @@ const L = pair => Array.isArray(pair) ? (lang === 'en' ? pair[0] : (pair[1] || p
 const chipClass = x => /^(Exótico|Exotic)$/.test(x) ? 'exo' : /^(Fácil|Easy)$/.test(x) ? 'easy' : /^(Médio|Medium)$/.test(x) ? 'mid' : /^(Difícil|Hard|Muito difícil|Very hard)$/.test(x) ? 'hard' : /%$/.test(x) ? 'hot' : '';
 
 /* ---------- estado ---------- */
+let APIW = null; // endereço do servidor (Cloudflare), em data/api.json
 let cfg = null, defs = null, ITEMS = null, auth = LS.get('dc-auth', null), profile = null, member = null;
 let charId = null, tab = LS.get('dc-tab', 'obj'), prevTab = 'obj', query = '';
 const lastSub = LS.get('dc-subs', {});
@@ -169,7 +170,7 @@ function login() {
   try { sessionStorage.setItem('dc-state', st); } catch {}
   location.href = `https://www.bungie.net/${lang === 'pt' ? 'pt-br' : 'en'}/OAuth/Authorize?client_id=${encodeURIComponent(cfg.clientId)}&response_type=code&state=${st}`;
 }
-function logout() { resetChar(); buildOpen = false; if (member) idbDel('profile-' + member.id); LS.del('dc-auth'); LS.del('dc-member'); LS.del('dc-el'); auth = null; profile = null; member = null; render(); }
+function logout() { resetChar(); buildOpen = false; if (member) idbDel('profile-' + member.id); LS.del('dc-auth'); LS.del('dc-member'); LS.del('dc-synct'); SY.t = {}; SY.dirty.clear(); LS.del('dc-el'); auth = null; profile = null; member = null; render(); }
 async function token() {
   if (!auth) throw new Error('auth');
   if (auth.access_expires - Date.now() > 60000) return auth.access_token;
@@ -211,9 +212,30 @@ async function entity(type, hash, lc, needPc) {
 }
 function saveEnt() { if (entDirty) { LS.set('dc-ent4-en', entCache.en); LS.set('dc-ent4-pt', entCache.pt); entDirty = false; } }
 async function pool(list, fn, n) { let i = 0; await Promise.all(Array.from({ length: Math.min(n, list.length) }, async () => { while (i < list.length) await fn(list[i++]); })); }
-async function entities(type, hashes, lc, needPc) {
-  const out = {};
-  await pool([...new Set(hashes)], async h => { out[h] = await entity(type, h, lc, needPc); }, 6);
+/* Nomes em lote pelo servidor: um pedido para até 25 itens, guardados lá para todos os visitantes.
+   O que o servidor não responder (fora do ar, limite do dia) é buscado direto na Bungie, como antes. */
+const SRV_TYPES = new Set(['DestinyInventoryItemDefinition', 'DestinyObjectiveDefinition', 'DestinyLocationDefinition', 'DestinyActivityDefinition', 'DestinyMilestoneDefinition', 'DestinyLoadoutNameDefinition', 'DestinyRecordDefinition', 'DestinyCollectibleDefinition', 'DestinyPresentationNodeDefinition']);
+let srvDown = 0;
+const entOk = (type, v, needPc) => v && (v.n || !/LoadoutName/.test(type)) && (!needPc || v.pc !== undefined);
+async function entities(type, hashes, lc, needPc, onChunk) {
+  const out = {}, store = entCache[lc], need = [];
+  for (const h of new Set(hashes)) { const v = store[type + ':' + h]; if (entOk(type, v, needPc)) out[h] = v; else need.push(h); }
+  if (need.length && APIW && SRV_TYPES.has(type) && Date.now() > srvDown) {
+    const chunks = []; for (let i = 0; i < need.length; i += 25) chunks.push(need.slice(i, i + 25));
+    await Promise.all(chunks.map(async c => {
+      try {
+        const r = await fetch(APIW + '/defs', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-API-Key': cfg.apiKey }, body: JSON.stringify({ t: type, lc, h: c }) });
+        if (!r.ok) { if (r.status >= 500 || r.status === 429) srvDown = Date.now() + 120000; return; }
+        const j = await r.json();
+        for (const [h, v] of Object.entries(j.d || {})) {
+          if (v.x) { if (!IDEF[h]) { IDEF[h] = v.x; clearTimeout(idefT); idefT = setTimeout(() => { try { LS.set('dc-idef1', IDEF); } catch {} }, 500); } delete v.x; }
+          store[type + ':' + h] = v; entDirty = true; out[h] = v;
+        }
+        if (onChunk) onChunk(out);
+      } catch { srvDown = Date.now() + 120000; }
+    }));
+  }
+  await pool(need.filter(h => !entOk(type, out[h], needPc)), async h => { out[h] = await entity(type, h, lc, needPc); if (onChunk) onChunk(out); }, 10);
   saveEnt();
   return out;
 }
@@ -258,6 +280,7 @@ async function loadAccount() {
     LS.set('dc-member', member);
   }
   marks = new Set(LS.get('dc-marks-' + member.id, []));
+  syncPull();
   // 1) cópia da última visita, se houver
   let usingCache = false;
   if (!profile) {
@@ -725,12 +748,11 @@ async function fetchBuild(p, cid, onProg) {
   // um idioma só (o do site): a classificação dos encaixes não depende do nome em inglês
   const en = {}, B = { en, loc: en, sets: [], art: null, partial: true };
   let tick = null; const bump = () => { if (onProg && !tick) tick = setTimeout(() => { tick = null; if (B.partial) onProg(B); }, 250); };
-  const one = async h => { en[h] = await entity(T, h, L, true); bump(); };
-  await pool(items, one, 12);
+  Object.assign(en, await entities(T, items, L, true)); bump();
   const wh = eq.filter(i => WEAPON_B.includes(i.bucketHash)).map(i => i.itemHash).filter(h => AMMO[h] == null);
   const side = Promise.all([armorSets(eq).then(v => { B.sets = v; }), ...wh.map(h => idef(h).then(d => { AMMO[h] = d.a; }))]);
   if (onProg) onProg(B);
-  await pool([...new Set(plugs)], one, 16);
+  Object.assign(en, await entities(T, plugs, L, true, part => { Object.assign(en, part); bump(); }));
   await side; saveEnt();
   // artefato: desde Monumento do Triunfo é um item equipado (7 artefatos para escolher); as vantagens escolhidas são os encaixes dele
   const ai = eq.find(i => i.bucketHash === ARTIFACT_BUCKET);
@@ -1772,6 +1794,57 @@ function sessHTML() {
 }
 
 /* ---------- início ---------- */
+/* ---------- sincronização entre aparelhos (servidor da Cloudflare) ----------
+   Favoritos, builds salvas, marcações e preferências ficam ligados à conta Bungie.
+   Cada chave guarda a hora da última mudança; a mais nova vence. Na primeira vez num aparelho, listas são somadas. */
+const SY = { t: LS.get('dc-synct', {}), dirty: new Set(), timer: null, applying: false, pulled: 0 };
+const syKeys = () => member ? ['favs', 'builds', 'opts', 'hide2', 'marks-' + member.id] : [];
+LS.hook = k => {
+  if (SY.applying || !member || !k.startsWith('dc-')) return; const n = k.slice(3);
+  if (!syKeys().includes(n)) return;
+  SY.t[n] = Date.now(); SY.dirty.add(n); try { localStorage.setItem('dc-synct', JSON.stringify(SY.t)); } catch {}
+  clearTimeout(SY.timer); SY.timer = setTimeout(syncPush, 2500);
+};
+function syMerge(n, a, b) {
+  if (!Array.isArray(a) || !Array.isArray(b)) return b;
+  if (n === 'favs') return [...a, ...b.filter(x => !a.some(y => y.id === x.id))].slice(0, 30);
+  if (n === 'builds') return [...a, ...b.filter(x => !a.some(y => y.k === x.k))].slice(0, 20);
+  if (n.startsWith('marks-')) return [...new Set([...a, ...b])];
+  return b;
+}
+async function syncPull() {
+  if (!APIW || !auth || !member) return;
+  try {
+    const r = await fetch(APIW + '/sync', { headers: { Authorization: 'Bearer ' + await token(), 'X-API-Key': cfg.apiKey } });
+    if (!r.ok) return; const remote = (await r.json()).d || {}; SY.pulled = Date.now();
+    let changed = false; SY.applying = true;
+    for (const n of syKeys()) {
+      const lt = SY.t[n] || 0, rv = remote[n], local = LS.get('dc-' + n, null);
+      if (rv && rv.t > lt) {
+        if (!lt && local != null) { LS.set('dc-' + n, syMerge(n, local, rv.v)); SY.t[n] = Date.now(); SY.dirty.add(n); } // primeira vez neste aparelho: soma
+        else { LS.set('dc-' + n, rv.v); SY.t[n] = rv.t; }
+        changed = true;
+      } else if (local != null && (!rv || lt > rv.t)) { if (!lt) SY.t[n] = Date.now(); SY.dirty.add(n); }
+    }
+    SY.applying = false; try { localStorage.setItem('dc-synct', JSON.stringify(SY.t)); } catch {}
+    if (SY.dirty.size) syncPush();
+    if (changed) {
+      marks = new Set(LS.get('dc-marks-' + member.id, [])); Object.assign(OPTS, LS.get('dc-opts', {}));
+      const hd = LS.get('dc-hide2', false); $('hide').checked = hd; document.body.classList.toggle('hide-done', hd);
+      if (profile) { build(); render(); }
+    }
+  } catch { SY.applying = false; }
+}
+async function syncPush(keepalive) {
+  clearTimeout(SY.timer); if (!APIW || !auth || !member || !SY.dirty.size) return;
+  const keys = [...SY.dirty], body = {}; for (const n of keys) body[n] = { v: LS.get('dc-' + n, null), t: SY.t[n] || Date.now() };
+  try {
+    const r = await fetch(APIW + '/sync', { method: 'PUT', keepalive: !!keepalive, headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + await token(), 'X-API-Key': cfg.apiKey }, body: JSON.stringify(body) });
+    if (r.ok) for (const n of keys) if (body[n].t === (SY.t[n] || body[n].t)) SY.dirty.delete(n);
+  } catch {}
+}
+// ao sair da aba envia o que falta; ao voltar (depois de 1 min) busca o que mudou em outro aparelho
+document.addEventListener('visibilitychange', () => { if (document.hidden) syncPush(true); else if (Date.now() - SY.pulled > 60000) syncPull(); });
 async function start() {
   try {
     status(u().loading);
@@ -1789,7 +1862,7 @@ if ('serviceWorker' in navigator) addEventListener('load', () => navigator.servi
   applyUI();
   const h = readHash();
   try {
-    [cfg, defs, ITEMS] = await Promise.all([fetch('/api/config').then(r => r.json()), fetch('/data/defs.json', { cache: 'no-cache' }).then(r => r.json()), fetch('/data/items.json', { cache: 'no-cache' }).then(r => r.json()).catch(() => ({}))]);
+    [cfg, defs, ITEMS, APIW] = await Promise.all([fetch('/api/config').then(r => r.json()), fetch('/data/defs.json', { cache: 'no-cache' }).then(r => r.json()), fetch('/data/items.json', { cache: 'no-cache' }).then(r => r.json()).catch(() => ({})), fetch('/data/api.json', { cache: 'no-cache' }).then(r => r.json()).then(j => j.api || null).catch(() => null)]);
   } catch { cfg = { configured: false }; showMessage(`<p class="notice">${esc(u().notConfigured)}</p>`); return; }
   if (h?.error) { render(); $('list').insertAdjacentHTML('afterbegin', `<p class="notice">${esc(u().authError(h.error))}</p>`); return; }
   if (h?.auth) { auth = h.auth; LS.set('dc-auth', auth); }
