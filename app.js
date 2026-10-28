@@ -515,7 +515,7 @@ function build() {
   // Atividades: incursões e masmorras
   for (const [kind, list] of [['raid', defs.raids], ['dg', defs.dungeons]]) {
     for (const a of list) {
-      const items = [I(`${kind}-${a.k}-clear`, s.clear(L(a.n)), null, [U.chip[a.d], kind === 'raid' ? U.chip['6'] : U.chip.Trio], a.m && metric(a.m) > 0)];
+      const items = [I(`${kind}-${a.k}-clear`, s.clear(L(a.n)), null, [U.chip[a.d]], a.m && metric(a.m) > 0)];
       const ex = a.x && exoticByName(a.x);
       if (ex) items.push(I(`${kind}-${a.k}-x`, s.exotic(L(ex.n)), L(ex.s), [U.chip['Exótico']], colAcquired(ex.h), { isEx: true, exName: L(ex.n) }));
       out.push(S(kind, `${kind}-${a.k}`, L(a.n), L([a.note[1], a.note[0]]), items, { firstIsClear: true, kind, key: a.k, metric: a.m }));
