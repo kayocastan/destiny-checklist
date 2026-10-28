@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<main class="wrap">
+<main class="wrap" id="app" hidden>
   <div class="top">
     <div><div class="eyebrow">DPI · painel do servidor</div><h1>Uso e limites</h1><p class="sub" id="when">Carregando…</p></div>
     <button class="r" id="reload" type="button">Atualizar</button>
@@ -95,6 +95,7 @@ function meterCard(k, used, max, fmt, extra) {
 }
 const tile = (k, v, sub) => `<div class="card"><div class="k">${esc(k)}</div><div class="v">${v}</div>${sub ? `<div class="st">${sub}</div>` : ''}</div>`;
 function render(d) {
+  $('app').hidden = false;
   const today = new Date().toISOString().slice(0, 10), W = d.cf.workers || [], D = d.cf.d1 || [];
   const wT = W.filter(x => x.dimensions.date === today), dT = D.filter(x => x.dimensions.date === today);
   const sum = (l, f) => l.reduce((a, x) => a + (f(x) || 0), 0);
@@ -134,12 +135,12 @@ async function load() {
   try {
     const [cfg, api] = await Promise.all([fetch('/api/config').then(r => r.json()), fetch('/data/api.json', { cache: 'no-cache' }).then(r => r.json())]);
     const t = await token();
-    if (!t) { $('out').innerHTML = '<p class="msg">Entre no site com a sua conta Bungie primeiro e depois volte aqui.</p>'; $('when').textContent = ''; return; }
+    if (!t) { location.replace('/'); return; }
     const r = await fetch(api.api + '/stats', { headers: { Authorization: 'Bearer ' + t, 'X-API-Key': cfg.apiKey } });
-    if (r.status === 403) { $('out').innerHTML = '<p class="msg">Este painel é só para o dono do site.</p>'; $('when').textContent = ''; return; }
+    if (r.status === 403 || r.status === 401) { location.replace('/'); return; } // quem não é o dono volta para o site, sem ver nada
     if (!r.ok) throw new Error('HTTP ' + r.status);
     render(await r.json());
-  } catch (e) { $('out').innerHTML = `<p class="msg">Não foi possível carregar agora (${esc(e.message)}). Tente de novo em instantes.</p>`; $('when').textContent = ''; }
+  } catch (e) { $('app').hidden = false; $('out').innerHTML = `<p class="msg">Não foi possível carregar agora (${esc(e.message)}). Tente de novo em instantes.</p>`; $('when').textContent = ''; }
 }
 $('reload').addEventListener('click', load);
 load();
