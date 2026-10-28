@@ -1938,7 +1938,7 @@ function renderLive() {
   const card = (m, i) => {
     const B = m.B, eq = m.p.characterEquipment?.data?.[m.cid]?.items || [], d = h => (B && (B.loc[h] || B.en[h])) || {};
     const sub = eq.find(x => x.bucketHash === SUB_BUCKET), el2 = B && sub ? ELEMENTS[B.en[sub.itemHash]?.dt] : null, [a1, a2] = ELEMENT_ACC[el2] || ELEMENT_ACC.arc;
-    const exo = B ? eq.filter(x => x.bucketHash !== SUB_BUCKET && B.en[x.itemHash]?.tt === 6) : [];
+    const exo = B ? eq.filter(x => (WEAPON_B.includes(x.bucketHash) || ARMOR_B.includes(x.bucketHash)) && B.en[x.itemHash]?.tt === 6) : []; // só armas e armaduras (fantasma, pardal e nave ficam de fora)
     const ws = B ? WEAPON_B.map(b => eq.find(x => x.bucketHash === b)).filter(Boolean) : [];
     const ic = (x, cls = '') => { const v = d(x.itemHash); return v.ic ? `<img class="${cls}" src="${BNET}${v.ic}" alt="" title="${esc(v.n || '')}" loading="lazy">` : ''; };
     const nm = m.name.replace(/#\d+$/, ''), you = m.id === member.id;
