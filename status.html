@@ -14,7 +14,7 @@
   :root{--good:var(--done);--warn:#b07a00;--crit:var(--hard);--bar:var(--arc)}
   @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--warn:#e8b43c}}
   :root[data-theme="dark"]{--warn:#e8b43c}
-  *{box-sizing:border-box}
+  *{box-sizing:border-box} [hidden]{display:none!important}
   body{margin:0}
   h1{font-size:34px}
   .sub{color:var(--muted);margin:4px 0 0}
