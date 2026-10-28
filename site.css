@@ -492,3 +492,11 @@ section.ss{padding:14px 16px;display:grid;gap:10px;border-color:color-mix(in srg
 .chip.exo{color:var(--exotic);font-weight:600;background:color-mix(in srgb,var(--exotic) 14%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--exotic) 45%,transparent)}
 li.is-done .chip.exo{opacity:.7}
 .tl-p{font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--exotic);margin-left:4px}
+/* 204: selo de exótico com taxa maior, desafios da semana e linha do Anoitecer */
+.chip.boost{color:var(--exotic);font-weight:600;background:color-mix(in srgb,var(--exotic) 14%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--exotic) 50%,transparent)}
+.ch-line{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-top:2px}
+.ch-line small{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-right:4px}
+.ch-line i{font-style:normal;font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 70%,transparent)}
+.nf-line{margin:0;padding-top:6px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--muted)}
+.nf-line b{color:var(--fg)}.nf-line span{color:var(--exotic);font-family:var(--mono)}
+section.wk-sec.collapsed:not(.q-open) .sec-head>.nf-line{display:block}
