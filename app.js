@@ -237,7 +237,7 @@ async function entities(type, hashes, lc, needPc, onChunk) {
   const out = {}, store = entCache[lc], need = [];
   for (const h of new Set(hashes)) { const v = store[type + ':' + h]; if (entOk(type, v, needPc)) out[h] = v; else need.push(h); }
   if (need.length && APIW && SRV_TYPES.has(type) && Date.now() > srvDown) {
-    const chunks = []; for (let i = 0; i < need.length; i += 25) chunks.push(need.slice(i, i + 25));
+    const chunks = []; for (let i = 0; i < need.length; i += 12) chunks.push(need.slice(i, i + 12));
     await Promise.all(chunks.map(async c => {
       try {
         const r = await fetch(APIW + '/defs', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-API-Key': cfg.apiKey }, body: JSON.stringify({ t: type, lc, h: c }) });

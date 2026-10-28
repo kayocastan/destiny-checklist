@@ -6,7 +6,7 @@ const BUNGIE = 'https://www.bungie.net/Platform';
 const TYPES = new Set(['DestinyInventoryItemDefinition', 'DestinyObjectiveDefinition', 'DestinyLocationDefinition', 'DestinyActivityDefinition', 'DestinyMilestoneDefinition', 'DestinyLoadoutNameDefinition', 'DestinyRecordDefinition', 'DestinyCollectibleDefinition', 'DestinyPresentationNodeDefinition', 'DestinyDestinationDefinition', 'DestinyEquipableItemSetDefinition']);
 const SET = 'DestinyEquipableItemSetDefinition';
 const SYNC_KEYS = /^(favs|builds|opts|hide2|marks-\d{1,25})$/;
-const MAX_BATCH = 25;              // até 25 busca na Bungie por pedido (o plano grátis permite 50 subpedidos)
+const MAX_BATCH = 12;              // até 12 itens por pedido: mantém o tempo de CPU abaixo de 10 ms quando há muitas buscas novas na Bungie
 const DEF_TTL = 30 * 864e5;        // nomes guardados são renovados depois de 30 dias
 const MAX_VALUE = 400_000;         // tamanho máximo de cada valor sincronizado
 
