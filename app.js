@@ -38,7 +38,7 @@ const UI = {
       nearCats: 'Catalisadores quase prontos', nearCatsNote: 'Já passaram da metade.',
       nearTitles: 'Títulos quase prontos', nearTitlesNote: 'Faltam poucos triunfos.',
       noCamp: 'Nenhuma campanha em andamento no registro deste personagem. Campanhas concluídas não aparecem.',
-      campNote: (a, b) => `Passo ${a} de ${b}.`, campStep: n => `Passo atual: ${n}`, xmClear: n => `Concluir ${n}`, xmTri: 'Triunfos da missão', xmHow: 'Como liberar', xmSteps: n => `${n} passos`, raidTri: 'Triunfos da incursão', dgTri: 'Triunfos da masmorra', campNormal: 'Concluir a campanha', campNotStarted: 'Não iniciada', campLeg: 'Todas as missões no Lendário', campMaster: 'Uma missão no Mestre', campIn: 'Em andamento.', campAll: 'Concluída em todas as dificuldades.', campLegLeft: 'Concluída; falta o Lendário.', campMasterLeft: 'Lendário feito; falta o Mestre.', campNone: 'Ainda não concluída.', current: 'Passo atual',
+      campNote: (a, b) => `Passo ${a} de ${b}.`, campStep: n => `Passo atual: ${n}`, xmClear: n => `Concluir ${n}`, xmTri: 'Triunfos da missão', xmHow: 'Como liberar', xmNext: 'Missões seguintes', xmSteps: n => `${n} passos`, raidTri: 'Triunfos da incursão', dgTri: 'Triunfos da masmorra', campNormal: 'Concluir a campanha', campNotStarted: 'Não iniciada', campLeg: 'Todas as missões no Lendário', campMaster: 'Uma missão no Mestre', campIn: 'Em andamento.', campAll: 'Concluída em todas as dificuldades.', campLegLeft: 'Concluída; falta o Lendário.', campMasterLeft: 'Lendário feito; falta o Mestre.', campNone: 'Ainda não concluída.', current: 'Passo atual',
       clear: n => `Concluir ${n}`, exotic: n => `Exótico: ${n}`,
       wpn: 'Armas exóticas', armor: c => `Armaduras exóticas de ${c}`,
       catProg: 'Em progresso', catProgNote: 'Catalisador obtido; use a arma para completar.',
@@ -93,7 +93,7 @@ const UI = {
       nearCats: 'Catalysts almost done', nearCatsNote: 'Already past halfway.',
       nearTitles: 'Titles almost done', nearTitlesNote: 'Only a few triumphs left.',
       noCamp: 'No campaign in progress in this character\'s quest log. Finished campaigns are not shown.',
-      campNote: (a, b) => `Step ${a} of ${b}.`, campStep: n => `Current step: ${n}`, xmClear: n => `Complete ${n}`, xmTri: 'Mission triumphs', xmHow: 'How to unlock', xmSteps: n => `${n} steps`, raidTri: 'Raid triumphs', dgTri: 'Dungeon triumphs', campNormal: 'Finish the campaign', campNotStarted: 'Not started', campLeg: 'All missions on Legendary', campMaster: 'One mission on Master', campIn: 'In progress.', campAll: 'Done on every difficulty.', campLegLeft: 'Done; Legendary is left.', campMasterLeft: 'Legendary done; Master is left.', campNone: 'Not finished yet.', current: 'Current step',
+      campNote: (a, b) => `Step ${a} of ${b}.`, campStep: n => `Current step: ${n}`, xmClear: n => `Complete ${n}`, xmTri: 'Mission triumphs', xmHow: 'How to unlock', xmNext: 'Follow-up missions', xmSteps: n => `${n} steps`, raidTri: 'Raid triumphs', dgTri: 'Dungeon triumphs', campNormal: 'Finish the campaign', campNotStarted: 'Not started', campLeg: 'All missions on Legendary', campMaster: 'One mission on Master', campIn: 'In progress.', campAll: 'Done on every difficulty.', campLegLeft: 'Done; Legendary is left.', campMasterLeft: 'Legendary done; Master is left.', campNone: 'Not finished yet.', current: 'Current step',
       clear: n => `Complete ${n}`, exotic: n => `Exotic: ${n}`,
       wpn: 'Exotic weapons', armor: c => `${c} exotic armor`,
       catProg: 'In progress', catProgNote: 'Catalyst obtained; use the weapon to finish it.',
@@ -537,6 +537,7 @@ function build() {
       if (has && c && recOK) items.push(I(`xm-${m.k}-c${i}`, L(c.n), L(c.d), [progText(cs) || (cs ? Math.round(pct(cs) * 100) + '%' : '')].filter(Boolean), recDone(cs)));
     });
     if (m.steps) items.push(I(`xm-${m.k}-how`, s.xmHow, m.steps.map(x => L(x[0])).join(' '), [s.xmSteps(m.steps.length)], false, { tl: m.steps.map(([n, dd]) => ({ ok: false, n: L(n), d: L(dd) })) }));
+    if (m.next) items.push(I(`xm-${m.k}-next`, s.xmNext, m.next.map(x => L(x[0])).join(' '), [s.xmSteps(m.next.length)], false, { tl: m.next.map(([n, dd]) => ({ ok: false, n: L(n), d: L(dd) })) }));
     const recs = recOK ? (m.r || []).map(h => [h, recState(h)]).filter(([, st]) => st) : [];
     if (recs.length) {
       const rd = recs.filter(([, st]) => recDone(st)).length;
