@@ -100,7 +100,7 @@ function render(d) {
   const wT = W.filter(x => x.dimensions.date === today), dT = D.filter(x => x.dimensions.date === today);
   const sum = (l, f) => l.reduce((a, x) => a + (f(x) || 0), 0);
   const req = sum(wT, x => x.sum.requests), err = sum(wT, x => x.sum.errors), rd = sum(dT, x => x.sum.rowsRead), wr = sum(dT, x => x.sum.rowsWritten);
-  const cpu = wT.length ? Math.max(...wT.map(x => x.quantiles?.cpuTimeP99 || 0)) : 0;
+  const cpu = wT.length ? Math.max(...wT.map(x => x.quantiles?.cpuTimeP99 || 0)) / 1000 /* vem em microssegundos */ : 0;
   const cfOk = !d.cf.error;
   let h = '<section><h2>Hoje (dia UTC)</h2><div class="grid">';
   h += cfOk ? meterCard('Pedidos ao servidor', req, LIM.req, nf, err ? `${nf(err)} com erro` : 'sem erros') : tile('Pedidos ao servidor', '—', 'Sem acesso ao Analytics da Cloudflare');
