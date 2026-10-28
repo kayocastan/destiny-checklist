@@ -1899,7 +1899,7 @@ const LIVE = { on: false, act: '', since: null, mem: [], seq: 0, timer: null, ty
 async function memType(id) {
   if (LIVE.types[id]) return LIVE.types[id];
   if (id === member?.id) return member.type;
-  try { const r = await bungie(`/User/GetMembershipsById/${id}/254/`, false); const m = r.destinyMemberships || []; const pick = m.find(x => x.membershipId === id) || m[0]; if (pick) { LIVE.types[id] = pick.membershipType; LS.set('dc-mtype', LIVE.types); return pick.membershipType; } } catch {}
+  try { const r = await bungie(`/User/GetMembershipsById/${id}/-1/`, false); const m = r.destinyMemberships || []; const pick = m.find(x => x.membershipId === id) || m[0]; if (pick) { LIVE.types[id] = pick.membershipType; LS.set('dc-mtype', LIVE.types); return pick.membershipType; } } catch {}
   return null;
 }
 async function liveMember(id, prev) {
