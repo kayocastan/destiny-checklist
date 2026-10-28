@@ -38,7 +38,7 @@ const UI = {
       nearCats: 'Catalisadores quase prontos', nearCatsNote: 'Já passaram da metade.',
       nearTitles: 'Títulos quase prontos', nearTitlesNote: 'Faltam poucos triunfos.',
       noCamp: 'Nenhuma campanha em andamento no registro deste personagem. Campanhas concluídas não aparecem.',
-      campNote: (a, b) => `Passo ${a} de ${b}.`, campStep: n => `Passo atual: ${n}`, campNormal: 'Concluir a campanha', campNotStarted: 'Não iniciada', campLeg: 'Todas as missões no Lendário', campMaster: 'Uma missão no Mestre', campIn: 'Em andamento.', campAll: 'Concluída em todas as dificuldades.', campLegLeft: 'Concluída; falta a dificuldade maior.', campNone: 'Ainda não concluída.', current: 'Passo atual',
+      campNote: (a, b) => `Passo ${a} de ${b}.`, campStep: n => `Passo atual: ${n}`, campNormal: 'Concluir a campanha', campNotStarted: 'Não iniciada', campLeg: 'Todas as missões no Lendário', campMaster: 'Uma missão no Mestre', campIn: 'Em andamento.', campAll: 'Concluída em todas as dificuldades.', campLegLeft: 'Concluída; falta o Lendário.', campMasterLeft: 'Lendário feito; falta o Mestre.', campNone: 'Ainda não concluída.', current: 'Passo atual',
       clear: n => `Concluir ${n}`, exotic: n => `Exótico: ${n}`,
       wpn: 'Armas exóticas', armor: c => `Armaduras exóticas de ${c}`,
       catProg: 'Em progresso', catProgNote: 'Catalisador obtido; use a arma para completar.',
@@ -93,7 +93,7 @@ const UI = {
       nearCats: 'Catalysts almost done', nearCatsNote: 'Already past halfway.',
       nearTitles: 'Titles almost done', nearTitlesNote: 'Only a few triumphs left.',
       noCamp: 'No campaign in progress in this character\'s quest log. Finished campaigns are not shown.',
-      campNote: (a, b) => `Step ${a} of ${b}.`, campStep: n => `Current step: ${n}`, campNormal: 'Finish the campaign', campNotStarted: 'Not started', campLeg: 'All missions on Legendary', campMaster: 'One mission on Master', campIn: 'In progress.', campAll: 'Done on every difficulty.', campLegLeft: 'Done; the harder difficulty is left.', campNone: 'Not finished yet.', current: 'Current step',
+      campNote: (a, b) => `Step ${a} of ${b}.`, campStep: n => `Current step: ${n}`, campNormal: 'Finish the campaign', campNotStarted: 'Not started', campLeg: 'All missions on Legendary', campMaster: 'One mission on Master', campIn: 'In progress.', campAll: 'Done on every difficulty.', campLegLeft: 'Done; Legendary is left.', campMasterLeft: 'Legendary done; Master is left.', campNone: 'Not finished yet.', current: 'Current step',
       clear: n => `Complete ${n}`, exotic: n => `Exotic: ${n}`,
       wpn: 'Exotic weapons', armor: c => `${c} exotic armor`,
       catProg: 'In progress', catProgNote: 'Catalyst obtained; use the weapon to finish it.',
@@ -513,10 +513,13 @@ function build() {
     const items = [];
     if (q) { const idx = Math.max(0, q.q.il.indexOf(q.it.itemHash)) + 1, tot = q.q.il.length || 1; items.push(I('cp-' + q.it.itemHash, s.campStep(q.qd.n || q.q.n), q.qd.d, [`${idx}/${tot}`], false)); }
     else items.push(I('cpn-' + c.k, s.campNormal, null, [normDone ? '' : s.campNotStarted].filter(Boolean), normDone));
-    const parts = (c.parts || []).map(h => progText(st(h))).filter(Boolean), lp = progText(st(c.rL));
-    items.push(I('cpl-' + c.k, s.campLeg, L(c.where), [lp || parts.join(' · ') || U.chip['Difícil']].filter(Boolean), legDone));
+    // progresso do Lendário: missões feitas somando os objetivos (do triunfo principal ou das partes)
+    const cnt = hs => { let a = 0, b = 0; for (const h of hs) for (const o of recObjs(st(h))) { b++; if (o.complete) a++; } return b > 1 ? `${a}/${b}` : ''; };
+    const lp = legDone ? '' : (cnt([c.rL]) || cnt(c.parts || []));
+    items.push(I('cpl-' + c.k, s.campLeg, L(c.where), [lp || U.chip['Difícil']], legDone));
     if (c.rM) items.push(I('cpm-' + c.k, s.campMaster, L(c.where), [U.chip['Muito difícil']], recOK && ok(c.rM)));
-    out.push(S('camp', 'cpx-' + c.k, L(c.n), q ? s.campIn : normDone ? (legDone ? s.campAll : s.campLegLeft) : s.campNone, items, { camp: c }));
+    const mDone = !c.rM || (recOK && ok(c.rM));
+    out.push(S('camp', 'cpx-' + c.k, L(c.n), q ? s.campIn : normDone ? (legDone ? (mDone ? s.campAll : s.campMasterLeft) : s.campLegLeft) : s.campNone, items, { camp: c }));
   }
   for (const x of camps.filter(x => !used.has(x))) {
     const idx = Math.max(0, x.q.il.indexOf(x.it.itemHash)) + 1, tot = x.q.il.length || 1;
