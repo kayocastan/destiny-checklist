@@ -793,3 +793,4 @@ dialog.gal::backdrop{background:rgba(0,0,0,.82)}
 .gal-dots{display:flex;justify-content:center;gap:6px}
 .gal-dots button{width:9px;height:9px;border-radius:50%;border:0;padding:0;background:#3a4654;cursor:pointer}
 .gal-dots button[aria-current]{background:var(--acc)}
+.gal-st img{transition:opacity .12s}.gal-st img.ld{opacity:.55}

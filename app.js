@@ -797,27 +797,38 @@ function titMeta(sec) {
 const actDefOf = (kind, key) => (kind === 'raid' ? defs.raids : kind === 'dg' ? defs.dungeons : kind === 'xm' ? (defs.xmissions || []) : []).find(x => x.k === key);
 const actYt = (kind, key) => { const a = actDefOf(kind, key); if (!a) return ''; const v = a.yt && /^https:\/\/(www\.)?youtube\.com\//.test(a.yt) ? `<a class="chip yt" href="${esc(a.yt)}" target="_blank" rel="noopener">▶ ${esc(u().ytGuide)}</a>` : ''; return v + (a.gi?.length ? `<button type="button" class="chip gi" data-gal="${kind}:${esc(key)}">🖼 ${esc(u().giBtn(a.gi.length))}</button>` : ''); };
 /* galeria de imagens do guia: só baixa as imagens quando abre */
-const GAL = { l: [], i: 0, t: '' };
+const GAL = { l: [], i: 0, t: '', seq: 0 };
 function galOpen(kind, key, i = 0) {
   const a = actDefOf(kind, key); if (!a?.gi?.length) return;
   GAL.l = a.gi; GAL.i = i; GAL.t = L(a.n);
   let d = $('galdlg'); if (!d) { d = document.createElement('dialog'); d.id = 'galdlg'; d.className = 'gal'; document.body.append(d); galWire(d); }
   galDraw(); if (!d.open) d.showModal();
 }
+// a estrutura é montada uma vez; ao trocar, a próxima imagem é decodificada antes de aparecer (sem piscar nem travar)
+const GALC = new Map();
+const galPre = src => { if (!GALC.has(src)) { const im = new Image(); im.decoding = 'async'; im.src = src; GALC.set(src, im.decode ? im.decode().catch(() => {}) : Promise.resolve()); } return GALC.get(src); };
 function galDraw() {
-  const d = $('galdlg'), g = GAL.l[GAL.i], n = GAL.l.length, W = u(); if (!d || !g) return;
-  const cap = lang === 'en' ? g[2] : g[1];
-  d.innerHTML = `<div class="gal-top"><b>${esc(GAL.t)}</b><span>${GAL.i + 1}/${n}</span><a class="gal-full" href="${esc(g[0])}" target="_blank" rel="noopener">${esc(W.giFull)}</a><button type="button" class="gal-x" aria-label="${esc(W.giClose)}">✕</button></div>
-    <div class="gal-st">${n > 1 ? `<button type="button" class="gal-nav gal-p" aria-label="‹">‹</button>` : ''}<img src="${esc(g[0])}" alt="${esc(cap)}" width="${g[3] || ''}" height="${g[4] || ''}">${n > 1 ? `<button type="button" class="gal-nav gal-n" aria-label="›">›</button>` : ''}</div>
-    <p class="gal-cap">${esc(cap)}</p>${n > 1 ? `<div class="gal-dots">${GAL.l.map((_, i) => `<button type="button" data-gi="${i}" aria-label="${i + 1}"${i === GAL.i ? ' aria-current="true"' : ''}></button>`).join('')}</div>` : ''}`;
-  const nx = GAL.l[(GAL.i + 1) % n]; if (nx) { const im = new Image(); im.src = nx[0]; }
+  const d = $('galdlg'), n = GAL.l.length, W = u(); if (!d || !n) return;
+  d.innerHTML = `<div class="gal-top"><b>${esc(GAL.t)}</b><span class="gal-c"></span><a class="gal-full" target="_blank" rel="noopener">${esc(W.giFull)}</a><button type="button" class="gal-x" aria-label="${esc(W.giClose)}">✕</button></div>
+    <div class="gal-st">${n > 1 ? `<button type="button" class="gal-nav gal-p" aria-label="‹">‹</button>` : ''}<img decoding="async" alt="">${n > 1 ? `<button type="button" class="gal-nav gal-n" aria-label="›">›</button>` : ''}</div>
+    <p class="gal-cap"></p>${n > 1 ? `<div class="gal-dots">${GAL.l.map((_, i) => `<button type="button" data-gi="${i}" aria-label="${i + 1}"></button>`).join('')}</div>` : ''}`;
+  GAL.l.forEach(g => galPre(g[0])); galShow();
 }
-function galGo(k) { const n = GAL.l.length; GAL.i = (GAL.i + k + n) % n; galDraw(); }
+async function galShow() {
+  const d = $('galdlg'), g = GAL.l[GAL.i], n = GAL.l.length, my = ++GAL.seq; if (!d || !g) return;
+  const cap = lang === 'en' ? g[2] : g[1];
+  d.querySelector('.gal-c').textContent = `${GAL.i + 1}/${n}`; d.querySelector('.gal-cap').textContent = cap; d.querySelector('.gal-full').href = g[0];
+  d.querySelectorAll('[data-gi]').forEach((b, i) => b.toggleAttribute('aria-current', i === GAL.i));
+  const img = d.querySelector('.gal-st img'); img.classList.add('ld');
+  await galPre(g[0]); if (my !== GAL.seq) return;
+  img.width = g[3] || 0; img.height = g[4] || 0; img.src = g[0]; img.alt = cap; img.classList.remove('ld');
+}
+function galGo(k) { const n = GAL.l.length; GAL.i = (GAL.i + k + n) % n; galShow(); }
 function galWire(d) {
   d.addEventListener('click', e => {
     if (e.target === d || e.target.closest('.gal-x')) { d.close(); return; }
     if (e.target.closest('.gal-p')) return galGo(-1); if (e.target.closest('.gal-n')) return galGo(1);
-    const b = e.target.closest('[data-gi]'); if (b) { GAL.i = +b.dataset.gi; galDraw(); }
+    const b = e.target.closest('[data-gi]'); if (b) { GAL.i = +b.dataset.gi; galShow(); }
   });
   d.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') galGo(-1); if (e.key === 'ArrowRight') galGo(1); });
   let x0 = null; d.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true });
