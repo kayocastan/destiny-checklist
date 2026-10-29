@@ -626,3 +626,8 @@ li.is-done .chip.exo{opacity:.7}
 .gh-band>*{z-index:2}
 .gh.noemb .gh-band::after,.gh.landing .gh-band::after{display:none}
 @media (max-width:400px){.gh-band{--embw:454px}}
+/* Títulos: escolher a ordem */
+.tsort{display:flex;flex-wrap:wrap;gap:6px;align-items:center;grid-column:1/-1}
+.tsort-k{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.tsort .char{font-size:13px}
+.tsort .char[aria-pressed="true"]{border-color:var(--acc);color:var(--fg);background:color-mix(in srgb,var(--acc) 14%,transparent)}
