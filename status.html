@@ -111,7 +111,7 @@ function render(d) {
   h += `<p class="note">${lvl === 2 ? '<b style="color:var(--crit)">Freio total ligado</b>: o servidor parou e o site usa a Bungie direto até o ciclo virar.' : lvl === 1 ? '<b style="color:var(--warn)">Freio parcial ligado</b>: sem gravar nomes novos nem sincronizar até o ciclo virar.' : 'Freio de gastos desligado: tudo dentro do incluído.'} Conferido de hora em hora${br.at ? ` (último: ${new Date(br.at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })})` : ''}. Liga em 80% (parcial) e 95% (total) de qualquer item.</p><div class="grid">`;
   if (M.error) h += tile('Uso do ciclo', '—', esc(M.error));
   else {
-    const since = M.since ? new Date(M.since + 'T00:00:00Z').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : '';
+    const since = M.since ? new Date(M.since + 'T00:00:00Z').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' }) : '';
     h += meterCard('Pedidos ao servidor', M.req, LIM.mReq, nf, 'desde ' + since);
     h += meterCard('Gravações do banco (linhas)', M.write, LIM.mWrite, nf);
     h += meterCard('Leituras do banco (linhas)', M.read, LIM.mRead, nf);
