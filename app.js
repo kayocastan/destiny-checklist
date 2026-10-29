@@ -1959,9 +1959,8 @@ function renderLive() {
     const nm = m.name.replace(/#\d+$/, ''), you = m.id === member.id;
     return `<button class="lv-c" type="button" data-lv="${i}" style="--a1:${a1};--a2:${a2}" title="${esc(U.liveTap)}">
       <span class="lv-b" style="background-image:url('${BNET}${m.ch.emblemBackgroundPath || ''}')"><span class="lv-n"><b>${esc(nm)}</b>${you ? `<small>${esc(U.liveYou)}</small>` : ''}</span><span class="lv-pw">${m.ch.light}</span></span>
-      <span class="lv-g">${sub ? ic(sub, 'lv-sub') : ''}<span class="lv-cls">${esc((sub && d(sub.itemHash).n) || U.classes[m.ch.classType] || '')}</span>${m.priv ? `<span class="lv-priv">${esc(U.livePriv)}</span>` : `<span class="lv-w">${ws.map(x => ic(x, B.en[x.itemHash]?.tt === 6 ? 'ex' : '')).join('')}${exo.filter(x => !WEAPON_B.includes(x.bucketHash)).map(x => ic(x, 'ex')).join('')}</span>`}</span>
-      ${(() => { const st = m.ch.stats; if (!st) return ''; loadStats(); const D = STATD?.d || {}; const top = STAT_ORDER.filter(h => st[h] != null).sort((x, y) => st[y] - st[x]).slice(0, 2); return `<span class="lv-st">${top.map(h => `<span title="${esc(D[h]?.n || '')}">${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}${esc(D[h]?.n || '')} <b>${st[h]}</b></span>`).join('')}</span>`; })()}
-      ${exo.length ? `<span class="lv-x">${exo.map(x => esc(d(x.itemHash).n || '')).join(' · ')}</span>` : ''}</button>`;
+      <span class="lv-g">${sub ? ic(sub, 'lv-sub') : ''}<span class="lv-cls">${esc((sub && d(sub.itemHash).n) || U.classes[m.ch.classType] || '')}</span>${m.priv ? `<span class="lv-priv">${esc(U.livePriv)}</span>` : ''}</span>
+      ${m.priv || !B ? '' : `<span class="lv-eq"><span class="lv-row">${WEAPON_B.map(b => eq.find(x => x.bucketHash === b)).map(x => x ? ic(x, B.en[x.itemHash]?.tt === 6 ? 'ex' : '') : '<i></i>').join('')}</span><span class="lv-row arm">${ARMOR_B.map(b => eq.find(x => x.bucketHash === b)).map(x => x ? ic(x, B.en[x.itemHash]?.tt === 6 ? 'ex' : '') : '<i></i>').join('')}</span></span>`}</button>`;
   };
   el.innerHTML = `<div class="lv-h"><span class="lv-dot" aria-hidden="true"></span><b>${esc(U.liveT)}</b>${LIVE.act ? `<span>${esc(LIVE.act)}</span>` : ''}${tm ? `<small>${esc(U.liveSince(tm))}</small>` : ''}</div><div class="lv-l">${LIVE.mem.map(card).join('')}</div>`;
   el.hidden = false;

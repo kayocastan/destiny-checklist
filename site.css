@@ -599,3 +599,9 @@ li.is-done .chip.exo{opacity:.7}
 .lv-st b{color:var(--fg);font-family:var(--mono);font-weight:500}
 :root:not([data-theme="dark"]) .lv-st img{filter:invert(1) brightness(.4)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .lv-st img{filter:none}}
+/* Ao vivo: quadro com armas e a armadura completa */
+.lv-eq{margin:0 10px 0 12px;padding:7px;border-radius:8px;background:color-mix(in srgb,var(--chip) 70%,transparent);border:1px solid var(--line);display:grid;gap:6px}
+.lv-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+.lv-row img,.lv-row i{width:100%;aspect-ratio:1;max-width:40px;border-radius:5px;display:block}
+.lv-row i{border:1px dashed var(--line)}
+.lv-row img.ex{box-shadow:0 0 0 1.5px rgba(227,192,74,.85)}
