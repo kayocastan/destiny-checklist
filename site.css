@@ -723,3 +723,17 @@ section.collapsed .gl-l{display:none}
 .wk-nl li{padding:2px 0}
 .wk-nl span{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--exotic);margin-right:4px}
 [data-gld].ask{background:var(--bad,#c0392b);color:#fff;border-color:transparent}
+.lv-go{font:inherit;font-weight:600;color:var(--fg);background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:999px;padding:2px 10px;cursor:pointer}
+.lv-go i{font-style:normal;color:var(--exotic)}
+.lv-go:hover{border-color:var(--exotic)}
+/* destaque da semana aberto no lugar */
+.wk-f.on{box-shadow:inset 0 0 0 2px var(--exotic)}
+.wk-fm{margin-top:8px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.03)}
+.wk-fm-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.wk-fm-h b{font-family:var(--display);font-size:17px}
+.wk-fm-h>span{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.wk-fm-go{margin-left:auto;font:inherit;font-size:12.5px;color:var(--fg);background:none;border:1px solid var(--line);border-radius:999px;padding:3px 10px;cursor:pointer}
+.wk-fm-go:hover{border-color:var(--exotic)}
+.wk-fm ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.wk-fm li{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13.5px;padding:4px 0;border-top:1px solid var(--line)}
+.wk-fm p{margin:0;font-size:13px;color:var(--muted)}
