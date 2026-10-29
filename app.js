@@ -1664,14 +1664,17 @@ function buildParts(C) {
   };
 }
 // Algo da build do outro que você também pode usar: aspectos/fragmentos/habilidades pelos seus conjuntos de encaixes; armas e armaduras pela sua coleção
-// conjuntos de encaixes da sua conta (aspectos, fragmentos, habilidades, vantagens de artefato): só quando a comparação abre
+// conjuntos de encaixes da sua conta (aspectos, fragmentos, habilidades, vantagens de artefato)
 let PLUGS = null, plugsP = null;
 function loadPlugs() {
+  // vêm com o componente de encaixes (305), que o perfil já carrega; só busca se ainda não tiver
+  if (!PLUGS && profile?.profilePlugSets?.data) PLUGS = { p: profile.profilePlugSets.data.plugs || {}, c: profile.characterPlugSets?.data || {} };
   if (PLUGS || plugsP || !member) return plugsP;
-  plugsP = bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=105,310`).then(r => { PLUGS = { p: r.profilePlugSets?.data?.plugs || {}, c: r.characterPlugSets?.data || {} }; if (FD.cmp) renderFind(); }).catch(() => { plugsP = null; });
+  plugsP = bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=305`).then(r => { PLUGS = { p: r.profilePlugSets?.data?.plugs || {}, c: r.characterPlugSets?.data || {} }; if (FD.cmp) renderFind(); }).catch(() => { plugsP = null; });
   return plugsP;
 }
 function iOwnPlug(h) {
+  if (!PLUGS) loadPlugs();
   if (!PLUGS) return null;
   const has = list => (list || []).some(p => p.plugItemHash === h && p.canInsert !== false);
   for (const list of Object.values(PLUGS.p)) if (has(list)) return true;
