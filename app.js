@@ -165,6 +165,19 @@ for (const [k, v] of Object.entries(lastSub)) if (!GROUPS.find(g => g.id === k)?
 
 /* ---------- status ---------- */
 function status(msg) { $('status').textContent = msg || ''; }
+/* telas largas: duas colunas independentes (abrir uma ilha não empurra a outra coluna) */
+const WIDE = matchMedia('(min-width:1100px)');
+function layoutCols() {
+  const P = $('list').firstElementChild; if (!WIDE.matches || !P || !P.classList.contains('panel') || P.querySelector(':scope>.pcols')) return;
+  const kids = [...P.children], full = el => getComputedStyle(el).gridColumnEnd === '-1', box = kids.filter(el => !full(el) && !el.hidden);
+  if (box.length < 2) return;
+  const wrap = document.createElement('div'), cols = [document.createElement('div'), document.createElement('div')], h = [0, 0];
+  wrap.className = 'pcols'; cols.forEach(c => { c.className = 'pcol'; wrap.append(c); });
+  const hs = box.map(el => el.offsetHeight); P.insertBefore(wrap, box[0]);
+  box.forEach((el, i) => { const k = h[0] <= h[1] ? 0 : 1; cols[k].append(el); h[k] += hs[i] + 18; });
+}
+new MutationObserver(layoutCols).observe($('list'), { childList: true });
+WIDE.addEventListener?.('change', () => typeof render === 'function' && render());
 function showMessage(html) { $('list').innerHTML = `<div class="panel">${html}</div>`; }
 
 /* ---------- autenticação ---------- */
@@ -1327,9 +1340,9 @@ function render() {
   if (SORT_TABS.includes(tab)) {
     // a pessoa escolhe a ordem; concluídos sempre no fim
     const m = sortOf(tab), pct = secPct, idx = new Map(secs.map((x, i) => [x, i]));
-    // "falta arma"/"falta catalisador" filtram: só o que ainda falta, na ordem de dificuldade
-    if (m === 'wpn' || m === 'cat') { const keep = secs.filter(x => x.items.some(i => (m === 'wpn' ? i.isEx : i.isCat) && !isDone(i))); secs.length = 0; secs.push(...keep); }
-    secs.sort((a, b) => (m === 'near' ? pct(b) - pct(a) : m === 'low' ? pct(a) - pct(b) : m === 'name' ? a.title.localeCompare(b.title, lang === 'en' ? 'en' : 'pt-BR') : (secTier(a) - secTier(b)) || (pct(b) - pct(a))) || idx.get(a) - idx.get(b));
+    // "falta arma"/"falta catalisador": o que ainda falta primeiro (por dificuldade), o resto no fim
+    const miss = x => m === 'wpn' || m === 'cat' ? (x.items.some(i => (m === 'wpn' ? i.isEx : i.isCat) && !isDone(i)) ? 0 : 1) : 0;
+    secs.sort((a, b) => (miss(a) - miss(b)) || (m === 'near' ? pct(b) - pct(a) : m === 'low' ? pct(a) - pct(b) : m === 'name' ? a.title.localeCompare(b.title, lang === 'en' ? 'en' : 'pt-BR') : (secTier(a) - secTier(b)) || (pct(b) - pct(a))) || idx.get(a) - idx.get(b));
   }
   secs.sort((a, b) => secDone(a) - secDone(b));
   const tsBar = SORT_TABS.includes(tab) ? `<div class="tsort"><label class="tsort-k" for="tsortsel">${esc(U.tsK)}</label><select id="tsortsel" class="tsort-sel">${TS_OPTS[tab].map(k => `<option value="${k}"${sortOf(tab) === k ? ' selected' : ''}>${esc(U.tsO[k])}</option>`).join('')}</select></div>${secs.length ? '' : `<p class="empty-msg">${esc(U.tsNone)}</p>`}` : '';
@@ -1414,7 +1427,7 @@ $('searchbtn').addEventListener('click', () => { const q = $('q'), show = q.hidd
 $('q').addEventListener('input', e => { query = e.target.value; filter(); });
 const toggleSec = h => { const id = h.dataset.coll, sec = h.closest('section'); const o = sec.classList.toggle('collapsed') === false; if (id === 'goals-x') { o ? openSecs.delete(id) : openSecs.add(id); } else { o ? openSecs.add(id) : openSecs.delete(id); } h.setAttribute('aria-expanded', o); };
 $('list').addEventListener('change', e => { if (e.target.id === 'tsortsel') { TSORT.v[tab] = e.target.value; LS.set('dc-sorts', TSORT.v); render(); } });
-$('list').addEventListener('keydown', e => { const h = e.target.closest && e.target.closest('.sec-head[data-coll]'); if (h && e.target === h && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleSec(h); } });
+$('list').addEventListener('keydown', e => { const jb = e.target.closest && e.target.closest('[data-jump][role="button"]'); if (jb && e.target === jb && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); jb.click(); return; } const h = e.target.closest && e.target.closest('.sec-head[data-coll]'); if (h && e.target === h && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleSec(h); } });
 $('list').addEventListener('click', e => {
   const hd = e.target.closest('.sec-head[data-coll]'); if (hd) { toggleSec(hd); return; }
   const it = e.target.closest('button.it'); if (it) { const li = it.closest('li'); const o = li.classList.toggle('open'); it.setAttribute('aria-expanded', o); o ? openItems.add(li.dataset.li) : openItems.delete(li.dataset.li); return; }
@@ -1543,27 +1556,31 @@ function ldListHTML() {
 const savedList = () => LS.get('dc-builds', []);
 function buildSig(C) { const eq = C.p?.characterEquipment?.data?.[C.cid]?.items || []; return [C.p?.characters?.data?.[C.cid]?.classType, ...eq.filter(i => i.bucketHash === SUB_BUCKET || WEAPON_B.includes(i.bucketHash) || ARMOR_B.includes(i.bucketHash)).map(i => i.itemHash)].join('.'); }
 const savedKey = C => { if (!C?.p || !C.B) return null; const k = C.k || String(C.name).replace(/#\d+$/, '') + '|' + buildSig(C); return savedList().some(x => x.k === k) ? k : null; };
+// cópia da build como está agora (mesmo formato das builds salvas): serve para salvar e para as metas
+function snapBuild(C, k) {
+  const ch = C.p.characters.data[C.cid], eq = C.p.characterEquipment.data[C.cid].items, sk = C.p.itemComponents?.sockets?.data || {}, ins = C.p.itemComponents?.instances?.data || {};
+  const sub = eq.find(i => i.bucketHash === SUB_BUCKET), so = {}, io = {};
+  for (const it of eq) { if (sk[it.itemInstanceId]) so[it.itemInstanceId] = sk[it.itemInstanceId]; if (ins[it.itemInstanceId]) io[it.itemInstanceId] = { primaryStat: ins[it.itemInstanceId].primaryStat }; }
+  const c = { characterId: C.cid, classType: ch.classType, raceType: ch.raceType, light: ch.light, emblemHash: ch.emblemHash, emblemPath: ch.emblemPath, emblemBackgroundPath: ch.emblemBackgroundPath, stats: ch.stats };
+  return { k, name: String(C.name).replace(/#\d+$/, ''), t: charTitle(u().classes[ch.classType] || '', C.B?.loc?.[sub?.itemHash]?.n), at: Date.now(), cid: C.cid, p: { characters: { data: { [C.cid]: c } }, characterEquipment: { data: { [C.cid]: { items: eq } } }, itemComponents: { sockets: { data: so }, instances: { data: io } } } };
+}
+function openSnap(x, title) {
+  const note = u().w.savedOn(new Date(x.at).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR', { day: '2-digit', month: '2-digit' }));
+  openCtx({ name: title || (x.title ? `${x.name} · ${x.title}` : x.name), note, k: x.k }, { p: x.p, cid: x.cid, B: null });
+  (async () => { const my = FD.seq, B = await fetchBuild(x.p, x.cid, b => { if (my === FD.seq) { FD.B = b; renderFind(); } }); if (my === FD.seq) { FD.B = B; renderFind(); } })();
+}
 function toggleSaved(C) {
   if (!C?.p || !C.B) return;
   const l = savedList(), k = C.k || String(C.name).replace(/#\d+$/, '') + '|' + buildSig(C), i = l.findIndex(x => x.k === k);
   if (i >= 0) l.splice(i, 1);
-  else {
-    const ch = C.p.characters.data[C.cid], eq = C.p.characterEquipment.data[C.cid].items, sk = C.p.itemComponents?.sockets?.data || {}, ins = C.p.itemComponents?.instances?.data || {};
-    const sub = eq.find(i => i.bucketHash === SUB_BUCKET), so = {}, io = {};
-    for (const it of eq) { if (sk[it.itemInstanceId]) so[it.itemInstanceId] = sk[it.itemInstanceId]; if (ins[it.itemInstanceId]) io[it.itemInstanceId] = { primaryStat: ins[it.itemInstanceId].primaryStat }; }
-    const c = { characterId: C.cid, classType: ch.classType, raceType: ch.raceType, light: ch.light, emblemHash: ch.emblemHash, emblemPath: ch.emblemPath, emblemBackgroundPath: ch.emblemBackgroundPath };
-    l.unshift({ k, name: String(C.name).replace(/#\d+$/, ''), t: charTitle(u().classes[ch.classType] || '', C.B.loc[sub?.itemHash]?.n), at: Date.now(), cid: C.cid, p: { characters: { data: { [C.cid]: c } }, characterEquipment: { data: { [C.cid]: { items: eq } } }, itemComponents: { sockets: { data: so }, instances: { data: io } } } });
-  }
+  else l.unshift(snapBuild(C, k));
   try { LS.set('dc-builds', l.slice(0, 20)); } catch {}
   if (isGd()) render();
 }
 // abre uma build qualquer (loadout ou salva) no mesmo visualizador da busca
 function openCtx(sel, C) { FD.seq++; FD.cmp = false; FD.src = -1; FD.sel = sel; FD.p = C.p; FD.cid = C.cid; FD.B = C.B; FD.status = ''; openFind(); }
 async function openSaved(i) {
-  const x = savedList()[i]; if (!x) return;
-  const note = u().w.savedOn(new Date(x.at).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR', { day: '2-digit', month: '2-digit' }));
-  openCtx({ name: x.title ? `${x.name} · ${x.title}` : x.name, note, k: x.k }, { p: x.p, cid: x.cid, B: null });
-  const my = FD.seq, B = await fetchBuild(x.p, x.cid, b => { if (my === FD.seq) { FD.B = b; renderFind(); } }); if (my === FD.seq) { FD.B = B; renderFind(); }
+  const x = savedList()[i]; if (!x) return; openSnap(x);
 }
 async function openLoadout(i) {
   const C = await getLdCtx(i); if (!C) return;
@@ -1905,12 +1922,12 @@ async function loadSession() {
       const fastAll = ACTH?.d?.[m.k]?.fast || 0;
       const rec = first ? null : prev ? (best.dur < prev.dur ? { o: fmtDur(prev.dur * 1000), d: fmtDur((prev.dur - best.dur) * 1000) } : null) : (fastAll && Math.abs(fastAll / 1000 - best.dur) < 2 && total > list.length ? { best: true } : null);
       const solo = list.find(r => r.pc === 1), fl = solo && list.some(r => r.pc === 1 && r.d === 0);
-      items.push({ p: first ? 0 : rec ? 0.5 : solo ? 2.5 : 3, cls: first || rec ? 'gold' : solo ? 'solo' : '', badge: first ? 'first' : m.kind, rec, solo: solo ? (fl ? 'fl' : 'y') : '', img: def.img, dif: def.d, n: L(def.n), sub: [fmtDur(best.dur * 1000), best.k + ' ' + u().w.kills, best.d + ' ' + u().w.deaths], foot: x && colMissing(x.h) ? u().w.ssNoDrop(L(x.n)) : '' });
+      items.push({ p: first ? 0 : rec ? 0.5 : solo ? 2.5 : 3, cls: first || rec ? 'gold' : solo ? 'solo' : '', badge: first ? 'first' : m.kind, rec, solo: solo ? (fl ? 'fl' : 'y') : '', img: def.img, dif: def.d, to: m.kind + '-' + m.k, n: L(def.n), sub: [fmtDur(best.dur * 1000), best.k + ' ' + u().w.kills, best.d + ' ' + u().w.deaths], foot: x && colMissing(x.h) ? u().w.ssNoDrop(L(x.n)) : '' });
     }
     for (const h of ex.newExo) { const e = defs.exotics.find(y => y.h[0] === h); if (e) items.push({ p: 1, cls: 'gold', badge: 'exo', n: L(e.n), sub: [u().w.ssNewExo], foot: '' }); }
     const claim = []; for (const se of defs.seals) { const c = se.r.filter(r => { const st = recState(r[0]); return st && !(st.state & 1) && !(st.state & 4); }).length; if (c) { const done = se.r.filter(r => recDone(recState(r[0]))).length; claim.push({ se, c, done }); } }
     if (claim.length) { const top = claim.sort((a, b) => b.c - a.c)[0], n = claim.reduce((t, x) => t + x.c, 0); items.push({ p: 2, cls: 'claim', badge: 'claim', n: u().w.ssClaim(n, L(top.se.t)), sub: [u().w.ssClaimSub], foot: u().w.ssTitle(top.done, top.se.r.length) }); }
-    for (const a of s) { const m = map[a.h]; if (m || !a.done) continue; items.push({ p: 4, dur: a.dur, cls: '', h: a.h, badge: 'mode' + a.mode, n: names[a.h]?.n || '?', sub: [Math.round(a.dur / 60) + ' min', a.k + ' ' + u().w.kills], foot: '' }); }
+    for (const a of s) { const m = map[a.h]; if (m || !a.done) continue; items.push({ p: 4, dur: a.dur, cls: '', h: a.h, to: (() => { const xm = (defs.xmissions || []).find(z => (z.ah || []).includes(a.h)); return xm ? 'xm-' + xm.k : ''; })(), badge: 'mode' + a.mode, n: names[a.h]?.n || '?', sub: [Math.round(a.dur / 60) + ' min', a.k + ' ' + u().w.kills], foot: '' }); }
     items.sort((a, b) => a.p - b.p || (b.dur || 0) - (a.dur || 0));
     if (member?.id !== mid) return;
     SESSION = { cid: charId, at: Date.now(), start, end, mins: Math.round(s.reduce((t, a) => t + a.dur, 0) / 60), from: ex.from, light, items };
@@ -1963,7 +1980,7 @@ function sessHTML() {
   const tm = t => new Date(t).toLocaleTimeString(lang === 'en' ? 'en-US' : 'pt-BR', { hour: '2-digit', minute: '2-digit' });
   const day = (() => { const d = new Date(S.start), n = new Date(); const y = new Date(n); y.setDate(n.getDate() - 1); return d.toDateString() === n.toDateString() ? W.today : d.toDateString() === y.toDateString() ? W.yesterday : d.toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR', { day: '2-digit', month: '2-digit' }); })();
   const badge = b => W.ssBadge[b] || W.ssBadge[b.replace(/\d+$/, '')] || (/^mode/.test(b) ? (W.ssMode[+b.slice(4)] || W.ssBadge.done) : W.ssBadge.done);
-  const card = t => { const im = FX ? (t.img || (t.h ? actImg(t.h) : '')) : ''; return `<div class="ss-c ${t.cls}${im ? ' ss-img' : ''}"${im ? ` style="--ss-img:url('${BNET}${im}')"` : ''}><span class="ss-bs"><span class="ss-badge">${esc(badge(t.badge))}</span>${FX && t.rec ? `<span class="ss-badge rec">⏱ ${esc(u().ssRec)}</span>` : ''}${FX && t.solo ? `<span class="ss-badge solo">${esc(t.solo === 'fl' ? u().ssSoloFl : u().ssSolo)}</span>` : ''}${FX && t.dif ? `<span class="ss-dif chip ${{ 'Fácil': 'easy', 'Médio': 'mid', 'Difícil': 'hard' }[t.dif] || ''}">${esc(u().chip[t.dif] || t.dif)}</span>` : ''}</span><b class="ss-cn">${esc(t.n)}</b>${FX && t.rec ? `<small class="ss-rec">${esc(t.rec.best ? u().ssRecBest : u().ssRecSub(t.rec.o, t.rec.d))}</small>` : ''}<small>${esc(t.sub.filter(Boolean).join(' · '))}</small>${t.foot ? `<span class="ss-foot">${esc(t.foot)}</span>` : ''}</div>`; };
+  const card = t => { const im = FX ? (t.img || (t.h ? actImg(t.h) : '')) : '', go = t.to && SECTIONS.find(x => x.id === t.to); return `<div class="ss-c ${t.cls}${im ? ' ss-img' : ''}${go ? ' ss-go' : ''}"${go ? ` data-jump="${go.tab}:${go.id}" role="button" tabindex="0"` : ''}${im ? ` style="--ss-img:url('${BNET}${im}')"` : ''}><span class="ss-bs"><span class="ss-badge">${esc(badge(t.badge))}</span>${FX && t.rec ? `<span class="ss-badge rec">⏱ ${esc(u().ssRec)}</span>` : ''}${FX && t.solo ? `<span class="ss-badge solo">${esc(t.solo === 'fl' ? u().ssSoloFl : u().ssSolo)}</span>` : ''}${FX && t.dif ? `<span class="ss-dif chip ${{ 'Fácil': 'easy', 'Médio': 'mid', 'Difícil': 'hard' }[t.dif] || ''}">${esc(u().chip[t.dif] || t.dif)}</span>` : ''}</span><b class="ss-cn">${esc(t.n)}</b>${FX && t.rec ? `<small class="ss-rec">${esc(t.rec.best ? u().ssRecBest : u().ssRecSub(t.rec.o, t.rec.d))}</small>` : ''}<small>${esc(t.sub.filter(Boolean).join(' · '))}</small>${t.foot ? `<span class="ss-foot">${esc(t.foot)}</span>` : ''}</div>`; };
   const top = S.items.slice(0, 3), rest = S.items.slice(3), h = Math.floor(S.mins / 60), m = S.mins % 60;
   return `<section class="ss keep" data-sec="session"><div class="ss-head"><h2>${esc(W.ssT)}</h2><div class="ss-meta"><span>${esc(day)}, ${tm(S.start)}–${tm(S.end)}</span><span>⏱ ${h ? h + 'h' + String(m).padStart(2, '0') : m + ' min'}</span>${S.from && S.light > S.from ? `<span class="ss-pw">✦ ${S.from} → <b>${S.light}</b></span>` : ''}</div></div>
     <div class="ss-top">${top.map(card).join('')}</div>${rest.length ? `<details class="ss-more"><summary>${esc(W.ssMore(rest.length))}</summary><div class="ss-top">${rest.map(card).join('')}</div></details>` : ''}</section>`;
@@ -2196,7 +2213,7 @@ function goalsHTML() {
     const ref = g.st ? `<div class="gl-ref"><small>${esc(W.glRef)}</small><div>${STAT_ORDER.map(h => `<span title="${esc(D[h]?.n || '')}">${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}<b>${g.st[h]}</b>${mine ? `<i>${esc(W.glYou)} ${mine[h] || 0}</i>` : ''}</span>`).join('')}</div></div>` : '';
     const [a1] = ELEMENT_ACC[g.el] || ELEMENT_ACC.arc;
     const shut = GLC.has(g.id);
-    return `<div class="gl-c${shut ? ' shut' : ''}" style="--a1:${a1}"><div class="gl-h" data-glt="${esc(g.id)}" role="button" tabindex="0" aria-expanded="${!shut}"><span class="gl-dot"></span><span class="gl-t"><b>${esc(g.title)}</b><small>${esc(W.glAt(new Date(g.at).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR', { day: '2-digit', month: '2-digit' })))}</small></span><span class="gl-n">${done}/${g.items.length}</span><span class="gl-acts">${g.sel ? `<button type="button" data-glv="${gi}">${esc(W.glView)}</button>` : ''}<button type="button" data-gld="${gi}">${esc(W.glDel)}</button></span><span class="chev" aria-hidden="true"></span></div>
+    return `<div class="gl-c${shut ? ' shut' : ''}" style="--a1:${a1}"><div class="gl-h" data-glt="${esc(g.id)}" role="button" tabindex="0" aria-expanded="${!shut}"><span class="gl-dot"></span><span class="gl-t"><b>${esc(g.title)}</b><small>${esc(W.glAt(new Date(g.at).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR', { day: '2-digit', month: '2-digit' })))}</small></span><span class="gl-n">${done}/${g.items.length}</span><span class="gl-acts">${g.sel || g.sig ? `<button type="button" data-glv="${gi}">${esc(W.glView)}</button>` : ''}<button type="button" data-gld="${gi}">${esc(W.glDel)}</button></span><span class="chev" aria-hidden="true"></span></div>
       <div class="gl-bar"><u style="width:${g.items.length ? done / g.items.length * 100 : 0}%"></u></div>
       <div class="gl-body">${ref}
       ${groups.map(([k, l]) => `<div class="gl-g"><small>${esc(W.glG[k])}</small>${l.map(([it, ok]) => `<div class="gl-it${ok ? ' ok' : ''}${ok == null ? ' unk' : ''}"><i></i>${it.ic ? `<img src="${BNET}${it.ic}" alt="" loading="lazy">` : '<span class="gl-noic"></span>'}<span><b>${esc(it.k === 'set' ? W.glSet(it.n || '?', it.need) : it.n || '')}</b><small>${esc(it.k === 'plug' ? W.glSrcPlug : it.k === 'set' ? `${owned[it.h] ?? '…'}/${it.need} · ${W.glSetSrc}` : (CSRC[COLL[it.h] + ':' + lang] || ''))}</small></span></div>`).join('')}</div>`).join('')}</div></div>`;
@@ -2205,10 +2222,10 @@ function goalsHTML() {
   return `<section data-sec="goals" class="keep coll${open ? '' : ' collapsed'}">${head(G.length, W.glNote)}<div class="gl-l">${G.map(card).join('')}</div></section>`;
 }
 document.addEventListener('click', e => {
-  const add = e.target.closest('.gl-add'); if (add && !add.disabled) { const C = fdCtx(), mine = cmpMine(); if (!mine) return; const g = goalFromCmp(mine, C); const l = goals().filter(x => x.id !== g.id); l.unshift(g); LS.set('dc-goals', l.slice(0, 12)); add.disabled = true; add.textContent = u().glDone; if (tab === 'obj') render(); return; }
+  const add = e.target.closest('.gl-add'); if (add && !add.disabled) { const C = fdCtx(), mine = cmpMine(); if (!mine) return; const g = goalFromCmp(mine, C); g.sig = buildSig(C); const l = goals().filter(x => x.id !== g.id); l.unshift(g); LS.set('dc-goals', l.slice(0, 12)); try { const sn = LS.get('dc-goalsnap', {}); sn[g.id] = snapBuild(C, ''); for (const id of Object.keys(sn)) if (!l.slice(0, 12).some(x => x.id === id)) delete sn[id]; LS.set('dc-goalsnap', sn); } catch {} add.disabled = true; add.textContent = u().glDone; if (tab === 'obj') render(); return; }
   const glt = e.target.closest('[data-glt]'); if (glt && !e.target.closest('button')) { const id = glt.dataset.glt, c = glt.closest('.gl-c'), shut = c.classList.toggle('shut'); shut ? GLC.add(id) : GLC.delete(id); glt.setAttribute('aria-expanded', !shut); LS.set('dc-glc', [...GLC]); return; }
   const del = e.target.closest('[data-gld]'); if (del) { if (!del.classList.contains('ask')) { del.classList.add('ask'); del.textContent = u().outQ; setTimeout(() => { if (del.isConnected) { del.classList.remove('ask'); del.textContent = u().glDel; } }, 3000); return; } const l = goals(); l.splice(+del.dataset.gld, 1); LS.set('dc-goals', l); render(); return; }
-  const v = e.target.closest('[data-glv]'); if (v) { const g = goals()[+v.dataset.glv]; if (g?.sel) { FD.q = ''; FD.results = null; openFind(); showPlayer(g.sel); } }
+  const v = e.target.closest('[data-glv]'); if (v) { const g = goals()[+v.dataset.glv]; const sn = g && (LS.get('dc-goalsnap', {})[g.id] || (g.sig && savedList().find(x => x.k.endsWith('|' + g.sig)))); if (sn) { FD.q = ''; FD.results = null; openSnap(sn, g.title); return; } if (g?.sel) { FD.q = ''; FD.results = null; openFind(); showPlayer(g.sel); } }
 });
 async function start() {
   try {
