@@ -1944,7 +1944,18 @@ async function syncPush(keepalive) {
 document.addEventListener('visibilitychange', () => { if (document.hidden) syncPush(true); else if (Date.now() - SY.pulled > 60000) syncPull(); });
 // /beta: confere no servidor se é o dono; qualquer outra pessoa volta para o site normal
 async function betaGate() {
-  try { const r = await fetch(APIW + '/whoami', { headers: { Authorization: 'Bearer ' + await token(), 'X-API-Key': cfg.apiKey } }); const j = await r.json(); if (!j.owner) location.replace('/'); else document.documentElement.classList.add('beta'); } catch { location.replace('/'); }
+  // só volta para o site normal quando o servidor responde que a conta não é a do dono; falha de rede não expulsa
+  document.documentElement.classList.add('beta');
+  for (let i = 0; i < 3; i++) {
+    try {
+      const r = await fetch((APIW || 'https://dni-api.dni-site.workers.dev') + '/whoami', { headers: { Authorization: 'Bearer ' + await token(), 'X-API-Key': cfg.apiKey } });
+      const j = await r.json().catch(() => null);
+      if (j && j.owner === true) return;
+      if (j && j.owner === false && j.uid) { location.replace('/'); return; }
+      console.warn('[beta] resposta inesperada', r.status, j);
+    } catch (e) { console.warn('[beta] não deu para confirmar o acesso', e?.message); if (e?.message === 'auth') { location.replace('/'); return; } }
+    await new Promise(r => setTimeout(r, 1500));
+  }
 }
 let moving = false;
 async function moveToNew() {
