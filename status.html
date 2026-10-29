@@ -82,7 +82,7 @@ try { const t = LS.get('dc-theme', null); if (t) document.documentElement.datase
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const nf = n => new Intl.NumberFormat('pt-BR').format(Math.round(n || 0));
 const bytes = b => b == null ? '—' : b < 1024 ? b + ' B' : b < 1048576 ? (b / 1024).toFixed(1).replace('.', ',') + ' KB' : (b / 1048576).toFixed(1).replace('.', ',') + ' MB';
-const LIM = { size: 500 * 1048576, mReq: 10e6, mWrite: 50e6, mRead: 25e9 };
+const LIM = { size: 500 * 1048576, mReq: 10e6, mWrite: 50e6, mRead: 25e9, mCpu: 30e6 };
 const level = p => p >= .85 ? ['crit', 'Perto do limite'] : p >= .6 ? ['warn', 'Atenção'] : ['good', 'Tranquilo'];
 async function token() {
   let a = LS.get('dc-auth', null); if (!a) return null;
@@ -115,6 +115,7 @@ function render(d) {
     h += meterCard('Pedidos ao servidor', M.req, LIM.mReq, nf, 'desde ' + since);
     h += meterCard('Gravações do banco (linhas)', M.write, LIM.mWrite, nf);
     h += meterCard('Leituras do banco (linhas)', M.read, LIM.mRead, nf);
+    h += meterCard('Tempo de CPU (estimado)', M.cpu, LIM.mCpu, v => nf(v) + ' ms');
   }
   h += '</div></section>';
   h += '<section><h2>Hoje (dia UTC)</h2><div class="grid">';

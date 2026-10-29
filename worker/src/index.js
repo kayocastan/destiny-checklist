@@ -101,7 +101,7 @@ async function sync(req, env) {
    De hora em hora lê no Analytics quanto já foi usado no ciclo de cobrança (renova no dia BILL_DAY).
    Acima de 80% do incluído em qualquer item: para de gravar o dispensável (nomes novos, registro de login,
    sincronização). Acima de 95%: o servidor deixa de responder e o site usa a Bungie direto, até o ciclo virar. */
-const INCL = { req: 10e6, write: 50e6, read: 25e9 };
+const INCL = { req: 10e6, write: 50e6, read: 25e9, cpu: 30e6 }; // cpu em ms de CPU por ciclo
 function cycleStart(env, now = new Date()) {
   const day = +env.BILL_DAY || 1, d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
   const dim = (y, m) => new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
@@ -112,13 +112,15 @@ function cycleStart(env, now = new Date()) {
 async function monthUsage(env) {
   const s = cycleStart(env).toISOString().slice(0, 10), u = new Date(Date.now() + 864e5).toISOString().slice(0, 10);
   const cf = await cfGraph(env, `query($a: String!, $s: Date!, $u: Date!) { viewer { accounts(filter: { accountTag: $a }) {
-    w: workersInvocationsAdaptive(limit: 1000, filter: { date_geq: $s, date_leq: $u }) { sum { requests } dimensions { date } }
+    w: workersInvocationsAdaptive(limit: 1000, filter: { date_geq: $s, date_leq: $u }) { sum { requests } quantiles { cpuTimeP50 cpuTimeP99 } dimensions { date } }
     d: d1AnalyticsAdaptiveGroups(limit: 1000, filter: { date_geq: $s, date_leq: $u }) { sum { rowsRead rowsWritten } dimensions { date } }
   } } }`, { a: env.ACCOUNT_ID, s, u });
   if (cf.error) return { error: cf.error };
   const a = cf.viewer?.accounts?.[0] || {}, sum = (l, f) => (l || []).reduce((t, x) => t + (f(x) || 0), 0);
-  const use = { since: s, req: sum(a.w, x => x.sum.requests), write: sum(a.d, x => x.sum.rowsWritten), read: sum(a.d, x => x.sum.rowsRead) };
-  const p = Math.max(use.req / INCL.req, use.write / INCL.write, use.read / INCL.read);
+  // tempo de CPU: a Cloudflare só informa medianas por dia; estimativa conservadora = pedidos × (mediana + pior caso) / 2
+  const cpu = (a.w || []).reduce((t, x) => t + (x.sum.requests || 0) * (((x.quantiles?.cpuTimeP50 || 0) + (x.quantiles?.cpuTimeP99 || 0)) / 2) / 1000, 0);
+  const use = { since: s, req: sum(a.w, x => x.sum.requests), write: sum(a.d, x => x.sum.rowsWritten), read: sum(a.d, x => x.sum.rowsRead), cpu: Math.round(cpu) };
+  const p = Math.max(use.req / INCL.req, use.write / INCL.write, use.read / INCL.read, use.cpu / INCL.cpu);
   return { ...use, pct: p, level: p >= .95 ? 2 : p >= .8 ? 1 : 0, at: Date.now() };
 }
 let BRAKE = { level: 0, t: 0 };
