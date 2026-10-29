@@ -1893,7 +1893,7 @@ async function moveToNew() {
   location.replace(NEW_ORIGIN + location.pathname + location.search + '#move=' + pay);
 }
 /* ---------- Ao vivo: o fireteam em que você está agora e a build de cada um ----------
-   Lê o grupo pela sua conta (componente 1000) a cada 60 s com a aba aberta; a build de cada membro é pública
+   Lê o grupo pela sua conta (componente 1000) a cada 30 s com a aba aberta; a build de cada membro é pública
    (mesmos dados da busca de guardião). Fora do jogo, a faixa some. */
 const LIVE = { on: false, act: '', since: null, mem: [], seq: 0, timer: null, types: LS.get('dc-mtype', {}), busy: false };
 async function memType(id) {
@@ -1929,7 +1929,7 @@ async function livePoll() {
   } catch { /* fora do ar ou sem permissão: tenta de novo no próximo ciclo */ }
   finally { LIVE.busy = false; }
 }
-function liveStart() { clearInterval(LIVE.timer); livePoll(); LIVE.timer = setInterval(livePoll, 60000); }
+function liveStart() { clearInterval(LIVE.timer); livePoll(); LIVE.timer = setInterval(livePoll, 30000); }
 document.addEventListener('visibilitychange', () => { if (!document.hidden && LIVE.timer) livePoll(); });
 function renderLive() {
   const el = $('live'); if (!el) return;
