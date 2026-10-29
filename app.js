@@ -734,7 +734,7 @@ function weekSection() {
     }
     const rw = (m.rewards || []).flatMap(r => r.entries || []);
     if (rw.length) { const red = rw.filter(e => e.redeemed).length, earn = rw.filter(e => e.earned).length; items.push(I(`wk-${m.milestoneHash}-rw`, W.wkRewardT(name), earn > red ? W.wkClaim(earn - red) : W.wkRewardsD, [`${red}/${rw.length}`, U_CHIP_WEEK()], red === rw.length, { wk: { k: 'rw', act: name, h: (m.activities || [])[0]?.activityHash, a: red, b: rw.length, claim: earn > red } })); }
-    for (const q of m.availableQuests || []) if (q.status) items.push(I(`wk-${m.milestoneHash}-q`, name, W.wkQuestD, [q.status.completed ? '✓' : q.status.started ? W.wkStarted : W.wkNew], !!q.status.completed));
+    for (const q of m.availableQuests || []) if (q.status) items.push(I(`wk-${m.milestoneHash}-q`, name, W.wkQuestD, [q.status.completed ? '✓' : q.status.started ? W.wkStarted : W.wkNew], !!q.status.completed, { wk: { k: 'q', act: name, h: (m.activities || [])[0]?.activityHash } }));
   }
   const miss = xurMissing();
   // o Xûr fica em Arsenal → Vendedores
