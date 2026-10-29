@@ -742,3 +742,6 @@ section.collapsed .gl-l{display:none}
 .tsort-sel{font:inherit;font-size:14px;color:var(--fg);background:var(--panel,#141a22);border:1px solid var(--line);border-radius:8px;padding:7px 30px 7px 10px;min-width:0;max-width:100%;appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 15px) 50%,calc(100% - 10px) 50%;background-size:5px 5px;background-repeat:no-repeat;cursor:pointer}
 .tsort-sel:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .tsort-sel option{background:#141a22;color:#e8edf2}
+/* o resumo abre logo abaixo do destaque clicado (ocupa a linha inteira; os outros destaques preenchem os espaços) */
+.wk-fs{grid-auto-flow:row dense}
+.wk-fs .wk-fm{grid-column:1/-1;margin-top:0}
