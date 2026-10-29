@@ -806,7 +806,13 @@ function galOpen(kind, key, i = 0) {
 }
 // a estrutura é montada uma vez; ao trocar, a próxima imagem é decodificada antes de aparecer (sem piscar nem travar)
 const GALC = new Map();
-const galPre = src => { if (!GALC.has(src)) { const im = new Image(); im.decoding = 'async'; im.src = src; GALC.set(src, im.decode ? im.decode().catch(() => {}) : Promise.resolve()); } return GALC.get(src); };
+const galPre = src => {
+  if (!GALC.has(src)) { const im = new Image(); im.decoding = 'async';
+    const loaded = new Promise(r => { im.onload = im.onerror = r; }); im.src = src;
+    // espera carregar e tenta decodificar antes de mostrar, mas nunca fica preso (aba em segundo plano, navegador antigo)
+    GALC.set(src, loaded.then(() => Promise.race([im.decode ? im.decode().catch(() => {}) : null, new Promise(r => setTimeout(r, 400))]))); }
+  return Promise.race([GALC.get(src), new Promise(r => setTimeout(r, 4000))]);
+};
 function galDraw() {
   const d = $('galdlg'), n = GAL.l.length, W = u(); if (!d || !n) return;
   d.innerHTML = `<div class="gal-top"><b>${esc(GAL.t)}</b><span class="gal-c"></span><a class="gal-full" target="_blank" rel="noopener">${esc(W.giFull)}</a><button type="button" class="gal-x" aria-label="${esc(W.giClose)}">✕</button></div>
