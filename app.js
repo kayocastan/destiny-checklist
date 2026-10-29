@@ -32,7 +32,7 @@ const UI = {
   pt: {
     hide: 'Ocultar feitos', search: 'Buscar por nome ou origem', refresh: 'Atualizar', logout: 'Sair',
     disclaimer: 'Dados lidos da sua conta pela API oficial da Bungie. Este site não é afiliado à Bungie.',
-    loadouts: 'Loadouts', checklist: 'Central', outQ: 'Confirmar?', liveT: 'Ao vivo', liveYou: 'você', liveSince: t => `desde ${t}`, livePriv: 'Build privada', liveTap: 'Toque para ver a build completa', statsT: 'Atributos', glT: 'Metas de build', ssRec: 'Novo recorde', ssRecBest: 'seu melhor tempo até hoje', ssRecSub: (o, d) => `antes ${o} · ${d} mais rápido`, ssSolo: 'Solo', ssSoloFl: 'Solo sem morrer', wkFeatT: 'Em destaque', wkFull: 'Abrir página', wkAllDone: 'Tudo feito aqui.', wkRwSt: { red: 'resgatada', earn: 'pronta para resgatar', todo: 'falta fazer' }, wkKind: { ch: 'Desafio', rw: 'Recompensas', q: 'Missão' }, glNote: 'Builds que você quer montar: cada item se marca sozinho quando você libera ou pega.', glAdd: n => `Faltam ${n} itens para você usar esta build.`, glBtn: '＋ Virar objetivo', glDone: 'Já é um objetivo', glView: 'Ver build', glDel: 'Remover', glAt: d => `adicionada em ${d}`, glSet: (n, k) => `Conjunto ${n}: ${k} ${k === 1 ? 'peça' : 'peças'}`, glSetSrc: 'qualquer peça do conjunto, para os bônus', glRef: 'Atributos da build', glYou: 'você', glNone: 'Nenhuma meta ainda. Na comparação de builds, use “Virar objetivo” no que falta.', glSrcPlug: 'Liberar no menu da subclasse', glG: { asp: 'Aspectos', fr: 'Fragmentos', ab: 'Habilidades', w: 'Armas', a: 'Armadura' }, tsK: 'Ordenar', tsO: { tier: 'Dificuldade', near: 'Quase lá', low: 'Menos feitos', name: 'Nome' }, statsHi: 'acima de 100: bônus extra',
+    loadouts: 'Loadouts', checklist: 'Central', outQ: 'Confirmar?', liveT: 'Ao vivo', liveYou: 'você', liveSince: t => `desde ${t}`, livePriv: 'Build privada', liveTap: 'Toque para ver a build completa', statsT: 'Atributos', glT: 'Metas de build', ssRec: 'Novo recorde', ssRecBest: 'seu melhor tempo até hoje', ssRecSub: (o, d) => `antes ${o} · ${d} mais rápido`, ssSolo: 'Solo', ssSoloFl: 'Solo sem morrer', wkFeatT: 'Em destaque', wkFull: 'Abrir página', wkAllDone: 'Tudo feito aqui.', wkRwSt: { red: 'resgatada', earn: 'pronta para resgatar', todo: 'falta fazer' }, wkKind: { ch: 'Desafio', rw: 'Recompensas', q: 'Missão' }, glNote: 'Builds que você quer montar: cada item se marca sozinho quando você libera ou pega.', glAdd: n => `Faltam ${n} itens para você usar esta build.`, glBtn: '＋ Virar objetivo', glDone: 'Já é um objetivo', glView: 'Ver build', glDel: 'Remover', glAt: d => `adicionada em ${d}`, glSet: (n, k) => `Conjunto ${n}: ${k} ${k === 1 ? 'peça' : 'peças'}`, glSetSrc: 'qualquer peça do conjunto, para os bônus', glRef: 'Atributos da build', glYou: 'você', glNone: 'Nenhuma meta ainda. Na comparação de builds, use “Virar objetivo” no que falta.', glSrcPlug: 'Liberar no menu da subclasse', glG: { asp: 'Aspectos', fr: 'Fragmentos', ab: 'Habilidades', w: 'Armas', a: 'Armadura' }, tsK: 'Ordenar', tsO: { tier: 'Dificuldade', wpn: 'Falta arma', cat: 'Falta catalisador', near: 'Quase lá', low: 'Menos feitos', name: 'A–Z' }, tsNone: 'Nada aqui com esse filtro.', statsHi: 'acima de 100: bônus extra',
     tabs: { obj: 'Objetivos', act: 'Atividades', drops: 'Arsenal', gd: 'Guardião' },
     subs: { obj: 'Principal', prog: 'Em andamento', camp: 'Campanhas', raid: 'Incursões', dg: 'Masmorras', xm: 'Missões exóticas', tit: 'Títulos', exo: 'Exóticos', cat: 'Catalisadores', vend: 'Vendedores', gd: 'Builds e clã', gst: 'Estatísticas' },
     heroTitle: 'Central do Guardião', heroText: 'Entre com a sua conta Bungie.net para verificar seus objetivos, acompanhar a rotação semanal, completar seu arsenal exótico e compartilhar suas builds.', lsQ: 'Buscar guardião: Nome#1234', lsBtn: 'Buscar', lsHint: 'Veja a build equipada de qualquer jogador, sem precisar entrar.',
@@ -87,7 +87,7 @@ const UI = {
   en: {
     hide: 'Hide done', search: 'Search by name or source', refresh: 'Refresh', logout: 'Sign out',
     disclaimer: 'Data read from your account through the official Bungie API. This site is not affiliated with Bungie.',
-    loadouts: 'Loadouts', checklist: 'Hub', outQ: 'Confirm?', liveT: 'Live', liveYou: 'you', liveSince: t => `since ${t}`, livePriv: 'Private build', liveTap: 'Tap to see the full build', statsT: 'Stats', glT: 'Build goals', ssRec: 'New record', ssRecBest: 'your best time ever', ssRecSub: (o, d) => `was ${o} · ${d} faster`, ssSolo: 'Solo', ssSoloFl: 'Solo flawless', wkFeatT: 'Featured', wkFull: 'Open page', wkAllDone: 'All done here.', wkRwSt: { red: 'claimed', earn: 'ready to claim', todo: 'to do' }, wkKind: { ch: 'Challenge', rw: 'Rewards', q: 'Quest' }, glNote: 'Builds you want to put together: each item checks itself off when you unlock or get it.', glAdd: n => `You're missing ${n} items to run this build.`, glBtn: '＋ Make it a goal', glDone: 'Already a goal', glView: 'View build', glDel: 'Remove', glAt: d => `added ${d}`, glSet: (n, k) => `${n} set: ${k} ${k === 1 ? 'piece' : 'pieces'}`, glSetSrc: 'any piece of the set, for the bonuses', glRef: 'Build stats', glYou: 'you', glNone: 'No goals yet. In build comparison, use “Make it a goal” on what is missing.', glSrcPlug: 'Unlock in the subclass menu', glG: { asp: 'Aspects', fr: 'Fragments', ab: 'Abilities', w: 'Weapons', a: 'Armor' }, tsK: 'Sort', tsO: { tier: 'Difficulty', near: 'Almost done', low: 'Least done', name: 'Name' }, statsHi: 'above 100: extra bonus',
+    loadouts: 'Loadouts', checklist: 'Hub', outQ: 'Confirm?', liveT: 'Live', liveYou: 'you', liveSince: t => `since ${t}`, livePriv: 'Private build', liveTap: 'Tap to see the full build', statsT: 'Stats', glT: 'Build goals', ssRec: 'New record', ssRecBest: 'your best time ever', ssRecSub: (o, d) => `was ${o} · ${d} faster`, ssSolo: 'Solo', ssSoloFl: 'Solo flawless', wkFeatT: 'Featured', wkFull: 'Open page', wkAllDone: 'All done here.', wkRwSt: { red: 'claimed', earn: 'ready to claim', todo: 'to do' }, wkKind: { ch: 'Challenge', rw: 'Rewards', q: 'Quest' }, glNote: 'Builds you want to put together: each item checks itself off when you unlock or get it.', glAdd: n => `You're missing ${n} items to run this build.`, glBtn: '＋ Make it a goal', glDone: 'Already a goal', glView: 'View build', glDel: 'Remove', glAt: d => `added ${d}`, glSet: (n, k) => `${n} set: ${k} ${k === 1 ? 'piece' : 'pieces'}`, glSetSrc: 'any piece of the set, for the bonuses', glRef: 'Build stats', glYou: 'you', glNone: 'No goals yet. In build comparison, use “Make it a goal” on what is missing.', glSrcPlug: 'Unlock in the subclass menu', glG: { asp: 'Aspects', fr: 'Fragments', ab: 'Abilities', w: 'Weapons', a: 'Armor' }, tsK: 'Sort', tsO: { tier: 'Difficulty', wpn: 'Missing weapon', cat: 'Missing catalyst', near: 'Almost done', low: 'Least done', name: 'A–Z' }, tsNone: 'Nothing here with this filter.', statsHi: 'above 100: extra bonus',
     tabs: { obj: 'Objectives', act: 'Activities', drops: 'Arsenal', gd: 'Guardian' },
     subs: { obj: 'Main', prog: 'In progress', camp: 'Campaigns', raid: 'Raids', dg: 'Dungeons', xm: 'Exotic missions', tit: 'Titles', exo: 'Exotics', cat: 'Catalysts', vend: 'Vendors', gd: 'Builds & clan', gst: 'Stats' },
     heroTitle: 'Guardian Hub', heroText: 'Sign in with your Bungie.net account to check your goals, follow the weekly rotation, complete your exotic arsenal and share your builds.', lsQ: 'Search guardian: Name#1234', lsBtn: 'Search', lsHint: "See any player's equipped build, no sign-in needed.",
@@ -592,9 +592,9 @@ function build() {
     const o = ACTH?.x?.[m.k], items = [I(`xm-${m.k}-clear`, s.xmClear(L(m.n)), m.note ? L(m.note) : null, [], !!o?.c)];
     (m.w || []).forEach((n, i) => {
       const e = exoticByName(n); if (!e) return; const has = colAcquired(e.h);
-      items.push(I(`xm-${m.k}-w${i}`, L(e.n), L(e.s), [U.chip['Exótico']], has));
+      items.push(I(`xm-${m.k}-w${i}`, L(e.n), L(e.s), [U.chip['Exótico']], has, { isEx: true }));
       const c = defs.cats.find(x => x.n[0] === n + ' Catalyst'), cs = c && recState(c.h);
-      if (has && c && recOK) items.push(I(`xm-${m.k}-c${i}`, L(c.n), L(c.d), [progText(cs) || (cs ? Math.round(pct(cs) * 100) + '%' : '')].filter(Boolean), recDone(cs)));
+      if (has && c && recOK) items.push(I(`xm-${m.k}-c${i}`, L(c.n), L(c.d), [progText(cs) || (cs ? Math.round(pct(cs) * 100) + '%' : '')].filter(Boolean), recDone(cs), { isCat: true }));
     });
     if (m.steps) items.push(I(`xm-${m.k}-how`, s.xmHow, m.steps.map(x => L(x[0])).join(' '), [s.xmSteps(m.steps.length)], false, { tl: m.steps.map(([n, dd]) => ({ ok: false, n: L(n), d: L(dd) })) }));
     if (m.next) items.push(I(`xm-${m.k}-next`, s.xmNext, m.next.map(x => L(x[0])).join(' '), [s.xmSteps(m.next.length)], false, { tl: m.next.map(([n, dd]) => ({ ok: false, n: L(n), d: L(dd) })) }));
@@ -772,7 +772,9 @@ const SORT_TABS = ['tit', 'raid', 'dg', 'xm'], TSORT = { v: Object.assign({ tit:
 const TIER_N = { 'Fácil': 1, 'Médio': 2, 'Difícil': 3, 'Muito difícil': 4 };
 const secTier = sec => sec.tier || (sec.kind && TIER_N[(sec.kind === 'raid' ? defs.raids : defs.dungeons).find(x => x.k === sec.key)?.d]) || 0;
 const secPct = sec => sec.items.length ? sec.items.filter(isDone).length / sec.items.length : 0;
-const sortOf = t => { const v = TSORT.v[t] || 'tier'; return v === 'tier' && t === 'xm' ? 'near' : v; };
+// opções de cada página (missões exóticas ainda sem dificuldade nos dados)
+const TS_OPTS = { tit: ['tier', 'near', 'name'], raid: ['tier', 'wpn', 'near', 'low', 'name'], dg: ['tier', 'wpn', 'near', 'low', 'name'], xm: ['wpn', 'cat', 'near', 'low', 'name'] };
+const sortOf = t => { const v = TSORT.v[t], o = TS_OPTS[t] || []; return o.includes(v) ? v : o[0]; };
 function titMeta(sec) {
   const t = secTier(sec), lbl = u().chip[['Fácil', 'Médio', 'Difícil', 'Muito difícil', 'Evento'][t - 1]], cls = ['easy', 'mid', 'hard', 'hard', 'feat'][t - 1];
   const p = Math.round(secPct(sec) * 100);
@@ -1325,10 +1327,12 @@ function render() {
   if (SORT_TABS.includes(tab)) {
     // a pessoa escolhe a ordem; concluídos sempre no fim
     const m = sortOf(tab), pct = secPct, idx = new Map(secs.map((x, i) => [x, i]));
+    // "falta arma"/"falta catalisador" filtram: só o que ainda falta, na ordem de dificuldade
+    if (m === 'wpn' || m === 'cat') { const keep = secs.filter(x => x.items.some(i => (m === 'wpn' ? i.isEx : i.isCat) && !isDone(i))); secs.length = 0; secs.push(...keep); }
     secs.sort((a, b) => (m === 'near' ? pct(b) - pct(a) : m === 'low' ? pct(a) - pct(b) : m === 'name' ? a.title.localeCompare(b.title, lang === 'en' ? 'en' : 'pt-BR') : (secTier(a) - secTier(b)) || (pct(b) - pct(a))) || idx.get(a) - idx.get(b));
   }
   secs.sort((a, b) => secDone(a) - secDone(b));
-  const tsBar = SORT_TABS.includes(tab) && secs.some(x => x.items.length) ? `<div class="tsort" role="group" aria-label="${esc(U.tsK)}"><span class="tsort-k">${esc(U.tsK)}</span>${Object.entries(U.tsO).filter(([k]) => !(k === 'tier' && tab === 'xm')).map(([k, t]) => `<button type="button" class="char" data-tsort="${k}" aria-pressed="${sortOf(tab) === k}">${esc(t)}</button>`).join('')}</div>` : '';
+  const tsBar = SORT_TABS.includes(tab) ? `<div class="tsort"><label class="tsort-k" for="tsortsel">${esc(U.tsK)}</label><select id="tsortsel" class="tsort-sel">${TS_OPTS[tab].map(k => `<option value="${k}"${sortOf(tab) === k ? ' selected' : ''}>${esc(U.tsO[k])}</option>`).join('')}</select></div>${secs.length ? '' : `<p class="empty-msg">${esc(U.tsNone)}</p>`}` : '';
   const wkBar = tab === 'exo' && have.a ? (() => { const n = weekExo().size; return `<div class="wkx"><button type="button" class="char wkx-b" id="wkxbtn" aria-pressed="${WKX.on}" title="${esc(U.w.wkExoTip)}">★ ${esc(U.w.wkExo(n))}</button></div><p class="empty-msg" id="wkxnone" hidden>${esc(U.w.wkExoNone)}</p>`; })() : '';
   if (tab === 'obj' && have.a && member) loadSession();
   if ((tab === 'raid' || tab === 'dg' || tab === 'xm') && have.a && member) loadActHist();
@@ -1409,6 +1413,7 @@ $('hide').addEventListener('change', e => { document.body.classList.toggle('hide
 $('searchbtn').addEventListener('click', () => { const q = $('q'), show = q.hidden; q.hidden = !show; $('searchbtn').setAttribute('aria-expanded', show); if (show) q.focus(); else { q.value = ''; query = ''; filter(); } });
 $('q').addEventListener('input', e => { query = e.target.value; filter(); });
 const toggleSec = h => { const id = h.dataset.coll, sec = h.closest('section'); const o = sec.classList.toggle('collapsed') === false; if (id === 'goals-x') { o ? openSecs.delete(id) : openSecs.add(id); } else { o ? openSecs.add(id) : openSecs.delete(id); } h.setAttribute('aria-expanded', o); };
+$('list').addEventListener('change', e => { if (e.target.id === 'tsortsel') { TSORT.v[tab] = e.target.value; LS.set('dc-sorts', TSORT.v); render(); } });
 $('list').addEventListener('keydown', e => { const h = e.target.closest && e.target.closest('.sec-head[data-coll]'); if (h && e.target === h && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleSec(h); } });
 $('list').addEventListener('click', e => {
   const hd = e.target.closest('.sec-head[data-coll]'); if (hd) { toggleSec(hd); return; }
@@ -1416,7 +1421,7 @@ $('list').addEventListener('click', e => {
   if (e.target.id === 'togglecomplete') { document.body.classList.toggle('show-complete'); update(); }
   const wo = e.target.closest('[data-wko]'); if (wo) { const id = wo.dataset.wko; WKO.has(id) ? WKO.delete(id) : WKO.add(id); render(); return; }
   const jf = e.target.closest('[data-jump]'); if (jf) { const [t, id] = jf.dataset.jump.split(':'); jumpTo(t, id); return; }
-  const ts = e.target.closest('[data-tsort]'); if (ts) { TSORT.v[tab] = ts.dataset.tsort; LS.set('dc-sorts', TSORT.v); render(); return; }
+  
   if (e.target.closest('#wkxbtn')) { WKX.on = !WKX.on; e.target.closest('#wkxbtn').setAttribute('aria-pressed', WKX.on); filter(); }
 });
 $('list').addEventListener('change', e => { const k = e.target.dataset.opt; if (k) { OPTS[k] = e.target.checked; LS.set('dc-opts', OPTS); render(); return; } const id = e.target.dataset.id; if (!id || !member) return; e.target.checked ? marks.add(id) : marks.delete(id); LS.set('dc-marks-' + member.id, [...marks]); update(); });
