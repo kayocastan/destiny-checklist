@@ -154,8 +154,9 @@ let marks = new Set(), SECTIONS = [], LOADOUTS = [], loadedAt = null;
 const openSecs = new Set(), openItems = new Set();
 const GROUPS = [{ id: 'obj', subs: ['obj'] }, { id: 'act', subs: ['camp', 'raid', 'dg', 'xm', 'tit'] }, { id: 'drops', subs: ['exo', 'cat', 'vend'] }, { id: 'gd', subs: ['gd'] }];
 // Página de teste (/beta): só para o dono do site; recursos novos aparecem aqui antes de ir para todos
-const BETA = location.pathname.replace(/\/+$/, '') === '/beta';
-if (BETA) GROUPS[0].subs = ['obj', 'prog'];
+const BETA = location.pathname.replace(/\/+$/, '') === '/beta'; // página de testes do dono (/beta)
+const FX = true; // recursos que passaram pelo /beta e agora valem para todos
+if (FX) GROUPS[0].subs = ['obj', 'prog'];
 const groupOf = t => GROUPS.find(g => g.subs.includes(t));
 // aba salva que não existe mais (ex.: Padrões, que foi retirada) volta para Objetivos
 if (tab !== 'ld' && !groupOf(tab)) { tab = 'obj'; LS.set('dc-tab', 'obj'); }
@@ -641,7 +642,7 @@ function build() {
   const fresh = catRows.filter(x => !recDone(x.r) && pct(x.r) === 0);
   if (prog.length) out.push(S('cat', 'cat-prog', s.catProg, s.catProgNote, prog.map(x => I('c-' + x.c.h, L(x.c.n), L(x.c.d), [progText(x.r) || Math.round(pct(x.r) * 100) + '%'], false))));
   if (fresh.length) out.push(S('cat', 'cat-new', s.catNew, s.catNewNote, fresh.map(x => I('c-' + x.c.h, L(x.c.n), [catSrc(x.c), L(x.c.d)].filter(Boolean).join(' '), [], false))));
-  if (BETA) {
+  if (FX) {
     for (const x of out) if (x.tab === 'obj' && /^(contracts|quests|nearcats|neartitles)/.test(x.id)) x.tab = 'prog';
     out.push(S('obj', 'goals', '', null, [], { html: true }));
   }
@@ -1330,7 +1331,7 @@ function render() {
   if (tab === 'xm') loadXmRec();
   $('list').innerHTML = `<div class="panel">${tab === 'obj' ? sessHTML() : ''}${wkBar}${tsBar}${secs.map(sec => {
     if (sec.html) return sec.id === 'vendors' ? vendorsHTML() : sec.id === 'xmissions' ? xmHTML() : sec.id === 'goals' ? goalsHTML() : '';
-    if (BETA && sec.id === 'week' && sec.items.length) return weekHTML(sec);
+    if (FX && sec.id === 'week' && sec.items.length) return weekHTML(sec);
     if (sec.empty) return `<p class="empty-msg${/…$/.test(sec.note || '') ? ' wait' : ''}">${esc(sec.note)}</p>`;
     if (!sec.items.length) return `<section data-sec="${sec.id}"><div class="sec-head"><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2></div></div><p>${esc(sec.note)}</p></div></section>`;
     const keep = true, coll = sec.coll || ((tab === 'exo' || tab === 'cat') && sec.items?.length) || (keep && secDone(sec)), open = openSecs.has(sec.id);
@@ -1733,7 +1734,7 @@ function compareHTML(A, Bc) {
     ${grp(W.armorCmp, a.arm.map((h, k) => row(h, b.arm[k], 'item', exW(A, h), exW(Bc, b.arm[k]))).join(''))}
     ${a.art.length || b.art.length ? grp(W.artT, pairs(a.art, b.art).map(([x, y]) => row(x, y, 'plug')).join('')) : ''}
     ${a.sets.length || b.sets.length ? grp(W.setT, `<div class="cmp-row ${a.sets.join() === b.sets.join() ? 'same' : 'diff'}"><span class="mine">${esc(a.sets.join(', ') || '—')}</span><span class="theirs">${esc(b.sets.join(', ') || '—')}</span></div>`) : ''}
-    ${BETA ? goalCta(A, Bc) : ''}
+    ${FX ? goalCta(A, Bc) : ''}
     <p class="cmp-leg"><span class="li"><span class="lg have"></span>${esc(W.lgHave)}</span><span class="li"><span class="lg miss"></span>${esc(W.lgMiss)}</span><span class="li"><span class="lg same">=</span>${esc(W.lgSame)}</span></p></div>`;
 }
 function dimLink(C) {
@@ -1786,7 +1787,7 @@ async function pgcrTeam(id) {
 async function loadActHist() {
   if (acthBusy || !member) return; const key = 'dc-acth-' + member.id, cached = LS.get(key, null);
   if (!ACTH && cached) ACTH = cached;
-  if (ACTH && ACTH.x && (!BETA || Object.values(ACTH.d || {}).some(o => o.top)) && Date.now() - ACTH.t < 1800000) return;
+  if (ACTH && ACTH.x && (!FX || Object.values(ACTH.d || {}).some(o => o.top)) && Date.now() - ACTH.t < 1800000) return;
   acthBusy = true; const mid = member.id;
   try {
     const chars = Object.keys(profile.characters?.data || {});
@@ -1882,7 +1883,8 @@ async function loadSession() {
     let ex = LS.get(sessK, null); if (!ex || ex.sid !== sid) ex = { sid, newExo: [], from: null };
     if (snap && snap.t <= end) { const before = new Set(snap.exo); for (const h of exoNow) if (!before.has(h) && !ex.newExo.includes(h)) ex.newExo.push(h); if (ex.from == null && snap.t <= start) ex.from = snap.light; }
     try { LS.set(sessK, ex); LS.set(snapK, { t: Date.now(), light, exo: exoNow }); } catch {}
-    if (BETA) await loadActHist().catch(() => {});
+    // recordes usam o histórico de incursões/masmorras; sem ele ainda, mostra a sessão já e recalcula quando chegar
+    if (FX && !ACTH) { const c = LS.get('dc-acth-' + member.id, null); if (c) ACTH = c; else loadActHist().then(() => { if (ACTH) { SESSION = null; if (tab === 'obj') loadSession(); } }).catch(() => {}); }
     const items = [];
     const runs = {}; for (const a of s) { const m = map[a.h]; if (m && a.done) (runs[m.k] = runs[m.k] || { m, list: [] }).list.push(a); }
     for (const { m, list } of Object.values(runs)) {
@@ -1946,7 +1948,7 @@ function sessHTML() {
   const tm = t => new Date(t).toLocaleTimeString(lang === 'en' ? 'en-US' : 'pt-BR', { hour: '2-digit', minute: '2-digit' });
   const day = (() => { const d = new Date(S.start), n = new Date(); const y = new Date(n); y.setDate(n.getDate() - 1); return d.toDateString() === n.toDateString() ? W.today : d.toDateString() === y.toDateString() ? W.yesterday : d.toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR', { day: '2-digit', month: '2-digit' }); })();
   const badge = b => W.ssBadge[b] || W.ssBadge[b.replace(/\d+$/, '')] || (/^mode/.test(b) ? (W.ssMode[+b.slice(4)] || W.ssBadge.done) : W.ssBadge.done);
-  const card = t => { const im = BETA ? (t.img || (t.h ? actImg(t.h) : '')) : ''; return `<div class="ss-c ${t.cls}${im ? ' ss-img' : ''}"${im ? ` style="--ss-img:url('${BNET}${im}')"` : ''}><span class="ss-bs"><span class="ss-badge">${esc(badge(t.badge))}</span>${BETA && t.rec ? `<span class="ss-badge rec">⏱ ${esc(u().ssRec)}</span>` : ''}${BETA && t.solo ? `<span class="ss-badge solo">${esc(t.solo === 'fl' ? u().ssSoloFl : u().ssSolo)}</span>` : ''}${BETA && t.dif ? `<span class="ss-dif chip ${{ 'Fácil': 'easy', 'Médio': 'mid', 'Difícil': 'hard' }[t.dif] || ''}">${esc(u().chip[t.dif] || t.dif)}</span>` : ''}</span><b class="ss-cn">${esc(t.n)}</b>${BETA && t.rec ? `<small class="ss-rec">${esc(t.rec.best ? u().ssRecBest : u().ssRecSub(t.rec.o, t.rec.d))}</small>` : ''}<small>${esc(t.sub.filter(Boolean).join(' · '))}</small>${t.foot ? `<span class="ss-foot">${esc(t.foot)}</span>` : ''}</div>`; };
+  const card = t => { const im = FX ? (t.img || (t.h ? actImg(t.h) : '')) : ''; return `<div class="ss-c ${t.cls}${im ? ' ss-img' : ''}"${im ? ` style="--ss-img:url('${BNET}${im}')"` : ''}><span class="ss-bs"><span class="ss-badge">${esc(badge(t.badge))}</span>${FX && t.rec ? `<span class="ss-badge rec">⏱ ${esc(u().ssRec)}</span>` : ''}${FX && t.solo ? `<span class="ss-badge solo">${esc(t.solo === 'fl' ? u().ssSoloFl : u().ssSolo)}</span>` : ''}${FX && t.dif ? `<span class="ss-dif chip ${{ 'Fácil': 'easy', 'Médio': 'mid', 'Difícil': 'hard' }[t.dif] || ''}">${esc(u().chip[t.dif] || t.dif)}</span>` : ''}</span><b class="ss-cn">${esc(t.n)}</b>${FX && t.rec ? `<small class="ss-rec">${esc(t.rec.best ? u().ssRecBest : u().ssRecSub(t.rec.o, t.rec.d))}</small>` : ''}<small>${esc(t.sub.filter(Boolean).join(' · '))}</small>${t.foot ? `<span class="ss-foot">${esc(t.foot)}</span>` : ''}</div>`; };
   const top = S.items.slice(0, 3), rest = S.items.slice(3), h = Math.floor(S.mins / 60), m = S.mins % 60;
   return `<section class="ss keep" data-sec="session"><div class="ss-head"><h2>${esc(W.ssT)}</h2><div class="ss-meta"><span>${esc(day)}, ${tm(S.start)}–${tm(S.end)}</span><span>⏱ ${h ? h + 'h' + String(m).padStart(2, '0') : m + ' min'}</span>${S.from && S.light > S.from ? `<span class="ss-pw">✦ ${S.from} → <b>${S.light}</b></span>` : ''}</div></div>
     <div class="ss-top">${top.map(card).join('')}</div>${rest.length ? `<details class="ss-more"><summary>${esc(W.ssMore(rest.length))}</summary><div class="ss-top">${rest.map(card).join('')}</div></details>` : ''}</section>`;
