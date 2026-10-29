@@ -613,3 +613,9 @@ li.is-done .chip.exo{opacity:.7}
 .lv-sts .hi b{color:var(--exotic)}
 :root:not([data-theme="dark"]) .lv-sts img{filter:invert(1) brightness(.4)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .lv-sts img{filter:none}}
+/* Ao vivo: cartões um pouco mais largos e atributos sem sobreposição */
+.lv-l{grid-template-columns:repeat(auto-fill,minmax(min(270px,100%),1fr))}
+.lv-sts{display:flex;justify-content:space-between;gap:6px}
+.lv-sts span{flex:none;gap:2px}
+.lv-sts img{width:12px;height:12px}
+.lv-sts b{font-size:11.5px;letter-spacing:-.02em}
