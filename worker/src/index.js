@@ -57,7 +57,7 @@ async function defs(req, env) {
       else out[x] = compact(t, d); fresh.push([key(x), JSON.stringify(out[x])]); }
     catch (e) { if (e.code === 2101 || e.code === 2102 || e.code === 2107) throw e; } // chave da API recusada: não adianta continuar
   }));
-  if (fresh.length) await env.DB.prepare(`INSERT OR REPLACE INTO defs (k, v, t) VALUES ${fresh.map(() => '(?, ?, ?)').join(',')}`).bind(...fresh.flatMap(([k, v]) => [k, v, now])).run();
+  if (fresh.length) await env.DB.prepare(`INSERT OR REPLACE INTO defs (k, v, t) VALUES ${fresh.map(() => '(?, ?, ?)').join(',')}`).bind(...fresh.flatMap(([k, v]) => [k, v, now])).run().catch(() => {}); // sem gravar (limite do dia), ainda devolve os nomes
   return json(req, { d: out });
 }
 
@@ -70,7 +70,8 @@ async function who(req, env) {
   if (row && row.exp > now) return row.uid;
   const m = await bungie(req, '/User/GetMembershipsForCurrentUser/', token).catch(() => null);
   const uid = m?.bungieNetUser?.membershipId; if (!uid) return null;
-  await env.DB.batch([env.DB.prepare('INSERT OR REPLACE INTO tok (h, uid, exp) VALUES (?, ?, ?)').bind(hash, String(uid), now + 50 * 60000), env.DB.prepare('DELETE FROM tok WHERE exp < ?').bind(now)]);
+  // guardar o resumo do token é só economia; se o banco recusar gravações (limite do dia), segue sem guardar
+  await env.DB.batch([env.DB.prepare('INSERT OR REPLACE INTO tok (h, uid, exp) VALUES (?, ?, ?)').bind(hash, String(uid), now + 50 * 60000), env.DB.prepare('DELETE FROM tok WHERE exp < ?').bind(now)]).catch(() => {});
   return String(uid);
 }
 

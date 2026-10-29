@@ -6,7 +6,8 @@ import { compact, compactSet } from '../worker/src/compact.js';
 
 const ACC = process.env.CLOUDFLARE_ACCOUNT_ID, TOK = process.env.CLOUDFLARE_API_TOKEN;
 const SITE = process.env.SITE || 'https://destinyparallel.vercel.app';
-const MAX_WRITES = +process.env.MAX_WRITES || 80000;
+// cada linha gravada conta ~2 no limite do D1 (a tabela e o índice da chave): 35 mil linhas ≈ 70 mil, sobra folga para o site
+const MAX_WRITES = +process.env.MAX_WRITES || 35000;
 const CF = `https://api.cloudflare.com/client/v4/accounts/${ACC}/d1/database`;
 if (!ACC || !TOK) throw new Error('faltam CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_API_TOKEN');
 
