@@ -1680,6 +1680,11 @@ function iOwnPlug(h) {
   for (const c of Object.values(PLUGS.c)) for (const list of Object.values(c.plugs || {})) if (has(list)) return true;
   return false;
 }
+function iOwnSub(h) {
+  if (!h || !profile) return null;
+  const lists = [...Object.values(profile.characterEquipment?.data || {}), ...Object.values(profile.characterInventories?.data || {})];
+  return lists.some(c => (c.items || []).some(i => i.itemHash === h));
+}
 function iOwnItem(h) { const c = COLL[h]; if (c === undefined) return null; return c ? colAcquired([c]) : null; }
 async function loadCmpOwnership() {
   loadPlugs();
@@ -1693,7 +1698,8 @@ function compareHTML(A, Bc) {
   const nmA = h => A.B.loc[h]?.n || A.B.en[h]?.n || '', nmB = h => Bc.B.loc[h]?.n || Bc.B.en[h]?.n || '';
   const icA = h => A.B.loc[h]?.ic || A.B.en[h]?.ic, icB = h => Bc.B.loc[h]?.ic || Bc.B.en[h]?.ic;
   const cell = (h, nm, ic, cls) => h ? `<span class="${cls}">${ic(h) ? `<img src="${BNET}${ic(h)}" alt="" loading="lazy">` : ''}${esc(nm(h))}</span>` : `<span class="${cls} none">—</span>`;
-  const own = (h, kind) => { if (kind === 'na') return ''; const o = kind === 'plug' ? iOwnPlug(h) : iOwnItem(h); return o === true ? 'have' : o === false ? 'miss' : 'unk'; };
+  // super: vem com a própria subclasse (não fica nos conjuntos de encaixes) → tem se você tem a mesma subclasse
+  const own = (h, kind) => { if (kind === 'na') return ''; const o = kind === 'sup' ? iOwnSub(b.sub) : kind === 'plug' ? iOwnPlug(h) : iOwnItem(h); return o === true ? 'have' : o === false ? 'miss' : 'unk'; };
   const row = (ha, hb, kind, exA, exB) => {
     if (ha && hb && (ha === hb || (nmA(ha) && nmA(ha) === nmB(hb)))) return `<div class="cmp-row same">${cell(ha, nmA, icA, 'mine' + (exA ? ' ex' : ''))}${cell(hb, nmB, icB, 'theirs' + (exB ? ' ex' : ''))}</div>`;
     return `<div class="cmp-row diff">${cell(ha, nmA, icA, 'mine' + (exA ? ' ex' : ''))}${cell(hb, nmB, icB, 'theirs ' + (hb ? own(hb, kind) : '') + (exB ? ' ex' : ''))}</div>`;
@@ -1709,7 +1715,7 @@ function compareHTML(A, Bc) {
     <div class="cmp-h"><div style="--c:${ca}"><small>${esc(W.you)} · ${esc(String(A.name).replace(/#\d+$/, ''))}</small><b>${esc(ttlA)}</b></div><div style="--c:${cb}"><small>${esc(String(Bc.name).replace(/#\d+$/, ''))}</small><b>${esc(ttlB)}</b></div></div>
     ${(() => { const sa = statsOf(A), sb = statsOf(Bc); if (!sa || !sb) return ''; loadStats(); const D = STATD?.d || {};
       return grp(u().statsT, `<div class="cmp-st">${STAT_ORDER.map(h => { const x = sa[h] || 0, y = sb[h] || 0, df = y - x; return `<div><span class="cs-n">${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}${esc(D[h]?.n || '')}</span><b class="${x > 100 ? 'hi' : ''}">${x}</b><b class="${y > 100 ? 'hi' : ''}">${y}</b><small class="${df > 0 ? 'up' : df < 0 ? 'dn' : ''}">${df > 0 ? '+' + df : df || '='}</small></div>`; }).join('')}</div>`); })()}
-    ${grp('Super', row(a.sup[0], b.sup[0], 'plug'))}
+    ${grp('Super', row(a.sup[0], b.sup[0], 'sup'))}
     ${grp(W.abilities, pairs(a.ab, b.ab).map(([x, y]) => row(x, y, 'plug')).join(''))}
     ${grp(W.aspects, pairs(a.asp, b.asp).map(([x, y]) => row(x, y, 'plug')).join(''))}
     ${grp(W.frags, pairs(a.fr, b.fr).map(([x, y]) => row(x, y, 'plug')).join(''))}
