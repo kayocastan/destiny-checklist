@@ -702,3 +702,16 @@ section.collapsed .gl-l{display:none}
 .ss-dif{font-size:10.5px}
 .ss-badge,.ss-c.gold .ss-badge,.ss-c.exo .ss-badge{animation:ss-fade .25s ease-out}
 @keyframes ss-fade{from{opacity:0}to{opacity:1}}
+/* beta: cartão da semana aberto ocupa a linha toda, com detalhes */
+.wk-c[role="button"]{cursor:pointer}
+.wk-c[role="button"]:hover{border-color:color-mix(in srgb,var(--acc) 45%,transparent)}
+.wk-c.open{grid-column:1/-1;border-color:color-mix(in srgb,var(--acc) 55%,transparent);opacity:1}
+.wk-c.open.wk-img{background:linear-gradient(90deg,var(--chip) 0%,color-mix(in srgb,var(--chip) 92%,transparent) 55%,color-mix(in srgb,var(--chip) 55%,transparent)),var(--wk-img) center/cover no-repeat}
+.wk-more{display:grid;gap:6px;padding-top:8px;margin-top:4px;border-top:1px solid var(--line);max-width:70ch}
+.wk-more p{margin:0;font-size:13px}.wk-more .wk-mm{color:var(--muted);font-size:12.5px}
+.wk-mt{font-size:14px}
+.wk-rw{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.wk-rw li{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:8px;align-items:center;font-size:13px;border:0}
+.wk-rw i{width:12px;height:12px;border-radius:50%;border:2px solid var(--muted)}
+.wk-rw li.earn i{border-color:var(--exotic);background:var(--exotic)}.wk-rw li.red i{border-color:var(--done);background:var(--done)}
+.wk-rw small{font-size:11.5px;color:var(--muted)}.wk-rw li.earn small{color:var(--exotic)}

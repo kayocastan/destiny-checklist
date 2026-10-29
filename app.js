@@ -32,7 +32,7 @@ const UI = {
   pt: {
     hide: 'Ocultar feitos', search: 'Buscar por nome ou origem', refresh: 'Atualizar', logout: 'Sair',
     disclaimer: 'Dados lidos da sua conta pela API oficial da Bungie. Este site não é afiliado à Bungie.',
-    loadouts: 'Loadouts', checklist: 'Central', outQ: 'Confirmar?', liveT: 'Ao vivo', liveYou: 'você', liveSince: t => `desde ${t}`, livePriv: 'Build privada', liveTap: 'Toque para ver a build completa', statsT: 'Atributos', glT: 'Metas de build', ssRec: 'Novo recorde', ssRecBest: 'seu melhor tempo até hoje', ssRecSub: (o, d) => `antes ${o} · ${d} mais rápido`, ssSolo: 'Solo', ssSoloFl: 'Solo sem morrer', wkFeatT: 'Em destaque', wkKind: { ch: 'Desafio', rw: 'Recompensas', q: 'Missão' }, glNote: 'Builds que você quer montar: cada item se marca sozinho quando você libera ou pega.', glAdd: n => `Faltam ${n} itens para você usar esta build.`, glBtn: '＋ Virar objetivo', glDone: 'Já é um objetivo', glView: 'Ver build', glDel: 'Remover', glAt: d => `adicionada em ${d}`, glSet: (n, k) => `Conjunto ${n}: ${k} ${k === 1 ? 'peça' : 'peças'}`, glSetSrc: 'qualquer peça do conjunto, para os bônus', glRef: 'Atributos da build', glYou: 'você', glNone: 'Nenhuma meta ainda. Na comparação de builds, use “Virar objetivo” no que falta.', glSrcPlug: 'Liberar no menu da subclasse', glG: { asp: 'Aspectos', fr: 'Fragmentos', ab: 'Habilidades', w: 'Armas', a: 'Armadura' }, tsK: 'Ordenar', tsO: { tier: 'Dificuldade', near: 'Mais perto de completar', low: 'Menos feitos', name: 'Nome' }, statsHi: 'acima de 100: bônus extra',
+    loadouts: 'Loadouts', checklist: 'Central', outQ: 'Confirmar?', liveT: 'Ao vivo', liveYou: 'você', liveSince: t => `desde ${t}`, livePriv: 'Build privada', liveTap: 'Toque para ver a build completa', statsT: 'Atributos', glT: 'Metas de build', ssRec: 'Novo recorde', ssRecBest: 'seu melhor tempo até hoje', ssRecSub: (o, d) => `antes ${o} · ${d} mais rápido`, ssSolo: 'Solo', ssSoloFl: 'Solo sem morrer', wkFeatT: 'Em destaque', wkRwSt: { red: 'resgatada', earn: 'pronta para resgatar', todo: 'falta fazer' }, wkKind: { ch: 'Desafio', rw: 'Recompensas', q: 'Missão' }, glNote: 'Builds que você quer montar: cada item se marca sozinho quando você libera ou pega.', glAdd: n => `Faltam ${n} itens para você usar esta build.`, glBtn: '＋ Virar objetivo', glDone: 'Já é um objetivo', glView: 'Ver build', glDel: 'Remover', glAt: d => `adicionada em ${d}`, glSet: (n, k) => `Conjunto ${n}: ${k} ${k === 1 ? 'peça' : 'peças'}`, glSetSrc: 'qualquer peça do conjunto, para os bônus', glRef: 'Atributos da build', glYou: 'você', glNone: 'Nenhuma meta ainda. Na comparação de builds, use “Virar objetivo” no que falta.', glSrcPlug: 'Liberar no menu da subclasse', glG: { asp: 'Aspectos', fr: 'Fragmentos', ab: 'Habilidades', w: 'Armas', a: 'Armadura' }, tsK: 'Ordenar', tsO: { tier: 'Dificuldade', near: 'Mais perto de completar', low: 'Menos feitos', name: 'Nome' }, statsHi: 'acima de 100: bônus extra',
     tabs: { obj: 'Objetivos', act: 'Atividades', drops: 'Arsenal', gd: 'Guardião' },
     subs: { obj: 'Principal', prog: 'Em andamento', camp: 'Campanhas', raid: 'Incursões', dg: 'Masmorras', xm: 'Missões exóticas', tit: 'Títulos', exo: 'Exóticos', cat: 'Catalisadores', vend: 'Vendedores' },
     heroTitle: 'Central do Guardião', heroText: 'Entre com a sua conta Bungie.net para verificar seus objetivos, acompanhar a rotação semanal, completar seu arsenal exótico e compartilhar suas builds.', lsQ: 'Buscar guardião: Nome#1234', lsBtn: 'Buscar', lsHint: 'Veja a build equipada de qualquer jogador, sem precisar entrar.',
@@ -87,7 +87,7 @@ const UI = {
   en: {
     hide: 'Hide done', search: 'Search by name or source', refresh: 'Refresh', logout: 'Sign out',
     disclaimer: 'Data read from your account through the official Bungie API. This site is not affiliated with Bungie.',
-    loadouts: 'Loadouts', checklist: 'Hub', outQ: 'Confirm?', liveT: 'Live', liveYou: 'you', liveSince: t => `since ${t}`, livePriv: 'Private build', liveTap: 'Tap to see the full build', statsT: 'Stats', glT: 'Build goals', ssRec: 'New record', ssRecBest: 'your best time ever', ssRecSub: (o, d) => `was ${o} · ${d} faster`, ssSolo: 'Solo', ssSoloFl: 'Solo flawless', wkFeatT: 'Featured', wkKind: { ch: 'Challenge', rw: 'Rewards', q: 'Quest' }, glNote: 'Builds you want to put together: each item checks itself off when you unlock or get it.', glAdd: n => `You're missing ${n} items to run this build.`, glBtn: '＋ Make it a goal', glDone: 'Already a goal', glView: 'View build', glDel: 'Remove', glAt: d => `added ${d}`, glSet: (n, k) => `${n} set: ${k} ${k === 1 ? 'piece' : 'pieces'}`, glSetSrc: 'any piece of the set, for the bonuses', glRef: 'Build stats', glYou: 'you', glNone: 'No goals yet. In build comparison, use “Make it a goal” on what is missing.', glSrcPlug: 'Unlock in the subclass menu', glG: { asp: 'Aspects', fr: 'Fragments', ab: 'Abilities', w: 'Weapons', a: 'Armor' }, tsK: 'Sort', tsO: { tier: 'Difficulty', near: 'Closest to done', low: 'Least done', name: 'Name' }, statsHi: 'above 100: extra bonus',
+    loadouts: 'Loadouts', checklist: 'Hub', outQ: 'Confirm?', liveT: 'Live', liveYou: 'you', liveSince: t => `since ${t}`, livePriv: 'Private build', liveTap: 'Tap to see the full build', statsT: 'Stats', glT: 'Build goals', ssRec: 'New record', ssRecBest: 'your best time ever', ssRecSub: (o, d) => `was ${o} · ${d} faster`, ssSolo: 'Solo', ssSoloFl: 'Solo flawless', wkFeatT: 'Featured', wkRwSt: { red: 'claimed', earn: 'ready to claim', todo: 'to do' }, wkKind: { ch: 'Challenge', rw: 'Rewards', q: 'Quest' }, glNote: 'Builds you want to put together: each item checks itself off when you unlock or get it.', glAdd: n => `You're missing ${n} items to run this build.`, glBtn: '＋ Make it a goal', glDone: 'Already a goal', glView: 'View build', glDel: 'Remove', glAt: d => `added ${d}`, glSet: (n, k) => `${n} set: ${k} ${k === 1 ? 'piece' : 'pieces'}`, glSetSrc: 'any piece of the set, for the bonuses', glRef: 'Build stats', glYou: 'you', glNone: 'No goals yet. In build comparison, use “Make it a goal” on what is missing.', glSrcPlug: 'Unlock in the subclass menu', glG: { asp: 'Aspects', fr: 'Fragments', ab: 'Abilities', w: 'Weapons', a: 'Armor' }, tsK: 'Sort', tsO: { tier: 'Difficulty', near: 'Closest to done', low: 'Least done', name: 'Name' }, statsHi: 'above 100: extra bonus',
     tabs: { obj: 'Objectives', act: 'Activities', drops: 'Arsenal', gd: 'Guardian' },
     subs: { obj: 'Main', prog: 'In progress', camp: 'Campaigns', raid: 'Raids', dg: 'Dungeons', xm: 'Exotic missions', tit: 'Titles', exo: 'Exotics', cat: 'Catalysts', vend: 'Vendors' },
     heroTitle: 'Guardian Hub', heroText: 'Sign in with your Bungie.net account to check your goals, follow the weekly rotation, complete your exotic arsenal and share your builds.', lsQ: 'Search guardian: Name#1234', lsBtn: 'Search', lsHint: "See any player's equipped build, no sign-in needed.",
@@ -730,10 +730,10 @@ function weekSection() {
     if (m.endDate && Date.parse(m.endDate) <= t) continue;
     for (const a of m.activities || []) for (const c of a.challenges || []) {
       const o = c.objective || {}, an = ACTN[a.activityHash]?.n || name, cv = o.completionValue || 1;
-      items.push(I(`wk-${m.milestoneHash}-${a.activityHash}-${o.objectiveHash || 0}`, W.wkChallenge(an), W.wkChallengeD, [`${Math.min(o.progress || 0, cv)}/${cv}`, U_CHIP_WEEK()], !!o.complete, { wk: { ms: m.milestoneHash, k: 'ch', act: an, h: a.activityHash, a: Math.min(o.progress || 0, cv), b: cv } }));
+      items.push(I(`wk-${m.milestoneHash}-${a.activityHash}-${o.objectiveHash || 0}`, W.wkChallenge(an), W.wkChallengeD, [`${Math.min(o.progress || 0, cv)}/${cv}`, U_CHIP_WEEK()], !!o.complete, { wk: { ms: m.milestoneHash, obj: o.objectiveHash, k: 'ch', act: an, h: a.activityHash, a: Math.min(o.progress || 0, cv), b: cv } }));
     }
     const rw = (m.rewards || []).flatMap(r => r.entries || []);
-    if (rw.length) { const red = rw.filter(e => e.redeemed).length, earn = rw.filter(e => e.earned).length; items.push(I(`wk-${m.milestoneHash}-rw`, W.wkRewardT(name), earn > red ? W.wkClaim(earn - red) : W.wkRewardsD, [`${red}/${rw.length}`, U_CHIP_WEEK()], red === rw.length, { wk: { ms: m.milestoneHash, k: 'rw', act: name, h: (m.activities || [])[0]?.activityHash, a: red, b: rw.length, claim: earn > red } })); }
+    if (rw.length) { const red = rw.filter(e => e.redeemed).length, earn = rw.filter(e => e.earned).length; items.push(I(`wk-${m.milestoneHash}-rw`, W.wkRewardT(name), earn > red ? W.wkClaim(earn - red) : W.wkRewardsD, [`${red}/${rw.length}`, U_CHIP_WEEK()], red === rw.length, { wk: { ms: m.milestoneHash, rw: rw.map(e => [e.rewardEntryHash, e.earned ? 1 : 0, e.redeemed ? 1 : 0]), k: 'rw', act: name, h: (m.activities || [])[0]?.activityHash, a: red, b: rw.length, claim: earn > red } })); }
     for (const q of m.availableQuests || []) if (q.status) items.push(I(`wk-${m.milestoneHash}-q`, name, W.wkQuestD, [q.status.completed ? '✓' : q.status.started ? W.wkStarted : W.wkNew], !!q.status.completed, { wk: { ms: m.milestoneHash, k: 'q', act: name, h: (m.activities || [])[0]?.activityHash } }));
   }
   const miss = xurMissing();
@@ -1409,6 +1409,7 @@ $('list').addEventListener('click', e => {
   const hd = e.target.closest('.sec-head[data-coll]'); if (hd) { toggleSec(hd); return; }
   const it = e.target.closest('button.it'); if (it) { const li = it.closest('li'); const o = li.classList.toggle('open'); it.setAttribute('aria-expanded', o); o ? openItems.add(li.dataset.li) : openItems.delete(li.dataset.li); return; }
   if (e.target.id === 'togglecomplete') { document.body.classList.toggle('show-complete'); update(); }
+  const wo = e.target.closest('[data-wko]'); if (wo) { const id = wo.dataset.wko; WKO.has(id) ? WKO.delete(id) : WKO.add(id); render(); return; }
   const jf = e.target.closest('[data-jump]'); if (jf) { const [t, id] = jf.dataset.jump.split(':'); jumpTo(t, id); return; }
   const ts = e.target.closest('[data-tsort]'); if (ts) { TSORT.v[tab] = ts.dataset.tsort; LS.set('dc-sorts', TSORT.v); render(); return; }
   if (e.target.closest('#wkxbtn')) { WKX.on = !WKX.on; e.target.closest('#wkxbtn').setAttribute('aria-pressed', WKX.on); filter(); }
@@ -1906,11 +1907,37 @@ async function loadSession() {
   if (tab === 'obj') render();
 }
 // "Esta semana" em cartões: destaques com a imagem da atividade, desafios e recompensas com barra de progresso
+// detalhes ao abrir um cartão da semana: descrição do marco, nomes das recompensas, texto do desafio
+const WKD = { ms: {}, ob: {}, p: {} }, WKO = new Set();
+function wkDetail(w) {
+  const lc = lang === 'pt' ? 'pt-br' : 'en', need = [];
+  if (w.ms && !WKD.ms[w.ms + lc]) need.push(['ms', w.ms, `/Destiny2/Manifest/DestinyMilestoneDefinition/${w.ms}/?lc=${lc}`, d => { const rw = {}; for (const c of Object.values(d.rewards || {})) for (const [eh, e] of Object.entries(c.rewardEntries || {})) rw[eh] = e.displayProperties?.name || ''; return { d: d.displayProperties?.description || '', rw }; }]);
+  if (w.obj && !WKD.ob[w.obj + lc]) need.push(['ob', w.obj, `/Destiny2/Manifest/DestinyObjectiveDefinition/${w.obj}/?lc=${lc}`, d => ({ n: d.displayProperties?.name || d.progressDescription || '', d: d.displayProperties?.description || '' })]);
+  for (const [k, h, url, f] of need) { const key = k + h + lc; if (WKD.p[key]) continue; WKD.p[key] = bungie(url, false).then(d => { WKD[k][h + lc] = f(d); }).catch(() => { WKD[k][h + lc] = {}; }).finally(() => { if (tab === 'obj') render(); }); }
+  return { ms: WKD.ms[w.ms + lc], ob: WKD.ob[w.obj + lc], act: ACTN?.[w.h] };
+}
+function wkMore(i) {
+  const w = i.wk || {}, D = wkDetail(w), U = u(), out = [];
+  if (w.k === 'ch') {
+    if (D.ob?.n) out.push(`<b class="wk-mt">${esc(D.ob.n)}</b>`);
+    if (D.ob?.d) out.push(`<p>${esc(D.ob.d)}</p>`);
+    if (D.act?.d) out.push(`<p class="wk-mm">${esc(D.act.d)}</p>`);
+    out.push(`<p class="wk-mm">${esc(U.w.wkChallengeD)}</p>`);
+  } else if (w.k === 'rw') {
+    if (D.ms?.d) out.push(`<p>${esc(D.ms.d)}</p>`);
+    if (w.rw?.length) out.push(`<ul class="wk-rw">${w.rw.map(([eh, ea, re]) => `<li class="${re ? 'red' : ea ? 'earn' : ''}"><i></i><span>${esc(D.ms?.rw?.[eh] || '…')}</span><small>${esc(re ? U.wkRwSt.red : ea ? U.wkRwSt.earn : U.wkRwSt.todo)}</small></li>`).join('')}</ul>`);
+  } else {
+    if (D.ms?.d) out.push(`<p>${esc(D.ms.d)}</p>`);
+    out.push(`<p class="wk-mm">${esc(i.d || '')}</p>`);
+  }
+  return `<div class="wk-more">${out.join('') || `<p class="wait">${esc(U.loadingDefs)}</p>`}</div>`;
+}
 function weekHTML(sec) {
   const W = u().w, open = openSecs.has(sec.id), done = sec.items.filter(isDone).length;
   const feat = (sec.feat || []).map(f => { const d = (f.kind === 'raid' ? defs.raids : defs.dungeons).find(x => x.k === f.key); return `<button type="button" class="wk-f" data-jump="${f.tab}:${f.id}" style="--wk-img:url('${BNET}${d?.img || ''}')"><small>${esc(u().wkFeatT)}${d?.d ? ` · ${esc(u().chip[d.d] || d.d)}` : ''}</small><b>${esc(f.title)}</b></button>`; }).join('');
   const card = i => { const w = i.wk || {}, mi = msImg(w.ms), im = (w.h ? actImg(w.h) : '') || mi.img || '', ic = !im && mi.ic, ok = isDone(i), p = w.b ? Math.round(w.a / w.b * 100) : ok ? 100 : 0;
-    return `<div class="wk-c${ok ? ' ok' : ''}${w.claim ? ' claim' : ''}${im ? ' wk-img' : ''}"${im ? ` style="--wk-img:url('${BNET}${im}')"` : ''}>${ic ? `<img class="wk-ic" src="${BNET}${ic}" alt="">` : ''}<small>${esc(u().wkKind[w.k] || '')}</small><b>${esc(w.act || i.t)}</b>${w.b ? `<span class="wk-p"><i><u style="width:${p}%"></u></i><span>${w.a}/${w.b}</span></span>` : `<span class="wk-p"><span>${esc(i.c[0] || '')}</span></span>`}${w.claim ? `<span class="wk-claim">${esc(i.d)}</span>` : ''}${ok ? '<span class="wk-ok">✓</span>' : ''}</div>`; };
+    const op = WKO.has(i.id);
+    return `<div class="wk-c${ok ? ' ok' : ''}${w.claim ? ' claim' : ''}${im ? ' wk-img' : ''}${op ? ' open' : ''}" data-wko="${esc(i.id)}" role="button" tabindex="0" aria-expanded="${op}"${im ? ` style="--wk-img:url('${BNET}${im}')"` : ''}>${ic ? `<img class="wk-ic" src="${BNET}${ic}" alt="">` : ''}<small>${esc(u().wkKind[w.k] || '')}</small><b>${esc(w.act || i.t)}</b>${w.b ? `<span class="wk-p"><i><u style="width:${p}%"></u></i><span>${w.a}/${w.b}</span></span>` : `<span class="wk-p"><span>${esc(i.c[0] || '')}</span></span>`}${w.claim ? `<span class="wk-claim">${esc(i.d)}</span>` : ''}${ok ? '<span class="wk-ok">✓</span>' : ''}${op ? wkMore(i) : ''}</div>`; };
   return `<section data-sec="${sec.id}" class="keep wk-sec coll${open ? '' : ' collapsed'}"><div class="sec-head" data-coll="${sec.id}" role="button" tabindex="0" aria-expanded="${open}"><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2></div><span class="count">${done}/${sec.items.length}</span><span class="chev" aria-hidden="true"></span></div><p>${esc(sec.note)}</p><div class="sec-bar"><i style="width:${sec.items.length ? done / sec.items.length * 100 : 0}%"></i></div></div>
     <div class="wk-body">${feat ? `<div class="wk-fs">${feat}</div>` : ''}<div class="wk-g">${sec.items.map(card).join('')}</div></div></section>`;
 }
