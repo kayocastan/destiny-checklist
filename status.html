@@ -115,6 +115,7 @@ function render(d) {
   h += meterCard('Tamanho do banco', d.db.size, LIM.size, bytes);
   h += tile('Pessoas sincronizadas', nf(d.db.users), `${nf(d.db.active1)} nas últimas 24h · ${nf(d.db.active7)} em 7 dias`);
   h += tile('Nomes guardados', nf(d.db.defs), `${bytes(d.db.defsBytes)} · servem a todos os visitantes`);
+  { const m = d.db.manifest; h += tile('Dicionário do jogo', m ? (m.done ? 'Completo' : 'Carregando') : '—', m ? `versão ${esc(String(m.version).split('.').slice(-2).join('.'))} · ${nf(m.total)} definições${m.pending ? ` · faltam ${nf(m.pending)} (continua amanhã)` : ''} · ${new Date(m.at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}` : 'A primeira carga ainda não rodou'); }
   h += tile('Dados sincronizados', bytes(d.db.kvBytes), `${nf(d.db.kvRows)} registros`);
   h += '</div></section>';
   if (cfOk) {

@@ -1,0 +1,23 @@
+name: Manifesto da Bungie (pré-carga do banco)
+on:
+  schedule:
+    - cron: '17 10 * * *'   # todo dia, 07:17 em Brasília
+  push:
+    branches: [main]
+    paths: ['scripts/manifest.mjs', 'worker/src/compact.js', '.github/workflows/manifest.yml']
+  workflow_dispatch:
+concurrency: manifest
+jobs:
+  load:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      NODE_OPTIONS: --max-old-space-size=6144
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/manifest.mjs

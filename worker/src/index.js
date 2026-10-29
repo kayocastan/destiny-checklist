@@ -2,12 +2,12 @@
    /defs  – nomes e dados resumidos de definições da Bungie, guardados para todos os visitantes.
    /sync  – favoritos, builds salvas, marcações e preferências de cada pessoa, ligados à conta Bungie.
    A chave da API da Bungie é pública (o site já a entrega ao navegador); o navegador a envia em X-API-Key. */
+import { compact } from './compact.js';
 const BUNGIE = 'https://www.bungie.net/Platform';
 const TYPES = new Set(['DestinyInventoryItemDefinition', 'DestinyObjectiveDefinition', 'DestinyLocationDefinition', 'DestinyActivityDefinition', 'DestinyMilestoneDefinition', 'DestinyLoadoutNameDefinition', 'DestinyRecordDefinition', 'DestinyCollectibleDefinition', 'DestinyPresentationNodeDefinition', 'DestinyDestinationDefinition', 'DestinyEquipableItemSetDefinition', 'DestinyStatDefinition']);
 const SET = 'DestinyEquipableItemSetDefinition';
 const SYNC_KEYS = /^(favs|builds|opts|hide2|marks-\d{1,25})$/;
 const MAX_BATCH = 12;              // até 12 itens por pedido: mantém o tempo de CPU abaixo de 10 ms quando há muitas buscas novas na Bungie
-const DEF_TTL = 30 * 864e5;        // nomes guardados são renovados depois de 30 dias
 const MAX_VALUE = 400_000;         // tamanho máximo de cada valor sincronizado
 
 const cors = req => ({
@@ -39,13 +39,6 @@ async function bungie(req, path, token) {
   const e = new Error(last?.Message || 'origin'); e.code = 2107; throw e;
 }
 
-// mesmo formato que o site guarda no navegador
-function compact(type, d) {
-  const v = { n: d.displayProperties?.name || d.name || '', d: d.displayProperties?.description || '', ql: d.setData?.questLineName || '', il: (d.setData?.itemList || []).map(x => x.itemHash), b: d.inventory?.bucketTypeHash || 0, it: d.itemType || 0, tl: d.itemTypeDisplayName || '', su: d.inventory?.stackUniqueLabel || '', ob: d.objectives?.objectiveHashes || [], lh: d.locationHash || 0, lr: (d.locationReleases || []).map(r => [r.destinationHash || 0, r.activityHash || 0]).slice(-1)[0] || null, ic: d.displayProperties?.icon || '', tt: d.inventory?.tierType || 0, dt: d.talentGrid?.hudDamageType || 0 };
-  if (type === 'DestinyInventoryItemDefinition') Object.assign(v, { pc: d.plug?.plugCategoryIdentifier || '', st: d.itemSubType || 0, tr: (d.traitIds || []).includes('item.plug.aspect') ? 'a' : (d.traitIds || []).includes('item.plug.fragment') ? 'f' : '', x: { a: d.equippingBlock?.ammoType || 0, s: d.equippingBlock?.equipableItemSetHash || 0, c: d.collectibleHash || 0 } });
-  return v;
-}
-
 async function defs(req, env) {
   const { t, lc, h } = await req.json().catch(() => ({}));
   if (!TYPES.has(t) || !['en', 'pt'].includes(lc) || !Array.isArray(h)) return json(req, { error: 'bad request' }, 400);
@@ -53,7 +46,7 @@ async function defs(req, env) {
   const key = x => `${t}:${lc}:${x}`, out = {}, now = Date.now();
   if (hashes.length) {
     const rows = await env.DB.prepare(`SELECT k, v, t FROM defs WHERE k IN (${hashes.map(() => '?').join(',')})`).bind(...hashes.map(key)).all();
-    for (const r of rows.results || []) if (now - r.t < DEF_TTL) out[r.k.slice(r.k.lastIndexOf(':') + 1)] = JSON.parse(r.v);
+    for (const r of rows.results || []) out[r.k.slice(r.k.lastIndexOf(':') + 1)] = JSON.parse(r.v);
   }
   const miss = hashes.filter(x => !out[x]), fresh = [];
   await Promise.all(miss.map(async x => {
@@ -124,6 +117,7 @@ async function stats(req, env) {
     env.DB.prepare("SELECT substr(k, 1, instr(k, ':') - 1) t, COUNT(*) n FROM defs GROUP BY 1 ORDER BY 2 DESC").all(),
   ]);
   const size = (await env.DB.prepare('SELECT 1').run()).meta?.size_after || null;
+  const man = await env.DB.prepare("SELECT v FROM meta WHERE k = 'manifest'").first().catch(() => null);
   const since = new Date(now - 7 * day).toISOString().slice(0, 10), until = new Date(now + day).toISOString().slice(0, 10);
   const cf = await cfGraph(env, `query($a: String!, $s: Date!, $u: Date!, $w: String!) { viewer { accounts(filter: { accountTag: $a }) {
     workers: workersInvocationsAdaptive(limit: 100, filter: { date_geq: $s, date_leq: $u, scriptName: $w }) { sum { requests errors subrequests } quantiles { cpuTimeP50 cpuTimeP99 } dimensions { date } }
@@ -131,7 +125,7 @@ async function stats(req, env) {
   } } }`, { a: env.ACCOUNT_ID, s: since, u: until, w: 'dni-api' });
   return json(req, {
     at: now,
-    db: { size, defs: defs?.n || 0, defsBytes: defs?.b || 0, users: users?.n || 0, active7: act7?.n || 0, active1: act1?.n || 0, kvBytes: kvSize?.b || 0, kvRows: kvSize?.n || 0, byType: defsBy.results || [] },
+    db: { size, defs: defs?.n || 0, defsBytes: defs?.b || 0, users: users?.n || 0, active7: act7?.n || 0, active1: act1?.n || 0, kvBytes: kvSize?.b || 0, kvRows: kvSize?.n || 0, byType: defsBy.results || [], manifest: man?.v ? JSON.parse(man.v) : null },
     cf: cf.error ? { error: cf.error } : { workers: cf.viewer?.accounts?.[0]?.workers || [], d1: cf.viewer?.accounts?.[0]?.d1 || [] },
   });
 }
