@@ -32,7 +32,7 @@ const UI = {
   pt: {
     hide: 'Ocultar feitos', search: 'Buscar por nome ou origem', refresh: 'Atualizar', logout: 'Sair',
     disclaimer: 'Dados lidos da sua conta pela API oficial da Bungie. Este site não é afiliado à Bungie.',
-    loadouts: 'Loadouts', checklist: 'Central', outQ: 'Confirmar?', liveT: 'Ao vivo', liveYou: 'você', liveSince: t => `desde ${t}`, livePriv: 'Build privada', liveTap: 'Toque para ver a build completa', statsT: 'Atributos', glT: 'Metas de build', glNote: 'Builds que você quer montar: cada item se marca sozinho quando você libera ou pega.', glAdd: n => `Faltam ${n} itens para você usar esta build.`, glBtn: '＋ Virar objetivo', glDone: 'Já é um objetivo', glView: 'Ver build', glDel: 'Remover', glAt: d => `adicionada em ${d}`, glSet: (n, k) => `Conjunto ${n}: ${k} ${k === 1 ? 'peça' : 'peças'}`, glSetSrc: 'qualquer peça do conjunto, para os bônus', glRef: 'Atributos da build', glYou: 'você', glNone: 'Nenhuma meta ainda. Na comparação de builds, use “Virar objetivo” no que falta.', glSrcPlug: 'Liberar no menu da subclasse', glG: { asp: 'Aspectos', fr: 'Fragmentos', ab: 'Habilidades', w: 'Armas', a: 'Armadura' }, tsK: 'Ordenar', tsO: { tier: 'Dificuldade', near: 'Mais perto de completar', low: 'Menos feitos', name: 'Nome' }, statsHi: 'acima de 100: bônus extra',
+    loadouts: 'Loadouts', checklist: 'Central', outQ: 'Confirmar?', liveT: 'Ao vivo', liveYou: 'você', liveSince: t => `desde ${t}`, livePriv: 'Build privada', liveTap: 'Toque para ver a build completa', statsT: 'Atributos', glT: 'Metas de build', ssRec: 'Novo recorde', ssRecSub: (o, d) => `antes ${o} · ${d} mais rápido`, ssSolo: 'Solo', ssSoloFl: 'Solo sem morrer', wkFeatT: 'Em destaque', wkKind: { ch: 'Desafio', rw: 'Recompensas', q: 'Missão' }, glNote: 'Builds que você quer montar: cada item se marca sozinho quando você libera ou pega.', glAdd: n => `Faltam ${n} itens para você usar esta build.`, glBtn: '＋ Virar objetivo', glDone: 'Já é um objetivo', glView: 'Ver build', glDel: 'Remover', glAt: d => `adicionada em ${d}`, glSet: (n, k) => `Conjunto ${n}: ${k} ${k === 1 ? 'peça' : 'peças'}`, glSetSrc: 'qualquer peça do conjunto, para os bônus', glRef: 'Atributos da build', glYou: 'você', glNone: 'Nenhuma meta ainda. Na comparação de builds, use “Virar objetivo” no que falta.', glSrcPlug: 'Liberar no menu da subclasse', glG: { asp: 'Aspectos', fr: 'Fragmentos', ab: 'Habilidades', w: 'Armas', a: 'Armadura' }, tsK: 'Ordenar', tsO: { tier: 'Dificuldade', near: 'Mais perto de completar', low: 'Menos feitos', name: 'Nome' }, statsHi: 'acima de 100: bônus extra',
     tabs: { obj: 'Objetivos', act: 'Atividades', drops: 'Arsenal', gd: 'Guardião' },
     subs: { obj: 'Principal', prog: 'Em andamento', camp: 'Campanhas', raid: 'Incursões', dg: 'Masmorras', xm: 'Missões exóticas', tit: 'Títulos', exo: 'Exóticos', cat: 'Catalisadores', vend: 'Vendedores' },
     heroTitle: 'Central do Guardião', heroText: 'Entre com a sua conta Bungie.net para verificar seus objetivos, acompanhar a rotação semanal, completar seu arsenal exótico e compartilhar suas builds.', lsQ: 'Buscar guardião: Nome#1234', lsBtn: 'Buscar', lsHint: 'Veja a build equipada de qualquer jogador, sem precisar entrar.',
@@ -87,7 +87,7 @@ const UI = {
   en: {
     hide: 'Hide done', search: 'Search by name or source', refresh: 'Refresh', logout: 'Sign out',
     disclaimer: 'Data read from your account through the official Bungie API. This site is not affiliated with Bungie.',
-    loadouts: 'Loadouts', checklist: 'Hub', outQ: 'Confirm?', liveT: 'Live', liveYou: 'you', liveSince: t => `since ${t}`, livePriv: 'Private build', liveTap: 'Tap to see the full build', statsT: 'Stats', glT: 'Build goals', glNote: 'Builds you want to put together: each item checks itself off when you unlock or get it.', glAdd: n => `You're missing ${n} items to run this build.`, glBtn: '＋ Make it a goal', glDone: 'Already a goal', glView: 'View build', glDel: 'Remove', glAt: d => `added ${d}`, glSet: (n, k) => `${n} set: ${k} ${k === 1 ? 'piece' : 'pieces'}`, glSetSrc: 'any piece of the set, for the bonuses', glRef: 'Build stats', glYou: 'you', glNone: 'No goals yet. In build comparison, use “Make it a goal” on what is missing.', glSrcPlug: 'Unlock in the subclass menu', glG: { asp: 'Aspects', fr: 'Fragments', ab: 'Abilities', w: 'Weapons', a: 'Armor' }, tsK: 'Sort', tsO: { tier: 'Difficulty', near: 'Closest to done', low: 'Least done', name: 'Name' }, statsHi: 'above 100: extra bonus',
+    loadouts: 'Loadouts', checklist: 'Hub', outQ: 'Confirm?', liveT: 'Live', liveYou: 'you', liveSince: t => `since ${t}`, livePriv: 'Private build', liveTap: 'Tap to see the full build', statsT: 'Stats', glT: 'Build goals', ssRec: 'New record', ssRecSub: (o, d) => `was ${o} · ${d} faster`, ssSolo: 'Solo', ssSoloFl: 'Solo flawless', wkFeatT: 'Featured', wkKind: { ch: 'Challenge', rw: 'Rewards', q: 'Quest' }, glNote: 'Builds you want to put together: each item checks itself off when you unlock or get it.', glAdd: n => `You're missing ${n} items to run this build.`, glBtn: '＋ Make it a goal', glDone: 'Already a goal', glView: 'View build', glDel: 'Remove', glAt: d => `added ${d}`, glSet: (n, k) => `${n} set: ${k} ${k === 1 ? 'piece' : 'pieces'}`, glSetSrc: 'any piece of the set, for the bonuses', glRef: 'Build stats', glYou: 'you', glNone: 'No goals yet. In build comparison, use “Make it a goal” on what is missing.', glSrcPlug: 'Unlock in the subclass menu', glG: { asp: 'Aspects', fr: 'Fragments', ab: 'Abilities', w: 'Weapons', a: 'Armor' }, tsK: 'Sort', tsO: { tier: 'Difficulty', near: 'Closest to done', low: 'Least done', name: 'Name' }, statsHi: 'above 100: extra bonus',
     tabs: { obj: 'Objectives', act: 'Activities', drops: 'Arsenal', gd: 'Guardian' },
     subs: { obj: 'Main', prog: 'In progress', camp: 'Campaigns', raid: 'Raids', dg: 'Dungeons', xm: 'Exotic missions', tit: 'Titles', exo: 'Exotics', cat: 'Catalysts', vend: 'Vendors' },
     heroTitle: 'Guardian Hub', heroText: 'Sign in with your Bungie.net account to check your goals, follow the weekly rotation, complete your exotic arsenal and share your builds.', lsQ: 'Search guardian: Name#1234', lsBtn: 'Search', lsHint: "See any player's equipped build, no sign-in needed.",
@@ -730,10 +730,10 @@ function weekSection() {
     if (m.endDate && Date.parse(m.endDate) <= t) continue;
     for (const a of m.activities || []) for (const c of a.challenges || []) {
       const o = c.objective || {}, an = ACTN[a.activityHash]?.n || name, cv = o.completionValue || 1;
-      items.push(I(`wk-${m.milestoneHash}-${a.activityHash}-${o.objectiveHash || 0}`, W.wkChallenge(an), W.wkChallengeD, [`${Math.min(o.progress || 0, cv)}/${cv}`, U_CHIP_WEEK()], !!o.complete));
+      items.push(I(`wk-${m.milestoneHash}-${a.activityHash}-${o.objectiveHash || 0}`, W.wkChallenge(an), W.wkChallengeD, [`${Math.min(o.progress || 0, cv)}/${cv}`, U_CHIP_WEEK()], !!o.complete, { wk: { k: 'ch', act: an, h: a.activityHash, a: Math.min(o.progress || 0, cv), b: cv } }));
     }
     const rw = (m.rewards || []).flatMap(r => r.entries || []);
-    if (rw.length) { const red = rw.filter(e => e.redeemed).length, earn = rw.filter(e => e.earned).length; items.push(I(`wk-${m.milestoneHash}-rw`, W.wkRewardT(name), earn > red ? W.wkClaim(earn - red) : W.wkRewardsD, [`${red}/${rw.length}`, U_CHIP_WEEK()], red === rw.length)); }
+    if (rw.length) { const red = rw.filter(e => e.redeemed).length, earn = rw.filter(e => e.earned).length; items.push(I(`wk-${m.milestoneHash}-rw`, W.wkRewardT(name), earn > red ? W.wkClaim(earn - red) : W.wkRewardsD, [`${red}/${rw.length}`, U_CHIP_WEEK()], red === rw.length, { wk: { k: 'rw', act: name, h: (m.activities || [])[0]?.activityHash, a: red, b: rw.length, claim: earn > red } })); }
     for (const q of m.availableQuests || []) if (q.status) items.push(I(`wk-${m.milestoneHash}-q`, name, W.wkQuestD, [q.status.completed ? '✓' : q.status.started ? W.wkStarted : W.wkNew], !!q.status.completed));
   }
   const miss = xurMissing();
@@ -741,7 +741,7 @@ function weekSection() {
   const f = featured(), feat = [...[...f.raid].map(k => 'raid-' + k), ...[...f.dg].map(k => 'dg-' + k)].map(id => SECTIONS_PREV.find(s => s.id === id)).filter(Boolean);
   const featTxt = feat.length ? ' ' + W.featured + feat.map(s => s.title).join(' · ') + '.' : '';
   const waiting = !(have.a && weekReady.m && weekReady.x);
-  return S('obj', 'week', W.week, (waiting ? u().loadingDefs + ' ' : '') + W.resetNote(cd(nextReset() - t)) + featTxt, items.sort((a, b) => a.auto - b.auto), { weekly: true, coll: true });
+  return S('obj', 'week', W.week, (waiting ? u().loadingDefs + ' ' : '') + W.resetNote(cd(nextReset() - t)) + featTxt, items.sort((a, b) => a.auto - b.auto), { weekly: true, coll: true, feat });
 }
 const U_CHIP_WEEK = () => u().w.weeklyChip;
 let SECTIONS_PREV = [];
@@ -1330,6 +1330,7 @@ function render() {
   if (tab === 'xm') loadXmRec();
   $('list').innerHTML = `<div class="panel">${tab === 'obj' ? sessHTML() : ''}${wkBar}${tsBar}${secs.map(sec => {
     if (sec.html) return sec.id === 'vendors' ? vendorsHTML() : sec.id === 'xmissions' ? xmHTML() : sec.id === 'goals' ? goalsHTML() : '';
+    if (BETA && sec.id === 'week' && sec.items.length) return weekHTML(sec);
     if (sec.empty) return `<p class="empty-msg${/…$/.test(sec.note || '') ? ' wait' : ''}">${esc(sec.note)}</p>`;
     if (!sec.items.length) return `<section data-sec="${sec.id}"><div class="sec-head"><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2></div></div><p>${esc(sec.note)}</p></div></section>`;
     const keep = true, coll = sec.coll || ((tab === 'exo' || tab === 'cat') && sec.items?.length) || (keep && secDone(sec)), open = openSecs.has(sec.id);
@@ -1402,12 +1403,13 @@ $('ghout').addEventListener('click', () => { const b = $('ghout'); if (b.classLi
 $('hide').addEventListener('change', e => { document.body.classList.toggle('hide-done', e.target.checked); LS.set('dc-hide2', e.target.checked); });
 $('searchbtn').addEventListener('click', () => { const q = $('q'), show = q.hidden; q.hidden = !show; $('searchbtn').setAttribute('aria-expanded', show); if (show) q.focus(); else { q.value = ''; query = ''; filter(); } });
 $('q').addEventListener('input', e => { query = e.target.value; filter(); });
-const toggleSec = h => { const id = h.dataset.coll, sec = h.closest('section'); const o = sec.classList.toggle('collapsed') === false; o ? openSecs.add(id) : openSecs.delete(id); h.setAttribute('aria-expanded', o); };
+const toggleSec = h => { const id = h.dataset.coll, sec = h.closest('section'); const o = sec.classList.toggle('collapsed') === false; if (id === 'goals-x') { o ? openSecs.delete(id) : openSecs.add(id); } else { o ? openSecs.add(id) : openSecs.delete(id); } h.setAttribute('aria-expanded', o); };
 $('list').addEventListener('keydown', e => { const h = e.target.closest && e.target.closest('.sec-head[data-coll]'); if (h && e.target === h && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleSec(h); } });
 $('list').addEventListener('click', e => {
   const hd = e.target.closest('.sec-head[data-coll]'); if (hd) { toggleSec(hd); return; }
   const it = e.target.closest('button.it'); if (it) { const li = it.closest('li'); const o = li.classList.toggle('open'); it.setAttribute('aria-expanded', o); o ? openItems.add(li.dataset.li) : openItems.delete(li.dataset.li); return; }
   if (e.target.id === 'togglecomplete') { document.body.classList.toggle('show-complete'); update(); }
+  const jf = e.target.closest('[data-jump]'); if (jf) { const [t, id] = jf.dataset.jump.split(':'); jumpTo(t, id); return; }
   const ts = e.target.closest('[data-tsort]'); if (ts) { TSORT.v[tab] = ts.dataset.tsort; LS.set('dc-sorts', TSORT.v); render(); return; }
   if (e.target.closest('#wkxbtn')) { WKX.on = !WKX.on; e.target.closest('#wkxbtn').setAttribute('aria-pressed', WKX.on); filter(); }
 });
@@ -1783,7 +1785,7 @@ async function pgcrTeam(id) {
 async function loadActHist() {
   if (acthBusy || !member) return; const key = 'dc-acth-' + member.id, cached = LS.get(key, null);
   if (!ACTH && cached) ACTH = cached;
-  if (ACTH && ACTH.x && Date.now() - ACTH.t < 1800000) return;
+  if (ACTH && ACTH.x && (!BETA || Object.values(ACTH.d || {}).some(o => o.top)) && Date.now() - ACTH.t < 1800000) return;
   acthBusy = true; const mid = member.id;
   try {
     const chars = Object.keys(profile.characters?.data || {});
@@ -1802,6 +1804,7 @@ async function loadActHist() {
         const t = Date.parse(r.period), dur = r.values?.activityDurationSeconds?.basic?.value || 0;
         if (!o.first || t < o.first.t) o.first = { t, id: r.activityDetails.instanceId };
         if (!o.fastRun || dur < o.fastRun.dur) o.fastRun = { dur, id: r.activityDetails.instanceId };
+        o.top = (o.top || []).concat({ dur, id: r.activityDetails.instanceId }).sort((a, b) => a.dur - b.dur).slice(0, 4);
       }
     }
     // quem estava junto na primeira conclusão, e se a mais rápida começou do início (só 1 ou 2 relatórios por atividade, guardados)
@@ -1842,13 +1845,23 @@ function loadXmRec() { if (XMREC || !have.b) return; XMREC = {}; entities('Desti
 
 /* ---------- sua última sessão: até 3 destaques, o resto recolhido ---------- */
 let SESSION = null, sessBusy = false;
+/* imagem de fundo de uma atividade: incursões, masmorras e missões exóticas pela lista do site; o resto pela definição da Bungie */
+const ACTIMG = LS.get('dc-actimg', {}), actImgP = {};
+function actImg(h, kind, key) {
+  if (kind && key) { const d = (kind === 'raid' ? defs.raids : defs.dungeons).find(x => x.k === key); if (d?.img) return d.img; }
+  for (const l of [defs.raids, defs.dungeons, defs.xmissions || []]) { const d = l.find(x => (x.ah || []).includes(h)); if (d?.img) return d.img; }
+  if (!h) return '';
+  if (ACTIMG[h] != null) return ACTIMG[h];
+  if (!actImgP[h]) actImgP[h] = bungie(`/Destiny2/Manifest/DestinyActivityDefinition/${h}/`, false).then(d => { ACTIMG[h] = d.pgcrImage && !/missing_pgcr/i.test(d.pgcrImage) ? d.pgcrImage : ''; try { LS.set('dc-actimg', ACTIMG); } catch {} if (tab === 'obj') render(); }).catch(() => { ACTIMG[h] = ''; });
+  return '';
+}
 async function loadSession() {
   if (sessBusy || !member || !have.a) return; if (SESSION && SESSION.cid === charId && Date.now() - SESSION.at < 600000) return;
   sessBusy = true; const mid = member.id;
   try {
     const chars = Object.keys(profile.characters?.data || {});
     const acts = (await Promise.all(chars.map(c => bungie(`/Destiny2/${member.type}/Account/${member.id}/Character/${c}/Stats/Activities/?count=20&mode=0`, false).then(r => (r.activities || []).map(a => ({ ...a, _c: c }))).catch(() => [])))).flat()
-      .map(a => { const v = k => a.values?.[k]?.basic?.value || 0, st = Date.parse(a.period); return { h: a.activityDetails.directorActivityHash || a.activityDetails.referenceId, mode: a.activityDetails.mode, id: a.activityDetails.instanceId, st, end: st + v('activityDurationSeconds') * 1000, dur: v('activityDurationSeconds'), done: v('completed') === 1 && v('completionReason') !== 2, k: v('kills'), d: v('deaths') }; })
+      .map(a => { const v = k => a.values?.[k]?.basic?.value || 0, st = Date.parse(a.period); return { h: a.activityDetails.directorActivityHash || a.activityDetails.referenceId, mode: a.activityDetails.mode, id: a.activityDetails.instanceId, st, end: st + v('activityDurationSeconds') * 1000, dur: v('activityDurationSeconds'), done: v('completed') === 1 && v('completionReason') !== 2, k: v('kills'), d: v('deaths'), pc: v('playerCount') }; })
       .sort((a, b) => b.st - a.st);
     if (!acts.length || Date.now() - acts[0].end > 24 * 3600e3) { SESSION = { cid: charId, at: Date.now(), none: true }; return; }
     const s = [acts[0]]; for (let i = 1; i < acts.length; i++) { if (s[s.length - 1].st - acts[i].end > 45 * 60e3) break; s.push(acts[i]); }
@@ -1861,29 +1874,43 @@ async function loadSession() {
     let ex = LS.get(sessK, null); if (!ex || ex.sid !== sid) ex = { sid, newExo: [], from: null };
     if (snap && snap.t <= end) { const before = new Set(snap.exo); for (const h of exoNow) if (!before.has(h) && !ex.newExo.includes(h)) ex.newExo.push(h); if (ex.from == null && snap.t <= start) ex.from = snap.light; }
     try { LS.set(sessK, ex); LS.set(snapK, { t: Date.now(), light, exo: exoNow }); } catch {}
+    if (BETA) await loadActHist().catch(() => {});
     const items = [];
     const runs = {}; for (const a of s) { const m = map[a.h]; if (m && a.done) (runs[m.k] = runs[m.k] || { m, list: [] }).list.push(a); }
     for (const { m, list } of Object.values(runs)) {
       const def = (m.kind === 'raid' ? defs.raids : defs.dungeons).find(x => x.k === m.k), total = metric(def.m), best = list.sort((a, b) => a.dur - b.dur)[0];
       const first = total > 0 && total <= list.length, x = def.x && exoticByName(def.x);
-      items.push({ p: first ? 0 : 3, cls: first ? 'gold' : '', badge: first ? 'first' : m.kind, n: L(def.n), sub: [fmtDur(best.dur * 1000), best.k + ' ' + u().w.kills, best.d + ' ' + u().w.deaths], foot: x && colMissing(x.h) ? u().w.ssNoDrop(L(x.n)) : '' });
+      // recorde: a melhor desta sessão contra as melhores de antes (histórico guardado das incursões/masmorras)
+      const ids = new Set(list.map(r => r.id)), prev = (ACTH?.d?.[m.k]?.top || []).filter(r => !ids.has(r.id)).sort((a, b) => a.dur - b.dur)[0];
+      const rec = !first && prev && best.dur < prev.dur ? { o: fmtDur(prev.dur * 1000), d: fmtDur((prev.dur - best.dur) * 1000) } : null;
+      const solo = list.find(r => r.pc === 1), fl = solo && list.some(r => r.pc === 1 && r.d === 0);
+      items.push({ p: first ? 0 : rec ? 0.5 : solo ? 2.5 : 3, cls: first || rec ? 'gold' : solo ? 'solo' : '', badge: first ? 'first' : m.kind, rec, solo: solo ? (fl ? 'fl' : 'y') : '', img: def.img, n: L(def.n), sub: [fmtDur(best.dur * 1000), best.k + ' ' + u().w.kills, best.d + ' ' + u().w.deaths], foot: x && colMissing(x.h) ? u().w.ssNoDrop(L(x.n)) : '' });
     }
     for (const h of ex.newExo) { const e = defs.exotics.find(y => y.h[0] === h); if (e) items.push({ p: 1, cls: 'gold', badge: 'exo', n: L(e.n), sub: [u().w.ssNewExo], foot: '' }); }
     const claim = []; for (const se of defs.seals) { const c = se.r.filter(r => { const st = recState(r[0]); return st && !(st.state & 1) && !(st.state & 4); }).length; if (c) { const done = se.r.filter(r => recDone(recState(r[0]))).length; claim.push({ se, c, done }); } }
     if (claim.length) { const top = claim.sort((a, b) => b.c - a.c)[0], n = claim.reduce((t, x) => t + x.c, 0); items.push({ p: 2, cls: 'claim', badge: 'claim', n: u().w.ssClaim(n, L(top.se.t)), sub: [u().w.ssClaimSub], foot: u().w.ssTitle(top.done, top.se.r.length) }); }
-    for (const a of s) { const m = map[a.h]; if (m || !a.done) continue; items.push({ p: 4, dur: a.dur, cls: '', badge: 'mode' + a.mode, n: names[a.h]?.n || '?', sub: [Math.round(a.dur / 60) + ' min', a.k + ' ' + u().w.kills], foot: '' }); }
+    for (const a of s) { const m = map[a.h]; if (m || !a.done) continue; items.push({ p: 4, dur: a.dur, cls: '', h: a.h, badge: 'mode' + a.mode, n: names[a.h]?.n || '?', sub: [Math.round(a.dur / 60) + ' min', a.k + ' ' + u().w.kills], foot: '' }); }
     items.sort((a, b) => a.p - b.p || (b.dur || 0) - (a.dur || 0));
     if (member?.id !== mid) return;
     SESSION = { cid: charId, at: Date.now(), start, end, mins: Math.round(s.reduce((t, a) => t + a.dur, 0) / 60), from: ex.from, light, items };
   } catch { SESSION = { cid: charId, at: Date.now(), none: true }; } finally { sessBusy = false; }
   if (tab === 'obj') render();
 }
+// "Esta semana" em cartões: destaques com a imagem da atividade, desafios e recompensas com barra de progresso
+function weekHTML(sec) {
+  const W = u().w, open = openSecs.has(sec.id), done = sec.items.filter(isDone).length;
+  const feat = (sec.feat || []).map(f => { const d = (f.kind === 'raid' ? defs.raids : defs.dungeons).find(x => x.k === f.key); return `<button type="button" class="wk-f" data-jump="${f.tab}:${f.id}" style="--wk-img:url('${BNET}${d?.img || ''}')"><small>${esc(W.wkFeatT)}</small><b>${esc(f.title)}</b></button>`; }).join('');
+  const card = i => { const w = i.wk || {}, im = w.h ? actImg(w.h) : '', ok = isDone(i), p = w.b ? Math.round(w.a / w.b * 100) : ok ? 100 : 0;
+    return `<div class="wk-c${ok ? ' ok' : ''}${w.claim ? ' claim' : ''}${im ? ' wk-img' : ''}"${im ? ` style="--wk-img:url('${BNET}${im}')"` : ''}><small>${esc(W.wkKind[w.k] || '')}</small><b>${esc(w.act || i.t)}</b>${w.b ? `<span class="wk-p"><i><u style="width:${p}%"></u></i><span>${w.a}/${w.b}</span></span>` : `<span class="wk-p"><span>${esc(i.c[0] || '')}</span></span>`}${w.claim ? `<span class="wk-claim">${esc(i.d)}</span>` : ''}${ok ? '<span class="wk-ok">✓</span>' : ''}</div>`; };
+  return `<section data-sec="${sec.id}" class="keep wk-sec coll${open ? '' : ' collapsed'}"><div class="sec-head" data-coll="${sec.id}" role="button" tabindex="0" aria-expanded="${open}"><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2></div><span class="count">${done}/${sec.items.length}</span><span class="chev" aria-hidden="true"></span></div><p>${esc(sec.note)}</p><div class="sec-bar"><i style="width:${sec.items.length ? done / sec.items.length * 100 : 0}%"></i></div></div>
+    <div class="wk-body">${feat ? `<div class="wk-fs">${feat}</div>` : ''}<div class="wk-g">${sec.items.map(card).join('')}</div></div></section>`;
+}
 function sessHTML() {
   const S = SESSION, W = u().w; if (!S || S.none || !S.items?.length) return '';
   const tm = t => new Date(t).toLocaleTimeString(lang === 'en' ? 'en-US' : 'pt-BR', { hour: '2-digit', minute: '2-digit' });
   const day = (() => { const d = new Date(S.start), n = new Date(); const y = new Date(n); y.setDate(n.getDate() - 1); return d.toDateString() === n.toDateString() ? W.today : d.toDateString() === y.toDateString() ? W.yesterday : d.toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR', { day: '2-digit', month: '2-digit' }); })();
   const badge = b => W.ssBadge[b] || W.ssBadge[b.replace(/\d+$/, '')] || (/^mode/.test(b) ? (W.ssMode[+b.slice(4)] || W.ssBadge.done) : W.ssBadge.done);
-  const card = t => `<div class="ss-c ${t.cls}"><span class="ss-badge">${esc(badge(t.badge))}</span><b class="ss-cn">${esc(t.n)}</b><small>${esc(t.sub.filter(Boolean).join(' · '))}</small>${t.foot ? `<span class="ss-foot">${esc(t.foot)}</span>` : ''}</div>`;
+  const card = t => { const im = BETA ? (t.img || (t.h ? actImg(t.h) : '')) : ''; return `<div class="ss-c ${t.cls}${im ? ' ss-img' : ''}"${im ? ` style="--ss-img:url('${BNET}${im}')"` : ''}><span class="ss-bs"><span class="ss-badge">${esc(badge(t.badge))}</span>${BETA && t.rec ? `<span class="ss-badge rec">⏱ ${esc(W.ssRec)}</span>` : ''}${BETA && t.solo ? `<span class="ss-badge solo">${esc(t.solo === 'fl' ? W.ssSoloFl : W.ssSolo)}</span>` : ''}</span><b class="ss-cn">${esc(t.n)}</b>${BETA && t.rec ? `<small class="ss-rec">${esc(W.ssRecSub(t.rec.o, t.rec.d))}</small>` : ''}<small>${esc(t.sub.filter(Boolean).join(' · '))}</small>${t.foot ? `<span class="ss-foot">${esc(t.foot)}</span>` : ''}</div>`; };
   const top = S.items.slice(0, 3), rest = S.items.slice(3), h = Math.floor(S.mins / 60), m = S.mins % 60;
   return `<section class="ss keep" data-sec="session"><div class="ss-head"><h2>${esc(W.ssT)}</h2><div class="ss-meta"><span>${esc(day)}, ${tm(S.start)}–${tm(S.end)}</span><span>⏱ ${h ? h + 'h' + String(m).padStart(2, '0') : m + ' min'}</span>${S.from && S.light > S.from ? `<span class="ss-pw">✦ ${S.from} → <b>${S.light}</b></span>` : ''}</div></div>
     <div class="ss-top">${top.map(card).join('')}</div>${rest.length ? `<details class="ss-more"><summary>${esc(W.ssMore(rest.length))}</summary><div class="ss-top">${rest.map(card).join('')}</div></details>` : ''}</section>`;
@@ -2090,7 +2117,8 @@ function collSrc(h) { // "Fonte: ..." da coleção, no idioma do site
 }
 function goalsHTML() {
   const W = u(), G = goals();
-  if (!G.length) return `<section data-sec="goals" class="keep"><div class="sec-head"><div class="sec-title"><div class="sec-name"><h2>${esc(W.glT)}</h2></div></div><p>${esc(W.glNone)}</p></div></section>`;
+  const open = !openSecs.has('goals-x'), head = (n, note) => `<div class="sec-head" data-coll="goals-x" role="button" tabindex="0" aria-expanded="${open}"><div class="sec-title"><div class="sec-name"><h2>${esc(W.glT)}</h2></div>${n != null ? `<span class="count">${n}</span>` : ''}<span class="chev" aria-hidden="true"></span></div><p>${esc(note)}</p></div>`;
+  if (!G.length) return `<section data-sec="goals" class="keep coll${open ? '' : ' collapsed'}">${head(null, W.glNone)}</section>`;
   // carrega o que falta para conferir (encaixes, coleção, peças de conjunto) e redesenha uma vez
   if (!goalLoading) {
     const need = G.flatMap(g => g.items.filter(i => i.k === 'item' && COLL[i.h] === undefined).map(i => i.h)), sets = [...new Set(G.flatMap(g => g.items.filter(i => i.k === 'set' && !SETITEMS[i.h]).map(i => i.h)))];
@@ -2112,7 +2140,7 @@ function goalsHTML() {
       ${groups.map(([k, l]) => `<div class="gl-g"><small>${esc(W.glG[k])}</small>${l.map(([it, ok]) => `<div class="gl-it${ok ? ' ok' : ''}${ok == null ? ' unk' : ''}"><i></i>${it.ic ? `<img src="${BNET}${it.ic}" alt="" loading="lazy">` : '<span class="gl-noic"></span>'}<span><b>${esc(it.k === 'set' ? W.glSet(it.n || '?', it.need) : it.n || '')}</b><small>${esc(it.k === 'plug' ? W.glSrcPlug : it.k === 'set' ? `${owned[it.h] ?? '…'}/${it.need} · ${W.glSetSrc}` : (CSRC[COLL[it.h] + ':' + lang] || ''))}</small></span></div>`).join('')}</div>`).join('')}</div>`;
   };
   const tot = G.reduce((a, g) => a + g.items.length, 0);
-  return `<section data-sec="goals" class="keep"><div class="sec-head"><div class="sec-title"><div class="sec-name"><h2>${esc(W.glT)}</h2></div><span class="count">${G.length}</span></div><p>${esc(W.glNote)}</p></div><div class="gl-l">${G.map(card).join('')}</div></section>`;
+  return `<section data-sec="goals" class="keep coll${open ? '' : ' collapsed'}">${head(G.length, W.glNote)}<div class="gl-l">${G.map(card).join('')}</div></section>`;
 }
 document.addEventListener('click', e => {
   const add = e.target.closest('.gl-add'); if (add && !add.disabled) { const C = fdCtx(), mine = cmpMine(); if (!mine) return; const g = goalFromCmp(mine, C); const l = goals().filter(x => x.id !== g.id); l.unshift(g); LS.set('dc-goals', l.slice(0, 12)); add.disabled = true; add.textContent = u().glDone; if (tab === 'obj') render(); return; }
