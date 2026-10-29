@@ -631,3 +631,33 @@ li.is-done .chip.exo{opacity:.7}
 .tsort-k{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:2px}
 .tsort .char{font-size:13px}
 .tsort .char[aria-pressed="true"]{border-color:var(--acc);color:var(--fg);background:color-mix(in srgb,var(--acc) 14%,transparent)}
+/* ---------- Metas de build (beta) ---------- */
+html.beta #title::after{content:"BETA";font-family:var(--mono);font-size:10px;letter-spacing:.08em;vertical-align:super;margin-left:8px;padding:1px 6px;border-radius:4px;border:1px solid #f07a8a;color:#f07a8a}
+.gl-cta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:10px;background:rgba(240,122,138,.1);border:1px solid rgba(240,122,138,.45);margin-top:6px}
+.gl-cta small{flex:1;min-width:180px;font-size:13px;color:#d5dbe6}
+.gl-add{font-family:var(--display);font-weight:700;font-size:15px;padding:7px 14px;border-radius:8px;border:0;background:#f07a8a;color:#1a0d10;cursor:pointer;white-space:nowrap}
+.gl-add:disabled{background:rgba(255,255,255,.12);color:#b9c3d3;cursor:default}
+.gl-l{display:grid;gap:10px;padding:12px 14px 14px}
+.gl-c{border-radius:10px;background:var(--chip);padding:10px 12px;display:grid;gap:8px;box-shadow:inset 3px 0 0 var(--a1)}
+.gl-h{display:flex;align-items:center;gap:10px}
+.gl-dot{width:12px;height:12px;border-radius:50%;background:var(--a1);flex:none}
+.gl-t{min-width:0}.gl-t b{display:block;font-size:14.5px}.gl-t small{font-size:12px;color:var(--muted)}
+.gl-acts{margin-left:auto;display:flex;gap:6px;flex:none}
+.gl-acts button{font:inherit;font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:none;color:var(--muted);cursor:pointer}
+.gl-acts button:hover{color:var(--fg);border-color:var(--muted)}
+.gl-bar{height:5px;border-radius:3px;background:color-mix(in srgb,var(--muted) 22%,transparent);overflow:hidden}.gl-bar u{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+.gl-ref{display:grid;gap:4px}.gl-ref small,.gl-g>small{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.gl-ref>div{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
+.gl-ref span{display:grid;justify-items:center;gap:1px;padding:4px 2px;border-radius:6px;background:color-mix(in srgb,var(--surface) 70%,transparent);min-width:0}
+.gl-ref img{width:16px;height:16px}
+:root:not([data-theme="dark"]) .gl-ref img{filter:invert(1) brightness(.4)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .gl-ref img{filter:none}}
+.gl-ref b{font-family:var(--mono);font-size:13px;font-weight:600}
+.gl-ref i{font-style:normal;font-size:10.5px;color:var(--muted);white-space:nowrap}
+.gl-g{display:grid;gap:4px}
+.gl-it{display:grid;grid-template-columns:18px 26px minmax(0,1fr);gap:8px;align-items:center;font-size:13px}
+.gl-it>i{width:16px;height:16px;border-radius:4px;border:2px solid var(--muted)}
+.gl-it.ok>i{background:var(--done);border-color:var(--done)}.gl-it.ok b{text-decoration:line-through;color:var(--muted)}
+.gl-it.unk>i{border-style:dashed}
+.gl-it img,.gl-noic{width:26px;height:26px;border-radius:4px}.gl-noic{background:color-mix(in srgb,var(--muted) 20%,transparent)}
+.gl-it span{min-width:0}.gl-it b{font-weight:600;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.gl-it small{display:block;font-size:11.5px;color:var(--muted)}

@@ -32,9 +32,9 @@ const UI = {
   pt: {
     hide: 'Ocultar feitos', search: 'Buscar por nome ou origem', refresh: 'Atualizar', logout: 'Sair',
     disclaimer: 'Dados lidos da sua conta pela API oficial da Bungie. Este site não é afiliado à Bungie.',
-    loadouts: 'Loadouts', checklist: 'Central', outQ: 'Confirmar?', liveT: 'Ao vivo', liveYou: 'você', liveSince: t => `desde ${t}`, livePriv: 'Build privada', liveTap: 'Toque para ver a build completa', statsT: 'Atributos', tsK: 'Ordenar', tsO: { tier: 'Dificuldade', near: 'Mais perto de completar', low: 'Menos feitos', name: 'Nome' }, statsHi: 'acima de 100: bônus extra',
+    loadouts: 'Loadouts', checklist: 'Central', outQ: 'Confirmar?', liveT: 'Ao vivo', liveYou: 'você', liveSince: t => `desde ${t}`, livePriv: 'Build privada', liveTap: 'Toque para ver a build completa', statsT: 'Atributos', glT: 'Metas de build', glNote: 'Builds que você quer montar: cada item se marca sozinho quando você libera ou pega.', glAdd: n => `Faltam ${n} itens para você usar esta build.`, glBtn: '＋ Virar objetivo', glDone: 'Já é um objetivo', glView: 'Ver build', glDel: 'Remover', glAt: d => `adicionada em ${d}`, glSet: (n, k) => `Conjunto ${n}: ${k} peças`, glSetSrc: 'qualquer peça do conjunto, para os bônus', glRef: 'Atributos da build', glYou: 'você', glNone: 'Nenhuma meta ainda. Na comparação de builds, use “Virar objetivo” no que falta.', glSrcPlug: 'Liberar no menu da subclasse', glG: { asp: 'Aspectos', fr: 'Fragmentos', ab: 'Habilidades', w: 'Armas', a: 'Armadura' }, tsK: 'Ordenar', tsO: { tier: 'Dificuldade', near: 'Mais perto de completar', low: 'Menos feitos', name: 'Nome' }, statsHi: 'acima de 100: bônus extra',
     tabs: { obj: 'Objetivos', act: 'Atividades', drops: 'Arsenal', gd: 'Guardião' },
-    subs: { camp: 'Campanhas', raid: 'Incursões', dg: 'Masmorras', xm: 'Missões exóticas', tit: 'Títulos', exo: 'Exóticos', cat: 'Catalisadores', vend: 'Vendedores' },
+    subs: { obj: 'Principal', prog: 'Em andamento', camp: 'Campanhas', raid: 'Incursões', dg: 'Masmorras', xm: 'Missões exóticas', tit: 'Títulos', exo: 'Exóticos', cat: 'Catalisadores', vend: 'Vendedores' },
     heroTitle: 'Central do Guardião', heroText: 'Entre com a sua conta Bungie.net para verificar seus objetivos, acompanhar a rotação semanal, completar seu arsenal exótico e compartilhar suas builds.', lsQ: 'Buscar guardião: Nome#1234', lsBtn: 'Buscar', lsHint: 'Veja a build equipada de qualquer jogador, sem precisar entrar.',
     heroList: ['O site só lê os seus dados; não altera nada no jogo.', 'Sua senha fica na Bungie; o site nunca vê.', 'Marcações, favoritos e builds salvas sincronizam entre celular e PC.'],
     login: 'Entrar com Bungie.net', notConfigured: 'O site ainda não foi configurado: faltam as chaves da Bungie nas variáveis de ambiente da Vercel.',
@@ -87,9 +87,9 @@ const UI = {
   en: {
     hide: 'Hide done', search: 'Search by name or source', refresh: 'Refresh', logout: 'Sign out',
     disclaimer: 'Data read from your account through the official Bungie API. This site is not affiliated with Bungie.',
-    loadouts: 'Loadouts', checklist: 'Hub', outQ: 'Confirm?', liveT: 'Live', liveYou: 'you', liveSince: t => `since ${t}`, livePriv: 'Private build', liveTap: 'Tap to see the full build', statsT: 'Stats', tsK: 'Sort', tsO: { tier: 'Difficulty', near: 'Closest to done', low: 'Least done', name: 'Name' }, statsHi: 'above 100: extra bonus',
+    loadouts: 'Loadouts', checklist: 'Hub', outQ: 'Confirm?', liveT: 'Live', liveYou: 'you', liveSince: t => `since ${t}`, livePriv: 'Private build', liveTap: 'Tap to see the full build', statsT: 'Stats', glT: 'Build goals', glNote: 'Builds you want to put together: each item checks itself off when you unlock or get it.', glAdd: n => `You're missing ${n} items to run this build.`, glBtn: '＋ Make it a goal', glDone: 'Already a goal', glView: 'View build', glDel: 'Remove', glAt: d => `added ${d}`, glSet: (n, k) => `${n} set: ${k} pieces`, glSetSrc: 'any piece of the set, for the bonuses', glRef: 'Build stats', glYou: 'you', glNone: 'No goals yet. In build comparison, use “Make it a goal” on what is missing.', glSrcPlug: 'Unlock in the subclass menu', glG: { asp: 'Aspects', fr: 'Fragments', ab: 'Abilities', w: 'Weapons', a: 'Armor' }, tsK: 'Sort', tsO: { tier: 'Difficulty', near: 'Closest to done', low: 'Least done', name: 'Name' }, statsHi: 'above 100: extra bonus',
     tabs: { obj: 'Objectives', act: 'Activities', drops: 'Arsenal', gd: 'Guardian' },
-    subs: { camp: 'Campaigns', raid: 'Raids', dg: 'Dungeons', xm: 'Exotic missions', tit: 'Titles', exo: 'Exotics', cat: 'Catalysts', vend: 'Vendors' },
+    subs: { obj: 'Main', prog: 'In progress', camp: 'Campaigns', raid: 'Raids', dg: 'Dungeons', xm: 'Exotic missions', tit: 'Titles', exo: 'Exotics', cat: 'Catalysts', vend: 'Vendors' },
     heroTitle: 'Guardian Hub', heroText: 'Sign in with your Bungie.net account to check your goals, follow the weekly rotation, complete your exotic arsenal and share your builds.', lsQ: 'Search guardian: Name#1234', lsBtn: 'Search', lsHint: "See any player's equipped build, no sign-in needed.",
     heroList: ['The site only reads your data; it never changes anything in the game.', 'Your password stays with Bungie; the site never sees it.', 'Checkmarks, favorites and saved builds sync between phone and PC.'],
     login: 'Sign in with Bungie.net', notConfigured: "The site isn't configured yet: the Bungie keys are missing from the Vercel environment variables.",
@@ -153,6 +153,9 @@ const lastSub = LS.get('dc-subs', {});
 let marks = new Set(), SECTIONS = [], LOADOUTS = [], loadedAt = null;
 const openSecs = new Set(), openItems = new Set();
 const GROUPS = [{ id: 'obj', subs: ['obj'] }, { id: 'act', subs: ['camp', 'raid', 'dg', 'xm', 'tit'] }, { id: 'drops', subs: ['exo', 'cat', 'vend'] }, { id: 'gd', subs: ['gd'] }];
+// Página de teste (/beta): só para o dono do site; recursos novos aparecem aqui antes de ir para todos
+const BETA = location.pathname.replace(/\/+$/, '') === '/beta';
+if (BETA) GROUPS[0].subs = ['obj', 'prog'];
 const groupOf = t => GROUPS.find(g => g.subs.includes(t));
 // aba salva que não existe mais (ex.: Padrões, que foi retirada) volta para Objetivos
 if (tab !== 'ld' && !groupOf(tab)) { tab = 'obj'; LS.set('dc-tab', 'obj'); }
@@ -638,6 +641,10 @@ function build() {
   const fresh = catRows.filter(x => !recDone(x.r) && pct(x.r) === 0);
   if (prog.length) out.push(S('cat', 'cat-prog', s.catProg, s.catProgNote, prog.map(x => I('c-' + x.c.h, L(x.c.n), L(x.c.d), [progText(x.r) || Math.round(pct(x.r) * 100) + '%'], false))));
   if (fresh.length) out.push(S('cat', 'cat-new', s.catNew, s.catNewNote, fresh.map(x => I('c-' + x.c.h, L(x.c.n), [catSrc(x.c), L(x.c.d)].filter(Boolean).join(' '), [], false))));
+  if (BETA) {
+    for (const x of out) if (x.tab === 'obj' && /^(contracts|quests|nearcats|neartitles)/.test(x.id)) x.tab = 'prog';
+    out.push(S('obj', 'goals', '', null, [], { html: true }));
+  }
   SECTIONS = out; SECTIONS_PREV = out;
   // Loadouts
   const inst = instanceMap();
@@ -1322,7 +1329,7 @@ function render() {
   if ((tab === 'raid' || tab === 'dg' || tab === 'xm') && have.a && member) loadActHist();
   if (tab === 'xm') loadXmRec();
   $('list').innerHTML = `<div class="panel">${tab === 'obj' ? sessHTML() : ''}${wkBar}${tsBar}${secs.map(sec => {
-    if (sec.html) return sec.id === 'vendors' ? vendorsHTML() : sec.id === 'xmissions' ? xmHTML() : '';
+    if (sec.html) return sec.id === 'vendors' ? vendorsHTML() : sec.id === 'xmissions' ? xmHTML() : sec.id === 'goals' ? goalsHTML() : '';
     if (sec.empty) return `<p class="empty-msg${/…$/.test(sec.note || '') ? ' wait' : ''}">${esc(sec.note)}</p>`;
     if (!sec.items.length) return `<section data-sec="${sec.id}"><div class="sec-head"><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2></div></div><p>${esc(sec.note)}</p></div></section>`;
     const keep = true, coll = sec.coll || ((tab === 'exo' || tab === 'cat') && sec.items?.length) || (keep && secDone(sec)), open = openSecs.has(sec.id);
@@ -1723,6 +1730,7 @@ function compareHTML(A, Bc) {
     ${grp(W.armorCmp, a.arm.map((h, k) => row(h, b.arm[k], 'item', exW(A, h), exW(Bc, b.arm[k]))).join(''))}
     ${a.art.length || b.art.length ? grp(W.artT, pairs(a.art, b.art).map(([x, y]) => row(x, y, 'plug')).join('')) : ''}
     ${a.sets.length || b.sets.length ? grp(W.setT, `<div class="cmp-row ${a.sets.join() === b.sets.join() ? 'same' : 'diff'}"><span class="mine">${esc(a.sets.join(', ') || '—')}</span><span class="theirs">${esc(b.sets.join(', ') || '—')}</span></div>`) : ''}
+    ${BETA ? goalCta(A, Bc) : ''}
     <p class="cmp-leg"><span class="li"><span class="lg have"></span>${esc(W.lgHave)}</span><span class="li"><span class="lg miss"></span>${esc(W.lgMiss)}</span><span class="li"><span class="lg same">=</span>${esc(W.lgSame)}</span></p></div>`;
 }
 function dimLink(C) {
@@ -1886,7 +1894,7 @@ function sessHTML() {
    Favoritos, builds salvas, marcações e preferências ficam ligados à conta Bungie.
    Cada chave guarda a hora da última mudança; a mais nova vence. Na primeira vez num aparelho, listas são somadas. */
 const SY = { t: LS.get('dc-synct', {}), dirty: new Set(), timer: null, applying: false, pulled: 0 };
-const syKeys = () => member ? ['favs', 'builds', 'opts', 'hide2', 'marks-' + member.id] : [];
+const syKeys = () => member ? ['favs', 'builds', 'opts', 'hide2', 'goals', 'marks-' + member.id] : [];
 LS.hook = k => {
   if (SY.applying || !member || !k.startsWith('dc-')) return; const n = k.slice(3);
   if (!syKeys().includes(n)) return;
@@ -1897,6 +1905,7 @@ function syMerge(n, a, b) {
   if (!Array.isArray(a) || !Array.isArray(b)) return b;
   if (n === 'favs') return [...a, ...b.filter(x => !a.some(y => y.id === x.id))].slice(0, 30);
   if (n === 'builds') return [...a, ...b.filter(x => !a.some(y => y.k === x.k))].slice(0, 20);
+  if (n === 'goals') return [...a, ...b.filter(x => !a.some(y => y.id === x.id))].slice(0, 12);
   if (n.startsWith('marks-')) return [...new Set([...a, ...b])];
   return b;
 }
@@ -1933,6 +1942,10 @@ async function syncPush(keepalive) {
 }
 // ao sair da aba envia o que falta; ao voltar (depois de 1 min) busca o que mudou em outro aparelho
 document.addEventListener('visibilitychange', () => { if (document.hidden) syncPush(true); else if (Date.now() - SY.pulled > 60000) syncPull(); });
+// /beta: confere no servidor se é o dono; qualquer outra pessoa volta para o site normal
+async function betaGate() {
+  try { const r = await fetch(APIW + '/whoami', { headers: { Authorization: 'Bearer ' + await token(), 'X-API-Key': cfg.apiKey } }); const j = await r.json(); if (!j.owner) location.replace('/'); else document.documentElement.classList.add('beta'); } catch { location.replace('/'); }
+}
 let moving = false;
 async function moveToNew() {
   if (moving) return; moving = true;
@@ -2008,9 +2021,90 @@ $('live').addEventListener('click', e => {
   openCtx({ name: m.name, type: m.type, id: m.id }, { p: m.p, cid: m.cid, B: m.B });
   if (!m.B && !m.priv) fetchBuild(m.p, m.cid).then(B => { m.B = B; if (FD.sel?.id === m.id) { FD.B = B; renderFind(); } });
 });
+/* ---------- Metas de build (beta) ----------
+   Na comparação, o que falta vira uma meta: encaixes (aspectos, fragmentos, habilidades) pelos seus conjuntos de encaixes;
+   armas e exóticas pela coleção; armadura lendária de conjunto vira "N peças do conjunto" (qualquer peça serve). */
+const goals = () => LS.get('dc-goals', []);
+const SETITEMS = LS.get('dc-setitems', {}); let setItemsP = {};
+function setItems(h) {
+  if (SETITEMS[h]) return Promise.resolve(SETITEMS[h]);
+  if (!setItemsP[h]) setItemsP[h] = (async () => {
+    const d = await bungie(`/Destiny2/Manifest/DestinyEquipableItemSetDefinition/${h}/`, false);
+    const list = d.setItems || [];
+    const info = await Promise.all(list.map(x => bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${x}/`, false).then(i => [x, i.classType, i.inventory?.bucketTypeHash || 0]).catch(() => null)));
+    SETITEMS[h] = info.filter(Boolean); try { LS.set('dc-setitems', SETITEMS); } catch {} return SETITEMS[h];
+  })().catch(() => { delete setItemsP[h]; return null; });
+  return setItemsP[h];
+}
+function goalFromCmp(A, Bc) {
+  const a = buildParts(A), b = buildParts(Bc), B = Bc.B, d = h => B.loc[h] || B.en[h] || {}, items = [];
+  const plug = (g, list) => { for (const h of list) if (h && iOwnPlug(h) === false) items.push({ g, k: 'plug', h, n: d(h).n, ic: d(h).ic }); };
+  plug('ab', b.ab); plug('asp', b.asp); plug('fr', b.fr);
+  for (const h of b.w) if (h && iOwnItem(h) === false) items.push({ g: 'w', k: 'item', h, n: d(h).n, ic: d(h).ic, tt: B.en[h]?.tt });
+  const sets = {};
+  for (const h of b.arm) {
+    if (!h) continue;
+    const sh = SETOF[h];
+    if (B.en[h]?.tt !== 6 && sh) { sets[sh] = (sets[sh] || 0) + 1; continue; }
+    if (iOwnItem(h) === false) items.push({ g: 'a', k: 'item', h, n: d(h).n, ic: d(h).ic, tt: B.en[h]?.tt });
+  }
+  for (const [sh, cnt] of Object.entries(sets)) { const nm = SETDEF[sh + ':' + (lang === 'pt' ? 'pt-br' : 'en')]?.n || ''; items.push({ g: 'a', k: 'set', h: +sh, need: cnt, n: nm, cls: Bc.p.characters.data[Bc.cid].classType }); }
+  const ch = Bc.p.characters.data[Bc.cid];
+  return { id: (FD.sel?.id || '') + ':' + Bc.cid + ':' + buildSig(Bc), sel: FD.sel ? { name: FD.sel.name, type: FD.sel.type, id: FD.sel.id } : null, title: `${String(Bc.name || '').replace(/#\d+$/, '')} · ${charTitle(u().classes[ch.classType] || '', B.loc[b.sub]?.n)}`, cls: ch.classType, el: ELEMENTS[B.en[b.sub]?.dt] || '', at: Date.now(), st: ch.stats ? Object.fromEntries(STAT_ORDER.map(h => [h, ch.stats[h] || 0])) : null, items };
+}
+function goalCta(A, Bc) {
+  if (!PLUGS) { loadPlugs(); return ''; }
+  const g = goalFromCmp(A, Bc), n = g.items.length; if (!n) return '';
+  const exists = goals().some(x => x.id === g.id), W = u();
+  return `<div class="gl-cta"><small>${esc(W.glAdd(n))}</small><button type="button" class="gl-add" ${exists ? 'disabled' : ''}>${esc(exists ? W.glDone : W.glBtn)}</button></div>`;
+}
+function goalState(it, ownedSets) {
+  if (it.k === 'plug') return iOwnPlug(it.h);
+  if (it.k === 'item') return iOwnItem(it.h);
+  if (it.k === 'set') { const got = ownedSets[it.h]; return got == null ? null : got >= it.need; }
+  return null;
+}
+// peças de conjunto que você tem (inventário, cofre ou equipadas), por espaço de armadura e classe
+function ownedSetSlots(list, cls) {
+  const have = new Set(), all = [...(profile.profileInventory?.data?.items || []), ...Object.values(profile.characterInventories?.data || {}).flatMap(c => c.items || []), ...Object.values(profile.characterEquipment?.data || {}).flatMap(c => c.items || [])].map(i => i.itemHash);
+  const hs = new Set(all); for (const [h, c, b] of list) if ((c === cls || c === 3) && hs.has(h)) have.add(b);
+  return have.size;
+}
+let goalLoading = false;
+function goalsHTML() {
+  const W = u(), G = goals();
+  if (!G.length) return `<section data-sec="goals" class="keep"><div class="sec-head"><div class="sec-title"><div class="sec-name"><h2>${esc(W.glT)}</h2></div></div><p>${esc(W.glNone)}</p></div></section>`;
+  // carrega o que falta para conferir (encaixes, coleção, peças de conjunto) e redesenha uma vez
+  if (!goalLoading) {
+    const need = G.flatMap(g => g.items.filter(i => i.k === 'item' && COLL[i.h] === undefined).map(i => i.h)), sets = [...new Set(G.flatMap(g => g.items.filter(i => i.k === 'set' && !SETITEMS[i.h]).map(i => i.h)))];
+    if (!PLUGS || need.length || sets.length) { goalLoading = true; Promise.all([loadPlugs(), ...need.map(h => idef(h).then(x => { COLL[h] = x.c; })), ...sets.map(setItems)]).finally(() => { goalLoading = false; if (tab === 'obj') render(); }); }
+  }
+  const D = STATD?.d || {}; loadStats();
+  const myCh = Object.values(profile.characters?.data || {});
+  const card = (g, gi) => {
+    const owned = {}; for (const it of g.items) if (it.k === 'set' && SETITEMS[it.h]) owned[it.h] = ownedSetSlots(SETITEMS[it.h], g.cls);
+    const st = g.items.map(it => goalState(it, owned)), done = st.filter(x => x === true).length;
+    const groups = ['asp', 'fr', 'ab', 'w', 'a'].map(k => [k, g.items.map((it, i) => [it, st[i]]).filter(([it]) => it.g === k)]).filter(([, l]) => l.length);
+    const mine = myCh.find(c => c.classType === g.cls)?.stats;
+    const ref = g.st ? `<div class="gl-ref"><small>${esc(W.glRef)}</small><div>${STAT_ORDER.map(h => `<span title="${esc(D[h]?.n || '')}">${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}<b>${g.st[h]}</b>${mine ? `<i>${esc(W.glYou)} ${mine[h] || 0}</i>` : ''}</span>`).join('')}</div></div>` : '';
+    const [a1] = ELEMENT_ACC[g.el] || ELEMENT_ACC.arc;
+    return `<div class="gl-c" style="--a1:${a1}"><div class="gl-h"><span class="gl-dot"></span><span class="gl-t"><b>${esc(g.title)}</b><small>${esc(W.glAt(new Date(g.at).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR', { day: '2-digit', month: '2-digit' })))}</small></span><span class="gl-acts">${g.sel ? `<button type="button" data-glv="${gi}">${esc(W.glView)}</button>` : ''}<button type="button" data-gld="${gi}">${esc(W.glDel)}</button></span></div>
+      <div class="gl-bar"><u style="width:${g.items.length ? done / g.items.length * 100 : 0}%"></u></div>
+      ${ref}
+      ${groups.map(([k, l]) => `<div class="gl-g"><small>${esc(W.glG[k])}</small>${l.map(([it, ok]) => `<div class="gl-it${ok ? ' ok' : ''}${ok == null ? ' unk' : ''}"><i></i>${it.ic ? `<img src="${BNET}${it.ic}" alt="" loading="lazy">` : '<span class="gl-noic"></span>'}<span><b>${esc(it.k === 'set' ? W.glSet(it.n || '?', it.need) : it.n || '')}</b><small>${esc(it.k === 'plug' ? W.glSrcPlug : it.k === 'set' ? `${owned[it.h] ?? '…'}/${it.need} · ${W.glSetSrc}` : '')}</small></span></div>`).join('')}</div>`).join('')}</div>`;
+  };
+  const tot = G.reduce((a, g) => a + g.items.length, 0);
+  return `<section data-sec="goals" class="keep"><div class="sec-head"><div class="sec-title"><div class="sec-name"><h2>${esc(W.glT)}</h2></div><span class="count">${G.length}</span></div><p>${esc(W.glNote)}</p></div><div class="gl-l">${G.map(card).join('')}</div></section>`;
+}
+document.addEventListener('click', e => {
+  const add = e.target.closest('.gl-add'); if (add && !add.disabled) { const C = fdCtx(), mine = cmpMine(); if (!mine) return; const g = goalFromCmp(mine, C); const l = goals().filter(x => x.id !== g.id); l.unshift(g); LS.set('dc-goals', l.slice(0, 12)); add.disabled = true; add.textContent = u().glDone; if (tab === 'obj') render(); return; }
+  const del = e.target.closest('[data-gld]'); if (del) { const l = goals(); l.splice(+del.dataset.gld, 1); LS.set('dc-goals', l); render(); return; }
+  const v = e.target.closest('[data-glv]'); if (v) { const g = goals()[+v.dataset.glv]; if (g?.sel) { FD.q = ''; FD.results = null; openFind(); showPlayer(g.sel); } }
+});
 async function start() {
   try {
     status(u().loading);
+    if (BETA) betaGate();
     await loadAccount();
     liveStart();
   } catch (e) {

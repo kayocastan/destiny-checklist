@@ -6,7 +6,7 @@ import { compact } from './compact.js';
 const BUNGIE = 'https://www.bungie.net/Platform';
 const TYPES = new Set(['DestinyInventoryItemDefinition', 'DestinyObjectiveDefinition', 'DestinyLocationDefinition', 'DestinyActivityDefinition', 'DestinyMilestoneDefinition', 'DestinyLoadoutNameDefinition', 'DestinyRecordDefinition', 'DestinyCollectibleDefinition', 'DestinyPresentationNodeDefinition', 'DestinyDestinationDefinition', 'DestinyEquipableItemSetDefinition', 'DestinyStatDefinition']);
 const SET = 'DestinyEquipableItemSetDefinition';
-const SYNC_KEYS = /^(favs|builds|opts|hide2|marks-\d{1,25})$/;
+const SYNC_KEYS = /^(favs|builds|opts|hide2|goals|marks-\d{1,25})$/;
 const MAX_BATCH = 12;              // até 12 itens por pedido: mantém o tempo de CPU abaixo de 10 ms quando há muitas buscas novas na Bungie
 const MAX_VALUE = 400_000;         // tamanho máximo de cada valor sincronizado
 
@@ -138,6 +138,7 @@ export default {
       if (path === '/defs' && req.method === 'POST') return await defs(req, env);
       if (path === '/sync' && (req.method === 'GET' || req.method === 'PUT')) return await sync(req, env);
       if (path === '/stats' && req.method === 'GET') return await stats(req, env);
+      if (path === '/whoami' && req.method === 'GET') { const uid = await who(req, env); return json(req, { uid, owner: !!uid && uid === String(env.OWNER) }); }
       if (path === '/') return json(req, { ok: true, service: 'dni-api' });
       return json(req, { error: 'not found' }, 404);
     } catch (e) {

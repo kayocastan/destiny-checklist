@@ -49,6 +49,10 @@
     {
       "source": "/status",
       "destination": "/status.html"
+    },
+    {
+      "source": "/beta",
+      "destination": "/index.html"
     }
   ]
 }
