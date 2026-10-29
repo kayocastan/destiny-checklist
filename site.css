@@ -619,9 +619,9 @@ li.is-done .chip.exo{opacity:.7}
 .lv-sts span{flex:none;gap:2px}
 .lv-sts img{width:12px;height:12px}
 .lv-sts b{font-size:11.5px;letter-spacing:-.02em}
-/* Cabeçalho: o emblema (474×96) termina em ~513 px; em telas largas ele se funde ao fundo em vez de cortar */
+/* Cabeçalho: o emblema (474×96) termina em ~513 px; em telas largas uma cópia desfocada dele preenche o resto */
 .gh-band{--embw:513px}
-.gh-band::after{content:"";position:absolute;top:0;bottom:0;left:calc(var(--embw) - 180px);width:181px;background:linear-gradient(90deg,rgba(27,34,50,0),#1b2232 92%);pointer-events:none;z-index:0}
+.gh-band::after{content:"";position:absolute;inset:0;background-image:inherit;background-size:cover;background-position:center;background-repeat:no-repeat;filter:blur(22px) saturate(1.3) brightness(.85);transform:scale(1.25);-webkit-mask-image:linear-gradient(90deg,transparent calc(var(--embw) - 190px),#000 calc(var(--embw) + 50px));mask-image:linear-gradient(90deg,transparent calc(var(--embw) - 190px),#000 calc(var(--embw) + 50px));pointer-events:none;z-index:0}
 .gh-band::before{z-index:1}
 .gh-band>*{z-index:2}
 .gh.noemb .gh-band::after,.gh.landing .gh-band::after{display:none}
