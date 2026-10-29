@@ -755,14 +755,19 @@ function renderWeek() {
   el.innerHTML = WK.length ? `<div class="week-k">${esc(u().w.week)}</div><div class="week-items">${WK.map((w, i) => `<button class="wk ${w.cls}" type="button" data-wk="${i}"${w.to ? '' : ' tabindex="-1"'}><span class="wk-ic" aria-hidden="true">${w.ic}</span><span class="wk-t">${esc(w.t)}</span><span class="wk-s">${esc(w.s)}</span></button>`).join('')}</div>` : '';
 }
 function jumpTo(t, id) { go(t); requestAnimationFrame(() => { const sec = document.querySelector(`[data-sec="${id}"]`); if (!sec) return; const h = sec.querySelector('.sec-head[data-coll]'); if (h && sec.classList.contains('collapsed')) toggleSec(h); sec.scrollIntoView({ behavior: 'smooth', block: 'start' }); }); }
-const TSORT = { v: LS.get('dc-titsort', 'tier') };
+// ordem escolhida em Títulos, Incursões, Masmorras e Missões exóticas (guardada por aba)
+const SORT_TABS = ['tit', 'raid', 'dg', 'xm'], TSORT = { v: Object.assign({ tit: LS.get('dc-titsort', 'tier') }, LS.get('dc-sorts', {})) };
+const TIER_N = { 'Fácil': 1, 'Médio': 2, 'Difícil': 3, 'Muito difícil': 4 };
+const secTier = sec => sec.tier || (sec.kind && TIER_N[(sec.kind === 'raid' ? defs.raids : defs.dungeons).find(x => x.k === sec.key)?.d]) || 0;
+const secPct = sec => sec.items.length ? sec.items.filter(isDone).length / sec.items.length : 0;
+const sortOf = t => { const v = TSORT.v[t] || 'tier'; return v === 'tier' && t === 'xm' ? 'near' : v; };
 function titMeta(sec) {
-  const t = sec.tier, lbl = u().chip[['Fácil', 'Médio', 'Difícil', 'Muito difícil', 'Evento'][t - 1]], cls = ['easy', 'mid', 'hard', 'hard', 'feat'][t - 1];
-  const p = sec.items.length ? Math.round(sec.items.filter(isDone).length / sec.items.length * 100) : 0;
-  return `<div class="sec-meta"><span class="chip ${cls}">${esc(lbl || '')}</span><span class="chip">${p}%</span></div>`;
+  const t = secTier(sec), lbl = u().chip[['Fácil', 'Médio', 'Difícil', 'Muito difícil', 'Evento'][t - 1]], cls = ['easy', 'mid', 'hard', 'hard', 'feat'][t - 1];
+  const p = Math.round(secPct(sec) * 100);
+  return `${t ? `<span class="chip ${cls}">${esc(lbl || '')}</span>` : ''}<span class="chip">${p}%</span>`;
 }
 function secMeta(sec) {
-  const W = u().w, c = [], f = featured(), n = metric(sec.metric);
+  const W = u().w, c = [titMeta(sec)], f = featured(), n = metric(sec.metric);
   if (f[sec.kind].has(sec.key) && (!f.ends || f.ends > Date.now())) c.push(`<span class="chip feat">${esc(W.featWeek)}</span>`);
   if (n && have.a) c.push(`<span class="chip clr">${esc(W.clears(n))}</span>`);
   return c.length ? `<div class="sec-meta">${c.join('')}</div>` : '';
@@ -1305,13 +1310,13 @@ function render() {
   const secs = SECTIONS.filter(x => x.tab === tab);
   // O que já foi concluído fica no fim da lista, minimizado.
   const secDone = x => x.items.length > 0 && x.items.every(isDone);
-  if (tab === 'tit') {
-    // títulos: a pessoa escolhe a ordem; concluídos sempre no fim
-    const pct = x => x.items.length ? x.items.filter(isDone).length / x.items.length : 0, m = TSORT.v;
-    secs.sort((a, b) => m === 'near' ? pct(b) - pct(a) : m === 'low' ? pct(a) - pct(b) : m === 'name' ? a.title.localeCompare(b.title, lang === 'en' ? 'en' : 'pt-BR') : (a.tier - b.tier) || (pct(b) - pct(a)));
+  if (SORT_TABS.includes(tab)) {
+    // a pessoa escolhe a ordem; concluídos sempre no fim
+    const m = sortOf(tab), pct = secPct, idx = new Map(secs.map((x, i) => [x, i]));
+    secs.sort((a, b) => (m === 'near' ? pct(b) - pct(a) : m === 'low' ? pct(a) - pct(b) : m === 'name' ? a.title.localeCompare(b.title, lang === 'en' ? 'en' : 'pt-BR') : (secTier(a) - secTier(b)) || (pct(b) - pct(a))) || idx.get(a) - idx.get(b));
   }
   secs.sort((a, b) => secDone(a) - secDone(b));
-  const tsBar = tab === 'tit' && secs.some(x => x.tier) ? `<div class="tsort" role="group" aria-label="${esc(U.tsK)}"><span class="tsort-k">${esc(U.tsK)}</span>${Object.entries(U.tsO).map(([k, t]) => `<button type="button" class="char" data-tsort="${k}" aria-pressed="${TSORT.v === k}">${esc(t)}</button>`).join('')}</div>` : '';
+  const tsBar = SORT_TABS.includes(tab) && secs.some(x => x.items.length) ? `<div class="tsort" role="group" aria-label="${esc(U.tsK)}"><span class="tsort-k">${esc(U.tsK)}</span>${Object.entries(U.tsO).filter(([k]) => !(k === 'tier' && tab === 'xm')).map(([k, t]) => `<button type="button" class="char" data-tsort="${k}" aria-pressed="${sortOf(tab) === k}">${esc(t)}</button>`).join('')}</div>` : '';
   const wkBar = tab === 'exo' && have.a ? (() => { const n = weekExo().size; return `<div class="wkx"><button type="button" class="char wkx-b" id="wkxbtn" aria-pressed="${WKX.on}" title="${esc(U.w.wkExoTip)}">★ ${esc(U.w.wkExo(n))}</button></div><p class="empty-msg" id="wkxnone" hidden>${esc(U.w.wkExoNone)}</p>`; })() : '';
   if (tab === 'obj' && have.a && member) loadSession();
   if ((tab === 'raid' || tab === 'dg' || tab === 'xm') && have.a && member) loadActHist();
@@ -1323,7 +1328,7 @@ function render() {
     const keep = true, coll = sec.coll || ((tab === 'exo' || tab === 'cat') && sec.items?.length) || (keep && secDone(sec)), open = openSecs.has(sec.id);
     const act = sec.camp || sec.xm || (sec.kind && (sec.kind === 'raid' ? defs.raids : defs.dungeons).find(x => x.k === sec.key));
     return `<section data-sec="${sec.id}"${act?.img ? ` style="--act-img:url('${BNET}${act.img}')"` : ''} class="${keep ? 'keep' : ''}${act?.img ? ' act-img' : ''}${sec.weekly ? ' wk-sec' : ''}${coll ? ` coll${open ? '' : ' collapsed'}` : ''}">
-      <div class="sec-head"${coll ? ` data-coll="${sec.id}" role="button" tabindex="0" aria-expanded="${open}"` : ''}><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2>${sec.kind ? secMeta(sec) : sec.tier ? titMeta(sec) : ''}</div><span class="count" data-sc="${sec.id}"></span>${coll ? '<span class="chev" aria-hidden="true"></span>' : ''}</div>
+      <div class="sec-head"${coll ? ` data-coll="${sec.id}" role="button" tabindex="0" aria-expanded="${open}"` : ''}><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2>${sec.kind ? secMeta(sec) : sec.tier || sec.xm ? `<div class="sec-meta">${titMeta(sec)}</div>` : ''}</div><span class="count" data-sc="${sec.id}"></span>${coll ? '<span class="chev" aria-hidden="true"></span>' : ''}</div>
       ${sec.note ? `<p>${esc(sec.note)}</p>` : ''}${sec.kind ? actStrip(sec) : sec.xm ? xmStrip(sec.xm) : ''}<div class="sec-bar"><i data-sb="${sec.id}"></i></div></div>
       <ul>${sec.items.map(i => {
         const cid = 'c-' + i.id.replace(/[^a-z0-9]+/gi, '-'), first = i.c[0], rest = i.c.slice(1), more = !!(i.d || rest.length || i.loc);
@@ -1396,7 +1401,7 @@ $('list').addEventListener('click', e => {
   const hd = e.target.closest('.sec-head[data-coll]'); if (hd) { toggleSec(hd); return; }
   const it = e.target.closest('button.it'); if (it) { const li = it.closest('li'); const o = li.classList.toggle('open'); it.setAttribute('aria-expanded', o); o ? openItems.add(li.dataset.li) : openItems.delete(li.dataset.li); return; }
   if (e.target.id === 'togglecomplete') { document.body.classList.toggle('show-complete'); update(); }
-  const ts = e.target.closest('[data-tsort]'); if (ts) { TSORT.v = ts.dataset.tsort; LS.set('dc-titsort', TSORT.v); render(); return; }
+  const ts = e.target.closest('[data-tsort]'); if (ts) { TSORT.v[tab] = ts.dataset.tsort; LS.set('dc-sorts', TSORT.v); render(); return; }
   if (e.target.closest('#wkxbtn')) { WKX.on = !WKX.on; e.target.closest('#wkxbtn').setAttribute('aria-pressed', WKX.on); filter(); }
 });
 $('list').addEventListener('change', e => { const k = e.target.dataset.opt; if (k) { OPTS[k] = e.target.checked; LS.set('dc-opts', OPTS); render(); return; } const id = e.target.dataset.id; if (!id || !member) return; e.target.checked ? marks.add(id) : marks.delete(id); LS.set('dc-marks-' + member.id, [...marks]); update(); });
