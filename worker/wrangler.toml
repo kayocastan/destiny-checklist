@@ -6,6 +6,10 @@ workers_dev = true
 [vars]
 OWNER = "9967831"        # conta Bungie do dono (vê o painel de uso)
 ACCOUNT_ID = "__ACCOUNT_ID__"
+BILL_DAY = "29"          # dia em que o plano pago renova (assinado em 29/10/2026)
+
+[triggers]
+crons = ["17 * * * *"]   # freio de gastos: confere o uso de hora em hora
 
 [[d1_databases]]
 binding = "DB"

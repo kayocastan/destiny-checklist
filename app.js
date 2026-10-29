@@ -244,7 +244,7 @@ async function entities(type, hashes, lc, needPc, onChunk) {
     await Promise.all(chunks.map(async c => {
       try {
         const r = await fetch(APIW + '/defs', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-API-Key': cfg.apiKey }, body: JSON.stringify({ t: type, lc, h: c }) });
-        if (!r.ok) { if (r.status >= 500 || r.status === 429) srvDown = Date.now() + 120000; return; }
+        if (!r.ok) { if (r.status >= 500 || r.status === 429) srvDown = Date.now() + (r.status === 503 ? 3600000 : 120000); return; } // 503 = freio de gastos
         const j = await r.json();
         for (const [h, v] of Object.entries(j.d || {})) {
           if (v.x) { if (!IDEF[h]) { IDEF[h] = v.x; clearTimeout(idefT); idefT = setTimeout(() => { try { LS.set('dc-idef1', IDEF); } catch {} }, 500); } delete v.x; }

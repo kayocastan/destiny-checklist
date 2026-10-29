@@ -70,7 +70,7 @@
       <a href="https://www.bungie.net/en/Application" target="_blank" rel="noopener">Portal de apps da Bungie</a>
       <a href="/">Voltar ao site</a>
     </div>
-    <p class="note">Os limites diários da Cloudflare zeram às 00:00 UTC (21h de Brasília). Se algum estourar, o site volta a buscar os nomes direto na Bungie e a sincronização espera a virada.</p>
+    <p class="note">Plano pago: os limites são do ciclo mensal, que renova todo dia 29. O freio evita cobrança extra; com ele ligado, o site continua funcionando com a Bungie direto.</p>
   </section>
 </main>
 <script>
@@ -82,7 +82,7 @@ try { const t = LS.get('dc-theme', null); if (t) document.documentElement.datase
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const nf = n => new Intl.NumberFormat('pt-BR').format(Math.round(n || 0));
 const bytes = b => b == null ? '—' : b < 1024 ? b + ' B' : b < 1048576 ? (b / 1024).toFixed(1).replace('.', ',') + ' KB' : (b / 1048576).toFixed(1).replace('.', ',') + ' MB';
-const LIM = { req: 100000, read: 5000000, write: 100000, size: 500 * 1048576, cpu: 10 };
+const LIM = { size: 500 * 1048576, mReq: 10e6, mWrite: 50e6, mRead: 25e9 };
 const level = p => p >= .85 ? ['crit', 'Perto do limite'] : p >= .6 ? ['warn', 'Atenção'] : ['good', 'Tranquilo'];
 async function token() {
   let a = LS.get('dc-auth', null); if (!a) return null;
@@ -105,11 +105,23 @@ function render(d) {
   const req = sum(wT, x => x.sum.requests), err = sum(wT, x => x.sum.errors), rd = sum(dT, x => x.sum.rowsRead), wr = sum(dT, x => x.sum.rowsWritten);
   const cpu = wT.length ? Math.max(...wT.map(x => x.quantiles?.cpuTimeP99 || 0)) / 1000 /* vem em microssegundos */ : 0;
   const cfOk = !d.cf.error;
-  let h = '<section><h2>Hoje (dia UTC)</h2><div class="grid">';
-  h += cfOk ? meterCard('Pedidos ao servidor', req, LIM.req, nf, err ? `${nf(err)} com erro` : 'sem erros') : tile('Pedidos ao servidor', '—', 'Sem acesso ao Analytics da Cloudflare');
-  h += cfOk ? meterCard('Leituras do banco (linhas)', rd, LIM.read, nf) : '';
-  h += cfOk ? meterCard('Gravações do banco (linhas)', wr, LIM.write, nf) : '';
-  h += cfOk ? meterCard('Tempo de CPU (pior caso)', cpu, LIM.cpu, v => (v || 0).toFixed(1).replace('.', ',') + ' ms', 'limite por pedido') : '';
+  // ciclo de cobrança do plano pago + freio de gastos
+  const M = d.month || {}, br = d.brake || {}, lvl = br.level || 0;
+  let h = '<section><h2>Ciclo de cobrança (plano pago)</h2>';
+  h += `<p class="note">${lvl === 2 ? '<b style="color:var(--crit)">Freio total ligado</b>: o servidor parou e o site usa a Bungie direto até o ciclo virar.' : lvl === 1 ? '<b style="color:var(--warn)">Freio parcial ligado</b>: sem gravar nomes novos nem sincronizar até o ciclo virar.' : 'Freio de gastos desligado: tudo dentro do incluído.'} Conferido de hora em hora${br.at ? ` (último: ${new Date(br.at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })})` : ''}. Liga em 80% (parcial) e 95% (total) de qualquer item.</p><div class="grid">`;
+  if (M.error) h += tile('Uso do ciclo', '—', esc(M.error));
+  else {
+    const since = M.since ? new Date(M.since + 'T00:00:00Z').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : '';
+    h += meterCard('Pedidos ao servidor', M.req, LIM.mReq, nf, 'desde ' + since);
+    h += meterCard('Gravações do banco (linhas)', M.write, LIM.mWrite, nf);
+    h += meterCard('Leituras do banco (linhas)', M.read, LIM.mRead, nf);
+  }
+  h += '</div></section>';
+  h += '<section><h2>Hoje (dia UTC)</h2><div class="grid">';
+  h += cfOk ? tile('Pedidos ao servidor', nf(req), err ? `${nf(err)} com erro` : 'sem erros') : tile('Pedidos ao servidor', '—', 'Sem acesso ao Analytics da Cloudflare');
+  h += cfOk ? tile('Leituras do banco', nf(rd), 'linhas') : '';
+  h += cfOk ? tile('Gravações do banco', nf(wr), 'linhas') : '';
+  h += cfOk ? tile('Tempo de CPU (pior caso)', (cpu || 0).toFixed(1).replace('.', ',') + ' ms', 'mediana bem menor; o plano pago permite até 30 s') : '';
   h += '</div></section>';
   h += '<section><h2>Banco</h2><div class="grid">';
   h += meterCard('Tamanho do banco', d.db.size, LIM.size, bytes);

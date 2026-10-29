@@ -57,7 +57,7 @@ async function defs(req, env) {
       else out[x] = compact(t, d); fresh.push([key(x), JSON.stringify(out[x])]); }
     catch (e) { if (e.code === 2101 || e.code === 2102 || e.code === 2107) throw e; } // chave da API recusada: não adianta continuar
   }));
-  if (fresh.length) await env.DB.prepare(`INSERT OR REPLACE INTO defs (k, v, t) VALUES ${fresh.map(() => '(?, ?, ?)').join(',')}`).bind(...fresh.flatMap(([k, v]) => [k, v, now])).run().catch(() => {}); // sem gravar (limite do dia), ainda devolve os nomes
+  if (fresh.length && !(await brake(env))) await env.DB.prepare(`INSERT OR REPLACE INTO defs (k, v, t) VALUES ${fresh.map(() => '(?, ?, ?)').join(',')}`).bind(...fresh.flatMap(([k, v]) => [k, v, now])).run().catch(() => {}); // sem gravar (limite do dia), ainda devolve os nomes
   return json(req, { d: out });
 }
 
@@ -70,8 +70,8 @@ async function who(req, env) {
   if (row && row.exp > now) return row.uid;
   const m = await bungie(req, '/User/GetMembershipsForCurrentUser/', token).catch(() => null);
   const uid = m?.bungieNetUser?.membershipId; if (!uid) return null;
-  // guardar o resumo do token é só economia; se o banco recusar gravações (limite do dia), segue sem guardar
-  await env.DB.batch([env.DB.prepare('INSERT OR REPLACE INTO tok (h, uid, exp) VALUES (?, ?, ?)').bind(hash, String(uid), now + 50 * 60000), env.DB.prepare('DELETE FROM tok WHERE exp < ?').bind(now)]).catch(() => {});
+  // guardar o resumo do token é só economia; com o freio ligado ou o banco recusando gravações, segue sem guardar
+  if (!(await brake(env))) await env.DB.batch([env.DB.prepare('INSERT OR REPLACE INTO tok (h, uid, exp) VALUES (?, ?, ?)').bind(hash, String(uid), now + 50 * 60000), env.DB.prepare('DELETE FROM tok WHERE exp < ?').bind(now)]).catch(() => {});
   return String(uid);
 }
 
@@ -83,6 +83,7 @@ async function sync(req, env) {
     const out = {}; for (const r of rows.results || []) out[r.k] = { v: JSON.parse(r.v), t: r.t };
     return json(req, { d: out });
   }
+  if (await brake(env)) return json(req, { error: 'brake' }, 503); // freio: cada aparelho guarda as mudanças até o ciclo virar
   const body = await req.json().catch(() => null);
   if (!body || typeof body !== 'object') return json(req, { error: 'bad request' }, 400);
   const stm = [];
@@ -94,6 +95,37 @@ async function sync(req, env) {
   }
   if (stm.length) await env.DB.batch(stm);
   return json(req, { ok: stm.length });
+}
+
+/* ---------- Freio de gastos (plano pago) ----------
+   De hora em hora lê no Analytics quanto já foi usado no ciclo de cobrança (renova no dia BILL_DAY).
+   Acima de 80% do incluído em qualquer item: para de gravar o dispensável (nomes novos, registro de login,
+   sincronização). Acima de 95%: o servidor deixa de responder e o site usa a Bungie direto, até o ciclo virar. */
+const INCL = { req: 10e6, write: 50e6, read: 25e9 };
+function cycleStart(env, now = new Date()) {
+  const day = +env.BILL_DAY || 1, d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+  const dim = (y, m) => new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+  let s = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), Math.min(day, dim(d.getUTCFullYear(), d.getUTCMonth()))));
+  if (s > now) { const y = d.getUTCMonth() ? d.getUTCFullYear() : d.getUTCFullYear() - 1, m = (d.getUTCMonth() + 11) % 12; s = new Date(Date.UTC(y, m, Math.min(day, dim(y, m)))); }
+  return s;
+}
+async function monthUsage(env) {
+  const s = cycleStart(env).toISOString().slice(0, 10), u = new Date(Date.now() + 864e5).toISOString().slice(0, 10);
+  const cf = await cfGraph(env, `query($a: String!, $s: Date!, $u: Date!) { viewer { accounts(filter: { accountTag: $a }) {
+    w: workersInvocationsAdaptive(limit: 1000, filter: { date_geq: $s, date_leq: $u }) { sum { requests } dimensions { date } }
+    d: d1AnalyticsAdaptiveGroups(limit: 1000, filter: { date_geq: $s, date_leq: $u }) { sum { rowsRead rowsWritten } dimensions { date } }
+  } } }`, { a: env.ACCOUNT_ID, s, u });
+  if (cf.error) return { error: cf.error };
+  const a = cf.viewer?.accounts?.[0] || {}, sum = (l, f) => (l || []).reduce((t, x) => t + (f(x) || 0), 0);
+  const use = { since: s, req: sum(a.w, x => x.sum.requests), write: sum(a.d, x => x.sum.rowsWritten), read: sum(a.d, x => x.sum.rowsRead) };
+  const p = Math.max(use.req / INCL.req, use.write / INCL.write, use.read / INCL.read);
+  return { ...use, pct: p, level: p >= .95 ? 2 : p >= .8 ? 1 : 0, at: Date.now() };
+}
+let BRAKE = { level: 0, t: 0 };
+async function brake(env) {
+  if (Date.now() - BRAKE.t < 300000) return BRAKE.level;
+  try { const r = await env.DB.prepare("SELECT v FROM meta WHERE k = 'brake'").first(); BRAKE = { level: r ? JSON.parse(r.v).level || 0 : 0, t: Date.now() }; } catch { BRAKE.t = Date.now(); }
+  return BRAKE.level;
 }
 
 /* Painel de uso (só para o dono do site): números do banco + Analytics da Cloudflare dos últimos 7 dias. */
@@ -127,15 +159,23 @@ async function stats(req, env) {
   return json(req, {
     at: now,
     db: { size, defs: defs?.n || 0, defsBytes: defs?.b || 0, users: users?.n || 0, active7: act7?.n || 0, active1: act1?.n || 0, kvBytes: kvSize?.b || 0, kvRows: kvSize?.n || 0, byType: defsBy.results || [], manifest: man?.v ? JSON.parse(man.v) : null },
+    month: await monthUsage(env).catch(e => ({ error: String(e.message || e) })),
+    brake: await env.DB.prepare("SELECT v FROM meta WHERE k = 'brake'").first().then(r => r ? JSON.parse(r.v) : null).catch(() => null),
     cf: cf.error ? { error: cf.error } : { workers: cf.viewer?.accounts?.[0]?.workers || [], d1: cf.viewer?.accounts?.[0]?.d1 || [] },
   });
 }
 
 export default {
+  // de hora em hora: confere o uso do ciclo e liga/desliga o freio
+  async scheduled(ev, env) {
+    const m = await monthUsage(env); if (m.error) return;
+    await env.DB.prepare("INSERT OR REPLACE INTO meta (k, v) VALUES ('brake', ?)").bind(JSON.stringify(m)).run().catch(() => {});
+  },
   async fetch(req, env) {
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(req) });
     const path = new URL(req.url).pathname;
     try {
+      if (path !== '/stats' && path !== '/whoami' && (await brake(env)) >= 2) return json(req, { error: 'brake' }, 503);
       if (path === '/defs' && req.method === 'POST') return await defs(req, env);
       if (path === '/sync' && (req.method === 'GET' || req.method === 'PUT')) return await sync(req, env);
       if (path === '/stats' && req.method === 'GET') return await stats(req, env);

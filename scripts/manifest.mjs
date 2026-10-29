@@ -6,8 +6,8 @@ import { compact, compactSet } from '../worker/src/compact.js';
 
 const ACC = process.env.CLOUDFLARE_ACCOUNT_ID, TOK = process.env.CLOUDFLARE_API_TOKEN;
 const SITE = process.env.SITE || 'https://destinyparallel.vercel.app';
-// cada linha gravada conta ~2 no limite do D1 (a tabela e o índice da chave): 35 mil linhas ≈ 70 mil, sobra folga para o site
-const MAX_WRITES = +process.env.MAX_WRITES || 35000;
+// cada linha gravada conta ~2 (a tabela e o índice da chave). No plano pago o limite é mensal (50 milhões); 60 mil linhas por dia é folgado
+const MAX_WRITES = +process.env.MAX_WRITES || 60000;
 const CF = `https://api.cloudflare.com/client/v4/accounts/${ACC}/d1/database`;
 if (!ACC || !TOK) throw new Error('faltam CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_API_TOKEN');
 
@@ -29,6 +29,8 @@ async function main() {
   DB = (await cf('?name=dni')).find(d => d.name === 'dni')?.uuid;
   if (!DB) throw new Error('banco "dni" não encontrado');
   await q('CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v TEXT NOT NULL)');
+  const br = JSON.parse((await q("SELECT v FROM meta WHERE k = 'brake'")).results?.[0]?.v || 'null');
+  if (br?.level) { log('freio de gastos ligado (uso do ciclo em', Math.round(br.pct * 100) + '%): pré-carga adiada'); return; }
 
   const { apiKey } = await (await fetch(SITE + '/api/config')).json();
   const mr = await (await fetch('https://www.bungie.net/Platform/Destiny2/Manifest/', { headers: { 'X-API-Key': apiKey, Origin: SITE } })).json();
