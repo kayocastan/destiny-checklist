@@ -1667,8 +1667,7 @@ function buildParts(C) {
 // conjuntos de encaixes da sua conta (aspectos, fragmentos, habilidades, vantagens de artefato)
 let PLUGS = null, plugsP = null;
 function loadPlugs() {
-  // vêm com o componente de encaixes (305), que o perfil já carrega; só busca se ainda não tiver
-  if (!PLUGS && profile?.profilePlugSets?.data) PLUGS = { p: profile.profilePlugSets.data.plugs || {}, c: profile.characterPlugSets?.data || {} };
+  // vêm com o componente de encaixes (305); busca uma vez, só quando a comparação precisa
   if (PLUGS || plugsP || !member) return plugsP;
   plugsP = bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=305`).then(r => { PLUGS = { p: r.profilePlugSets?.data?.plugs || {}, c: r.characterPlugSets?.data || {} }; if (FD.cmp) renderFind(); }).catch(() => { plugsP = null; });
   return plugsP;
