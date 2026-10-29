@@ -32,7 +32,7 @@ const UI = {
   pt: {
     hide: 'Ocultar feitos', search: 'Buscar por nome ou origem', refresh: 'Atualizar', logout: 'Sair',
     disclaimer: 'Dados lidos da sua conta pela API oficial da Bungie. Este site não é afiliado à Bungie.',
-    loadouts: 'Loadouts', checklist: 'Central', outQ: 'Confirmar?', liveT: 'Ao vivo', liveYou: 'você', liveSince: t => `desde ${t}`, livePriv: 'Build privada', liveTap: 'Toque para ver a build completa',
+    loadouts: 'Loadouts', checklist: 'Central', outQ: 'Confirmar?', liveT: 'Ao vivo', liveYou: 'você', liveSince: t => `desde ${t}`, livePriv: 'Build privada', liveTap: 'Toque para ver a build completa', statsT: 'Atributos', statsHi: 'acima de 100: bônus extra',
     tabs: { obj: 'Objetivos', act: 'Atividades', drops: 'Arsenal', gd: 'Guardião' },
     subs: { camp: 'Campanhas', raid: 'Incursões', dg: 'Masmorras', xm: 'Missões exóticas', tit: 'Títulos', exo: 'Exóticos', cat: 'Catalisadores', vend: 'Vendedores' },
     heroTitle: 'Central do Guardião', heroText: 'Entre com a sua conta Bungie.net para verificar seus objetivos, acompanhar a rotação semanal, completar seu arsenal exótico e compartilhar suas builds.', lsQ: 'Buscar guardião: Nome#1234', lsBtn: 'Buscar', lsHint: 'Veja a build equipada de qualquer jogador, sem precisar entrar.',
@@ -87,7 +87,7 @@ const UI = {
   en: {
     hide: 'Hide done', search: 'Search by name or source', refresh: 'Refresh', logout: 'Sign out',
     disclaimer: 'Data read from your account through the official Bungie API. This site is not affiliated with Bungie.',
-    loadouts: 'Loadouts', checklist: 'Hub', outQ: 'Confirm?', liveT: 'Live', liveYou: 'you', liveSince: t => `since ${t}`, livePriv: 'Private build', liveTap: 'Tap to see the full build',
+    loadouts: 'Loadouts', checklist: 'Hub', outQ: 'Confirm?', liveT: 'Live', liveYou: 'you', liveSince: t => `since ${t}`, livePriv: 'Private build', liveTap: 'Tap to see the full build', statsT: 'Stats', statsHi: 'above 100: extra bonus',
     tabs: { obj: 'Objectives', act: 'Activities', drops: 'Arsenal', gd: 'Guardian' },
     subs: { camp: 'Campaigns', raid: 'Raids', dg: 'Dungeons', xm: 'Exotic missions', tit: 'Titles', exo: 'Exotics', cat: 'Catalysts', vend: 'Vendors' },
     heroTitle: 'Guardian Hub', heroText: 'Sign in with your Bungie.net account to check your goals, follow the weekly rotation, complete your exotic arsenal and share your builds.', lsQ: 'Search guardian: Name#1234', lsBtn: 'Search', lsHint: "See any player's equipped build, no sign-in needed.",
@@ -230,7 +230,7 @@ function saveEnt() { if (entDirty) { LS.set('dc-ent4-en', entCache.en); LS.set('
 async function pool(list, fn, n) { let i = 0; await Promise.all(Array.from({ length: Math.min(n, list.length) }, async () => { while (i < list.length) await fn(list[i++]); })); }
 /* Nomes em lote pelo servidor: um pedido para até 25 itens, guardados lá para todos os visitantes.
    O que o servidor não responder (fora do ar, limite do dia) é buscado direto na Bungie, como antes. */
-const SRV_TYPES = new Set(['DestinyInventoryItemDefinition', 'DestinyObjectiveDefinition', 'DestinyLocationDefinition', 'DestinyActivityDefinition', 'DestinyMilestoneDefinition', 'DestinyLoadoutNameDefinition', 'DestinyRecordDefinition', 'DestinyCollectibleDefinition', 'DestinyPresentationNodeDefinition', 'DestinyDestinationDefinition']);
+const SRV_TYPES = new Set(['DestinyInventoryItemDefinition', 'DestinyObjectiveDefinition', 'DestinyLocationDefinition', 'DestinyActivityDefinition', 'DestinyMilestoneDefinition', 'DestinyLoadoutNameDefinition', 'DestinyRecordDefinition', 'DestinyCollectibleDefinition', 'DestinyPresentationNodeDefinition', 'DestinyDestinationDefinition', 'DestinyStatDefinition']);
 let srvDown = 0;
 const entOk = (type, v, needPc) => v && (v.n || !/LoadoutName/.test(type)) && (!needPc || v.pc !== undefined);
 async function entities(type, hashes, lc, needPc, onChunk) {
@@ -844,12 +844,25 @@ function buildHTML(C = ownCtx()) {
   html += `<div class="b-cols">${grp(W.weapons, eq.filter(i => [1498876634, 2465295065, 953998645].includes(i.bucketHash)))}<div>${grp(W.armor, eq.filter(i => [3448274439, 3551918588, 14239492, 20886954, 1585787867].includes(i.bucketHash)))}${sets ? `<div class="b-grp b-sets"><div class="b-k">${esc(W.setT)}</div>${sets}</div>` : ''}</div></div>`;
   if (B.art) html += `<div class="b-grp"><div class="b-k">${esc(W.artT)}${B.art.h && B.loc[B.art.h]?.n ? ' · ' + esc(B.loc[B.art.h].n) : ''}</div><div class="b-row"><div class="b-perks">${B.art.perks.map(h => chip(h)).join('')}</div></div></div>`;
   const cam = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.3l1.4-2h5.6l1.4 2h2.3A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12.8" r="3.4" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>';
-  return `<div class="b-top"><div class="b-k">${sub ? esc(W.subclass) : ''}</div><button class="b-link b-save" type="button" aria-pressed="${!!savedKey(C)}" title="${esc(savedKey(C) ? W.unsaveB : W.saveB)}" aria-label="${esc(savedKey(C) ? W.unsaveB : W.saveB)}">${SAVE_ICON(!!savedKey(C))}</button><button class="b-link" type="button" title="${esc(W.myLink)}" aria-label="${esc(W.myLink)}">${LINK_ICON}</button><button class="b-cam" type="button" title="${esc(W.share)}" aria-label="${esc(W.share)}"${B.partial ? ' disabled' : ''}>${cam}</button></div>` + html + (B.partial ? `<p class="b-note wait" role="status">${esc(u().loadingDefs)}</p>` : '');
+  return `<div class="b-top"><div class="b-k">${sub ? esc(W.subclass) : ''}</div><button class="b-link b-save" type="button" aria-pressed="${!!savedKey(C)}" title="${esc(savedKey(C) ? W.unsaveB : W.saveB)}" aria-label="${esc(savedKey(C) ? W.unsaveB : W.saveB)}">${SAVE_ICON(!!savedKey(C))}</button><button class="b-link" type="button" title="${esc(W.myLink)}" aria-label="${esc(W.myLink)}">${LINK_ICON}</button><button class="b-cam" type="button" title="${esc(W.share)}" aria-label="${esc(W.share)}"${B.partial ? ' disabled' : ''}>${cam}</button></div>` + statsHTML(C) + html + (B.partial ? `<p class="b-note wait" role="status">${esc(u().loadingDefs)}</p>` : '');
 }
 /* ---------- imagem da build para compartilhar ----------
    Desenha o conteúdo numa tela transparente, anotando os cartões; no fim compõe:
    fundo + brilho da cor da subclasse, cartões, conteúdo, e corta na altura usada. */
 const STAT_ORDER = [2996146975, 392767087, 1943323491, 1735777505, 144602215, 4244567218];
+/* Atributos do personagem (vêm prontos no perfil: armadura + mods + artefato + afinação) */
+let STATD = null, statLoading = null;
+function loadStats() {
+  if (STATD && STATD.lang === lang) return; if (statLoading) return;
+  statLoading = entities('DestinyStatDefinition', STAT_ORDER, lang).then(d => { STATD = { lang, d }; statLoading = null; if (buildOpen) renderBuild(); if ($('finddlg').open) renderFind(); renderLive(); }).catch(() => { statLoading = null; });
+}
+const statsOf = C => { if (!C?.p || C.p.ld) return null; const st = C.p.characters?.data?.[C.cid]?.stats; return st && STAT_ORDER.some(h => st[h] != null) ? st : null; };
+function statsHTML(C) {
+  const st = statsOf(C); if (!st) return ''; loadStats(); const D = STATD?.d || {}, U = u();
+  const cell = h => { const v = st[h] || 0, d = D[h] || {}, cls = v > 100 ? ' hi' : v < 30 ? ' lo' : ''; return `<span class="b-sc${cls}" title="${esc(d.n || '')}">${d.ic ? `<img src="${BNET}${d.ic}" alt="">` : ''}<b>${v}</b><i><u style="width:${Math.min(100, v / 2)}%"></u></i></span>`; };
+  const det = STAT_ORDER.map(h => { const v = st[h] || 0, d = D[h] || {}; return `<li${v > 100 ? ' class="hi"' : ''}>${d.ic ? `<img src="${BNET}${d.ic}" alt="">` : ''}<span><b>${esc(d.n || '')} · ${v}</b>${d.d ? `<small>${esc(d.d)}</small>` : ''}</span></li>`; }).join('');
+  return `<details class="b-st"><summary aria-label="${esc(U.statsT)}">${STAT_ORDER.map(cell).join('')}</summary><ul>${det}</ul><p class="b-note">${esc(U.statsHi)}</p></details>`;
+}
 const imgCache = new Map();
 function loadImg(path) {
   if (!path) return Promise.resolve(null);
@@ -1560,7 +1573,7 @@ async function loadLdCtx(i) {
   // o artefato não faz parte do loadout: mantém o que está equipado agora
   const art = (profile.characterEquipment?.data?.[charId]?.items || []).find(i => i.bucketHash === ARTIFACT_BUCKET);
   if (art) { items.push(art); sockets[art.itemInstanceId] = sk[art.itemInstanceId]; }
-  const p = { characters: { data: { [charId]: profile.characters.data[charId] } }, characterEquipment: { data: { [charId]: { items } } }, itemComponents: { sockets: { data: sockets }, instances: profile.itemComponents?.instances } };
+  const p = { ld: 1, characters: { data: { [charId]: profile.characters.data[charId] } }, characterEquipment: { data: { [charId]: { items } } }, itemComponents: { sockets: { data: sockets }, instances: profile.itemComponents?.instances } };
   const B = await fetchBuild(p, charId);
   LDCTX[key] = { p, cid: charId, B, name: loadoutNames[l.nameHash]?.n || member?.name || '' };
 }
@@ -1664,6 +1677,8 @@ function compareHTML(A, Bc) {
   const [ca] = ELEMENT_ACC[ELEMENTS[A.B.en[a.sub]?.dt]] || ELEMENT_ACC.arc, [cb] = ELEMENT_ACC[ELEMENTS[Bc.B.en[b.sub]?.dt]] || ELEMENT_ACC.arc;
   return `<div class="cmp">
     <div class="cmp-h"><div style="--c:${ca}"><small>${esc(W.you)} · ${esc(String(A.name).replace(/#\d+$/, ''))}</small><b>${esc(ttlA)}</b></div><div style="--c:${cb}"><small>${esc(String(Bc.name).replace(/#\d+$/, ''))}</small><b>${esc(ttlB)}</b></div></div>
+    ${(() => { const sa = statsOf(A), sb = statsOf(Bc); if (!sa || !sb) return ''; loadStats(); const D = STATD?.d || {};
+      return grp(u().statsT, `<div class="cmp-st">${STAT_ORDER.map(h => { const x = sa[h] || 0, y = sb[h] || 0, df = y - x; return `<div><span class="cs-n">${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}${esc(D[h]?.n || '')}</span><b class="${x > 100 ? 'hi' : ''}">${x}</b><b class="${y > 100 ? 'hi' : ''}">${y}</b><small class="${df > 0 ? 'up' : df < 0 ? 'dn' : ''}">${df > 0 ? '+' + df : df || '='}</small></div>`; }).join('')}</div>`); })()}
     ${grp('Super', row(a.sup[0], b.sup[0], 'plug'))}
     ${grp(W.abilities, pairs(a.ab, b.ab).map(([x, y]) => row(x, y, 'plug')).join(''))}
     ${grp(W.aspects, pairs(a.asp, b.asp).map(([x, y]) => row(x, y, 'plug')).join(''))}
@@ -1945,6 +1960,7 @@ function renderLive() {
     return `<button class="lv-c" type="button" data-lv="${i}" style="--a1:${a1};--a2:${a2}" title="${esc(U.liveTap)}">
       <span class="lv-b" style="background-image:url('${BNET}${m.ch.emblemBackgroundPath || ''}')"><span class="lv-n"><b>${esc(nm)}</b>${you ? `<small>${esc(U.liveYou)}</small>` : ''}</span><span class="lv-pw">${m.ch.light}</span></span>
       <span class="lv-g">${sub ? ic(sub, 'lv-sub') : ''}<span class="lv-cls">${esc((sub && d(sub.itemHash).n) || U.classes[m.ch.classType] || '')}</span>${m.priv ? `<span class="lv-priv">${esc(U.livePriv)}</span>` : `<span class="lv-w">${ws.map(x => ic(x, B.en[x.itemHash]?.tt === 6 ? 'ex' : '')).join('')}${exo.filter(x => !WEAPON_B.includes(x.bucketHash)).map(x => ic(x, 'ex')).join('')}</span>`}</span>
+      ${(() => { const st = m.ch.stats; if (!st) return ''; loadStats(); const D = STATD?.d || {}; const top = STAT_ORDER.filter(h => st[h] != null).sort((x, y) => st[y] - st[x]).slice(0, 2); return `<span class="lv-st">${top.map(h => `<span title="${esc(D[h]?.n || '')}">${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}${esc(D[h]?.n || '')} <b>${st[h]}</b></span>`).join('')}</span>`; })()}
       ${exo.length ? `<span class="lv-x">${exo.map(x => esc(d(x.itemHash).n || '')).join(' · ')}</span>` : ''}</button>`;
   };
   el.innerHTML = `<div class="lv-h"><span class="lv-dot" aria-hidden="true"></span><b>${esc(U.liveT)}</b>${LIVE.act ? `<span>${esc(LIVE.act)}</span>` : ''}${tm ? `<small>${esc(U.liveSince(tm))}</small>` : ''}</div><div class="lv-l">${LIVE.mem.map(card).join('')}</div>`;
