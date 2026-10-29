@@ -730,11 +730,11 @@ function weekSection() {
     if (m.endDate && Date.parse(m.endDate) <= t) continue;
     for (const a of m.activities || []) for (const c of a.challenges || []) {
       const o = c.objective || {}, an = ACTN[a.activityHash]?.n || name, cv = o.completionValue || 1;
-      items.push(I(`wk-${m.milestoneHash}-${a.activityHash}-${o.objectiveHash || 0}`, W.wkChallenge(an), W.wkChallengeD, [`${Math.min(o.progress || 0, cv)}/${cv}`, U_CHIP_WEEK()], !!o.complete, { wk: { k: 'ch', act: an, h: a.activityHash, a: Math.min(o.progress || 0, cv), b: cv } }));
+      items.push(I(`wk-${m.milestoneHash}-${a.activityHash}-${o.objectiveHash || 0}`, W.wkChallenge(an), W.wkChallengeD, [`${Math.min(o.progress || 0, cv)}/${cv}`, U_CHIP_WEEK()], !!o.complete, { wk: { ms: m.milestoneHash, k: 'ch', act: an, h: a.activityHash, a: Math.min(o.progress || 0, cv), b: cv } }));
     }
     const rw = (m.rewards || []).flatMap(r => r.entries || []);
-    if (rw.length) { const red = rw.filter(e => e.redeemed).length, earn = rw.filter(e => e.earned).length; items.push(I(`wk-${m.milestoneHash}-rw`, W.wkRewardT(name), earn > red ? W.wkClaim(earn - red) : W.wkRewardsD, [`${red}/${rw.length}`, U_CHIP_WEEK()], red === rw.length, { wk: { k: 'rw', act: name, h: (m.activities || [])[0]?.activityHash, a: red, b: rw.length, claim: earn > red } })); }
-    for (const q of m.availableQuests || []) if (q.status) items.push(I(`wk-${m.milestoneHash}-q`, name, W.wkQuestD, [q.status.completed ? '✓' : q.status.started ? W.wkStarted : W.wkNew], !!q.status.completed, { wk: { k: 'q', act: name, h: (m.activities || [])[0]?.activityHash } }));
+    if (rw.length) { const red = rw.filter(e => e.redeemed).length, earn = rw.filter(e => e.earned).length; items.push(I(`wk-${m.milestoneHash}-rw`, W.wkRewardT(name), earn > red ? W.wkClaim(earn - red) : W.wkRewardsD, [`${red}/${rw.length}`, U_CHIP_WEEK()], red === rw.length, { wk: { ms: m.milestoneHash, k: 'rw', act: name, h: (m.activities || [])[0]?.activityHash, a: red, b: rw.length, claim: earn > red } })); }
+    for (const q of m.availableQuests || []) if (q.status) items.push(I(`wk-${m.milestoneHash}-q`, name, W.wkQuestD, [q.status.completed ? '✓' : q.status.started ? W.wkStarted : W.wkNew], !!q.status.completed, { wk: { ms: m.milestoneHash, k: 'q', act: name, h: (m.activities || [])[0]?.activityHash } }));
   }
   const miss = xurMissing();
   // o Xûr fica em Arsenal → Vendedores
@@ -1855,6 +1855,13 @@ function actImg(h, kind, key) {
   if (!actImgP[h]) actImgP[h] = bungie(`/Destiny2/Manifest/DestinyActivityDefinition/${h}/`, false).then(d => { ACTIMG[h] = d.pgcrImage && !/missing_pgcr/i.test(d.pgcrImage) ? d.pgcrImage : ''; try { LS.set('dc-actimg', ACTIMG); } catch {} if (tab === 'obj') render(); }).catch(() => { ACTIMG[h] = ''; });
   return '';
 }
+// marcos semanais: imagem ou ícone oficial (quando a atividade não tem imagem)
+const MSIMG = LS.get('dc-msimg', {}), msImgP = {};
+function msImg(h) {
+  if (!h) return {}; if (MSIMG[h]) return MSIMG[h];
+  if (!msImgP[h]) msImgP[h] = bungie(`/Destiny2/Manifest/DestinyMilestoneDefinition/${h}/`, false).then(d => { MSIMG[h] = { img: d.image || '', ic: d.displayProperties?.icon || '' }; try { LS.set('dc-msimg', MSIMG); } catch {} if (tab === 'obj') render(); }).catch(() => { MSIMG[h] = {}; });
+  return {};
+}
 async function loadSession() {
   if (sessBusy || !member || !have.a) return; if (SESSION && SESSION.cid === charId && Date.now() - SESSION.at < 600000) return;
   sessBusy = true; const mid = member.id;
@@ -1886,7 +1893,7 @@ async function loadSession() {
       const fastAll = ACTH?.d?.[m.k]?.fast || 0;
       const rec = first ? null : prev ? (best.dur < prev.dur ? { o: fmtDur(prev.dur * 1000), d: fmtDur((prev.dur - best.dur) * 1000) } : null) : (fastAll && Math.abs(fastAll / 1000 - best.dur) < 2 && total > list.length ? { best: true } : null);
       const solo = list.find(r => r.pc === 1), fl = solo && list.some(r => r.pc === 1 && r.d === 0);
-      items.push({ p: first ? 0 : rec ? 0.5 : solo ? 2.5 : 3, cls: first || rec ? 'gold' : solo ? 'solo' : '', badge: first ? 'first' : m.kind, rec, solo: solo ? (fl ? 'fl' : 'y') : '', img: def.img, n: L(def.n), sub: [fmtDur(best.dur * 1000), best.k + ' ' + u().w.kills, best.d + ' ' + u().w.deaths], foot: x && colMissing(x.h) ? u().w.ssNoDrop(L(x.n)) : '' });
+      items.push({ p: first ? 0 : rec ? 0.5 : solo ? 2.5 : 3, cls: first || rec ? 'gold' : solo ? 'solo' : '', badge: first ? 'first' : m.kind, rec, solo: solo ? (fl ? 'fl' : 'y') : '', img: def.img, dif: def.d, n: L(def.n), sub: [fmtDur(best.dur * 1000), best.k + ' ' + u().w.kills, best.d + ' ' + u().w.deaths], foot: x && colMissing(x.h) ? u().w.ssNoDrop(L(x.n)) : '' });
     }
     for (const h of ex.newExo) { const e = defs.exotics.find(y => y.h[0] === h); if (e) items.push({ p: 1, cls: 'gold', badge: 'exo', n: L(e.n), sub: [u().w.ssNewExo], foot: '' }); }
     const claim = []; for (const se of defs.seals) { const c = se.r.filter(r => { const st = recState(r[0]); return st && !(st.state & 1) && !(st.state & 4); }).length; if (c) { const done = se.r.filter(r => recDone(recState(r[0]))).length; claim.push({ se, c, done }); } }
@@ -1901,9 +1908,9 @@ async function loadSession() {
 // "Esta semana" em cartões: destaques com a imagem da atividade, desafios e recompensas com barra de progresso
 function weekHTML(sec) {
   const W = u().w, open = openSecs.has(sec.id), done = sec.items.filter(isDone).length;
-  const feat = (sec.feat || []).map(f => { const d = (f.kind === 'raid' ? defs.raids : defs.dungeons).find(x => x.k === f.key); return `<button type="button" class="wk-f" data-jump="${f.tab}:${f.id}" style="--wk-img:url('${BNET}${d?.img || ''}')"><small>${esc(u().wkFeatT)}</small><b>${esc(f.title)}</b></button>`; }).join('');
-  const card = i => { const w = i.wk || {}, im = w.h ? actImg(w.h) : '', ok = isDone(i), p = w.b ? Math.round(w.a / w.b * 100) : ok ? 100 : 0;
-    return `<div class="wk-c${ok ? ' ok' : ''}${w.claim ? ' claim' : ''}${im ? ' wk-img' : ''}"${im ? ` style="--wk-img:url('${BNET}${im}')"` : ''}><small>${esc(u().wkKind[w.k] || '')}</small><b>${esc(w.act || i.t)}</b>${w.b ? `<span class="wk-p"><i><u style="width:${p}%"></u></i><span>${w.a}/${w.b}</span></span>` : `<span class="wk-p"><span>${esc(i.c[0] || '')}</span></span>`}${w.claim ? `<span class="wk-claim">${esc(i.d)}</span>` : ''}${ok ? '<span class="wk-ok">✓</span>' : ''}</div>`; };
+  const feat = (sec.feat || []).map(f => { const d = (f.kind === 'raid' ? defs.raids : defs.dungeons).find(x => x.k === f.key); return `<button type="button" class="wk-f" data-jump="${f.tab}:${f.id}" style="--wk-img:url('${BNET}${d?.img || ''}')"><small>${esc(u().wkFeatT)}${d?.d ? ` · ${esc(u().chip[d.d] || d.d)}` : ''}</small><b>${esc(f.title)}</b></button>`; }).join('');
+  const card = i => { const w = i.wk || {}, mi = msImg(w.ms), im = (w.h ? actImg(w.h) : '') || mi.img || '', ic = !im && mi.ic, ok = isDone(i), p = w.b ? Math.round(w.a / w.b * 100) : ok ? 100 : 0;
+    return `<div class="wk-c${ok ? ' ok' : ''}${w.claim ? ' claim' : ''}${im ? ' wk-img' : ''}"${im ? ` style="--wk-img:url('${BNET}${im}')"` : ''}>${ic ? `<img class="wk-ic" src="${BNET}${ic}" alt="">` : ''}<small>${esc(u().wkKind[w.k] || '')}</small><b>${esc(w.act || i.t)}</b>${w.b ? `<span class="wk-p"><i><u style="width:${p}%"></u></i><span>${w.a}/${w.b}</span></span>` : `<span class="wk-p"><span>${esc(i.c[0] || '')}</span></span>`}${w.claim ? `<span class="wk-claim">${esc(i.d)}</span>` : ''}${ok ? '<span class="wk-ok">✓</span>' : ''}</div>`; };
   return `<section data-sec="${sec.id}" class="keep wk-sec coll${open ? '' : ' collapsed'}"><div class="sec-head" data-coll="${sec.id}" role="button" tabindex="0" aria-expanded="${open}"><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2></div><span class="count">${done}/${sec.items.length}</span><span class="chev" aria-hidden="true"></span></div><p>${esc(sec.note)}</p><div class="sec-bar"><i style="width:${sec.items.length ? done / sec.items.length * 100 : 0}%"></i></div></div>
     <div class="wk-body">${feat ? `<div class="wk-fs">${feat}</div>` : ''}<div class="wk-g">${sec.items.map(card).join('')}</div></div></section>`;
 }
@@ -1912,7 +1919,7 @@ function sessHTML() {
   const tm = t => new Date(t).toLocaleTimeString(lang === 'en' ? 'en-US' : 'pt-BR', { hour: '2-digit', minute: '2-digit' });
   const day = (() => { const d = new Date(S.start), n = new Date(); const y = new Date(n); y.setDate(n.getDate() - 1); return d.toDateString() === n.toDateString() ? W.today : d.toDateString() === y.toDateString() ? W.yesterday : d.toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR', { day: '2-digit', month: '2-digit' }); })();
   const badge = b => W.ssBadge[b] || W.ssBadge[b.replace(/\d+$/, '')] || (/^mode/.test(b) ? (W.ssMode[+b.slice(4)] || W.ssBadge.done) : W.ssBadge.done);
-  const card = t => { const im = BETA ? (t.img || (t.h ? actImg(t.h) : '')) : ''; return `<div class="ss-c ${t.cls}${im ? ' ss-img' : ''}"${im ? ` style="--ss-img:url('${BNET}${im}')"` : ''}><span class="ss-bs"><span class="ss-badge">${esc(badge(t.badge))}</span>${BETA && t.rec ? `<span class="ss-badge rec">⏱ ${esc(u().ssRec)}</span>` : ''}${BETA && t.solo ? `<span class="ss-badge solo">${esc(t.solo === 'fl' ? u().ssSoloFl : u().ssSolo)}</span>` : ''}</span><b class="ss-cn">${esc(t.n)}</b>${BETA && t.rec ? `<small class="ss-rec">${esc(t.rec.best ? u().ssRecBest : u().ssRecSub(t.rec.o, t.rec.d))}</small>` : ''}<small>${esc(t.sub.filter(Boolean).join(' · '))}</small>${t.foot ? `<span class="ss-foot">${esc(t.foot)}</span>` : ''}</div>`; };
+  const card = t => { const im = BETA ? (t.img || (t.h ? actImg(t.h) : '')) : ''; return `<div class="ss-c ${t.cls}${im ? ' ss-img' : ''}"${im ? ` style="--ss-img:url('${BNET}${im}')"` : ''}><span class="ss-bs"><span class="ss-badge">${esc(badge(t.badge))}</span>${BETA && t.rec ? `<span class="ss-badge rec">⏱ ${esc(u().ssRec)}</span>` : ''}${BETA && t.solo ? `<span class="ss-badge solo">${esc(t.solo === 'fl' ? u().ssSoloFl : u().ssSolo)}</span>` : ''}${BETA && t.dif ? `<span class="ss-dif chip ${{ 'Fácil': 'easy', 'Médio': 'mid', 'Difícil': 'hard' }[t.dif] || ''}">${esc(u().chip[t.dif] || t.dif)}</span>` : ''}</span><b class="ss-cn">${esc(t.n)}</b>${BETA && t.rec ? `<small class="ss-rec">${esc(t.rec.best ? u().ssRecBest : u().ssRecSub(t.rec.o, t.rec.d))}</small>` : ''}<small>${esc(t.sub.filter(Boolean).join(' · '))}</small>${t.foot ? `<span class="ss-foot">${esc(t.foot)}</span>` : ''}</div>`; };
   const top = S.items.slice(0, 3), rest = S.items.slice(3), h = Math.floor(S.mins / 60), m = S.mins % 60;
   return `<section class="ss keep" data-sec="session"><div class="ss-head"><h2>${esc(W.ssT)}</h2><div class="ss-meta"><span>${esc(day)}, ${tm(S.start)}–${tm(S.end)}</span><span>⏱ ${h ? h + 'h' + String(m).padStart(2, '0') : m + ' min'}</span>${S.from && S.light > S.from ? `<span class="ss-pw">✦ ${S.from} → <b>${S.light}</b></span>` : ''}</div></div>
     <div class="ss-top">${top.map(card).join('')}</div>${rest.length ? `<details class="ss-more"><summary>${esc(W.ssMore(rest.length))}</summary><div class="ss-top">${rest.map(card).join('')}</div></details>` : ''}</section>`;
@@ -2065,6 +2072,7 @@ $('live').addEventListener('click', e => {
    Na comparação, o que falta vira uma meta: encaixes (aspectos, fragmentos, habilidades) pelos seus conjuntos de encaixes;
    armas e exóticas pela coleção; armadura lendária de conjunto vira "N peças do conjunto" (qualquer peça serve). */
 const goals = () => LS.get('dc-goals', []);
+const GLC = new Set(LS.get('dc-glc', [])); // metas recolhidas (só neste aparelho)
 const SETITEMS = LS.get('dc-setitems', {}); let setItemsP = {};
 function setItems(h) {
   if (SETITEMS[h]) return Promise.resolve(SETITEMS[h]);
@@ -2136,16 +2144,18 @@ function goalsHTML() {
     const mine = myCh.find(c => c.classType === g.cls)?.stats;
     const ref = g.st ? `<div class="gl-ref"><small>${esc(W.glRef)}</small><div>${STAT_ORDER.map(h => `<span title="${esc(D[h]?.n || '')}">${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}<b>${g.st[h]}</b>${mine ? `<i>${esc(W.glYou)} ${mine[h] || 0}</i>` : ''}</span>`).join('')}</div></div>` : '';
     const [a1] = ELEMENT_ACC[g.el] || ELEMENT_ACC.arc;
-    return `<div class="gl-c" style="--a1:${a1}"><div class="gl-h"><span class="gl-dot"></span><span class="gl-t"><b>${esc(g.title)}</b><small>${esc(W.glAt(new Date(g.at).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR', { day: '2-digit', month: '2-digit' })))}</small></span><span class="gl-acts">${g.sel ? `<button type="button" data-glv="${gi}">${esc(W.glView)}</button>` : ''}<button type="button" data-gld="${gi}">${esc(W.glDel)}</button></span></div>
+    const shut = GLC.has(g.id);
+    return `<div class="gl-c${shut ? ' shut' : ''}" style="--a1:${a1}"><div class="gl-h" data-glt="${esc(g.id)}" role="button" tabindex="0" aria-expanded="${!shut}"><span class="gl-dot"></span><span class="gl-t"><b>${esc(g.title)}</b><small>${esc(W.glAt(new Date(g.at).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR', { day: '2-digit', month: '2-digit' })))}</small></span><span class="gl-n">${done}/${g.items.length}</span><span class="gl-acts">${g.sel ? `<button type="button" data-glv="${gi}">${esc(W.glView)}</button>` : ''}<button type="button" data-gld="${gi}">${esc(W.glDel)}</button></span><span class="chev" aria-hidden="true"></span></div>
       <div class="gl-bar"><u style="width:${g.items.length ? done / g.items.length * 100 : 0}%"></u></div>
-      ${ref}
-      ${groups.map(([k, l]) => `<div class="gl-g"><small>${esc(W.glG[k])}</small>${l.map(([it, ok]) => `<div class="gl-it${ok ? ' ok' : ''}${ok == null ? ' unk' : ''}"><i></i>${it.ic ? `<img src="${BNET}${it.ic}" alt="" loading="lazy">` : '<span class="gl-noic"></span>'}<span><b>${esc(it.k === 'set' ? W.glSet(it.n || '?', it.need) : it.n || '')}</b><small>${esc(it.k === 'plug' ? W.glSrcPlug : it.k === 'set' ? `${owned[it.h] ?? '…'}/${it.need} · ${W.glSetSrc}` : (CSRC[COLL[it.h] + ':' + lang] || ''))}</small></span></div>`).join('')}</div>`).join('')}</div>`;
+      <div class="gl-body">${ref}
+      ${groups.map(([k, l]) => `<div class="gl-g"><small>${esc(W.glG[k])}</small>${l.map(([it, ok]) => `<div class="gl-it${ok ? ' ok' : ''}${ok == null ? ' unk' : ''}"><i></i>${it.ic ? `<img src="${BNET}${it.ic}" alt="" loading="lazy">` : '<span class="gl-noic"></span>'}<span><b>${esc(it.k === 'set' ? W.glSet(it.n || '?', it.need) : it.n || '')}</b><small>${esc(it.k === 'plug' ? W.glSrcPlug : it.k === 'set' ? `${owned[it.h] ?? '…'}/${it.need} · ${W.glSetSrc}` : (CSRC[COLL[it.h] + ':' + lang] || ''))}</small></span></div>`).join('')}</div>`).join('')}</div></div>`;
   };
   const tot = G.reduce((a, g) => a + g.items.length, 0);
   return `<section data-sec="goals" class="keep coll${open ? '' : ' collapsed'}">${head(G.length, W.glNote)}<div class="gl-l">${G.map(card).join('')}</div></section>`;
 }
 document.addEventListener('click', e => {
   const add = e.target.closest('.gl-add'); if (add && !add.disabled) { const C = fdCtx(), mine = cmpMine(); if (!mine) return; const g = goalFromCmp(mine, C); const l = goals().filter(x => x.id !== g.id); l.unshift(g); LS.set('dc-goals', l.slice(0, 12)); add.disabled = true; add.textContent = u().glDone; if (tab === 'obj') render(); return; }
+  const glt = e.target.closest('[data-glt]'); if (glt && !e.target.closest('button')) { const id = glt.dataset.glt, c = glt.closest('.gl-c'), shut = c.classList.toggle('shut'); shut ? GLC.add(id) : GLC.delete(id); glt.setAttribute('aria-expanded', !shut); LS.set('dc-glc', [...GLC]); return; }
   const del = e.target.closest('[data-gld]'); if (del) { const l = goals(); l.splice(+del.dataset.gld, 1); LS.set('dc-goals', l); render(); return; }
   const v = e.target.closest('[data-glv]'); if (v) { const g = goals()[+v.dataset.glv]; if (g?.sel) { FD.q = ''; FD.results = null; openFind(); showPlayer(g.sel); } }
 });
