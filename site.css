@@ -755,3 +755,16 @@ section.wk-sec.collapsed .sec-head>ul.wk-nl{display:block}
 .ss-c.ss-go{cursor:pointer;transition:box-shadow .15s}
 .ss-c.ss-go:hover{box-shadow:inset 0 0 0 2px var(--exotic)}
 .ss-c.ss-go:focus-visible{outline:2px solid var(--exotic);outline-offset:2px}
+/* setas de expandir mais visíveis: círculo com a seta na cor de destaque */
+.sec-title .chev,.gl-h .chev{width:26px;height:26px;border:1px solid color-mix(in srgb,var(--acc) 55%,transparent);border-radius:50%;background:color-mix(in srgb,var(--acc) 12%,transparent);display:grid;place-items:center;transform:none!important;transition:background .15s,border-color .15s}
+.sec-title .chev::before,.gl-h .chev::before{content:'';width:7px;height:7px;border-right:2px solid var(--acc);border-bottom:2px solid var(--acc);transform:translateY(-2px) rotate(45deg);transition:transform .15s}
+section.coll:not(.collapsed) .sec-title .chev::before,.gl-c:not(.shut) .gl-h .chev::before{transform:translateY(2px) rotate(-135deg)}
+section.coll:not(.collapsed) .sec-title .chev,.gl-c:not(.shut) .gl-h .chev{background:transparent;border-color:var(--line)}
+section.collapsed .sec-head:hover .chev,.gl-c.shut .gl-h:hover .chev{background:color-mix(in srgb,var(--acc) 28%,transparent);border-color:var(--acc)}
+li .it .chev{border-color:var(--acc)}
+/* subpáginas: barra segmentada mais evidente */
+.subtabs{width:fit-content;max-width:100%;margin-inline:auto;padding:4px;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+.subtabs .sub{border:0;background:transparent;color:var(--fg);opacity:.72;font-size:14px;font-weight:600;padding:7px 16px;border-radius:12px;transition:background .15s,opacity .15s}
+.subtabs .sub:hover{opacity:1;background:color-mix(in srgb,var(--acc) 10%,transparent)}
+.subtabs .sub[aria-pressed="true"]{opacity:1;background:color-mix(in srgb,var(--acc) 20%,transparent);box-shadow:inset 0 0 0 1px var(--acc)}
+@media (max-width:560px){.subtabs{width:100%;justify-content:center}.subtabs .sub{padding:7px 12px;font-size:13.5px}}
