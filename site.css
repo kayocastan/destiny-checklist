@@ -605,3 +605,11 @@ li.is-done .chip.exo{opacity:.7}
 .lv-row img,.lv-row i{width:100%;aspect-ratio:1;max-width:40px;border-radius:5px;display:block}
 .lv-row i{border:1px dashed var(--line)}
 .lv-row img.ex{box-shadow:0 0 0 1.5px rgba(227,192,74,.85)}
+/* Ao vivo: os 6 atributos embaixo da subclasse */
+.lv-sts{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:2px;padding:0 10px 0 12px}
+.lv-sts span{display:flex;align-items:center;gap:3px;min-width:0}
+.lv-sts img{width:13px;height:13px;flex:none}
+.lv-sts b{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--fg);font-variant-numeric:tabular-nums}
+.lv-sts .hi b{color:var(--exotic)}
+:root:not([data-theme="dark"]) .lv-sts img{filter:invert(1) brightness(.4)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .lv-sts img{filter:none}}
