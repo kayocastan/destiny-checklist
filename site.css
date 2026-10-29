@@ -770,3 +770,7 @@ li .it .chev{border-color:var(--acc)}
 @media (max-width:560px){.subtabs{width:100%;justify-content:center}.subtabs .sub{padding:7px 12px;font-size:13.5px}}
 /* metas no celular: nome em uma linha, botões embaixo */
 @media (max-width:560px){.gl-h{flex-wrap:wrap;row-gap:6px}.gl-t{flex:1 1 0}.gl-h .gl-acts{order:9;flex-basis:100%;margin-left:20px}}
+/* guia em vídeo */
+.chip.yt{text-decoration:none;color:#fff;background:#c4302b;border-color:#c4302b;font-weight:600;cursor:pointer}
+.chip.yt:hover{background:#e0403a;border-color:#e0403a}
+.wk-fm-h .chip.yt{margin-left:auto}.wk-fm-h .chip.yt+.wk-fm-go{margin-left:0}
