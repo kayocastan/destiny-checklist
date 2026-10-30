@@ -138,6 +138,28 @@ async function cfGraph(env, query, variables) {
   if (!j || j.errors?.length) return { error: j?.errors?.[0]?.message || 'HTTP ' + r.status };
   return j.data;
 }
+// acesso único: o site manda um sinal por dia por navegador (id aleatório) ou por conta (logado); guarda só o resumo
+const spDay = (t = Date.now()) => new Date(t - 3 * 3600e3).toISOString().slice(0, 10); // dia no horário de Brasília
+async function hit(req, env) {
+  if (await brake(env)) return json(req, { ok: false }, 503);
+  let b; try { b = await req.json(); } catch { return json(req, { error: 'bad' }, 400); }
+  const v = String(b?.v || ''); if (!/^[am]:[\w-]{6,64}$/.test(v)) return json(req, { error: 'bad' }, 400);
+  const h = [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('dpi|' + v)))].slice(0, 10).map(x => x.toString(16).padStart(2, '0')).join('');
+  await env.DB.prepare('INSERT INTO visit (d, v, u) VALUES (?, ?, ?) ON CONFLICT(d, v) DO UPDATE SET u = MAX(u, excluded.u)').bind(spDay(), h, v[0] === 'm' ? 1 : 0).run().catch(() => {});
+  return json(req, { ok: true });
+}
+async function visits(env) {
+  const d0 = spDay(), dd = n => spDay(Date.now() - n * 864e5);
+  const q = (sql, ...a) => env.DB.prepare(sql).bind(...a).first().catch(() => null);
+  const [t, w, m, all, days] = await Promise.all([
+    q('SELECT COUNT(*) n, SUM(u) l FROM visit WHERE d = ?', d0),
+    q('SELECT COUNT(DISTINCT v) n FROM visit WHERE d >= ?', dd(6)),
+    q('SELECT COUNT(DISTINCT v) n FROM visit WHERE d >= ?', dd(29)),
+    q('SELECT COUNT(DISTINCT v) n, MIN(d) since FROM visit'),
+    env.DB.prepare('SELECT d, COUNT(*) n, SUM(u) l FROM visit WHERE d >= ? GROUP BY d ORDER BY d').bind(dd(13)).all().then(r => r.results).catch(() => []),
+  ]);
+  return { today: t?.n || 0, todayLogged: t?.l || 0, d7: w?.n || 0, d30: m?.n || 0, total: all?.n || 0, since: all?.since || null, days };
+}
 async function stats(req, env) {
   const uid = await who(req, env);
   if (!uid) return json(req, { error: 'auth' }, 401);
@@ -161,6 +183,7 @@ async function stats(req, env) {
   return json(req, {
     at: now,
     db: { size, defs: defs?.n || 0, defsBytes: defs?.b || 0, users: users?.n || 0, active7: act7?.n || 0, active1: act1?.n || 0, kvBytes: kvSize?.b || 0, kvRows: kvSize?.n || 0, byType: defsBy.results || [], manifest: man?.v ? JSON.parse(man.v) : null },
+    visits: await visits(env),
     month: await monthUsage(env).catch(e => ({ error: String(e.message || e) })),
     brake: await env.DB.prepare("SELECT v FROM meta WHERE k = 'brake'").first().then(r => r ? JSON.parse(r.v) : null).catch(() => null),
     cf: cf.error ? { error: cf.error } : { workers: cf.viewer?.accounts?.[0]?.workers || [], d1: cf.viewer?.accounts?.[0]?.d1 || [] },
@@ -172,6 +195,7 @@ export default {
   async scheduled(ev, env) {
     const m = await monthUsage(env); if (m.error) return;
     await env.DB.prepare("INSERT OR REPLACE INTO meta (k, v) VALUES ('brake', ?)").bind(JSON.stringify(m)).run().catch(() => {});
+    if (new Date().getUTCHours() === 6) await env.DB.prepare('DELETE FROM visit WHERE d < ?').bind(spDay(Date.now() - 400 * 864e5)).run().catch(() => {}); // guarda ~13 meses
   },
   async fetch(req, env) {
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(req) });
@@ -180,6 +204,7 @@ export default {
       if (path !== '/stats' && path !== '/whoami' && (await brake(env)) >= 2) return json(req, { error: 'brake' }, 503);
       if (path === '/defs' && req.method === 'POST') return await defs(req, env);
       if (path === '/sync' && (req.method === 'GET' || req.method === 'PUT')) return await sync(req, env);
+      if (path === '/hit' && req.method === 'POST') return await hit(req, env);
       if (path === '/stats' && req.method === 'GET') return await stats(req, env);
       if (path === '/whoami' && req.method === 'GET') { const uid = await who(req, env); return json(req, { uid, owner: !!uid && uid === String(env.OWNER) }); }
       if (path === '/') return json(req, { ok: true, service: 'dni-api' });

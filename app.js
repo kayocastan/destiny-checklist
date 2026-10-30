@@ -2276,6 +2276,17 @@ document.addEventListener('click', e => {
   const del = e.target.closest('[data-gld]'); if (del) { if (!del.classList.contains('ask')) { del.classList.add('ask'); del.textContent = u().outQ; setTimeout(() => { if (del.isConnected) { del.classList.remove('ask'); del.textContent = u().glDel; } }, 3000); return; } const l = goals(); l.splice(+del.dataset.gld, 1); LS.set('dc-goals', l); render(); return; }
   const v = e.target.closest('[data-glv]'); if (v) { const g = goals()[+v.dataset.glv]; const sn = g && (LS.get('dc-goalsnap', {})[g.id] || (g.sig && savedList().find(x => x.k.endsWith('|' + g.sig)))); if (sn) { FD.q = ''; FD.results = null; openSnap(sn, g.title); return; } if (g?.sel) { FD.q = ''; FD.results = null; openFind(); showPlayer(g.sel); } }
 });
+// acesso único do dia (para o painel de status): um sinal por dia por navegador; logado, conta como a conta (vários aparelhos = 1)
+function sendHit() {
+  try {
+    if (!APIW || Date.now() < srvDown) return;
+    if (auth && !member?.id && (sendHit.n = (sendHit.n || 0) + 1) < 12) { setTimeout(sendHit, 5000); return; } // logado: espera a conta carregar
+    const day = new Date(Date.now() - 3 * 3600e3).toISOString().slice(0, 10), k = member?.id ? 'm' : 'a', last = LS.get('dc-hit', '');
+    if (last === day + k || (k === 'a' && last.startsWith(day))) return;
+    let vid = LS.get('dc-vid', ''); if (!vid) { vid = (crypto.randomUUID?.() || Math.random().toString(36).slice(2) + Date.now().toString(36)).replace(/[^\w-]/g, ''); LS.set('dc-vid', vid); }
+    fetch(APIW + '/hit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ v: k === 'm' ? 'm:' + member.id : 'a:' + vid }), keepalive: true }).then(r => { if (r.ok) LS.set('dc-hit', day + k); }).catch(() => {});
+  } catch {}
+}
 async function start() {
   try {
     status(u().loading);
@@ -2302,6 +2313,7 @@ if ('serviceWorker' in navigator) addEventListener('load', () => navigator.servi
   if (h?.error) { render(); $('list').insertAdjacentHTML('afterbegin', `<p class="notice">${esc(u().authError(h.error))}</p>`); return; }
   if (h?.auth) { auth = h.auth; LS.set('dc-auth', auth); }
   if (location.host === OLD_HOST && !auth) bungie('/GlobalAlerts/', false).catch(() => {});
+  setTimeout(sendHit, 5000);
   const pub = new URLSearchParams(location.search).get('jogador') || new URLSearchParams(location.search).get('player');
   if (auth) { render(); if (pub) openPublic(pub); await start(); if ($('finddlg').open) renderFind(); } else { render(); if (pub) openPublic(pub); }
 })();

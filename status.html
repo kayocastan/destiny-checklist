@@ -118,6 +118,17 @@ function render(d) {
     h += meterCard('Tempo de CPU (estimado)', M.cpu, LIM.mCpu, v => nf(v) + ' ms');
   }
   h += '</div></section>';
+  { const V = d.visits; if (V) {
+    const lbl = x => x.slice(8, 10) + '/' + x.slice(5, 7), since = V.since ? lbl(V.since) : '';
+    h += '<section><h2>Acessos únicos</h2><p class="note">Cada navegador conta uma vez por dia; quem está logado conta pela conta (celular + PC = 1). Sem IP nem cookies de rastreio.' + (since ? ` Contando desde ${since}.` : ' A contagem começa agora.') + '</p><div class="grid">';
+    h += tile('Hoje', nf(V.today), `${nf(V.todayLogged)} logados · ${nf(V.today - V.todayLogged)} sem login`);
+    h += tile('Últimos 7 dias', nf(V.d7), 'pessoas diferentes');
+    h += tile('Últimos 30 dias', nf(V.d30), 'pessoas diferentes');
+    h += tile('Desde o início', nf(V.total), 'pessoas diferentes');
+    h += '</div>';
+    if (V.days?.length) { const mx = Math.max(1, ...V.days.map(x => x.n)); h += `<table class="vis"><thead><tr><th>Dia</th><th>Únicos</th><th>Logados</th><th></th></tr></thead><tbody>${V.days.slice().reverse().map(x => `<tr><td>${lbl(x.d)}</td><td>${nf(x.n)}</td><td>${nf(x.l || 0)}</td><td style="width:45%"><i style="display:block;height:8px;border-radius:4px;background:var(--acc,#6cc4ff);width:${(x.n / mx * 100).toFixed(1)}%"></i></td></tr>`).join('')}</tbody></table>`; }
+    h += '</section>';
+  } }
   h += '<section><h2>Hoje (dia UTC)</h2><div class="grid">';
   h += cfOk ? tile('Pedidos ao servidor', nf(req), err ? `${nf(err)} com erro` : 'sem erros') : tile('Pedidos ao servidor', '—', 'Sem acesso ao Analytics da Cloudflare');
   h += cfOk ? tile('Leituras do banco', nf(rd), 'linhas') : '';
