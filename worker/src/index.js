@@ -90,7 +90,7 @@ async function pubPost(req, env) {
   if (old) { await env.DB.prepare('UPDATE pub SET v = ?, t = ? WHERE c = ?').bind(v, Date.now(), old.c).run(); return json(req, { c: old.c, n: await cnt(), max: PUB_PER_USER }); }
   let replaced = null;
   // passou do limite: sai o mais antigo (e o site diz qual foi); o excesso de antes do limite também sai
-  while ((await cnt()) >= PUB_PER_USER) { const o = await env.DB.prepare('SELECT c, v FROM pub WHERE uid = ? ORDER BY t LIMIT 1').bind(uid).first(); if (!o) break; try { replaced = JSON.parse(o.v)?.og?.t || o.c; } catch { replaced = o.c; } await env.DB.prepare('DELETE FROM pub WHERE c = ?').bind(o.c).run(); }
+  while ((await cnt()) >= PUB_PER_USER) { const o = await env.DB.prepare('SELECT c, v FROM pub WHERE uid = ? ORDER BY t LIMIT 1').bind(uid).first(); if (!o) break; try { replaced = JSON.parse(o.v)?.og?.t || o.c; } catch { replaced = o.c; } await env.DB.prepare('DELETE FROM pub WHERE c = ?').bind(o.c).run(); await env.DB.prepare('DELETE FROM pubimg WHERE c = ?').bind(o.c).run().catch(() => {}); }
   for (let i = 0; i < 4; i++) { const c = pubCode(); const r = await env.DB.prepare('INSERT OR IGNORE INTO pub (c, v, uid, sig, t) VALUES (?, ?, ?, ?, ?)').bind(c, v, uid, sig, Date.now()).run(); if (r.meta?.changes) return json(req, { c, n: await cnt(), max: PUB_PER_USER, replaced }); }
   return json(req, { error: 'busy' }, 503);
 }
@@ -99,12 +99,27 @@ async function pubGet(req, env, c) {
   const r = await env.DB.prepare('SELECT v, t FROM pub WHERE c = ?').bind(c).first(); if (!r) return json(req, { error: 'not found' }, 404);
   return new Response(`{"snap":${r.v},"t":${r.t}}`, { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=300', ...cors(req) } });
 }
+// imagem de prévia: só quem criou o link envia (até 450 KB, JPEG); qualquer um lê
+async function pubImgPost(req, env, c) {
+  const uid = await who(req, env); if (!uid) return json(req, { error: 'auth' }, 401);
+  if (await brake(env)) return json(req, { error: 'brake' }, 503);
+  const own = await env.DB.prepare('SELECT uid FROM pub WHERE c = ?').bind(c).first(); if (!own || own.uid !== uid) return json(req, { error: 'forbidden' }, 403);
+  const buf = new Uint8Array(await req.arrayBuffer()); if (buf.length < 1000 || buf.length > 460_000 || buf[0] !== 0xFF || buf[1] !== 0xD8) return json(req, { error: 'bad image' }, 400);
+  await env.DB.prepare('INSERT OR REPLACE INTO pubimg (c, img, t) VALUES (?, ?, ?)').bind(c, buf, Date.now()).run();
+  return json(req, { ok: true });
+}
+async function pubImgGet(req, env, c) {
+  c = c.replace(/\.jpg$/, ''); if (!/^[A-Za-z0-9]{6}$/.test(c)) return new Response('not found', { status: 404 });
+  const r = await env.DB.prepare('SELECT img, t FROM pubimg WHERE c = ?').bind(c).first(); if (!r) return new Response('not found', { status: 404 });
+  return new Response(new Uint8Array(r.img), { headers: { 'Content-Type': 'image/jpeg', 'Cache-Control': 'public, max-age=3600', ...cors(req) } });
+}
 let INDEX = null;
 const escH = x => String(x ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 async function pubPage(req, env, c) {
   if (!INDEX || Date.now() - INDEX.t > 600000) { const h = await fetch(SITES[0] + '/index.html', { cf: { cacheTtl: 300 } }).then(r => r.text()); INDEX = { h, t: Date.now() }; }
   let meta = null; if (/^[A-Za-z0-9]{6}$/.test(c)) { const r = await env.DB.prepare('SELECT v FROM pub WHERE c = ?').bind(c).first().catch(() => null); try { meta = r ? JSON.parse(r.v)?.og : null; } catch {} }
-  const title = meta?.t ? `${meta.t} · DPI` : 'Build · DPI', desc = meta?.d || 'Build de Destiny 2 compartilhada no DPI · Destiny Parallel Interface', img = /^https:\/\/www\.bungie\.net\//.test(meta?.img || '') ? meta.img : '';
+  const hasImg = meta && await env.DB.prepare('SELECT t FROM pubimg WHERE c = ?').bind(c).first().catch(() => null);
+  const title = meta?.t ? `${meta.t} · DPI` : 'Build · DPI', desc = meta?.d || 'Build de Destiny 2 compartilhada no DPI · Destiny Parallel Interface', img = hasImg ? `${SITES[0]}/bi/${c}.jpg?v=${hasImg.t}` : /^https:\/\/www\.bungie\.net\//.test(meta?.img || '') ? meta.img : '';
   const tags = `<meta property="og:type" content="website"><meta property="og:site_name" content="DPI · Destiny Parallel Interface"><meta property="og:title" content="${escH(title)}"><meta property="og:description" content="${escH(desc)}"><meta property="og:url" content="${SITES[0]}/b/${escH(c)}">${img ? `<meta property="og:image" content="${escH(img)}"><meta name="twitter:card" content="summary_large_image">` : ''}<meta name="theme-color" content="#6fd3ff">`;
   // as etiquetas de prévia que o index já tem dão lugar às da build
   const h = INDEX.h.replace(/<meta (property="og:[^"]*"|name="twitter:[^"]*")[^>]*>\s*/g, '').replace(/<title>[^<]*<\/title>/, `<title>${escH(title)}</title>`).replace(/(src|href)="(?!\/|https?:|#|data:|mailto:)/g, '$1="/').replace('</head>', tags + '</head>'); // caminhos relativos do index passam a valer a partir da raiz
@@ -256,17 +271,19 @@ export default {
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(req) });
     const path = new URL(req.url).pathname;
     try {
-      if (path !== '/stats' && path !== '/whoami' && !path.startsWith('/page/') && (await brake(env)) >= 2) return json(req, { error: 'brake' }, 503);
+      if (path !== '/stats' && path !== '/whoami' && !path.startsWith('/page/') && !(path.startsWith('/pubimg/') && req.method === 'GET') && (await brake(env)) >= 2) return json(req, { error: 'brake' }, 503);
       if (path === '/defs' && req.method === 'POST') return await defs(req, env);
       if (path === '/sync' && (req.method === 'GET' || req.method === 'PUT')) return await sync(req, env);
       if (path === '/hit' && req.method === 'POST') return await hit(req, env);
       if (path === '/pub' && req.method === 'POST') return await pubPost(req, env);
       if (path === '/sug' && req.method === 'POST') return await sugPost(req, env);
       if (path === '/sug/read' && req.method === 'POST') return await sugRead(req, env);
+      if (path.startsWith('/pubimg/') && req.method === 'POST') return await pubImgPost(req, env, path.slice(8));
+      if (path.startsWith('/pubimg/') && req.method === 'GET') return await pubImgGet(req, env, path.slice(8));
       if (path.startsWith('/pub/') && req.method === 'GET') return await pubGet(req, env, path.slice(5));
       if (path.startsWith('/page/') && req.method === 'GET') return await pubPage(req, env, path.slice(6));
       if (path === '/stats' && req.method === 'GET') return await stats(req, env);
-      if (path === '/whoami' && req.method === 'GET') { const uid = await who(req, env); return json(req, { uid, owner: !!uid && uid === String(env.OWNER) }); }
+      if (path === '/whoami' && req.method === 'GET') { const uid = await who(req, env), owner = !!uid && uid === String(env.OWNER); const sug = owner ? (await env.DB.prepare('SELECT COUNT(*) n FROM sug WHERE rd = 0').first().catch(() => null))?.n || 0 : undefined; return json(req, { uid, owner, sug }); }
       if (path === '/') return json(req, { ok: true, service: 'dni-api' });
       return json(req, { error: 'not found' }, 404);
     } catch (e) {
