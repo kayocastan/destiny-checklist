@@ -931,3 +931,8 @@ section.wo.collapsed .sec-head>p{display:block}
 .wo-sts{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .wo-st{display:grid;gap:2px;min-width:0}.wo-st small{font-size:11px;color:var(--muted)}
 .wo-st select{width:100%;font-size:13px;padding:6px 26px 6px 8px}
+/* itens concluídos: compactos, sem seta; tocar no nome abre o detalhe */
+li.is-done .it .chev{display:none}
+li.is-done>.row{min-height:0}
+li.is-done .it{padding-block:6px}
+li.is-done .it .chip{opacity:.55}
