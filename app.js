@@ -2304,7 +2304,8 @@ function wishOnSale() {
 }
 // armadura: atributo principal e secundário que você quer na peça
 function wishStatSel(x) {
-  loadStats(); const D = STATD?.d || {}, W = u();
+  if ((!STATD || STATD.lang !== lang) && !wishStatSel.busy) { wishStatSel.busy = true; entities('DestinyStatDefinition', STAT_ORDER, lang).then(d => { STATD = { lang, d }; if (tab === 'obj' || isGd()) render(); }).finally(() => { wishStatSel.busy = false; }); }
+  const D = STATD?.d || {}, W = u();
   const sel = (k, lbl) => `<label class="wo-st"><small>${esc(lbl)}</small><select class="tsort-sel" data-wst="${k}" data-wh="${x.h}"><option value="">${esc(W.wishAny)}</option>${STAT_ORDER.map(h => `<option value="${h}"${x[k] === h ? ' selected' : ''}>${esc(D[h]?.n || '…')}</option>`).join('')}</select></label>`;
   return `<div class="wo-sts">${sel('s1', W.wishSt1)}${sel('s2', W.wishSt2)}</div>`;
 }
