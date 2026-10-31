@@ -2286,9 +2286,8 @@ const STAT_EN = { weapons: 2996146975, health: 392767087, class: 1943323491, gre
 const archParse = (t, n) => { const g = re => STAT_EN[(re.exec(t || '')?.[1] || '').toLowerCase()] || null; return { an: n || '', s1: g(/Primary Stat:\s*(\w+)/i), s2: g(/Secondary Stat:\s*(\w+)/i) }; };
 function armArch(B, sockets) {
   const all = (sockets?.sockets || []).map(x => x.plugHash).filter(Boolean), h = all.find(x => B.en[x]?.pc === 'armor_archetypes');
-  if (!h) return { pl: all }; // ainda sem a definição do encaixe: busca ao favoritar
-  const t = B.en[h].d || '', g = re => STAT_EN[(re.exec(t)?.[1] || '').toLowerCase()] || null;
-  return { an: (B.loc[h] || B.en[h]).n || '', s1: g(/Primary Stat:\s*(\w+)/i), s2: g(/Secondary Stat:\s*(\w+)/i) };
+  const r = h && B.en[h].d ? archParse(B.en[h].d, (B.loc[h] || B.en[h]).n) : {};
+  return { ...r, pl: all }; // sem a descrição ainda: o clique na estrela busca o encaixe
 }
 const WEAPON_BUCKETS = [1498876634, 2465295065, 953998645], ARMOR_BUCKETS = [3448274439, 3551918588, 14239492, 20886954, 1585787867];
 const wishList = () => LS.get('dc-wish', []);
