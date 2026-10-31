@@ -1440,14 +1440,28 @@ function render() {
       ${sec.note ? `<p>${esc(sec.note)}</p>` : ''}${sec.kind ? actStrip(sec) : sec.xm ? xmStrip(sec.xm) : ''}<div class="sec-bar"><i data-sb="${sec.id}"></i></div></div>
       <ul>${sec.items.map(i => {
         const cid = 'c-' + i.id.replace(/[^a-z0-9]+/gi, '-'), first = i.c[0], rest = i.c.slice(1), more = !!(i.d || rest.length || i.loc);
-        const head = `<span class="t">${esc(i.t)}</span>${first ? `<span class="chip ${chipClass(first)}">${esc(first)}</span>` : ''}`;
-        return `<li data-li="${esc(i.id)}" data-search="${esc([i.t, i.d, i.loc, ...i.c, sec.title].join(' ').toLowerCase())}"><div class="row"><label class="ck" for="${cid}"><input type="checkbox" id="${cid}" data-id="${esc(i.id)}" aria-label="${esc(i.t)}"${i.auto ? ' checked disabled' : ''}></label>${FOCUS_ITEM_TABS.includes(sec.tab) && !isDone(i) ? focBtn('it:' + i.id) : ''}${more ? `<button class="it" type="button" aria-expanded="false">${head}<span class="chev" aria-hidden="true"></span></button>` : `<span class="it">${head}</span>`}</div>${more ? `<div class="more">${i.loc ? `<div class="loc"><span class="loc-k">${esc(U.where)}</span> ${hiLoc(esc(i.loc))}</div>` : ''}${i.tl ? `<ul class="tl">${i.tl.map(x => `<li class="${x.ok ? 'ok' : ''}"><span class="tl-i" aria-label="${x.ok ? '✓' : '○'}">${x.ok ? '✓' : ''}</span><div><b>${esc(x.n)}${x.pr ? ` <span class="tl-p">${esc(x.pr)}</span>` : ''}</b>${x.d && !x.ok ? `<small>${hiLoc(esc(x.d))}</small>` : ''}</div></li>`).join('')}</ul>` : i.d ? `<div class="d">${hiLoc(esc(i.d))}</div>` : ''}${rest.length ? `<div class="chips">${rest.map(x => `<span class="chip ${chipClass(x)}">${esc(x)}</span>`).join('')}</div>` : ''}</div>` : ''}</li>`;
+        const ich = sec.tab === 'exo' && /^x-\d+$/.test(i.id) ? 'DestinyCollectibleDefinition:' + i.id.slice(2) : sec.tab === 'cat' && /^c-\d+$/.test(i.id) ? 'DestinyRecordDefinition:' + i.id.slice(2) : '';
+        const head = `${ich ? `<span class="it-ic" data-ich="${ich}" aria-hidden="true"${ICONS[ich] ? ` style="background-image:url('${BNET}${ICONS[ich]}')"` : ''}></span>` : ''}<span class="t">${esc(i.t)}</span>${first ? `<span class="chip ${chipClass(first)}">${esc(first)}</span>` : ''}`;
+        return `<li data-li="${esc(i.id)}" data-search="${esc([i.t, i.d, i.loc, ...i.c, sec.title].join(' ').toLowerCase())}"><div class="row"><label class="ck" for="${cid}"><input type="checkbox" id="${cid}" data-id="${esc(i.id)}" aria-label="${esc(i.t)}"${i.auto ? ' checked disabled' : ''}></label>${more ? `<button class="it" type="button" aria-expanded="false">${head}<span class="chev" aria-hidden="true"></span></button>` : `<span class="it">${head}</span>`}${FOCUS_ITEM_TABS.includes(sec.tab) && !isDone(i) ? focBtn('it:' + i.id) : ''}</div>${more ? `<div class="more">${i.loc ? `<div class="loc"><span class="loc-k">${esc(U.where)}</span> ${hiLoc(esc(i.loc))}</div>` : ''}${i.tl ? `<ul class="tl">${i.tl.map(x => `<li class="${x.ok ? 'ok' : ''}"><span class="tl-i" aria-label="${x.ok ? '✓' : '○'}">${x.ok ? '✓' : ''}</span><div><b>${esc(x.n)}${x.pr ? ` <span class="tl-p">${esc(x.pr)}</span>` : ''}</b>${x.d && !x.ok ? `<small>${hiLoc(esc(x.d))}</small>` : ''}</div></li>`).join('')}</ul>` : i.d ? `<div class="d">${hiLoc(esc(i.d))}</div>` : ''}${rest.length ? `<div class="chips">${rest.map(x => `<span class="chip ${chipClass(x)}">${esc(x)}</span>`).join('')}</div>` : ''}</div>` : ''}</li>`;
       }).join('')}</ul></section>`;
   }).join('')}<p class="donebar" id="donebar" hidden><span id="donetxt"></span><button class="reset" id="togglecomplete" type="button"></button></p></div>`;
   document.querySelectorAll('#list li[data-li]').forEach(li => { if (openItems.has(li.dataset.li)) { li.classList.add('open'); li.querySelector('button.it')?.setAttribute('aria-expanded', 'true'); } });
   update(); filter();
+  if (tab === 'exo' || tab === 'cat') window.requestIdleCallback ? window.requestIdleCallback(() => loadIcons(), { timeout: 800 }) : setTimeout(loadIcons, 200);
 }
 const isDone = i => i.auto || marks.has(i.id);
+/* ícones de exóticos e catalisadores: o texto aparece na hora e a imagem chega depois (guardada no navegador para as próximas visitas) */
+const ICONS = LS.get('dc-icons', {});
+let iconsBusy = false;
+async function loadIcons() {
+  if (iconsBusy) return; const els = [...document.querySelectorAll('#list [data-ich]')].filter(e => !e.style.backgroundImage); if (!els.length) return;
+  iconsBusy = true; const by = {};
+  for (const e of els) { const [t, h] = e.dataset.ich.split(':'); if (!ICONS[e.dataset.ich]) (by[t] = by[t] || new Set()).add(+h); }
+  try { for (const [t, hs] of Object.entries(by)) { const d = await entities(t, [...hs], 'en'); for (const h of hs) if (d[h]?.ic) ICONS[t + ':' + h] = d[h].ic; } } catch {}
+  try { LS.set('dc-icons', ICONS); } catch {}
+  for (const e of document.querySelectorAll('#list [data-ich]')) { const ic = ICONS[e.dataset.ich]; if (ic && !e.style.backgroundImage) e.style.backgroundImage = `url('${BNET}${ic}')`; }
+  iconsBusy = false;
+}
 function update() {
   const U = u();
   document.querySelectorAll('#list input[data-id]').forEach(cb => { const it = findItem(cb.dataset.id); const d = it ? isDone(it) : false; cb.checked = d; cb.closest('li').classList.toggle('is-done', d); });

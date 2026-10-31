@@ -959,3 +959,9 @@ section.fo.collapsed .sec-head>p{display:block}
 .fo-go{justify-self:start;font:inherit;font-size:12.5px;color:var(--fg);background:none;border:1px solid var(--line);border-radius:999px;padding:4px 10px;cursor:pointer}
 .fo-go:hover{border-color:var(--exotic)}
 .foot-links{margin:0 0 6px}.foot-links a{color:var(--acc);font-size:13.5px}
+/* exóticos e catalisadores: ícone à esquerda do nome e ☆ na mesma linha, à direita */
+li .row:has(> .foc-b){grid-template-columns:auto minmax(0,1fr) auto;column-gap:6px}
+li .row > .foc-b{order:0;margin:0 10px 0 0;align-self:center}
+.it-ic{flex:none;width:34px;height:34px;border-radius:5px;background:var(--chip) center/cover no-repeat;margin-right:2px}
+li .it:has(.it-ic){gap:10px}
+li.is-done .it-ic{width:24px;height:24px;opacity:.6}
