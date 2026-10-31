@@ -811,3 +811,25 @@ dialog.gal{margin:auto;inset:0}
 /* Xûr: catalisadores e lendárias */
 .vd-k{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:12px 0 6px}
 .vd-more{margin-top:12px}.vd-more summary{cursor:pointer;font-size:13px;color:var(--muted);margin-bottom:6px}
+/* Correios */
+section.post .post-sum{display:flex;flex-wrap:wrap;gap:12px;margin:2px 0 0;font-size:13px;color:var(--muted)}
+section.post .post-sum b{color:var(--fg);font-family:var(--mono);font-weight:600}
+section.post .post-sum .hot b{color:var(--hard)}
+section.post.collapsed .sec-head>p.post-sum{display:flex}
+.post-warn{margin:6px 0 0;font-size:13px;color:var(--hard)}
+section.post.collapsed .post-body{display:none}
+.post-body{padding:10px 16px 14px;display:grid;gap:12px}
+.post-k{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.post-l{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px}
+.post-i{display:flex;gap:8px;align-items:center;padding:6px 8px;border-radius:8px;background:var(--chip);min-width:0}
+.post-i img,.post-noic{width:32px;height:32px;border-radius:4px;flex:none;background:rgba(255,255,255,.05)}
+.post-i span{display:grid;min-width:0}.post-i b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.post-i small{font-size:11.5px;color:var(--muted)}
+.post-i.exo{box-shadow:inset 3px 0 0 var(--exotic)}.post-i.exo b{color:var(--exotic)}
+.post-note{margin:0;font-size:12.5px;color:var(--muted)}
+/* aviso de atualização da Bungie */
+.news{grid-column:1/-1;display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1px solid color-mix(in srgb,var(--acc) 50%,transparent);background:color-mix(in srgb,var(--acc) 10%,var(--surface))}
+.news-ic{font-size:20px;color:var(--acc)}
+.news>div{flex:1;min-width:0;display:grid}.news b{font-size:14px}.news small{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.news a{font-size:13px;color:var(--acc);white-space:nowrap}
+.news-x{background:none;border:0;color:var(--muted);font-size:14px;cursor:pointer;padding:4px}
+@media (max-width:560px){.news{flex-wrap:wrap}.news small{white-space:normal}}
