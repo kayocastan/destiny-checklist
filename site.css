@@ -903,3 +903,19 @@ table.cmpg th:not(:first-child),table.cmpg td:not(:first-child){text-align:right
 .shr-m b{display:block;font-size:13.5px;font-weight:600}
 .shr-m small{display:block;font-size:12px;color:var(--muted);line-height:1.35;margin-top:2px;white-space:normal}
 .b-row.wished{box-shadow:inset 3px 0 0 var(--exotic)}
+/* rolo guardado na lista de desejos */
+.wish-roll{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.wish-roll span{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;background:var(--chip);border-radius:999px;padding:2px 8px 2px 3px;color:var(--fg)}
+.wish-roll img{width:16px;height:16px;border-radius:50%}
+/* Objetivos: lista de desejos */
+section.wo.collapsed .wo-g{display:none}
+section.wo.collapsed .sec-head>p{display:block}
+.wo-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;padding:10px 16px 14px}
+.wo-c{display:grid;gap:6px;padding:10px 12px;border-radius:10px;background:var(--chip);min-width:0}
+.wo-c.sale{box-shadow:inset 3px 0 0 var(--exotic)}
+.wo-h{display:flex;align-items:center;gap:10px}
+.wo-h img{width:38px;height:38px;border-radius:4px;flex:none}
+.wo-h span{flex:1;min-width:0;display:grid}.wo-h b{font-size:14px}.wo-h small{font-size:12px;color:var(--muted)}
+.wo-c .wish-roll span{background:var(--surface)}
+.wo-sale{margin:0;font-size:13px;color:var(--exotic);font-weight:600}
+.wo-src{margin:0;font-size:12.5px;color:var(--muted)}
