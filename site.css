@@ -919,3 +919,11 @@ section.wo.collapsed .sec-head>p{display:block}
 .wo-c .wish-roll span{background:var(--surface)}
 .wo-sale{margin:0;font-size:13px;color:var(--exotic);font-weight:600}
 .wo-src{margin:0;font-size:12.5px;color:var(--muted)}
+/* nome do item com tipo e poder embaixo (sobra espaço para a ☆ no canto) */
+.b-name{flex-wrap:nowrap}
+.b-name img{width:34px;height:34px;border-radius:4px}
+.b-nt{flex:1;min-width:0;display:grid;gap:2px}
+.b-nn{display:flex;gap:6px;align-items:center;min-width:0}
+.b-nn>span:not(.ammo){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.b-nt small{margin-left:0;white-space:normal}
+.b-name .wish-b{align-self:center}
