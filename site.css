@@ -885,3 +885,6 @@ table.cmpg th:not(:first-child),table.cmpg td:not(:first-child){text-align:right
 .vd-fi span{flex:1;min-width:0;display:grid}.vd-fi b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.vd-fi small{font-size:11.5px;color:var(--muted)}
 .vd-fi.wished{box-shadow:inset 3px 0 0 var(--exotic)}
 .b-name .wish-b{margin-left:auto;width:26px;height:26px;font-size:14px}
+/* Ao vivo: guias da atividade ao lado do nome */
+.lv-g{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap}
+.lv-g .chip{display:inline-flex;align-items:center;height:24px;box-sizing:border-box;line-height:1;text-decoration:none}

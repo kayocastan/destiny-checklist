@@ -938,7 +938,7 @@ function buildHTML(C = ownCtx()) {
   const eq = (C.p.characterEquipment?.data?.[C.cid]?.items || []).filter(i => GEAR_BUCKETS.includes(i.bucketHash)).sort((a, b) => GEAR_BUCKETS.indexOf(a.bucketHash) - GEAR_BUCKETS.indexOf(b.bucketHash));
   const chip = (h, cls) => { const d = B.loc[h] || B.en[h] || {}; return `<span class="${cls || ''}">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy">` : ''}${esc(d.n)}</span>`; };
   const plugsOf = i => { const own = B.en[i.itemHash]?.tl || ''; return (sk[i.itemInstanceId]?.sockets || []).filter(s => s.plugHash && s.isVisible !== false).map(s => s.plugHash).filter(h => { const e = B.en[h]; return pShow(e) && e.tl !== own; }); };
-  const row = (i, body) => { const d = B.loc[i.itemHash] || {}, pw = i.bucketHash === SUB_BUCKET ? 0 : inst[i.itemInstanceId]?.primaryStat?.value; return `<div class="b-row${d.tt === 6 ? ' exo' : ''}"><div class="b-name">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy">` : ''}<span>${esc(d.n)}</span>${AMMO[i.itemHash] ? `<span class="ammo" title="${esc(u().w.ammo[AMMO[i.itemHash]])}" aria-label="${esc(u().w.ammo[AMMO[i.itemHash]])}">${ammoSVG(AMMO[i.itemHash])}</span>` : ''}<small>${esc(d.tl || '')}${pw && pw > 0 ? ` · <b>${pw}</b>` : ''}</small>${BETA && WEAPON_BUCKETS.includes(i.bucketHash) ? wishBtn({ h: i.itemHash, n: d.n, ic: d.ic, tl: d.tl }) : ''}</div>${body}</div>`; };
+  const row = (i, body) => { const d = B.loc[i.itemHash] || {}, pw = i.bucketHash === SUB_BUCKET ? 0 : inst[i.itemInstanceId]?.primaryStat?.value; return `<div class="b-row${d.tt === 6 ? ' exo' : ''}"><div class="b-name">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy">` : ''}<span>${esc(d.n)}</span>${AMMO[i.itemHash] ? `<span class="ammo" title="${esc(u().w.ammo[AMMO[i.itemHash]])}" aria-label="${esc(u().w.ammo[AMMO[i.itemHash]])}">${ammoSVG(AMMO[i.itemHash])}</span>` : ''}<small>${esc(d.tl || '')}${pw && pw > 0 ? ` · <b>${pw}</b>` : ''}</small>${FX && WEAPON_BUCKETS.includes(i.bucketHash) ? wishBtn({ h: i.itemHash, n: d.n, ic: d.ic, tl: d.tl }) : ''}</div>${body}</div>`; };
   const sub = eq.find(i => i.bucketHash === SUB_BUCKET);
   let html = '';
   if (sub) {
@@ -1239,7 +1239,7 @@ function gdHTML() {
   const fav = `<article class="gd"><div class="gd-head"><h2>${esc(W.favGT)}</h2></div>${fl.length ? `<ul class="sq">${fl.map(x => { const k = x.name.lastIndexOf('#'); return `<li><button type="button" class="cl-p sq-p fav-p" data-mt="${x.type}" data-mid="${esc(x.id)}" data-name="${esc(x.name)}" title="${esc(W.seeBuild)}"><span class="sq-n">${esc(k > 0 ? x.name.slice(0, k) : x.name)}<small>${esc(k > 0 ? x.name.slice(k) : '')}</small></span><span class="sq-s">${esc([x.t, x.pw ? '✦ ' + x.pw : '', x.at ? W.seenAgo(ago(x.at)) : ''].filter(Boolean).join(' · '))}</span></button></li>`; }).join('')}</ul>` : `<p>${esc(W.favNone)}</p>`}</article>`;
   const sv = savedList();
   const saved = `<article class="gd"><div class="gd-head"><h2>${esc(W.savedT)}</h2></div>${sv.length ? `<ul class="sq">${sv.map((x, i) => `<li><button type="button" class="cl-p sq-p sv-p" data-sv="${i}" title="${esc(W.seeBuild)}"><span class="sq-n">${esc(x.title || x.t)}</span><span class="sq-s">${esc([x.title ? x.t : '', x.name, '✦ ' + (x.p.characters.data[x.cid]?.light || ''), W.savedOn(ago(x.at))].filter(Boolean).join(' · '))}</span>${x.note ? `<span class="sq-s sv-note">${esc(x.note)}</span>` : ''}</button></li>`).join('')}</ul>` : `<p>${esc(W.savedNone)}</p>`}</article>`;
-  return tab === 'gst' ? `<div class="panel">${ranks}${BETA ? cmpGHTML() : ''}${statsA}${clears}${wp}${comm}</div>` : `<div class="panel">${saved}${fav}${BETA ? wishHTML() : ''}${rec}${clan}${BETA ? clanCkHTML() : ''}${vaultHTML()}${opts}</div>`;
+  return tab === 'gst' ? `<div class="panel">${ranks}${FX ? cmpGHTML() : ''}${statsA}${clears}${wp}${comm}</div>` : `<div class="panel">${saved}${fav}${FX ? wishHTML() : ''}${rec}${clan}${FX ? clanCkHTML() : ''}${vaultHTML()}${opts}</div>`;
 }
 
 /* Título do cabeçalho: subclasse + classe ("Titã Combatente" / "Striker Titan"); se o nome da subclasse já traz a classe ("Titã Prismático"), usa só ele */
@@ -1320,10 +1320,10 @@ function vendorsHTML() {
     if (v.failed) return card('vd-' + k, v.name, W.unavailable, '', '');
     const wm = v.weapons.filter(w => w.owned === false).length;
     const sub = [v.focus?.length ? W.nFocus(v.focus.length) : '', v.weapons.length ? W.nWeapons(v.weapons.length) : '', v.other.length ? W.nOther(v.other.length) : '', v.until ? W.changesIn(cd(Date.parse(v.until) - now)) : ''].filter(Boolean).join(' · ');
-    const body = `${v.weapons.map(w => `<div class="vd-w${wishHas(w.h) ? ' wished' : ''}"><div class="vd-wh">${BETA ? wishBtn(w) : ''}${w.ic ? `<img src="${BNET}${w.ic}" alt="" loading="lazy">` : ''}<div><b>${esc(w.n)}</b><small><span class="vd-el" style="--c:${EL_COLOR[w.dt] || 'var(--muted)'}"></span>${esc(w.tl)}${w.cost ? ' · ' + esc(w.cost) : ''}</small></div>${w.owned === false ? `<span class="chip hot">${esc(W.notOwned)}</span>` : ''}</div>
+    const body = `${v.weapons.map(w => `<div class="vd-w${wishHas(w.h) ? ' wished' : ''}"><div class="vd-wh">${FX ? wishBtn(w) : ''}${w.ic ? `<img src="${BNET}${w.ic}" alt="" loading="lazy">` : ''}<div><b>${esc(w.n)}</b><small><span class="vd-el" style="--c:${EL_COLOR[w.dt] || 'var(--muted)'}"></span>${esc(w.tl)}${w.cost ? ' · ' + esc(w.cost) : ''}</small></div>${w.owned === false ? `<span class="chip hot">${esc(W.notOwned)}</span>` : ''}</div>
       <div class="vd-perks">${w.perks.map(p => `<span class="${p.k}">${p.ic ? `<img src="${BNET}${p.ic}" alt="" loading="lazy">` : ''}${esc(p.n)}</span>`).join('')}</div></div>`).join('')}
       ${v.other.length ? `<table class="vd-t">${v.other.map(o => `<tr><td><b>${esc(o.n)}</b>${o.d ? `<small>${esc(o.d)}</small>` : ''}</td><td class="n">${esc(o.cost || '')}</td></tr>`).join('')}</table>` : ''}
-      ${v.focus?.length ? `<div class="vd-k">${esc(W.focusT)}</div><div class="vd-f">${v.focus.map(f => `<div class="vd-fi${wishHas(f.h, f.n) ? ' wished' : ''}">${f.ic ? `<img src="${BNET}${f.ic}" alt="" loading="lazy">` : ''}<span><b>${esc(f.n)}</b><small>${esc(f.tl)}</small></span>${BETA ? wishBtn(f) : ''}</div>`).join('')}</div><p class="vd-note">${esc(W.focusNote)}</p>` : ''}
+      ${v.focus?.length ? `<div class="vd-k">${esc(W.focusT)}</div><div class="vd-f">${v.focus.map(f => `<div class="vd-fi${wishHas(f.h, f.n) ? ' wished' : ''}">${f.ic ? `<img src="${BNET}${f.ic}" alt="" loading="lazy">` : ''}<span><b>${esc(f.n)}</b><small>${esc(f.tl)}</small></span>${FX ? wishBtn(f) : ''}</div>`).join('')}</div><p class="vd-note">${esc(W.focusNote)}</p>` : ''}
       ${v.sh ? `<p class="vd-note">${esc(W.shaders(v.sh, v.shOwn))}</p>` : ''}${v.weapons.length ? `<p class="vd-note">${esc(W.perksGold)}</p>` : ''}`;
     return card('vd-' + k, v.name, sub, wm ? W.missN(wm) : '', body);
   }).join('');
@@ -2160,6 +2160,8 @@ async function liveMember(id, prev) {
   return { id, type, name, p, cid: ch.characterId, ch, sig, B, priv: !eq.length || !p.itemComponents?.sockets?.data };
 }
 // atividade atual → página da incursão, masmorra ou missão exótica no site (para abrir o guia dela)
+// botões de guia (vídeos e imagens) da atividade em que o grupo está
+const liveGuides = id => { const m = /^(raid|dg|xm)-(.+)$/.exec(id || ''); return m ? actYt(m[1], m[2]) : ''; };
 async function liveTarget(h, mode) {
   const xm = (defs.xmissions || []).find(m => (m.ah || []).includes(h)); let id = xm ? 'xm-' + xm.k : '';
   if (!id) { const k = (await mapActs([h], () => mode).catch(() => ({})))[h]; if (k) id = k.kind + '-' + k.k; }
@@ -2214,7 +2216,7 @@ function renderLive() {
       ${(() => { const st = m.ch.stats; if (!st || !STAT_ORDER.some(h => st[h] != null)) return ''; loadStats(); const D = STATD?.d || {}; return `<span class="lv-sts">${STAT_ORDER.map(h => `<span class="${(st[h] || 0) > 100 ? 'hi' : ''}" title="${esc(D[h]?.n || '')}">${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}<b>${st[h] || 0}</b></span>`).join('')}</span>`; })()}
       ${m.priv || !B ? '' : `<span class="lv-eq"><span class="lv-row">${WEAPON_B.map(b => eq.find(x => x.bucketHash === b)).map(x => x ? ic(x, B.en[x.itemHash]?.tt === 6 ? 'ex' : '') : '<i></i>').join('')}</span><span class="lv-row arm">${ARMOR_B.map(b => eq.find(x => x.bucketHash === b)).map(x => x ? ic(x, B.en[x.itemHash]?.tt === 6 ? 'ex' : '') : '<i></i>').join('')}</span></span>`}</button>`;
   };
-  el.innerHTML = `<div class="lv-h"><span class="lv-dot" aria-hidden="true"></span><b>${esc(U.liveT)}</b>${LIVE.act ? (LIVE.to ? `<button type="button" class="lv-go" data-jump="${LIVE.to.join(':')}">${esc(LIVE.act)} <i aria-hidden="true">→</i></button>` : `<span>${esc(LIVE.act)}</span>`) : ''}${tm ? `<small>${esc(U.liveSince(tm))}</small>` : ''}</div><div class="lv-l">${LIVE.mem.map(card).join('')}</div>`;
+  el.innerHTML = `<div class="lv-h"><span class="lv-dot" aria-hidden="true"></span><b>${esc(U.liveT)}</b>${LIVE.act ? (LIVE.to ? `<button type="button" class="lv-go" data-jump="${LIVE.to.join(':')}">${esc(LIVE.act)} <i aria-hidden="true">→</i></button>` : `<span>${esc(LIVE.act)}</span>`) : ''}${LIVE.to ? `<span class="lv-g">${liveGuides(LIVE.to[1])}</span>` : ''}${tm ? `<small>${esc(U.liveSince(tm))}</small>` : ''}</div><div class="lv-l">${LIVE.mem.map(card).join('')}</div>`;
   el.hidden = false;
 }
 $('live').addEventListener('click', e => {
