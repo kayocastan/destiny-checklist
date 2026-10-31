@@ -53,6 +53,10 @@
     {
       "source": "/beta",
       "destination": "/index.html"
+    },
+    {
+      "source": "/b/:c",
+      "destination": "https://dni-api.dni-site.workers.dev/page/:c"
     }
   ]
 }

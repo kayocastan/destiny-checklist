@@ -75,6 +75,39 @@ async function who(req, env) {
   return String(uid);
 }
 
+/* ---------- Build pública: /b/<código> ----------
+   POST /pub (logado) guarda a foto da build e devolve o código; a mesma build da mesma pessoa reaproveita o código.
+   GET /pub/<c> devolve a foto; /page/<c> é a página do site com as etiquetas de prévia (Discord, WhatsApp) já preenchidas. */
+const PUB_MAX = 120_000, PUB_PER_USER = 60;
+const pubCode = () => { const a = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789', r = crypto.getRandomValues(new Uint8Array(6)); return [...r].map(x => a[x % a.length]).join(''); };
+async function pubPost(req, env) {
+  const uid = await who(req, env); if (!uid) return json(req, { error: 'auth' }, 401);
+  if (await brake(env)) return json(req, { error: 'brake' }, 503);
+  const body = await req.json().catch(() => null); const sig = String(body?.sig || '').slice(0, 200);
+  const v = JSON.stringify(body?.snap || null); if (!body?.snap || !sig || v.length > PUB_MAX) return json(req, { error: 'bad request' }, 400);
+  const old = await env.DB.prepare('SELECT c FROM pub WHERE uid = ? AND sig = ?').bind(uid, sig).first();
+  if (old) { await env.DB.prepare('UPDATE pub SET v = ?, t = ? WHERE c = ?').bind(v, Date.now(), old.c).run(); return json(req, { c: old.c }); }
+  const n = await env.DB.prepare('SELECT COUNT(*) n FROM pub WHERE uid = ?').bind(uid).first();
+  if ((n?.n || 0) >= PUB_PER_USER) await env.DB.prepare('DELETE FROM pub WHERE c = (SELECT c FROM pub WHERE uid = ? ORDER BY t LIMIT 1)').bind(uid).run();
+  for (let i = 0; i < 4; i++) { const c = pubCode(); const r = await env.DB.prepare('INSERT OR IGNORE INTO pub (c, v, uid, sig, t) VALUES (?, ?, ?, ?, ?)').bind(c, v, uid, sig, Date.now()).run(); if (r.meta?.changes) return json(req, { c }); }
+  return json(req, { error: 'busy' }, 503);
+}
+async function pubGet(req, env, c) {
+  if (!/^[A-Za-z0-9]{6}$/.test(c)) return json(req, { error: 'not found' }, 404);
+  const r = await env.DB.prepare('SELECT v, t FROM pub WHERE c = ?').bind(c).first(); if (!r) return json(req, { error: 'not found' }, 404);
+  return new Response(`{"snap":${r.v},"t":${r.t}}`, { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=300', ...cors(req) } });
+}
+let INDEX = null;
+const escH = x => String(x ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+async function pubPage(req, env, c) {
+  if (!INDEX || Date.now() - INDEX.t > 600000) { const h = await fetch(SITES[0] + '/index.html', { cf: { cacheTtl: 300 } }).then(r => r.text()); INDEX = { h, t: Date.now() }; }
+  let meta = null; if (/^[A-Za-z0-9]{6}$/.test(c)) { const r = await env.DB.prepare('SELECT v FROM pub WHERE c = ?').bind(c).first().catch(() => null); try { meta = r ? JSON.parse(r.v)?.og : null; } catch {} }
+  const title = meta?.t ? `${meta.t} · DPI` : 'Build · DPI', desc = meta?.d || 'Build de Destiny 2 compartilhada no DPI · Destiny Parallel Interface', img = /^https:\/\/www\.bungie\.net\//.test(meta?.img || '') ? meta.img : '';
+  const tags = `<meta property="og:type" content="website"><meta property="og:site_name" content="DPI · Destiny Parallel Interface"><meta property="og:title" content="${escH(title)}"><meta property="og:description" content="${escH(desc)}"><meta property="og:url" content="${SITES[0]}/b/${escH(c)}">${img ? `<meta property="og:image" content="${escH(img)}"><meta name="twitter:card" content="summary_large_image">` : ''}<meta name="theme-color" content="#6fd3ff">`;
+  // as etiquetas de prévia que o index já tem dão lugar às da build
+  const h = INDEX.h.replace(/<meta (property="og:[^"]*"|name="twitter:[^"]*")[^>]*>\s*/g, '').replace(/<title>[^<]*<\/title>/, `<title>${escH(title)}</title>`).replace(/(src|href)="(?!\/|https?:|#|data:|mailto:)/g, '$1="/').replace('</head>', tags + '</head>'); // caminhos relativos do index passam a valer a partir da raiz
+  return new Response(h, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=300' } });
+}
 async function sync(req, env) {
   const uid = await who(req, env);
   if (!uid) return json(req, { error: 'auth' }, 401);
@@ -201,10 +234,13 @@ export default {
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(req) });
     const path = new URL(req.url).pathname;
     try {
-      if (path !== '/stats' && path !== '/whoami' && (await brake(env)) >= 2) return json(req, { error: 'brake' }, 503);
+      if (path !== '/stats' && path !== '/whoami' && !path.startsWith('/page/') && (await brake(env)) >= 2) return json(req, { error: 'brake' }, 503);
       if (path === '/defs' && req.method === 'POST') return await defs(req, env);
       if (path === '/sync' && (req.method === 'GET' || req.method === 'PUT')) return await sync(req, env);
       if (path === '/hit' && req.method === 'POST') return await hit(req, env);
+      if (path === '/pub' && req.method === 'POST') return await pubPost(req, env);
+      if (path.startsWith('/pub/') && req.method === 'GET') return await pubGet(req, env, path.slice(5));
+      if (path.startsWith('/page/') && req.method === 'GET') return await pubPage(req, env, path.slice(6));
       if (path === '/stats' && req.method === 'GET') return await stats(req, env);
       if (path === '/whoami' && req.method === 'GET') { const uid = await who(req, env); return json(req, { uid, owner: !!uid && uid === String(env.OWNER) }); }
       if (path === '/') return json(req, { ok: true, service: 'dni-api' });
