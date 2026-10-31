@@ -1259,7 +1259,7 @@ try { document.fonts.ready.then(() => fitTitle()); } catch {}
 function charTitle(cls, sn) { if (!sn) return cls; if (sn.toLowerCase().includes(cls.toLowerCase())) return sn; return lang === 'pt' ? `${cls} ${sn}` : `${sn} ${cls}`; }
 
 /* ---------- Vendedores da semana (Banshee-44 e Ada-1): armas com o rolo à venda e o que mais importa ---------- */
-const VENDORS = [[672118013, 'Banshee-44'], [3603221665, 'Lord Shaxx', false, 3459454558], [69482069, 'Zavala', false, 3756955867], [765357505, 'Saint-14', true]]; // 4º: sub-loja "Armas" (foco da semana com engrama) // Saint-14 só nos fins de semana dos Desafios de Osíris (some quando não está)
+const VENDORS = [[672118013, 'Banshee-44'], [3603221665, 'Lord Shaxx', false, 3459454558], [69482069, 'Zavala', false, 3756955867], [765357505, 'Saint-14', true, 142095858]]; // 4º: sub-loja "Armas" (foco da semana com engrama) // Saint-14 só nos fins de semana dos Desafios de Osíris (some quando não está)
 let VEND = null, vendLoading = false;
 async function loadVendors(my) {
   if (vendLoading) return; vendLoading = true;
