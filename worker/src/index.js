@@ -78,7 +78,7 @@ async function who(req, env) {
 /* ---------- Build pública: /b/<código> ----------
    POST /pub (logado) guarda a foto da build e devolve o código; a mesma build da mesma pessoa reaproveita o código.
    GET /pub/<c> devolve a foto; /page/<c> é a página do site com as etiquetas de prévia (Discord, WhatsApp) já preenchidas. */
-const PUB_MAX = 120_000, PUB_PER_USER = 60;
+const PUB_MAX = 120_000, PUB_PER_USER = 5; // até 5 links fixos por conta; o 6º substitui o mais antigo (o site avisa)
 const pubCode = () => { const a = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789', r = crypto.getRandomValues(new Uint8Array(6)); return [...r].map(x => a[x % a.length]).join(''); };
 async function pubPost(req, env) {
   const uid = await who(req, env); if (!uid) return json(req, { error: 'auth' }, 401);
@@ -86,10 +86,12 @@ async function pubPost(req, env) {
   const body = await req.json().catch(() => null); const sig = String(body?.sig || '').slice(0, 200);
   const v = JSON.stringify(body?.snap || null); if (!body?.snap || !sig || v.length > PUB_MAX) return json(req, { error: 'bad request' }, 400);
   const old = await env.DB.prepare('SELECT c FROM pub WHERE uid = ? AND sig = ?').bind(uid, sig).first();
-  if (old) { await env.DB.prepare('UPDATE pub SET v = ?, t = ? WHERE c = ?').bind(v, Date.now(), old.c).run(); return json(req, { c: old.c }); }
-  const n = await env.DB.prepare('SELECT COUNT(*) n FROM pub WHERE uid = ?').bind(uid).first();
-  if ((n?.n || 0) >= PUB_PER_USER) await env.DB.prepare('DELETE FROM pub WHERE c = (SELECT c FROM pub WHERE uid = ? ORDER BY t LIMIT 1)').bind(uid).run();
-  for (let i = 0; i < 4; i++) { const c = pubCode(); const r = await env.DB.prepare('INSERT OR IGNORE INTO pub (c, v, uid, sig, t) VALUES (?, ?, ?, ?, ?)').bind(c, v, uid, sig, Date.now()).run(); if (r.meta?.changes) return json(req, { c }); }
+  const cnt = async () => (await env.DB.prepare('SELECT COUNT(*) n FROM pub WHERE uid = ?').bind(uid).first())?.n || 0;
+  if (old) { await env.DB.prepare('UPDATE pub SET v = ?, t = ? WHERE c = ?').bind(v, Date.now(), old.c).run(); return json(req, { c: old.c, n: await cnt(), max: PUB_PER_USER }); }
+  let replaced = null;
+  // passou do limite: sai o mais antigo (e o site diz qual foi); o excesso de antes do limite também sai
+  while ((await cnt()) >= PUB_PER_USER) { const o = await env.DB.prepare('SELECT c, v FROM pub WHERE uid = ? ORDER BY t LIMIT 1').bind(uid).first(); if (!o) break; try { replaced = JSON.parse(o.v)?.og?.t || o.c; } catch { replaced = o.c; } await env.DB.prepare('DELETE FROM pub WHERE c = ?').bind(o.c).run(); }
+  for (let i = 0; i < 4; i++) { const c = pubCode(); const r = await env.DB.prepare('INSERT OR IGNORE INTO pub (c, v, uid, sig, t) VALUES (?, ?, ?, ?, ?)').bind(c, v, uid, sig, Date.now()).run(); if (r.meta?.changes) return json(req, { c, n: await cnt(), max: PUB_PER_USER, replaced }); }
   return json(req, { error: 'busy' }, 503);
 }
 async function pubGet(req, env, c) {

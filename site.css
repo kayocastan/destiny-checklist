@@ -890,3 +890,15 @@ table.cmpg th:not(:first-child),table.cmpg td:not(:first-child){text-align:right
 .lv-g .chip{display:inline-flex;align-items:center;height:24px;box-sizing:border-box;line-height:1;text-decoration:none}
 /* build pública aberta por link: sem a busca por cima */
 #finddlg.pubview .fd-t,#finddlg.pubview .fd-q,#finddlg.pubview .fd-back{display:none}
+/* menu Compartilhar */
+.shr{position:relative;display:inline-flex}
+.shr-b{position:relative}
+.shr-m{position:absolute;top:calc(100% + 6px);right:0;z-index:30;width:min(300px,86vw);display:grid;gap:2px;padding:6px;border-radius:12px;border:1px solid var(--line);background:var(--surface);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.shr-m[hidden]{display:none}
+.shr-m button{all:unset;box-sizing:border-box;display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border-radius:8px;cursor:pointer;color:var(--fg);width:100%}
+.shr-m button:hover,.shr-m button:focus-visible{background:var(--chip)}
+.shr-m button:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
+.shr-ic{flex:none;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--chip);color:var(--acc)}
+.shr-ic svg{width:16px;height:16px}
+.shr-m b{display:block;font-size:13.5px;font-weight:600}
+.shr-m small{display:block;font-size:12px;color:var(--muted);line-height:1.35;margin-top:2px;white-space:normal}
