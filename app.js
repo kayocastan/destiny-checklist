@@ -2237,11 +2237,13 @@ async function livePoll() {
   try {
     const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=1000,204`);
     saveAvail(r.characterActivities?.data);
+    const prevTo = LIVE.to, ended = () => { if (prevTo) setTimeout(() => autoRefresh(), 45000); }; // saiu de incursão/masmorra/missão: a Bungie leva ~1 min para contar; depois recarrega
     const t = r.profileTransitoryData?.data, party = t?.partyMembers || [];
-    if (!t || !party.length) { LIVE.on = false; LIVE.mem = []; renderLive(); return; }
+    if (!t || !party.length) { LIVE.on = false; LIVE.mem = []; LIVE.to = null; renderLive(); ended(); return; }
     const act = Object.values(r.characterActivities?.data || {}).sort((a, b) => new Date(b.dateActivityStarted) - new Date(a.dateActivityStarted))[0];
     LIVE.since = t.currentActivity?.startTime || act?.dateActivityStarted || null;
     if (act?.currentActivityHash) { const a = await entities('DestinyActivityDefinition', [act.currentActivityHash], lang); LIVE.act = a[act.currentActivityHash]?.n || ''; LIVE.to = await liveTarget(act.currentActivityHash, act.currentActivityModeType); } else { LIVE.act = ''; LIVE.to = null; }
+    if (prevTo && (!LIVE.to || LIVE.to.join() !== prevTo.join())) ended();
     // você primeiro, depois o resto do grupo
     const ids = [...new Set([member.id, ...party.map(x => x.membershipId)])];
     const old = Object.fromEntries(LIVE.mem.map(m => [m.id, m]));
@@ -2252,7 +2254,14 @@ async function livePoll() {
   finally { LIVE.busy = false; }
 }
 function liveStart() { clearInterval(LIVE.timer); livePoll(); LIVE.timer = setInterval(livePoll, 30000); }
-document.addEventListener('visibilitychange', () => { if (!document.hidden && LIVE.timer) livePoll(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden && LIVE.timer) livePoll(); if (!document.hidden && loadedAt && Date.now() - loadedAt > 5 * 60000) autoRefresh(); });
+// recarrega os dados da conta sozinho: ao voltar para a aba depois de 5 min e logo depois de terminar uma atividade (no máximo a cada 2 min)
+let autoT = 0;
+function autoRefresh() {
+  if (!auth || !member || document.hidden || Date.now() - autoT < 120000) return; autoT = Date.now();
+  SESSION = null; if (ACTH) ACTH.t = 0; // histórico de incursões/masmorras também (tempo, conclusões)
+  start();
+}
 function renderLive() {
   const el = $('live'); if (!el) return;
   if (!(auth && profile) || !LIVE.on || !LIVE.mem.length) { el.hidden = true; el.innerHTML = ''; return; }
