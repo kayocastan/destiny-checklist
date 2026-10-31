@@ -1646,13 +1646,44 @@ async function pubMeta(C) {
 // prévia 1200×630: o topo da imagem da build (cabeçalho, atributos, subclasse e armas), feita aqui no navegador e guardada no servidor
 async function pubPreview(C, code) {
   try {
-    const src = await buildShareCanvas(C, 1), out = document.createElement('canvas'); out.width = 1200; out.height = 630;
-    const g = out.getContext('2d'); g.fillStyle = '#0d1219'; g.fillRect(0, 0, 1200, 630);
-    const k = 1200 / src.width; g.drawImage(src, 0, 0, src.width, Math.min(src.height, 630 / k), 0, 0, 1200, Math.min(src.height * k, 630));
-    let q = 0.86, blob; do { blob = await new Promise(r => out.toBlob(r, 'image/jpeg', q)); q -= 0.12; } while (blob && blob.size > 440000 && q > 0.4);
+    const out = await previewCard(C); if (!out) return;
+    let q = 0.88, blob; do { blob = await new Promise(r => out.toBlob(r, 'image/jpeg', q)); q -= 0.12; } while (blob && blob.size > 440000 && q > 0.4);
     if (!blob) return;
     await fetch(APIW + '/pubimg/' + code, { method: 'POST', headers: { 'Content-Type': 'image/jpeg', Authorization: 'Bearer ' + await token(), 'X-API-Key': cfg.apiKey }, body: blob });
   } catch {}
+}
+// cartão 1200×630: emblema, nome, classe/subclasse e luz; os 9 itens equipados (exóticos com borda dourada); os 6 atributos; os exóticos por nome
+async function previewCard(C) {
+  const B = C.B, ch = C.p.characters.data[C.cid]; if (!B || !ch) return null;
+  try { await Promise.all(['700 40px Rajdhani', '500 20px "IBM Plex Sans"', '600 20px "IBM Plex Sans"', '500 20px "IBM Plex Mono"'].map(f => document.fonts.load(f))); } catch {}
+  const def = h => B.loc[h] || B.en[h] || {}, statDefs = await entities('DestinyStatDefinition', STAT_ORDER, lang).catch(() => ({}));
+  const eq = (C.p.characterEquipment?.data?.[C.cid]?.items || []).filter(i => GEAR_BUCKETS.includes(i.bucketHash)).sort((a, b) => GEAR_BUCKETS.indexOf(a.bucketHash) - GEAR_BUCKETS.indexOf(b.bucketHash));
+  const sub = eq.find(i => i.bucketHash === SUB_BUCKET), [acc] = ELEMENT_ACC[ELEMENTS[B.en[sub?.itemHash]?.dt]] || ELEMENT_ACC.arc;
+  const emDef = EMBLEMS[ch.emblemHash] || (EMBLEMS[ch.emblemHash] = await bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${ch.emblemHash}/`, false).catch(() => ({})));
+  const [bg, emIc, ...icons] = await Promise.all([loadImg(ch.emblemBackgroundPath), loadImg(emDef.displayProperties?.icon), ...eq.map(i => loadImg(def(i.itemHash).ic))]);
+  const stIc = await Promise.all(STAT_ORDER.map(h => loadImg(statDefs[h]?.ic)));
+  const cv = document.createElement('canvas'); cv.width = 1200; cv.height = 630; const g = cv.getContext('2d');
+  g.fillStyle = '#0d1219'; g.fillRect(0, 0, 1200, 630);
+  if (bg) { g.globalAlpha = .55; g.drawImage(bg, 0, 0, 1200, 1200 * bg.height / bg.width); g.globalAlpha = 1; }
+  const grd = g.createLinearGradient(0, 0, 0, 630); grd.addColorStop(0, 'rgba(13,18,25,.35)'); grd.addColorStop(.42, 'rgba(13,18,25,.92)'); grd.addColorStop(1, '#0d1219'); g.fillStyle = grd; g.fillRect(0, 0, 1200, 630);
+  g.fillStyle = acc; g.fillRect(0, 0, 1200, 6);
+  // cabeçalho
+  if (emIc) g.drawImage(emIc, 56, 52, 112, 112);
+  const title = charTitle(u().classes[ch.classType] || '', def(sub?.itemHash).n), name = String(C.name || '').replace(/#\d+$/, '').split(' · ')[0];
+  g.fillStyle = '#9fb0c2'; g.font = '500 22px "IBM Plex Mono"'; g.fillText(name.toUpperCase(), 192, 86);
+  g.fillStyle = '#ffffff'; g.font = '700 64px Rajdhani'; g.fillText(title, 190, 148);
+  g.textAlign = 'right'; g.fillStyle = '#f2d36b'; g.font = '700 64px Rajdhani'; g.fillText('✦ ' + (ch.light || ''), 1144, 130); g.textAlign = 'left';
+  // itens equipados
+  const S = 96, gap = 18, x0 = (1200 - (eq.length * S + (eq.length - 1) * gap)) / 2, y0 = 228;
+  eq.forEach((i, k) => { const x = x0 + k * (S + gap), exo = def(i.itemHash).tt === 6; g.fillStyle = '#18222e'; g.fillRect(x, y0, S, S); if (icons[k]) g.drawImage(icons[k], x, y0, S, S); g.lineWidth = exo ? 4 : 2; g.strokeStyle = exo ? '#e8c06a' : 'rgba(255,255,255,.22)'; g.strokeRect(x + g.lineWidth / 2, y0 + g.lineWidth / 2, S - g.lineWidth, S - g.lineWidth); });
+  // exóticos por nome
+  const ex = eq.filter(i => def(i.itemHash).tt === 6 && i.bucketHash !== SUB_BUCKET).map(i => def(i.itemHash).n).filter(Boolean);
+  if (ex.length) { g.textAlign = 'center'; g.fillStyle = '#e8c06a'; g.font = '600 26px "IBM Plex Sans"'; g.fillText(ex.join('  ·  '), 600, 372); g.textAlign = 'left'; }
+  // atributos
+  const st = statsOf(C);
+  if (st) { const cw = 172, sx = (1200 - cw * 6 - 12 * 5) / 2; STAT_ORDER.forEach((h, k) => { const x = sx + k * (cw + 12), y = 418, v = st[h] || 0; g.fillStyle = 'rgba(255,255,255,.06)'; g.fillRect(x, y, cw, 112); if (stIc[k]) g.drawImage(stIc[k], x + 16, y + 18, 34, 34); g.fillStyle = v > 100 ? '#f2d36b' : '#ffffff'; g.font = '700 46px Rajdhani'; g.fillText(String(v), x + 60, y + 52); g.fillStyle = '#9fb0c2'; g.font = '500 19px "IBM Plex Sans"'; g.fillText((statDefs[h]?.n || '').slice(0, 14), x + 16, y + 88); g.fillStyle = 'rgba(255,255,255,.1)'; g.fillRect(x + 16, y + 98, cw - 32, 5); g.fillStyle = acc; g.fillRect(x + 16, y + 98, (cw - 32) * Math.min(1, v / 200), 5); }); }
+  g.fillStyle = '#6f8091'; g.font = '500 18px "IBM Plex Mono"'; g.textAlign = 'right'; g.fillText('DPI · destinyparallel.vercel.app', 1144, 600); g.textAlign = 'left';
+  return cv;
 }
 async function sharePub(C, item) {
   if (!C?.p || !C.B || !APIW) return; const W = u(), btn = item.closest('.shr')?.querySelector('.shr-b') || item;
