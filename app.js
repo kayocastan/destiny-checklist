@@ -1604,7 +1604,8 @@ async function pubMeta(C) {
   const B = C.B, ch = C.p.characters.data[C.cid], eq = C.p.characterEquipment.data[C.cid].items, d = h => B?.loc?.[h] || B?.en?.[h] || {};
   const sub = eq.find(i => i.bucketHash === SUB_BUCKET), exo = eq.filter(i => d(i.itemHash).tt === 6 && GEAR_BUCKETS.includes(i.bucketHash));
   const name = String(C.name || '').replace(/#\d+$/, '').split(' · ')[0], title = `${charTitle(u().classes[ch.classType] || '', d(sub?.itemHash).n)} · ${name}`;
-  const st = statsOf(C), stTxt = st ? STAT_ORDER.map(h => (STATD?.d?.[h]?.n || '').slice(0, 3) + ' ' + (st[h] || 0)).join(' · ') : '';
+  if (!STATD) { try { STATD = { lang, d: await entities('DestinyStatDefinition', STAT_ORDER, lang) }; } catch {} }
+  const st = statsOf(C), stTxt = st ? STAT_ORDER.map(h => `${STATD?.d?.[h]?.n || ''} ${st[h] || 0}`.trim()).join(' · ') : '';
   const desc = [ch.light ? '✦ ' + ch.light : '', exo.map(i => d(i.itemHash).n).filter(Boolean).join(' + '), stTxt].filter(Boolean).join(' · ');
   let img = ''; for (const i of exo) { try { const x = await bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${i.itemHash}/`, false); if (x.screenshot) { img = BNET + x.screenshot; break; } } catch {} }
   return { t: title, d: desc, img };
@@ -1630,7 +1631,7 @@ async function openPub() {
   try {
     const j = await fetch(APIW + '/pub/' + m[1]).then(r => r.ok ? r.json() : null); if (!j?.snap) throw 0;
     FD.q = ''; FD.results = null; openSnap(j.snap, j.snap.title || j.snap.og?.t);
-    const d = $('finddlg'); d.addEventListener('close', () => { if (/^\/b\//.test(location.pathname)) history.replaceState(null, '', '/'); }, { once: true });
+    const d = $('finddlg'); d.classList.add('pubview'); d.addEventListener('close', () => { d.classList.remove('pubview'); if (/^\/b\//.test(location.pathname)) history.replaceState(null, '', '/'); }, { once: true });
   } catch { history.replaceState(null, '', '/'); }
 }
 async function copyLink(name, btn) {
