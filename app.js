@@ -662,7 +662,7 @@ function build() {
   if (FX) {
     for (const x of out) if (x.tab === 'obj' && /^(contracts|quests|nearcats|neartitles)/.test(x.id)) x.tab = 'prog';
     out.push(S('obj', 'goals', '', null, [], { html: true }));
-    if (BETA) out.push(S('obj', 'post', '', null, [], { html: true }));
+    out.push(S('obj', 'post', '', null, [], { html: true }));
   }
   SECTIONS = out; SECTIONS_PREV = out;
   // Loadouts
@@ -1259,7 +1259,7 @@ try { document.fonts.ready.then(() => fitTitle()); } catch {}
 function charTitle(cls, sn) { if (!sn) return cls; if (sn.toLowerCase().includes(cls.toLowerCase())) return sn; return lang === 'pt' ? `${cls} ${sn}` : `${sn} ${cls}`; }
 
 /* ---------- Vendedores da semana (Banshee-44 e Ada-1): armas com o rolo à venda e o que mais importa ---------- */
-const VENDORS = [[672118013, 'Banshee-44'], [350061650, 'Ada-1']];
+const VENDORS = [[672118013, 'Banshee-44'], [3603221665, 'Lord Shaxx'], [69482069, 'Zavala'], [765357505, 'Saint-14', true]]; // Saint-14 só nos fins de semana dos Desafios de Osíris (some quando não está)
 let VEND = null, vendLoading = false;
 async function loadVendors(my) {
   if (vendLoading) return; vendLoading = true;
@@ -1290,8 +1290,8 @@ async function loadVendors(my) {
           weapons.push({ n: d.n, tl: d.tl, ic: d.ic, dt: e.dt, owned, perks: ps.map(h => ({ n: loc[h]?.n || en[h].n, ic: loc[h]?.ic || en[h].ic, k: kind(h) })), cost });
         } else other.push({ n: d.n, d: (d.d || '').replace(/\{var:\d+\}/g, '…').split('\n')[0], ic: d.ic, cost });
       }
-      out[vi] = { name: vname, until: r.vendor?.data?.nextRefreshDate, weapons, other, sh, shOwn };
-    } catch { out[vi] = { name: vname, failed: true }; }
+      out[vi] = { opt: VENDORS[vi][2], name: vname, until: r.vendor?.data?.nextRefreshDate, weapons, other, sh, shOwn };
+    } catch { out[vi] = { opt: VENDORS[vi][2], name: vname, failed: true }; }
   }));
   vendLoading = false; if (cid !== charId) return;
   VEND = out.filter(Boolean); if (tab === 'vend') render();
@@ -1310,8 +1310,9 @@ function vendorsHTML() {
   const xMiss = xItems.filter(x => miss.includes(x.h)).length + (have.b ? xCats.filter(xurCatMissing).length : 0);
   const xur = card('vd-xur', 'Xûr', xu ? W.xurSub2(xItems.length, cd(Date.parse(XUR.until) - now), u().classes[cls]) : (XUR ? W.xurGoneShort : u().loadingDefs), xMiss ? W.missN(xMiss) : '',
     xu ? `<div class="vd-x">${xItems.map(x => `<div class="vd-xi${miss.includes(x.h) ? ' miss' : ''}">${x.ic ? `<img src="${BNET}${x.ic}" alt="" loading="lazy">` : ''}<div><b>${esc(x.n)}</b><small>${esc(x.tl)}${x.cost ? ` · ${x.cost} ${esc(W.coins)}` : ''}</small></div>${miss.includes(x.h) ? `<span class="chip hot">${esc(x.why === 'held' ? W.notHeld : W.notOwned)}</span>` : ''}</div>`).join('')}</div>${xCats.length ? `<div class="vd-k">${esc(W.xurCats)}</div><div class="vd-x">${xCats.map(x => { const m = have.b && xurCatMissing(x); return `<div class="vd-xi${m ? ' miss' : ''}">${x.ic ? `<img src="${BNET}${x.ic}" alt="" loading="lazy">` : ''}<div><b>${esc(x.n)}</b><small>${x.cost ? `${x.cost} ${esc(W.coins)}` : ''}</small></div>${m ? `<span class="chip hot">${esc(W.notOwned)}</span>` : ''}</div>`; }).join('')}</div>` : ''}${xLeg.length ? `<details class="vd-more"><summary>${esc(W.xurLeg(xLeg.length))}</summary><div class="vd-x">${xLeg.map(x => `<div class="vd-xi">${x.ic ? `<img src="${BNET}${x.ic}" alt="" loading="lazy">` : ''}<div><b>${esc(x.n)}</b><small>${esc(x.tl)}${x.cost ? ` · ${x.cost} ${esc(W.coins)}` : ''}</small></div></div>`).join('')}</div></details>` : ''}${have.c ? `<p class="vd-note">${esc(W.coinsHave(coins()))}</p>` : ''}` : `<p class="vd-note">${esc(XUR ? W.xurGone : u().loadingDefs)}</p>`);
-  if (!VEND) return xur + VENDORS.map(([, n], k) => card('vd-' + k, n, u().loadingDefs, '', '')).join('');
+  if (!VEND) return xur + VENDORS.filter(v => !v[2]).map(([, n], k) => card('vd-' + k, n, u().loadingDefs, '', '')).join('');
   const others = VEND.map((v, k) => {
+    if (v.opt && (v.failed || (!v.weapons.length && !v.other.length))) return '';
     if (v.failed) return card('vd-' + k, v.name, W.unavailable, '', '');
     const wm = v.weapons.filter(w => w.owned === false).length;
     const sub = [v.weapons.length ? W.nWeapons(v.weapons.length) : '', v.other.length ? W.nOther(v.other.length) : '', v.until ? W.changesIn(cd(Date.parse(v.until) - now)) : ''].filter(Boolean).join(' · ');
@@ -1420,7 +1421,7 @@ function render() {
   if (tab === 'obj' && have.a && member) loadSession();
   if ((tab === 'raid' || tab === 'dg' || tab === 'xm') && have.a && member) loadActHist();
   if (tab === 'xm') loadXmRec();
-  $('list').innerHTML = `<div class="panel">${tab === 'obj' && BETA ? newsHTML() : ''}${tab === 'obj' ? sessHTML() : ''}${wkBar}${tsBar}${secs.map(sec => {
+  $('list').innerHTML = `<div class="panel">${tab === 'obj' ? newsHTML() : ''}${tab === 'obj' ? sessHTML() : ''}${wkBar}${tsBar}${secs.map(sec => {
     if (sec.html) return sec.id === 'vendors' ? vendorsHTML() : sec.id === 'xmissions' ? xmHTML() : sec.id === 'goals' ? goalsHTML() : sec.id === 'post' ? postHTML() : '';
     if (FX && sec.id === 'week' && sec.items.length) return weekHTML(sec);
     if (sec.empty) return `<p class="empty-msg${/…$/.test(sec.note || '') ? ' wait' : ''}">${esc(sec.note)}</p>`;
@@ -2224,7 +2225,8 @@ function postHTML() {
   if (!have.c || !profile?.characterInventories?.data) return '';
   const W = u(), chars = Object.entries(profile.characters.data), per = chars.map(([cid, ch]) => ({ cid, ch, items: (profile.characterInventories.data[cid]?.items || []).filter(i => i.bucketHash === POST_BUCKET) }));
   const total = per.reduce((t, x) => t + x.items.length, 0);
-  if (!total) return `<section data-sec="post" class="keep post post-empty"><div class="sec-head"><div class="sec-title"><div class="sec-name"><h2>✉ ${esc(W.postT)}</h2></div><span class="count">0</span></div><p class="post-sum">${esc(W.postEmpty)}</p></div></section>`;
+  if (!total) return '';
+  if (false) return `<section data-sec="post" class="keep post post-empty"><div class="sec-head"><div class="sec-title"><div class="sec-name"><h2>✉ ${esc(W.postT)}</h2></div><span class="count">0</span></div><p class="post-sum">${esc(W.postEmpty)}</p></div></section>`;
   const need = [...new Set(per.flatMap(x => x.items.map(i => i.itemHash)))].filter(h => !POSTN[h]);
   if (need.length && !postHTML.busy) { postHTML.busy = true; entities('DestinyInventoryItemDefinition', need, lang === 'pt' ? 'pt' : 'en').then(m => { Object.assign(POSTN, m); postHTML.busy = false; if (tab === 'obj') render(); }).catch(() => { postHTML.busy = false; }); }
   const open = openSecs.has('post'), full = per.some(x => x.items.length >= 15);
