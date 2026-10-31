@@ -32,7 +32,7 @@ const UI = {
   pt: {
     hide: 'Ocultar feitos', search: 'Buscar por nome ou origem', refresh: 'Atualizar', logout: 'Sair',
     disclaimer: 'Dados lidos da sua conta pela API oficial da Bungie. Este site não é afiliado à Bungie.',
-    loadouts: 'Loadouts', checklist: 'Central', outQ: 'Confirmar?', liveT: 'Ao vivo', liveYou: 'você', liveSince: t => `desde ${t}`, livePriv: 'Build privada', liveTap: 'Toque para ver a build completa', statsT: 'Atributos', glT: 'Metas de build', ssRec: 'Novo recorde', ssRecBest: 'seu melhor tempo até hoje', ssRecSub: (o, d) => `antes ${o} · ${d} mais rápido`, ssSolo: 'Solo', ssSoloFl: 'Solo sem morrer', wkFeatT: 'Em destaque', wkFull: 'Abrir página', wkAllDone: 'Tudo feito aqui.', wkRwSt: { red: 'resgatada', earn: 'pronta para resgatar', todo: 'falta fazer' }, wkKind: { ch: 'Desafio', rw: 'Recompensas', q: 'Missão' }, glNote: 'Builds que você quer montar: cada item se marca sozinho quando você libera ou pega.', glAdd: n => `Faltam ${n} itens para você usar esta build.`, glBtn: '＋ Virar objetivo', glDone: 'Já é um objetivo', glView: 'Ver build', glDel: 'Remover', glAt: d => `adicionada em ${d}`, glSet: (n, k) => `Conjunto ${n}: ${k} ${k === 1 ? 'peça' : 'peças'}`, glSetSrc: 'qualquer peça do conjunto, para os bônus', glRef: 'Atributos da build', glYou: 'você', glNone: 'Nenhuma meta ainda. Na comparação de builds, use “Virar objetivo” no que falta.', glSrcPlug: 'Liberar no menu da subclasse', glG: { asp: 'Aspectos', fr: 'Fragmentos', ab: 'Habilidades', w: 'Armas', a: 'Armadura' }, tsK: 'Ordenar', ytGuide: 'Guia em vídeo', postT: 'Correios', postEmpty: 'Nada parado nos correios dos seus personagens.', postFull: 'Correio quase cheio: com 21 itens, o que chegar depois se perde.', postNote: 'Pegue no Postmaster, na Torre. Os exóticos aparecem em dourado.', newsT: t => `Destiny 2 atualizou: ${t.replace(/^Destiny 2\s*/i, '')}`, newsAgo: d => d <= 0 ? 'hoje' : d === 1 ? 'ontem' : `há ${d} dias`, newsRead: 'Ler as notas ↗', ytMany: n => `Vídeos (${n})`, giBtn: n => `Imagens (${n})`, giFull: 'Tamanho original', giClose: 'Fechar', tsO: { tier: 'Dificuldade', wpn: 'Falta arma', cat: 'Falta catalisador', near: 'Quase lá', low: 'Menos feitos', name: 'A–Z' }, tsNone: 'Nada aqui com esse filtro.', statsHi: 'acima de 100: bônus extra',
+    loadouts: 'Loadouts', checklist: 'Central', outQ: 'Confirmar?', liveT: 'Ao vivo', liveYou: 'você', liveSince: t => `desde ${t}`, livePriv: 'Build privada', liveTap: 'Toque para ver a build completa', statsT: 'Atributos', glT: 'Metas de build', ssRec: 'Novo recorde', ssRecBest: 'seu melhor tempo até hoje', ssRecSub: (o, d) => `antes ${o} · ${d} mais rápido`, ssSolo: 'Solo', ssSoloFl: 'Solo sem morrer', wkFeatT: 'Em destaque', wkFull: 'Abrir página', wkAllDone: 'Tudo feito aqui.', wkRwSt: { red: 'resgatada', earn: 'pronta para resgatar', todo: 'falta fazer' }, wkKind: { ch: 'Desafio', rw: 'Recompensas', q: 'Missão' }, glNote: 'Builds que você quer montar: cada item se marca sozinho quando você libera ou pega.', glAdd: n => `Faltam ${n} itens para você usar esta build.`, glBtn: '＋ Virar objetivo', glDone: 'Já é um objetivo', glView: 'Ver build', glDel: 'Remover', glAt: d => `adicionada em ${d}`, glSet: (n, k) => `Conjunto ${n}: ${k} ${k === 1 ? 'peça' : 'peças'}`, glSetSrc: 'qualquer peça do conjunto, para os bônus', glRef: 'Atributos da build', glYou: 'você', glNone: 'Nenhuma meta ainda. Na comparação de builds, use “Virar objetivo” no que falta.', glSrcPlug: 'Liberar no menu da subclasse', glG: { asp: 'Aspectos', fr: 'Fragmentos', ab: 'Habilidades', w: 'Armas', a: 'Armadura' }, tsK: 'Ordenar', ytGuide: 'Guia em vídeo', postT: 'Correios', wishT: 'Lista de desejos', wishShort: 'Desejo', wishNote: 'Toque na ☆ de uma arma nos vendedores para guardar aqui. Quando ela estiver à venda, aparece em Hoje.', wishNone: 'Nada na lista ainda.', wishSale: who => `à venda agora com ${who}`, todayT: 'Hoje', todayReset: t => `Reseta em ${t} (14h de Brasília).`, todayNone: 'Nenhuma arma nova nos vendedores hoje.', todayNote: 'Armas que os vendedores trocam todo dia; ☆ guarda na lista de desejos.', clckT: 'Checklist do clã', clckNote: 'Quem do clã já fez cada incursão e masmorra, para montar grupos de primeira vez.', clckBtn: n => `Carregar (${n} membros)`, clckLoading: (a, b) => `Carregando ${a}/${b}…`, clckNever: 'Nunca fizeram:', clckAll: 'Todo mundo já fez.', clckPriv: n => n ? `${n} com perfil privado ficaram de fora.` : '', clckRe: 'Atualizar', cmpgT: 'Comparar guardiões', cmpgNote: 'Conclusões de cada incursão e masmorra, lado a lado.', cmpgPick: 'Escolha um favorito ou alguém do clã…', cmpgYou: 'Você', cmpgTot: 'Total', cmpgPriv: 'Esse guardião tem o perfil privado.', postEmpty: 'Nada parado nos correios dos seus personagens.', postFull: 'Correio quase cheio: com 21 itens, o que chegar depois se perde.', postNote: 'Pegue no Postmaster, na Torre. Os exóticos aparecem em dourado.', newsT: t => `Destiny 2 atualizou: ${t.replace(/^Destiny 2\s*/i, '')}`, newsAgo: d => d <= 0 ? 'hoje' : d === 1 ? 'ontem' : `há ${d} dias`, newsRead: 'Ler as notas ↗', ytMany: n => `Vídeos (${n})`, giBtn: n => `Imagens (${n})`, giFull: 'Tamanho original', giClose: 'Fechar', tsO: { tier: 'Dificuldade', wpn: 'Falta arma', cat: 'Falta catalisador', near: 'Quase lá', low: 'Menos feitos', name: 'A–Z' }, tsNone: 'Nada aqui com esse filtro.', statsHi: 'acima de 100: bônus extra',
     tabs: { obj: 'Objetivos', act: 'Atividades', drops: 'Arsenal', gd: 'Guardião' },
     subs: { obj: 'Principal', prog: 'Em andamento', camp: 'Campanhas', raid: 'Incursões', dg: 'Masmorras', xm: 'Missões exóticas', tit: 'Títulos', exo: 'Exóticos', cat: 'Catalisadores', vend: 'Vendedores', gd: 'Builds e clã', gst: 'Estatísticas' },
     heroTitle: 'Central do Guardião', heroText: 'Entre com a sua conta Bungie.net para verificar seus objetivos, acompanhar a rotação semanal, completar seu arsenal exótico e compartilhar suas builds.', lsQ: 'Buscar guardião: Nome#1234', lsBtn: 'Buscar', lsHint: 'Veja a build equipada de qualquer jogador, sem precisar entrar.',
@@ -87,7 +87,7 @@ const UI = {
   en: {
     hide: 'Hide done', search: 'Search by name or source', refresh: 'Refresh', logout: 'Sign out',
     disclaimer: 'Data read from your account through the official Bungie API. This site is not affiliated with Bungie.',
-    loadouts: 'Loadouts', checklist: 'Hub', outQ: 'Confirm?', liveT: 'Live', liveYou: 'you', liveSince: t => `since ${t}`, livePriv: 'Private build', liveTap: 'Tap to see the full build', statsT: 'Stats', glT: 'Build goals', ssRec: 'New record', ssRecBest: 'your best time ever', ssRecSub: (o, d) => `was ${o} · ${d} faster`, ssSolo: 'Solo', ssSoloFl: 'Solo flawless', wkFeatT: 'Featured', wkFull: 'Open page', wkAllDone: 'All done here.', wkRwSt: { red: 'claimed', earn: 'ready to claim', todo: 'to do' }, wkKind: { ch: 'Challenge', rw: 'Rewards', q: 'Quest' }, glNote: 'Builds you want to put together: each item checks itself off when you unlock or get it.', glAdd: n => `You're missing ${n} items to run this build.`, glBtn: '＋ Make it a goal', glDone: 'Already a goal', glView: 'View build', glDel: 'Remove', glAt: d => `added ${d}`, glSet: (n, k) => `${n} set: ${k} ${k === 1 ? 'piece' : 'pieces'}`, glSetSrc: 'any piece of the set, for the bonuses', glRef: 'Build stats', glYou: 'you', glNone: 'No goals yet. In build comparison, use “Make it a goal” on what is missing.', glSrcPlug: 'Unlock in the subclass menu', glG: { asp: 'Aspects', fr: 'Fragments', ab: 'Abilities', w: 'Weapons', a: 'Armor' }, tsK: 'Sort', ytGuide: 'Video guide', postT: 'Postmaster', postEmpty: 'Nothing waiting at the Postmaster on your characters.', postFull: 'Postmaster almost full: at 21 items, anything new is lost.', postNote: 'Pick them up from the Postmaster in the Tower. Gold ones are exotics.', newsT: t => `Destiny 2 updated: ${t.replace(/^Destiny 2\s*/i, '')}`, newsAgo: d => d <= 0 ? 'today' : d === 1 ? 'yesterday' : `${d} days ago`, newsRead: 'Read the notes ↗', ytMany: n => `Videos (${n})`, giBtn: n => `Images (${n})`, giFull: 'Full size', giClose: 'Close', tsO: { tier: 'Difficulty', wpn: 'Missing weapon', cat: 'Missing catalyst', near: 'Almost done', low: 'Least done', name: 'A–Z' }, tsNone: 'Nothing here with this filter.', statsHi: 'above 100: extra bonus',
+    loadouts: 'Loadouts', checklist: 'Hub', outQ: 'Confirm?', liveT: 'Live', liveYou: 'you', liveSince: t => `since ${t}`, livePriv: 'Private build', liveTap: 'Tap to see the full build', statsT: 'Stats', glT: 'Build goals', ssRec: 'New record', ssRecBest: 'your best time ever', ssRecSub: (o, d) => `was ${o} · ${d} faster`, ssSolo: 'Solo', ssSoloFl: 'Solo flawless', wkFeatT: 'Featured', wkFull: 'Open page', wkAllDone: 'All done here.', wkRwSt: { red: 'claimed', earn: 'ready to claim', todo: 'to do' }, wkKind: { ch: 'Challenge', rw: 'Rewards', q: 'Quest' }, glNote: 'Builds you want to put together: each item checks itself off when you unlock or get it.', glAdd: n => `You're missing ${n} items to run this build.`, glBtn: '＋ Make it a goal', glDone: 'Already a goal', glView: 'View build', glDel: 'Remove', glAt: d => `added ${d}`, glSet: (n, k) => `${n} set: ${k} ${k === 1 ? 'piece' : 'pieces'}`, glSetSrc: 'any piece of the set, for the bonuses', glRef: 'Build stats', glYou: 'you', glNone: 'No goals yet. In build comparison, use “Make it a goal” on what is missing.', glSrcPlug: 'Unlock in the subclass menu', glG: { asp: 'Aspects', fr: 'Fragments', ab: 'Abilities', w: 'Weapons', a: 'Armor' }, tsK: 'Sort', ytGuide: 'Video guide', postT: 'Postmaster', wishT: 'Wishlist', wishShort: 'Wish', wishNote: 'Tap the ☆ on a vendor weapon to save it here. When it is for sale, it shows up in Today.', wishNone: 'Nothing on the list yet.', wishSale: who => `for sale now at ${who}`, todayT: 'Today', todayReset: t => `Resets in ${t} (17:00 UTC).`, todayNone: 'No new weapons at the vendors today.', todayNote: 'Weapons the vendors swap every day; ☆ saves to your wishlist.', clckT: 'Clan checklist', clckNote: 'Who in the clan has done each raid and dungeon, to build first-timer groups.', clckBtn: n => `Load (${n} members)`, clckLoading: (a, b) => `Loading ${a}/${b}…`, clckNever: 'Never done:', clckAll: 'Everyone has done it.', clckPriv: n => n ? `${n} with private profiles left out.` : '', clckRe: 'Refresh', cmpgT: 'Compare guardians', cmpgNote: 'Clears for every raid and dungeon, side by side.', cmpgPick: 'Pick a favorite or a clanmate…', cmpgYou: 'You', cmpgTot: 'Total', cmpgPriv: 'This guardian has a private profile.', postEmpty: 'Nothing waiting at the Postmaster on your characters.', postFull: 'Postmaster almost full: at 21 items, anything new is lost.', postNote: 'Pick them up from the Postmaster in the Tower. Gold ones are exotics.', newsT: t => `Destiny 2 updated: ${t.replace(/^Destiny 2\s*/i, '')}`, newsAgo: d => d <= 0 ? 'today' : d === 1 ? 'yesterday' : `${d} days ago`, newsRead: 'Read the notes ↗', ytMany: n => `Videos (${n})`, giBtn: n => `Images (${n})`, giFull: 'Full size', giClose: 'Close', tsO: { tier: 'Difficulty', wpn: 'Missing weapon', cat: 'Missing catalyst', near: 'Almost done', low: 'Least done', name: 'A–Z' }, tsNone: 'Nothing here with this filter.', statsHi: 'above 100: extra bonus',
     tabs: { obj: 'Objectives', act: 'Activities', drops: 'Arsenal', gd: 'Guardian' },
     subs: { obj: 'Main', prog: 'In progress', camp: 'Campaigns', raid: 'Raids', dg: 'Dungeons', xm: 'Exotic missions', tit: 'Titles', exo: 'Exotics', cat: 'Catalysts', vend: 'Vendors', gd: 'Builds & clan', gst: 'Stats' },
     heroTitle: 'Guardian Hub', heroText: 'Sign in with your Bungie.net account to check your goals, follow the weekly rotation, complete your exotic arsenal and share your builds.', lsQ: 'Search guardian: Name#1234', lsBtn: 'Search', lsHint: "See any player's equipped build, no sign-in needed.",
@@ -1239,7 +1239,7 @@ function gdHTML() {
   const fav = `<article class="gd"><div class="gd-head"><h2>${esc(W.favGT)}</h2></div>${fl.length ? `<ul class="sq">${fl.map(x => { const k = x.name.lastIndexOf('#'); return `<li><button type="button" class="cl-p sq-p fav-p" data-mt="${x.type}" data-mid="${esc(x.id)}" data-name="${esc(x.name)}" title="${esc(W.seeBuild)}"><span class="sq-n">${esc(k > 0 ? x.name.slice(0, k) : x.name)}<small>${esc(k > 0 ? x.name.slice(k) : '')}</small></span><span class="sq-s">${esc([x.t, x.pw ? '✦ ' + x.pw : '', x.at ? W.seenAgo(ago(x.at)) : ''].filter(Boolean).join(' · '))}</span></button></li>`; }).join('')}</ul>` : `<p>${esc(W.favNone)}</p>`}</article>`;
   const sv = savedList();
   const saved = `<article class="gd"><div class="gd-head"><h2>${esc(W.savedT)}</h2></div>${sv.length ? `<ul class="sq">${sv.map((x, i) => `<li><button type="button" class="cl-p sq-p sv-p" data-sv="${i}" title="${esc(W.seeBuild)}"><span class="sq-n">${esc(x.title || x.t)}</span><span class="sq-s">${esc([x.title ? x.t : '', x.name, '✦ ' + (x.p.characters.data[x.cid]?.light || ''), W.savedOn(ago(x.at))].filter(Boolean).join(' · '))}</span>${x.note ? `<span class="sq-s sv-note">${esc(x.note)}</span>` : ''}</button></li>`).join('')}</ul>` : `<p>${esc(W.savedNone)}</p>`}</article>`;
-  return tab === 'gst' ? `<div class="panel">${ranks}${statsA}${clears}${wp}${comm}</div>` : `<div class="panel">${saved}${fav}${rec}${clan}${vaultHTML()}${opts}</div>`;
+  return tab === 'gst' ? `<div class="panel">${ranks}${BETA ? cmpGHTML() : ''}${statsA}${clears}${wp}${comm}</div>` : `<div class="panel">${saved}${fav}${BETA ? wishHTML() : ''}${rec}${clan}${BETA ? clanCkHTML() : ''}${vaultHTML()}${opts}</div>`;
 }
 
 /* Título do cabeçalho: subclasse + classe ("Titã Combatente" / "Striker Titan"); se o nome da subclasse já traz a classe ("Titã Prismático"), usa só ele */
@@ -1287,7 +1287,7 @@ async function loadVendors(my) {
         if (e.it === 3) {
           const ps = (r.itemComponents?.sockets?.data?.[i]?.sockets || []).filter(sk => sk.plugHash && sk.isVisible !== false).map(sk => sk.plugHash).filter(h => pShow(en[h]));
           const kind = h => { const pc = en[h]?.pc || ''; return /intrinsics/.test(pc) ? 'k' : /^(frames|origins)$/.test(pc) ? 'tr' : /masterworks/.test(pc) ? 'mw' : ''; };
-          weapons.push({ n: d.n, tl: d.tl, ic: d.ic, dt: e.dt, owned, perks: ps.map(h => ({ n: loc[h]?.n || en[h].n, ic: loc[h]?.ic || en[h].ic, k: kind(h) })), cost });
+          weapons.push({ h: x.itemHash, n: d.n, tl: d.tl, ic: d.ic, dt: e.dt, owned, perks: ps.map(h => ({ n: loc[h]?.n || en[h].n, ic: loc[h]?.ic || en[h].ic, k: kind(h) })), cost });
         } else other.push({ n: d.n, d: (d.d || '').replace(/\{var:\d+\}/g, '…').split('\n')[0], ic: d.ic, cost });
       }
       out[vi] = { opt: VENDORS[vi][2], name: vname, until: r.vendor?.data?.nextRefreshDate, weapons, other, sh, shOwn };
@@ -1316,7 +1316,7 @@ function vendorsHTML() {
     if (v.failed) return card('vd-' + k, v.name, W.unavailable, '', '');
     const wm = v.weapons.filter(w => w.owned === false).length;
     const sub = [v.weapons.length ? W.nWeapons(v.weapons.length) : '', v.other.length ? W.nOther(v.other.length) : '', v.until ? W.changesIn(cd(Date.parse(v.until) - now)) : ''].filter(Boolean).join(' · ');
-    const body = `${v.weapons.map(w => `<div class="vd-w"><div class="vd-wh">${w.ic ? `<img src="${BNET}${w.ic}" alt="" loading="lazy">` : ''}<div><b>${esc(w.n)}</b><small><span class="vd-el" style="--c:${EL_COLOR[w.dt] || 'var(--muted)'}"></span>${esc(w.tl)}${w.cost ? ' · ' + esc(w.cost) : ''}</small></div>${w.owned === false ? `<span class="chip hot">${esc(W.notOwned)}</span>` : ''}</div>
+    const body = `${v.weapons.map(w => `<div class="vd-w${wishHas(w.h) ? ' wished' : ''}"><div class="vd-wh">${BETA ? wishBtn(w) : ''}${w.ic ? `<img src="${BNET}${w.ic}" alt="" loading="lazy">` : ''}<div><b>${esc(w.n)}</b><small><span class="vd-el" style="--c:${EL_COLOR[w.dt] || 'var(--muted)'}"></span>${esc(w.tl)}${w.cost ? ' · ' + esc(w.cost) : ''}</small></div>${w.owned === false ? `<span class="chip hot">${esc(W.notOwned)}</span>` : ''}</div>
       <div class="vd-perks">${w.perks.map(p => `<span class="${p.k}">${p.ic ? `<img src="${BNET}${p.ic}" alt="" loading="lazy">` : ''}${esc(p.n)}</span>`).join('')}</div></div>`).join('')}
       ${v.other.length ? `<table class="vd-t">${v.other.map(o => `<tr><td><b>${esc(o.n)}</b>${o.d ? `<small>${esc(o.d)}</small>` : ''}</td><td class="n">${esc(o.cost || '')}</td></tr>`).join('')}</table>` : ''}
       ${v.sh ? `<p class="vd-note">${esc(W.shaders(v.sh, v.shOwn))}</p>` : ''}${v.weapons.length ? `<p class="vd-note">${esc(W.perksGold)}</p>` : ''}`;
@@ -1421,7 +1421,7 @@ function render() {
   if (tab === 'obj' && have.a && member) loadSession();
   if ((tab === 'raid' || tab === 'dg' || tab === 'xm') && have.a && member) loadActHist();
   if (tab === 'xm') loadXmRec();
-  $('list').innerHTML = `<div class="panel">${tab === 'obj' ? newsHTML() : ''}${tab === 'obj' ? sessHTML() : ''}${wkBar}${tsBar}${secs.map(sec => {
+  $('list').innerHTML = `<div class="panel">${tab === 'obj' ? newsHTML() : ''}${tab === 'obj' ? sessHTML() : ''}${tab === 'obj' && BETA ? todayHTML() : ''}${wkBar}${tsBar}${secs.map(sec => {
     if (sec.html) return sec.id === 'vendors' ? vendorsHTML() : sec.id === 'xmissions' ? xmHTML() : sec.id === 'goals' ? goalsHTML() : sec.id === 'post' ? postHTML() : '';
     if (FX && sec.id === 'week' && sec.items.length) return weekHTML(sec);
     if (sec.empty) return `<p class="empty-msg${/…$/.test(sec.note || '') ? ' wait' : ''}">${esc(sec.note)}</p>`;
@@ -1496,7 +1496,7 @@ $('ghout').addEventListener('click', () => { const b = $('ghout'); if (b.classLi
 $('hide').addEventListener('change', e => { document.body.classList.toggle('hide-done', e.target.checked); LS.set('dc-hide2', e.target.checked); });
 $('searchbtn').addEventListener('click', () => { const q = $('q'), show = q.hidden; q.hidden = !show; $('searchbtn').setAttribute('aria-expanded', show); if (show) q.focus(); else { q.value = ''; query = ''; filter(); } });
 $('q').addEventListener('input', e => { query = e.target.value; filter(); });
-const toggleSec = h => { const id = h.dataset.coll, sec = h.closest('section'); const o = sec.classList.toggle('collapsed') === false; if (id === 'goals-x') { o ? openSecs.delete(id) : openSecs.add(id); } else { o ? openSecs.add(id) : openSecs.delete(id); } h.setAttribute('aria-expanded', o); };
+const toggleSec = h => { const id = h.dataset.coll, sec = h.closest('section'); const o = sec.classList.toggle('collapsed') === false; if (id === 'goals-x' || id === 'today-x') { o ? openSecs.delete(id) : openSecs.add(id); } else { o ? openSecs.add(id) : openSecs.delete(id); } h.setAttribute('aria-expanded', o); };
 $('list').addEventListener('change', e => { if (e.target.id === 'tsortsel') { TSORT.v[tab] = e.target.value; LS.set('dc-sorts', TSORT.v); render(); } });
 $('list').addEventListener('keydown', e => { const jb = e.target.closest && e.target.closest('[data-jump][role="button"]'); if (jb && e.target === jb && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); jb.click(); return; } const h = e.target.closest && e.target.closest('.sec-head[data-coll]'); if (h && e.target === h && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleSec(h); } });
 $('list').addEventListener('click', e => {
@@ -2219,6 +2219,83 @@ $('live').addEventListener('click', e => {
   openCtx({ name: m.name, type: m.type, id: m.id }, { p: m.p, cid: m.cid, B: m.B });
   if (!m.B && !m.priv) fetchBuild(m.p, m.cid).then(B => { m.B = B; if (FD.sel?.id === m.id) { FD.B = B; renderFind(); } });
 });
+/* ---------- Beta: lista de desejos ---------- */
+const wishList = () => LS.get('dc-wish', []);
+const wishHas = h => !!h && wishList().some(x => x.h === h);
+const wishBtn = w => `<button type="button" class="wish-b" data-wish="${w.h}" data-wn="${esc(w.n)}" data-wi="${esc(w.ic || '')}" data-wt="${esc(w.tl || '')}" aria-pressed="${wishHas(w.h)}" title="${esc(u().wishT)}">${wishHas(w.h) ? '★' : '☆'}</button>`;
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-wish]'); if (!b) return; e.stopPropagation();
+  const h = +b.dataset.wish, l = wishList(), i = l.findIndex(x => x.h === h);
+  if (i >= 0) l.splice(i, 1); else l.unshift({ h, n: b.dataset.wn, ic: b.dataset.wi, tl: b.dataset.wt, at: Date.now() });
+  LS.set('dc-wish', l.slice(0, 40)); render();
+}, true);
+// tudo que está à venda agora (vendedores carregados + Xûr) que está na lista
+function wishOnSale() {
+  const out = [], l = wishList(); if (!l.length) return out;
+  for (const v of VEND || []) for (const w of v.weapons || []) if (l.some(x => x.h === w.h)) out.push({ ...w, who: v.name });
+  for (const x of [...(XUR?.items || []), ...(XUR?.leg || [])]) if (l.some(y => y.h === x.h)) out.push({ ...x, who: 'Xûr' });
+  return out;
+}
+function wishHTML() {
+  const W = u(), l = wishList(), sale = wishOnSale();
+  return `<article class="gd"><div class="gd-head"><h2>★ ${esc(W.wishT)}</h2></div><p>${esc(W.wishNote)}</p>${l.length ? `<ul class="sq wish-l">${l.map(x => { const s = sale.find(y => y.h === x.h); return `<li class="${s ? 'on' : ''}">${x.ic ? `<img src="${BNET}${x.ic}" alt="" loading="lazy">` : ''}<span class="sq-n">${esc(x.n)}<small>${esc(s ? W.wishSale(s.who) : x.tl)}</small></span><button type="button" class="wish-x" data-wish="${x.h}" aria-label="${esc(W.glDel)}">✕</button></li>`; }).join('')}</ul>` : `<p class="wish-none">${esc(W.wishNone)}</p>`}</article>`;
+}
+/* ---------- Beta: Hoje (rotação diária): o que muda no reset diário, a partir das lojas ---------- */
+const dailyReset = () => { const d = new Date(); d.setUTCHours(17, 0, 0, 0); if (d <= new Date()) d.setUTCDate(d.getUTCDate() + 1); return d.getTime(); };
+function todayHTML() {
+  if (!have.a || !member) return '';
+  if (!VEND && !vendLoading) setTimeout(() => { if (!VEND && !vendLoading) loadVendors(gen); }, 1500);
+  const W = u(), now = Date.now(), open = !openSecs.has('today-x');
+  const sale = wishOnSale(), xm = xurMissing();
+  const day = (VEND || []).filter(v => !v.failed && v.until && Date.parse(v.until) - now < 26 * 3600e3 && v.weapons?.length);
+  const rows = day.flatMap(v => v.weapons.map(w => ({ ...w, who: v.name }))).sort((a, b) => (wishHas(b.h) - wishHas(a.h)) || ((a.owned === false ? 0 : 1) - (b.owned === false ? 0 : 1)));
+  const card = w => `<div class="td-w${wishHas(w.h) ? ' wished' : ''}${w.owned === false ? ' miss' : ''}">${w.ic ? `<img src="${BNET}${w.ic}" alt="" loading="lazy">` : ''}<div><b>${esc(w.n)}</b><small>${esc(w.who)} · ${esc(w.tl)}</small></div>${wishHas(w.h) ? `<span class="chip hot">★ ${esc(W.wishShort)}</span>` : w.owned === false ? `<span class="chip hot">${esc(W.w.notOwned)}</span>` : ''}${wishBtn(w)}</div>`;
+  return `<section data-sec="today" class="keep today coll${open ? '' : ' collapsed'}"><div class="sec-head" data-coll="today-x" role="button" tabindex="0" aria-expanded="${open}"><div class="sec-title"><div class="sec-name"><h2>${esc(W.todayT)}</h2></div><span class="chev" aria-hidden="true"></span></div>
+    <p>${esc(W.todayReset(cd(dailyReset() - now)))}</p>${sale.length ? `<ul class="wk-nl">${sale.map(x => `<li><span>★ ${esc(W.wishShort)}</span> ${esc(x.n)} · ${esc(x.who)}</li>`).join('')}</ul>` : ''}</div>
+    <div class="td-body">${!VEND ? `<p class="vd-note wait">${esc(W.loadingDefs)}</p>` : rows.length ? `<div class="td-g">${rows.map(card).join('')}</div>` : `<p class="vd-note">${esc(W.todayNone)}</p>`}${xm.length && XUR?.until && Date.parse(XUR.until) > now ? `<p class="td-x" data-jump="vend:vendors" role="button" tabindex="0">◆ ${esc(W.w.xurSells(xm.map(x => x.n).join(', ')))} →</p>` : ''}<p class="vd-note">${esc(W.todayNote)}</p></div></section>`;
+}
+/* ---------- Beta: métricas de outros guardiões (conclusões de incursões/masmorras), com cache de 1 dia ---------- */
+const GMET = LS.get('dc-gmet', {});
+const ACT_METRICS = () => [...defs.raids.map(a => ['raid', a]), ...defs.dungeons.map(a => ['dg', a])].filter(([, a]) => a.m);
+async function guardianMetrics(mt, mid) {
+  const c = GMET[mid]; if (c && Date.now() - c.at < 864e5) return c;
+  let v;
+  try { const r = await bungie(`/Destiny2/${mt}/Profile/${mid}/?components=100,1100`, false); const m = r.metrics?.data?.metrics; v = { at: Date.now(), priv: !m, gr: r.profile?.data?.currentGuardianRank || 0, m: m ? Object.fromEntries(ACT_METRICS().map(([, a]) => [a.m, m[a.m]?.objectiveProgress?.progress || 0])) : {} }; }
+  catch { v = { at: Date.now(), priv: true, m: {} }; }
+  GMET[mid] = v; try { LS.set('dc-gmet', GMET); } catch {} return v;
+}
+const CLCK = { busy: false, n: 0 };
+async function loadClanCk() {
+  const list = GD?.clan?.list || []; if (CLCK.busy || !list.length) return; CLCK.busy = true; CLCK.n = 0; render();
+  let i = 0; const next = async () => { while (i < list.length) { const x = list[i++]; await guardianMetrics(x.mt, x.mid); CLCK.n++; if (CLCK.n % 4 === 0 && isGd()) render(); } };
+  await Promise.all(Array.from({ length: 5 }, next)); CLCK.busy = false; CLCK.done = true; if (isGd()) render();
+}
+function clanCkHTML() {
+  const W = u(), list = GD?.clan?.list || []; if (!list.length) return '';
+  const got = list.filter(x => GMET[x.mid]), pub = got.filter(x => !GMET[x.mid].priv);
+  const head = `<article class="gd"><div class="gd-head"><h2>${esc(W.clckT)}</h2></div><p>${esc(W.clckNote)}</p>`;
+  if (!got.length || CLCK.busy && !CLCK.done) return head + `<button type="button" class="char clck-b" data-clck ${CLCK.busy ? 'disabled' : ''}>${esc(CLCK.busy ? W.clckLoading(CLCK.n, list.length) : W.clckBtn(list.length))}</button></article>`;
+  const rows = ACT_METRICS().map(([k, a]) => { const done = pub.filter(x => GMET[x.mid].m[a.m] > 0), never = pub.filter(x => !(GMET[x.mid].m[a.m] > 0)); return { k, a, done, never }; });
+  return head + `<div class="clck">${rows.map(r => `<details class="clck-r"><summary><span class="clck-n">${esc((r.k === 'raid' ? W.w.raidW : W.w.dgW) + ' ' + L(r.a.n))}</span><span class="clck-c">${r.done.length}/${pub.length}</span><i style="--p:${pub.length ? r.done.length / pub.length * 100 : 0}%"></i></summary>${r.never.length ? `<p><b>${esc(W.clckNever)}</b> ${r.never.map(x => `<span class="clck-p">${esc(x.n)}</span>`).join('')}</p>` : `<p>${esc(W.clckAll)}</p>`}</details>`).join('')}</div><p class="clck-f">${esc(W.clckPriv(got.length - pub.length))} <button type="button" class="linkb" data-clck>${esc(W.clckRe)}</button></p></article>`;
+}
+document.addEventListener('click', e => { if (e.target.closest('[data-clck]')) { for (const x of GD?.clan?.list || []) delete GMET[x.mid]; CLCK.done = false; loadClanCk(); } });
+/* ---------- Beta: comparar guardiões (conclusões de cada atividade, lado a lado) ---------- */
+const CMPG = { sel: null };
+function cmpGHTML() {
+  const W = u(), opts = [...favs().map(f => ({ n: f.name.replace(/#\d+$/, ''), mt: f.type, mid: f.id })), ...(GD?.clan?.list || []).map(x => ({ n: x.n, mt: x.mt, mid: x.mid }))].filter((x, i, l) => l.findIndex(y => y.mid === x.mid) === i);
+  const o = CMPG.sel && GMET[CMPG.sel.mid];
+  let body = '';
+  if (CMPG.sel && !o) body = `<p class="wait">${esc(W.loadingDefs)}</p>`;
+  else if (o?.priv) body = `<p>${esc(W.cmpgPriv)}</p>`;
+  else if (o) {
+    const rows = ACT_METRICS().map(([k, a]) => ({ k, a, me: metric(a.m), him: o.m[a.m] || 0 })).filter(r => r.me || r.him);
+    const tot = (f) => rows.reduce((t, r) => t + f(r), 0);
+    body = `<table class="cmpg"><thead><tr><th></th><th>${esc(W.cmpgYou)}</th><th>${esc(CMPG.sel.n)}</th></tr></thead><tbody>${profile.profile?.data?.currentGuardianRank ? `<tr><td>${esc(W.w.gRank)}</td>${cmpCell(profile.profile.data.currentGuardianRank, o.gr)}</tr>` : ''}${rows.map(r => `<tr><td>${esc(L(r.a.n))}</td>${cmpCell(r.me, r.him)}</tr>`).join('')}<tr class="tot"><td>${esc(W.cmpgTot)}</td>${cmpCell(tot(r => r.me), tot(r => r.him))}</tr></tbody></table>`;
+  }
+  return `<article class="gd"><div class="gd-head"><h2>${esc(W.cmpgT)}</h2></div><p>${esc(W.cmpgNote)}</p><select class="tsort-sel cmpg-s" id="cmpgsel"><option value="">${esc(W.cmpgPick)}</option>${opts.map(x => `<option value="${esc(x.mt + ':' + x.mid)}"${CMPG.sel?.mid === x.mid ? ' selected' : ''}>${esc(x.n)}</option>`).join('')}</select>${body}</article>`;
+}
+const cmpCell = (a, b) => `<td class="${a > b ? 'win' : ''}">${fmtN(a)}</td><td class="${b > a ? 'win' : ''}">${fmtN(b)}</td>`;
+document.addEventListener('change', e => { if (e.target.id !== 'cmpgsel') return; const [mt, mid] = e.target.value.split(':'); const n = e.target.selectedOptions[0]?.textContent || ''; CMPG.sel = mid ? { mt: +mt, mid, n } : null; render(); if (mid) guardianMetrics(+mt, mid).then(() => { if (isGd()) render(); }); });
 /* ---------- Correios (beta): o que está parado no Postmaster de cada personagem; usa o inventário já carregado ---------- */
 const POST_BUCKET = 215593132, POSTN = {};
 function postHTML() {
@@ -2226,7 +2303,6 @@ function postHTML() {
   const W = u(), chars = Object.entries(profile.characters.data), per = chars.map(([cid, ch]) => ({ cid, ch, items: (profile.characterInventories.data[cid]?.items || []).filter(i => i.bucketHash === POST_BUCKET) }));
   const total = per.reduce((t, x) => t + x.items.length, 0);
   if (!total) return '';
-  if (false) return `<section data-sec="post" class="keep post post-empty"><div class="sec-head"><div class="sec-title"><div class="sec-name"><h2>✉ ${esc(W.postT)}</h2></div><span class="count">0</span></div><p class="post-sum">${esc(W.postEmpty)}</p></div></section>`;
   const need = [...new Set(per.flatMap(x => x.items.map(i => i.itemHash)))].filter(h => !POSTN[h]);
   if (need.length && !postHTML.busy) { postHTML.busy = true; entities('DestinyInventoryItemDefinition', need, lang === 'pt' ? 'pt' : 'en').then(m => { Object.assign(POSTN, m); postHTML.busy = false; if (tab === 'obj') render(); }).catch(() => { postHTML.busy = false; }); }
   const open = openSecs.has('post'), full = per.some(x => x.items.length >= 15);
