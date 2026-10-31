@@ -927,3 +927,7 @@ section.wo.collapsed .sec-head>p{display:block}
 .b-nn>span:not(.ammo){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .b-nt small{margin-left:0;white-space:normal}
 .b-name .wish-b{align-self:center}
+/* armadura desejada: atributos */
+.wo-sts{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.wo-st{display:grid;gap:2px;min-width:0}.wo-st small{font-size:11px;color:var(--muted)}
+.wo-st select{width:100%;font-size:13px;padding:6px 26px 6px 8px}

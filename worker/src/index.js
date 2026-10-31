@@ -6,7 +6,7 @@ import { compact } from './compact.js';
 const BUNGIE = 'https://www.bungie.net/Platform';
 const TYPES = new Set(['DestinyInventoryItemDefinition', 'DestinyObjectiveDefinition', 'DestinyLocationDefinition', 'DestinyActivityDefinition', 'DestinyMilestoneDefinition', 'DestinyLoadoutNameDefinition', 'DestinyRecordDefinition', 'DestinyCollectibleDefinition', 'DestinyPresentationNodeDefinition', 'DestinyDestinationDefinition', 'DestinyEquipableItemSetDefinition', 'DestinyStatDefinition']);
 const SET = 'DestinyEquipableItemSetDefinition';
-const SYNC_KEYS = /^(favs|builds|opts|hide2|goals|marks-\d{1,25})$/;
+const SYNC_KEYS = /^(favs|builds|opts|hide2|goals|wish|marks-\d{1,25})$/;
 const MAX_BATCH = 12;              // até 12 itens por pedido: mantém o tempo de CPU abaixo de 10 ms quando há muitas buscas novas na Bungie
 const MAX_VALUE = 400_000;         // tamanho máximo de cada valor sincronizado
 
