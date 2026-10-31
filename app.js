@@ -32,7 +32,7 @@ const UI = {
   pt: {
     hide: 'Ocultar feitos', search: 'Buscar por nome ou origem', refresh: 'Atualizar', logout: 'Sair',
     disclaimer: 'Dados lidos da sua conta pela API oficial da Bungie. Este site não é afiliado à Bungie.',
-    loadouts: 'Loadouts', checklist: 'Central', outQ: 'Confirmar?', liveT: 'Ao vivo', liveYou: 'você', liveSince: t => `desde ${t}`, livePriv: 'Build privada', liveTap: 'Toque para ver a build completa', statsT: 'Atributos', glT: 'Metas de build', ssRec: 'Novo recorde', ssRecBest: 'seu melhor tempo até hoje', ssRecSub: (o, d) => `antes ${o} · ${d} mais rápido`, ssSolo: 'Solo', ssSoloFl: 'Solo sem morrer', wkFeatT: 'Em destaque', wkFull: 'Abrir página', wkAllDone: 'Tudo feito aqui.', wkRwSt: { red: 'resgatada', earn: 'pronta para resgatar', todo: 'falta fazer' }, wkKind: { ch: 'Desafio', rw: 'Recompensas', q: 'Missão' }, glNote: 'Builds que você quer montar: cada item se marca sozinho quando você libera ou pega.', glAdd: n => `Faltam ${n} itens para você usar esta build.`, glBtn: '＋ Virar objetivo', glDone: 'Já é um objetivo', glView: 'Ver build', glDel: 'Remover', glAt: d => `adicionada em ${d}`, glSet: (n, k) => `Conjunto ${n}: ${k} ${k === 1 ? 'peça' : 'peças'}`, glSetSrc: 'qualquer peça do conjunto, para os bônus', glRef: 'Atributos da build', glYou: 'você', glNone: 'Nenhuma meta ainda. Na comparação de builds, use “Virar objetivo” no que falta.', glSrcPlug: 'Liberar no menu da subclasse', glG: { asp: 'Aspectos', fr: 'Fragmentos', ab: 'Habilidades', w: 'Armas', a: 'Armadura' }, tsK: 'Ordenar', ytGuide: 'Guia em vídeo', giBtn: n => `Imagens (${n})`, giFull: 'Tamanho original', giClose: 'Fechar', tsO: { tier: 'Dificuldade', wpn: 'Falta arma', cat: 'Falta catalisador', near: 'Quase lá', low: 'Menos feitos', name: 'A–Z' }, tsNone: 'Nada aqui com esse filtro.', statsHi: 'acima de 100: bônus extra',
+    loadouts: 'Loadouts', checklist: 'Central', outQ: 'Confirmar?', liveT: 'Ao vivo', liveYou: 'você', liveSince: t => `desde ${t}`, livePriv: 'Build privada', liveTap: 'Toque para ver a build completa', statsT: 'Atributos', glT: 'Metas de build', ssRec: 'Novo recorde', ssRecBest: 'seu melhor tempo até hoje', ssRecSub: (o, d) => `antes ${o} · ${d} mais rápido`, ssSolo: 'Solo', ssSoloFl: 'Solo sem morrer', wkFeatT: 'Em destaque', wkFull: 'Abrir página', wkAllDone: 'Tudo feito aqui.', wkRwSt: { red: 'resgatada', earn: 'pronta para resgatar', todo: 'falta fazer' }, wkKind: { ch: 'Desafio', rw: 'Recompensas', q: 'Missão' }, glNote: 'Builds que você quer montar: cada item se marca sozinho quando você libera ou pega.', glAdd: n => `Faltam ${n} itens para você usar esta build.`, glBtn: '＋ Virar objetivo', glDone: 'Já é um objetivo', glView: 'Ver build', glDel: 'Remover', glAt: d => `adicionada em ${d}`, glSet: (n, k) => `Conjunto ${n}: ${k} ${k === 1 ? 'peça' : 'peças'}`, glSetSrc: 'qualquer peça do conjunto, para os bônus', glRef: 'Atributos da build', glYou: 'você', glNone: 'Nenhuma meta ainda. Na comparação de builds, use “Virar objetivo” no que falta.', glSrcPlug: 'Liberar no menu da subclasse', glG: { asp: 'Aspectos', fr: 'Fragmentos', ab: 'Habilidades', w: 'Armas', a: 'Armadura' }, tsK: 'Ordenar', ytGuide: 'Guia em vídeo', ytMany: n => `Vídeos (${n})`, giBtn: n => `Imagens (${n})`, giFull: 'Tamanho original', giClose: 'Fechar', tsO: { tier: 'Dificuldade', wpn: 'Falta arma', cat: 'Falta catalisador', near: 'Quase lá', low: 'Menos feitos', name: 'A–Z' }, tsNone: 'Nada aqui com esse filtro.', statsHi: 'acima de 100: bônus extra',
     tabs: { obj: 'Objetivos', act: 'Atividades', drops: 'Arsenal', gd: 'Guardião' },
     subs: { obj: 'Principal', prog: 'Em andamento', camp: 'Campanhas', raid: 'Incursões', dg: 'Masmorras', xm: 'Missões exóticas', tit: 'Títulos', exo: 'Exóticos', cat: 'Catalisadores', vend: 'Vendedores', gd: 'Builds e clã', gst: 'Estatísticas' },
     heroTitle: 'Central do Guardião', heroText: 'Entre com a sua conta Bungie.net para verificar seus objetivos, acompanhar a rotação semanal, completar seu arsenal exótico e compartilhar suas builds.', lsQ: 'Buscar guardião: Nome#1234', lsBtn: 'Buscar', lsHint: 'Veja a build equipada de qualquer jogador, sem precisar entrar.',
@@ -87,7 +87,7 @@ const UI = {
   en: {
     hide: 'Hide done', search: 'Search by name or source', refresh: 'Refresh', logout: 'Sign out',
     disclaimer: 'Data read from your account through the official Bungie API. This site is not affiliated with Bungie.',
-    loadouts: 'Loadouts', checklist: 'Hub', outQ: 'Confirm?', liveT: 'Live', liveYou: 'you', liveSince: t => `since ${t}`, livePriv: 'Private build', liveTap: 'Tap to see the full build', statsT: 'Stats', glT: 'Build goals', ssRec: 'New record', ssRecBest: 'your best time ever', ssRecSub: (o, d) => `was ${o} · ${d} faster`, ssSolo: 'Solo', ssSoloFl: 'Solo flawless', wkFeatT: 'Featured', wkFull: 'Open page', wkAllDone: 'All done here.', wkRwSt: { red: 'claimed', earn: 'ready to claim', todo: 'to do' }, wkKind: { ch: 'Challenge', rw: 'Rewards', q: 'Quest' }, glNote: 'Builds you want to put together: each item checks itself off when you unlock or get it.', glAdd: n => `You're missing ${n} items to run this build.`, glBtn: '＋ Make it a goal', glDone: 'Already a goal', glView: 'View build', glDel: 'Remove', glAt: d => `added ${d}`, glSet: (n, k) => `${n} set: ${k} ${k === 1 ? 'piece' : 'pieces'}`, glSetSrc: 'any piece of the set, for the bonuses', glRef: 'Build stats', glYou: 'you', glNone: 'No goals yet. In build comparison, use “Make it a goal” on what is missing.', glSrcPlug: 'Unlock in the subclass menu', glG: { asp: 'Aspects', fr: 'Fragments', ab: 'Abilities', w: 'Weapons', a: 'Armor' }, tsK: 'Sort', ytGuide: 'Video guide', giBtn: n => `Images (${n})`, giFull: 'Full size', giClose: 'Close', tsO: { tier: 'Difficulty', wpn: 'Missing weapon', cat: 'Missing catalyst', near: 'Almost done', low: 'Least done', name: 'A–Z' }, tsNone: 'Nothing here with this filter.', statsHi: 'above 100: extra bonus',
+    loadouts: 'Loadouts', checklist: 'Hub', outQ: 'Confirm?', liveT: 'Live', liveYou: 'you', liveSince: t => `since ${t}`, livePriv: 'Private build', liveTap: 'Tap to see the full build', statsT: 'Stats', glT: 'Build goals', ssRec: 'New record', ssRecBest: 'your best time ever', ssRecSub: (o, d) => `was ${o} · ${d} faster`, ssSolo: 'Solo', ssSoloFl: 'Solo flawless', wkFeatT: 'Featured', wkFull: 'Open page', wkAllDone: 'All done here.', wkRwSt: { red: 'claimed', earn: 'ready to claim', todo: 'to do' }, wkKind: { ch: 'Challenge', rw: 'Rewards', q: 'Quest' }, glNote: 'Builds you want to put together: each item checks itself off when you unlock or get it.', glAdd: n => `You're missing ${n} items to run this build.`, glBtn: '＋ Make it a goal', glDone: 'Already a goal', glView: 'View build', glDel: 'Remove', glAt: d => `added ${d}`, glSet: (n, k) => `${n} set: ${k} ${k === 1 ? 'piece' : 'pieces'}`, glSetSrc: 'any piece of the set, for the bonuses', glRef: 'Build stats', glYou: 'you', glNone: 'No goals yet. In build comparison, use “Make it a goal” on what is missing.', glSrcPlug: 'Unlock in the subclass menu', glG: { asp: 'Aspects', fr: 'Fragments', ab: 'Abilities', w: 'Weapons', a: 'Armor' }, tsK: 'Sort', ytGuide: 'Video guide', ytMany: n => `Videos (${n})`, giBtn: n => `Images (${n})`, giFull: 'Full size', giClose: 'Close', tsO: { tier: 'Difficulty', wpn: 'Missing weapon', cat: 'Missing catalyst', near: 'Almost done', low: 'Least done', name: 'A–Z' }, tsNone: 'Nothing here with this filter.', statsHi: 'above 100: extra bonus',
     tabs: { obj: 'Objectives', act: 'Activities', drops: 'Arsenal', gd: 'Guardian' },
     subs: { obj: 'Main', prog: 'In progress', camp: 'Campaigns', raid: 'Raids', dg: 'Dungeons', xm: 'Exotic missions', tit: 'Titles', exo: 'Exotics', cat: 'Catalysts', vend: 'Vendors', gd: 'Builds & clan', gst: 'Stats' },
     heroTitle: 'Guardian Hub', heroText: 'Sign in with your Bungie.net account to check your goals, follow the weekly rotation, complete your exotic arsenal and share your builds.', lsQ: 'Search guardian: Name#1234', lsBtn: 'Search', lsHint: "See any player's equipped build, no sign-in needed.",
@@ -795,7 +795,12 @@ function titMeta(sec) {
 }
 // guia em vídeo (YouTube) da incursão/masmorra, quando houver
 const actDefOf = (kind, key) => (kind === 'raid' ? defs.raids : kind === 'dg' ? defs.dungeons : kind === 'xm' ? (defs.xmissions || []) : []).find(x => x.k === key);
-const actYt = (kind, key) => { const a = actDefOf(kind, key); if (!a) return ''; const v = a.yt && /^https:\/\/(www\.)?youtube\.com\//.test(a.yt) ? `<a class="chip yt" href="${esc(a.yt)}" target="_blank" rel="noopener">▶ ${esc(u().ytGuide)}</a>` : ''; return v + (a.gi?.length ? `<button type="button" class="chip gi" data-gal="${kind}:${esc(key)}">🖼 ${esc(u().giBtn(a.gi.length))}</button>` : ''); };
+// vídeos: um link ou uma lista [url, nome pt, nome en]; com mais de um, abre uma lista para escolher
+const YT_OK = x => /^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//.test(x || '');
+const ytList = a => (Array.isArray(a?.yt) ? a.yt : a?.yt ? [[a.yt]] : []).filter(x => YT_OK(x[0]));
+const ytId = url => { try { const x = new URL(url); return x.hostname === 'youtu.be' ? x.pathname.slice(1) : x.searchParams.get('v') || ''; } catch { return ''; } };
+const actYt = (kind, key) => { const a = actDefOf(kind, key); if (!a) return ''; const yl = ytList(a);
+  const v = yl.length === 1 ? `<a class="chip yt" href="${esc(yl[0][0])}" target="_blank" rel="noopener">▶ ${esc(u().ytGuide)}</a>` : yl.length > 1 ? `<button type="button" class="chip yt" data-ytl="${kind}:${esc(key)}">▶ ${esc(u().ytMany(yl.length))}</button>` : ''; return v + (a.gi?.length ? `<button type="button" class="chip gi" data-gal="${kind}:${esc(key)}">🖼 ${esc(u().giBtn(a.gi.length))}</button>` : ''); };
 /* galeria de imagens do guia: só baixa as imagens quando abre */
 const GAL = { l: [], i: 0, t: '', seq: 0 };
 function galOpen(kind, key, i = 0) {
@@ -840,6 +845,13 @@ function galWire(d) {
   let x0 = null; d.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true });
   d.addEventListener('touchend', e => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 50) galGo(dx < 0 ? 1 : -1); });
 }
+function ytOpen(kind, key) {
+  const a = actDefOf(kind, key), yl = ytList(a); if (!yl.length) return; const W = u();
+  let d = $('ytdlg'); if (!d) { d = document.createElement('dialog'); d.id = 'ytdlg'; d.className = 'gal ytl'; document.body.append(d); d.addEventListener('click', e => { if (e.target === d || e.target.closest('.gal-x')) d.close(); }); }
+  d.innerHTML = `<div class="gal-top"><b>${esc(L(a.n))}</b><span>${esc(W.ytMany(yl.length))}</span><button type="button" class="gal-x" aria-label="${esc(W.giClose)}">✕</button></div><div class="ytl-l">${yl.map((x, i) => { const id = ytId(x[0]), n = (lang === 'en' ? x[2] : x[1]) || `${W.ytGuide} ${i + 1}`; return `<a class="ytl-i" href="${esc(x[0])}" target="_blank" rel="noopener">${id ? `<img src="https://i.ytimg.com/vi/${esc(id)}/mqdefault.jpg" alt="" loading="lazy" width="320" height="180">` : ''}<span><b>${esc(n)}</b><small>YouTube ↗</small></span></a>`; }).join('')}</div>`;
+  if (!d.open) d.showModal();
+}
+document.addEventListener('click', e => { const y = e.target.closest('[data-ytl]'); if (y) { e.stopPropagation(); const [k, key] = y.dataset.ytl.split(':'); ytOpen(k, key); } }, true);
 document.addEventListener('click', e => { const b = e.target.closest('[data-gal]'); if (!b) return; e.stopPropagation(); const [k, key] = b.dataset.gal.split(':'); galOpen(k, key); }, true);
 function secMeta(sec) {
   const W = u().w, c = [titMeta(sec)], f = featured(), n = metric(sec.metric);
@@ -1383,7 +1395,7 @@ function render() {
     $('ovcount').textContent = U.ld(LOADOUTS.length); $('ovbar').style.width = '0';
     return;
   }
-  const secs = SECTIONS.filter(x => x.tab === tab);
+  const secs = SECTIONS.filter(x => x.tab === tab && secAvail(x));
   // O que já foi concluído fica no fim da lista, minimizado.
   const secDone = x => x.items.length > 0 && x.items.every(isDone);
   if (SORT_TABS.includes(tab)) {
@@ -1407,7 +1419,7 @@ function render() {
     const keep = true, coll = sec.coll || ((tab === 'exo' || tab === 'cat') && sec.items?.length) || (keep && secDone(sec)), open = openSecs.has(sec.id);
     const act = sec.camp || sec.xm || (sec.kind && (sec.kind === 'raid' ? defs.raids : defs.dungeons).find(x => x.k === sec.key));
     return `<section data-sec="${sec.id}"${act?.img ? ` style="--act-img:url('${BNET}${act.img}')"` : ''} class="${keep ? 'keep' : ''}${act?.img ? ' act-img' : ''}${sec.weekly ? ' wk-sec' : ''}${coll ? ` coll${open ? '' : ' collapsed'}` : ''}">
-      <div class="sec-head"${coll ? ` data-coll="${sec.id}" role="button" tabindex="0" aria-expanded="${open}"` : ''}><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2>${sec.kind ? secMeta(sec) : sec.tier || sec.xm ? `<div class="sec-meta">${titMeta(sec)}</div>` : ''}</div><span class="count" data-sc="${sec.id}"></span>${coll ? '<span class="chev" aria-hidden="true"></span>' : ''}</div>
+      <div class="sec-head"${coll ? ` data-coll="${sec.id}" role="button" tabindex="0" aria-expanded="${open}"` : ''}><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2>${sec.kind ? secMeta(sec) : sec.tier || sec.xm ? `<div class="sec-meta">${titMeta(sec)}${sec.xm ? actYt('xm', sec.xm.k) : ''}</div>` : ''}</div><span class="count" data-sc="${sec.id}"></span>${coll ? '<span class="chev" aria-hidden="true"></span>' : ''}</div>
       ${sec.note ? `<p>${esc(sec.note)}</p>` : ''}${sec.kind ? actStrip(sec) : sec.xm ? xmStrip(sec.xm) : ''}<div class="sec-bar"><i data-sb="${sec.id}"></i></div></div>
       <ul>${sec.items.map(i => {
         const cid = 'c-' + i.id.replace(/[^a-z0-9]+/gi, '-'), first = i.c[0], rest = i.c.slice(1), more = !!(i.d || rest.length || i.loc);
@@ -1432,7 +1444,7 @@ function update() {
   }
   const bar = $('donebar');
   if (bar) { bar.hidden = full === 0; const sh = document.body.classList.contains('show-complete'); $('donetxt').textContent = U.panels(full, sh); $('togglecomplete').textContent = sh ? U.hideDone : U.show; }
-  const secs = SECTIONS.filter(x => x.tab === tab && !x.empty && !x.html);
+  const secs = SECTIONS.filter(x => x.tab === tab && !x.empty && !x.html && secAvail(x));
   let n, t, label;
   if (tab === 'raid' || tab === 'dg' || tab === 'xm') { t = secs.length; n = secs.filter(x => isDone(x.items[0])).length; label = U[tab](n, t); }
   else if (tab === 'tit') { t = secs.length; n = secs.filter(x => x.items.every(isDone)).length; label = U.tit(n, t); }
@@ -2138,10 +2150,22 @@ async function liveTarget(h, mode) {
   if (!id) { const k = (await mapActs([h], () => mode).catch(() => ({})))[h]; if (k) id = k.kind + '-' + k.k; }
   const sec = id && SECTIONS.find(x => x.id === id); return sec ? [sec.tab, id] : null;
 }
+/* atividades fora do jogo (guardadas no cofre de conteúdo): a Bungie só lista as disponíveis; aproveita a consulta do Ao vivo, sem pedido extra */
+let AVAIL = (() => { const c = LS.get('dc-avail', null); return c && Date.now() - c.at < 7 * 864e5 ? new Set(c.h) : null; })();
+function saveAvail(data) {
+  const all = new Set(); for (const c of Object.values(data || {})) for (const a of c.availableActivities || []) all.add(a.activityHash);
+  if (all.size < 50) return; // resposta incompleta: não esconde nada
+  const mine = []; for (const l of [defs.raids, defs.dungeons, defs.xmissions || []]) for (const x of l) for (const h of x.ah || []) if (all.has(h)) mine.push(h);
+  const changed = !AVAIL || AVAIL.size !== mine.length || mine.some(h => !AVAIL.has(h));
+  AVAIL = new Set(mine); LS.set('dc-avail', { at: Date.now(), h: mine });
+  if (changed && ['raid', 'dg', 'xm'].includes(tab)) render();
+}
+const secAvail = sec => { if (!AVAIL) return true; const d = sec.kind ? actDefOf(sec.kind, sec.key) : sec.xm; return !d?.ah?.length || d.ah.some(h => AVAIL.has(h)); };
 async function livePoll() {
   if (LIVE.busy || !auth || !member || document.hidden) return; LIVE.busy = true; const my = ++LIVE.seq;
   try {
     const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=1000,204`);
+    saveAvail(r.characterActivities?.data);
     const t = r.profileTransitoryData?.data, party = t?.partyMembers || [];
     if (!t || !party.length) { LIVE.on = false; LIVE.mem = []; renderLive(); return; }
     const act = Object.values(r.characterActivities?.data || {}).sort((a, b) => new Date(b.dateActivityStarted) - new Date(a.dateActivityStarted))[0];
