@@ -2288,7 +2288,10 @@ document.addEventListener('click', e => {
   const b = e.target.closest('[data-wish]'); if (!b) return; e.stopPropagation();
   const h = +b.dataset.wish, l = wishList(), i = l.findIndex(x => x.h === h || (b.dataset.wn && wishKey(x.n) === wishKey(b.dataset.wn)));
   if (i >= 0) l.splice(i, 1); else l.unshift({ h, n: b.dataset.wn, ic: b.dataset.wi, tl: b.dataset.wt, at: Date.now() });
-  LS.set('dc-wish', l.slice(0, 40)); render();
+  LS.set('dc-wish', l.slice(0, 40));
+  // a estrela pode estar fora da lista principal (tela da build, busca de guardião): atualiza todas na hora
+  document.querySelectorAll('[data-wish]').forEach(x => { const on = wishHas(+x.dataset.wish, x.dataset.wn); x.setAttribute('aria-pressed', on); if (x.dataset.wn) x.textContent = on ? '★' : '☆'; x.closest('.vd-w,.vd-fi,.b-row')?.classList.toggle('wished', on); });
+  if (!b.closest('#build,#finddlg')) render(); else if (isGd() || tab === 'vend') render();
 }, true);
 // tudo que está à venda agora (vendedores carregados + Xûr) que está na lista
 function wishOnSale() {
