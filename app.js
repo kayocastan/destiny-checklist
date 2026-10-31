@@ -2283,8 +2283,10 @@ $('live').addEventListener('click', e => {
 /* ---------- Beta: lista de desejos ---------- */
 // arquétipo da armadura (encaixe "armor_archetypes"): a descrição em inglês diz o atributo primário e o secundário
 const STAT_EN = { weapons: 2996146975, health: 392767087, class: 1943323491, grenade: 1735777505, super: 144602215, melee: 4244567218 };
+const archParse = (t, n) => { const g = re => STAT_EN[(re.exec(t || '')?.[1] || '').toLowerCase()] || null; return { an: n || '', s1: g(/Primary Stat:\s*(\w+)/i), s2: g(/Secondary Stat:\s*(\w+)/i) }; };
 function armArch(B, sockets) {
-  const h = (sockets?.sockets || []).map(x => x.plugHash).find(x => B.en[x]?.pc === 'armor_archetypes'); if (!h) return {};
+  const all = (sockets?.sockets || []).map(x => x.plugHash).filter(Boolean), h = all.find(x => B.en[x]?.pc === 'armor_archetypes');
+  if (!h) return { pl: all }; // ainda sem a definição do encaixe: busca ao favoritar
   const t = B.en[h].d || '', g = re => STAT_EN[(re.exec(t)?.[1] || '').toLowerCase()] || null;
   return { an: (B.loc[h] || B.en[h]).n || '', s1: g(/Primary Stat:\s*(\w+)/i), s2: g(/Secondary Stat:\s*(\w+)/i) };
 }
@@ -2292,12 +2294,14 @@ const WEAPON_BUCKETS = [1498876634, 2465295065, 953998645], ARMOR_BUCKETS = [344
 const wishList = () => LS.get('dc-wish', []);
 const wishKey = n => String(n || '').toLowerCase().replace(/\s*\((adept|adepta)\)$/, '');
 const wishHas = (h, n) => (!!h || !!n) && wishList().some(x => x.h === h || (n && wishKey(x.n) === wishKey(n)));
-const wishBtn = w => `<button type="button" class="wish-b" data-wish="${w.h}" data-wn="${esc(w.n)}" data-wi="${esc(w.ic || '')}" data-wt="${esc(w.tl || '')}"${w.a ? ` data-wa="1" data-ws="${w.s1 || ''},${w.s2 || ''}" data-wan="${esc(w.an || '')}"` : ''}${(w.p || w.perks)?.length ? ` data-wp="${esc(JSON.stringify((w.p || w.perks).filter(x => x.k !== 'mw').slice(0, 8).map(x => ({ n: x.n, ic: x.ic }))))}"` : ''} aria-pressed="${wishHas(w.h, w.n)}" title="${esc(u().wishT)}">${wishHas(w.h, w.n) ? '★' : '☆'}</button>`;
+const wishBtn = w => `<button type="button" class="wish-b" data-wish="${w.h}" data-wn="${esc(w.n)}" data-wi="${esc(w.ic || '')}" data-wt="${esc(w.tl || '')}"${w.a ? ` data-wa="1" data-ws="${w.s1 || ''},${w.s2 || ''}" data-wan="${esc(w.an || '')}" data-wpl="${(w.pl || []).join(',')}"` : ''}${(w.p || w.perks)?.length ? ` data-wp="${esc(JSON.stringify((w.p || w.perks).filter(x => x.k !== 'mw').slice(0, 8).map(x => ({ n: x.n, ic: x.ic }))))}"` : ''} aria-pressed="${wishHas(w.h, w.n)}" title="${esc(u().wishT)}">${wishHas(w.h, w.n) ? '★' : '☆'}</button>`;
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-wish]'); if (!b) return; e.stopPropagation();
   const h = +b.dataset.wish, l = wishList(), i = l.findIndex(x => x.h === h || (b.dataset.wn && wishKey(x.n) === wishKey(b.dataset.wn)));
   if (i >= 0) l.splice(i, 1); else { let p = []; try { p = JSON.parse(b.dataset.wp || '[]'); } catch {} const [s1, s2] = (b.dataset.ws || '').split(',').map(x => +x || null); l.unshift({ h, n: b.dataset.wn, ic: b.dataset.wi, tl: b.dataset.wt, p, ...(b.dataset.wa ? { a: 1, s1, s2, an: b.dataset.wan || '' } : {}), at: Date.now() }); }
   LS.set('dc-wish', l.slice(0, 40));
+  // armadura sem o arquétipo conhecido: lê o encaixe agora (definição em inglês, que traz "Primary Stat"/"Secondary Stat") e completa a entrada
+  if (i < 0 && b.dataset.wa && !l[0].s1 && b.dataset.wpl) { const hs = b.dataset.wpl.split(',').map(Number); entities('DestinyInventoryItemDefinition', hs, 'en', true).then(async en => { const a = hs.find(x => en[x]?.pc === 'armor_archetypes'); if (!a) return; const loc = lang === 'en' ? en : await entities('DestinyInventoryItemDefinition', [a], 'pt').catch(() => en); const r = archParse(en[a].d, (loc[a] || en[a]).n); const L2 = wishList(), e2 = L2.find(x => x.h === h); if (!e2) return; Object.assign(e2, r); LS.set('dc-wish', L2); if (tab === 'obj' || isGd()) render(); }).catch(() => {}); }
   // a estrela pode estar fora da lista principal (tela da build, busca de guardião): atualiza todas na hora
   document.querySelectorAll('[data-wish]').forEach(x => { const on = wishHas(+x.dataset.wish, x.dataset.wn); x.setAttribute('aria-pressed', on); if (x.dataset.wn) x.textContent = on ? '★' : '☆'; x.closest('.vd-w,.vd-fi,.b-row')?.classList.toggle('wished', on); });
   if (!b.closest('#build,#finddlg')) render(); else if (isGd() || tab === 'vend') render();
