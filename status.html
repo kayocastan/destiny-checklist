@@ -17,7 +17,7 @@
   *{box-sizing:border-box} [hidden]{display:none!important}
   body{margin:0}
   h1{font-size:34px}
-  .sub{color:var(--muted);margin:4px 0 0}
+  .when{color:var(--muted);margin:4px 0 0;font-size:14px}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:12px}
   .wrap>*,section>*{min-width:0}
   details{overflow-x:auto}
@@ -32,7 +32,10 @@
   .st b{font-weight:600}
   .st .dot{width:9px;height:9px;border-radius:50%;flex:none}
   .good .meter i,.good .dot{background:var(--good)} .warn .meter i,.warn .dot{background:var(--warn)} .crit .meter i,.crit .dot{background:var(--crit)}
-  section{display:grid;gap:10px}
+  /* as seções aqui são blocos simples (o styles.css do site dá borda e fundo de cartão a toda <section>) */
+  #out section{display:grid;gap:10px;background:none;border:0;border-radius:0;padding:0;box-shadow:none;overflow:visible;margin:0}
+  #out{display:grid;gap:28px;margin-top:18px}
+  #out section::before,#out section::after{content:none}
   h2{font-family:var(--display);font-size:22px;margin:6px 0 0}
   .chart{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;position:relative}
   .bars{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:2px;align-items:end;height:160px;border-bottom:1px solid var(--line)}
@@ -58,7 +61,7 @@
 <body>
 <main class="wrap" id="app" hidden>
   <div class="top">
-    <div><div class="eyebrow">DPI · painel do servidor</div><h1>Uso e limites</h1><p class="sub" id="when">Carregando…</p></div>
+    <div><div class="eyebrow">DPI · painel do servidor</div><h1>Uso e limites</h1><p class="when" id="when">Carregando…</p></div>
     <button class="r" id="reload" type="button">Atualizar</button>
   </div>
   <div id="out"><p class="msg wait" role="status">Carregando os números…</p></div>
@@ -126,7 +129,7 @@ function render(d) {
     h += tile('Últimos 30 dias', nf(V.d30), 'pessoas diferentes');
     h += tile('Desde o início', nf(V.total), 'pessoas diferentes');
     h += '</div>';
-    if (V.days?.length) { const mx = Math.max(1, ...V.days.map(x => x.n)); h += `<table class="vis"><thead><tr><th>Dia</th><th>Únicos</th><th>Logados</th><th></th></tr></thead><tbody>${V.days.slice().reverse().map(x => `<tr><td>${lbl(x.d)}</td><td>${nf(x.n)}</td><td>${nf(x.l || 0)}</td><td style="width:45%"><i style="display:block;height:8px;border-radius:4px;background:var(--acc,#6cc4ff);width:${(x.n / mx * 100).toFixed(1)}%"></i></td></tr>`).join('')}</tbody></table>`; }
+    if (V.days?.length) { const mx = Math.max(1, ...V.days.map(x => x.n)); h += `<div class="card" style="padding:6px 12px"><table class="vis"><thead><tr><th>Dia</th><th>Únicos</th><th>Logados</th><th></th></tr></thead><tbody>${V.days.slice().reverse().map(x => `<tr><td>${lbl(x.d)}</td><td>${nf(x.n)}</td><td>${nf(x.l || 0)}</td><td style="width:45%"><i style="display:block;height:8px;border-radius:4px;background:var(--acc,#6cc4ff);width:${(x.n / mx * 100).toFixed(1)}%"></i></td></tr>`).join('')}</tbody></table></div>`; }
     h += '</section>';
   } }
   h += '<section><h2>Hoje (dia UTC)</h2><div class="grid">';
