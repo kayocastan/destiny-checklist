@@ -110,6 +110,25 @@ async function pubPage(req, env, c) {
   const h = INDEX.h.replace(/<meta (property="og:[^"]*"|name="twitter:[^"]*")[^>]*>\s*/g, '').replace(/<title>[^<]*<\/title>/, `<title>${escH(title)}</title>`).replace(/(src|href)="(?!\/|https?:|#|data:|mailto:)/g, '$1="/').replace('</head>', tags + '</head>'); // caminhos relativos do index passam a valer a partir da raiz
   return new Response(h, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=300' } });
 }
+/* ---------- Sugestões (página /novidades): qualquer um envia; só o dono lê no /status ---------- */
+async function sugPost(req, env) {
+  if (await brake(env)) return json(req, { error: 'brake' }, 503);
+  const b = await req.json().catch(() => null), txt = String(b?.txt || '').trim().slice(0, 2000), name = String(b?.name || '').trim().slice(0, 60);
+  if (txt.length < 5) return json(req, { error: 'short' }, 400);
+  // limite de 5 por dia por endereço, guardando só um resumo (endereço + dia), nunca o IP
+  const ip = req.headers.get('CF-Connecting-IP') || '', day = new Date().toISOString().slice(0, 10);
+  const ipd = [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('dpi-sug|' + day + '|' + ip)))].slice(0, 10).map(x => x.toString(16).padStart(2, '0')).join('');
+  const n = await env.DB.prepare('SELECT COUNT(*) n FROM sug WHERE ipd = ?').bind(ipd).first(); if ((n?.n || 0) >= 5) return json(req, { error: 'limit' }, 429);
+  const uid = await who(req, env).catch(() => null);
+  await env.DB.prepare('INSERT INTO sug (t, txt, name, uid, ipd) VALUES (?, ?, ?, ?, ?)').bind(Date.now(), txt, name || null, uid, ipd).run();
+  return json(req, { ok: true });
+}
+async function sugList(env) { const r = await env.DB.prepare('SELECT id, t, txt, name, uid, rd FROM sug ORDER BY id DESC LIMIT 100').all().catch(() => ({ results: [] })); return r.results || []; }
+async function sugRead(req, env) {
+  const uid = await who(req, env); if (uid !== String(env.OWNER)) return json(req, { error: 'forbidden' }, 403);
+  const b = await req.json().catch(() => ({})); if (b?.del) await env.DB.prepare('DELETE FROM sug WHERE id = ?').bind(+b.del).run(); else await env.DB.prepare('UPDATE sug SET rd = 1 WHERE rd = 0').run();
+  return json(req, { ok: true });
+}
 async function sync(req, env) {
   const uid = await who(req, env);
   if (!uid) return json(req, { error: 'auth' }, 401);
@@ -219,6 +238,7 @@ async function stats(req, env) {
     at: now,
     db: { size, defs: defs?.n || 0, defsBytes: defs?.b || 0, users: users?.n || 0, active7: act7?.n || 0, active1: act1?.n || 0, kvBytes: kvSize?.b || 0, kvRows: kvSize?.n || 0, byType: defsBy.results || [], manifest: man?.v ? JSON.parse(man.v) : null },
     visits: await visits(env),
+    sug: await sugList(env),
     month: await monthUsage(env).catch(e => ({ error: String(e.message || e) })),
     brake: await env.DB.prepare("SELECT v FROM meta WHERE k = 'brake'").first().then(r => r ? JSON.parse(r.v) : null).catch(() => null),
     cf: cf.error ? { error: cf.error } : { workers: cf.viewer?.accounts?.[0]?.workers || [], d1: cf.viewer?.accounts?.[0]?.d1 || [] },
@@ -241,6 +261,8 @@ export default {
       if (path === '/sync' && (req.method === 'GET' || req.method === 'PUT')) return await sync(req, env);
       if (path === '/hit' && req.method === 'POST') return await hit(req, env);
       if (path === '/pub' && req.method === 'POST') return await pubPost(req, env);
+      if (path === '/sug' && req.method === 'POST') return await sugPost(req, env);
+      if (path === '/sug/read' && req.method === 'POST') return await sugRead(req, env);
       if (path.startsWith('/pub/') && req.method === 'GET') return await pubGet(req, env, path.slice(5));
       if (path.startsWith('/page/') && req.method === 'GET') return await pubPage(req, env, path.slice(6));
       if (path === '/stats' && req.method === 'GET') return await stats(req, env);

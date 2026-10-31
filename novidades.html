@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Novidades · DPI</title>
+<meta name="description" content="O que mudou no DPI · Destiny Parallel Interface, semana a semana, e um espaço para deixar sugestões.">
+<meta property="og:title" content="Novidades · DPI">
+<meta property="og:description" content="O que mudou no DPI, semana a semana, e um espaço para deixar sugestões.">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="/styles.css">
+<style>
+  *{box-sizing:border-box} [hidden]{display:none!important}
+  body{margin:0}
+  .nv{max-width:820px;margin:0 auto;padding:24px 16px 48px;display:grid;gap:22px}
+  .nv-top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .nv-top h1{margin:0;font-family:var(--display);font-size:38px;line-height:1}
+  .nv-top a{font-size:14px;color:var(--fg);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:9px 14px;background:var(--surface)}
+  .nv-top a:hover{border-color:var(--arc)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .wk{border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden}
+  .wk-h{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+  .wk-h h2{margin:0;font-family:var(--display);font-size:24px}
+  .wk-h span{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .wk ul{list-style:none;margin:0;padding:6px 0}
+  .wk li{display:grid;grid-template-columns:30px minmax(0,1fr);gap:4px 10px;padding:10px 18px}
+  .wk li+li{border-top:1px solid var(--line)}
+  .wk li .ic{font-size:18px;line-height:1.3}
+  .wk li b{font-size:14.5px}
+  .wk li p{margin:2px 0 0;font-size:14px;color:var(--muted);line-height:1.5}
+  .sg{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:18px;display:grid;gap:12px}
+  .sg h2{margin:0;font-family:var(--display);font-size:24px}
+  .sg p{margin:0;font-size:14px;color:var(--muted)}
+  .sg label{display:grid;gap:6px;font-size:13px;color:var(--muted)}
+  .sg textarea,.sg input{font:inherit;font-size:15px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+  .sg textarea{min-height:120px;resize:vertical}
+  .sg textarea:focus,.sg input:focus{outline:2px solid var(--arc);outline-offset:1px}
+  .sg-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .sg button{font:inherit;font-size:15px;font-weight:600;border:0;border-radius:10px;padding:11px 18px;background:var(--arc);color:#0b1520;cursor:pointer}
+  .sg button:disabled{opacity:.6;cursor:default}
+  .sg-msg{font-size:14px}
+  .sg-msg.ok{color:var(--done)} .sg-msg.err{color:var(--hard)}
+  .empty{color:var(--muted)}
+</style>
+</head>
+<body>
+<main class="nv">
+  <div class="nv-top">
+    <div><div class="eyebrow">DPI · Destiny Parallel Interface</div><h1>Novidades</h1></div>
+    <a href="/">← Voltar ao site</a>
+  </div>
+
+  <section class="sg" aria-labelledby="sgt">
+    <h2 id="sgt">Deixe uma sugestão</h2>
+    <p>Ideia, algo que faltou ou um erro que você viu: tudo chega direto para quem mantém o site. Não precisa de login.</p>
+    <form id="sgf">
+      <label for="sgtxt">Sua sugestão</label>
+      <textarea id="sgtxt" name="txt" maxlength="2000" required placeholder="Ex.: mostrar o rolo das armas do Xûr…"></textarea>
+      <label for="sgname" style="margin-top:10px">Seu nome Bungie ou do Discord (opcional, para eu poder te responder)</label>
+      <input id="sgname" name="name" maxlength="60" autocomplete="nickname">
+      <div class="sg-row" style="margin-top:12px"><button type="submit" id="sgb">Enviar sugestão</button><span class="sg-msg" id="sgm" role="status"></span></div>
+    </form>
+  </section>
+
+  <div id="list"><p class="empty">Carregando…</p></div>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const dm = d => { const [y, m, dd] = d.split('-'); return `${dd}/${m}`; };
+// tema igual ao do site
+try { const t = JSON.parse(localStorage.getItem('dc-theme') || 'null'); if (t) document.documentElement.dataset.theme = t; } catch {}
+fetch('/data/changelog.json', { cache: 'no-cache' }).then(r => r.json()).then(l => {
+  $('list').innerHTML = l.length ? l.map(w => `<article class="wk"><div class="wk-h"><h2>${esc(w.titulo)}</h2><span>${dm(w.de)} a ${dm(w.ate)}</span></div><ul>${w.itens.map(([ic, t, d]) => `<li><span class="ic" aria-hidden="true">${esc(ic)}</span><div><b>${esc(t)}</b><p>${esc(d)}</p></div></li>`).join('')}</ul></article>`).join('') : '<p class="empty">Nada por aqui ainda.</p>';
+}).catch(() => { $('list').innerHTML = '<p class="empty">Não deu para carregar as novidades agora.</p>'; });
+let API = null;
+fetch('/data/api.json', { cache: 'no-cache' }).then(r => r.json()).then(j => { API = j.api; }).catch(() => {});
+$('sgf').addEventListener('submit', async e => {
+  e.preventDefault(); const txt = $('sgtxt').value.trim(), m = $('sgm');
+  if (txt.length < 5) { m.className = 'sg-msg err'; m.textContent = 'Escreva um pouco mais.'; return; }
+  if (!API) { m.className = 'sg-msg err'; m.textContent = 'O servidor não respondeu, tente de novo em instantes.'; return; }
+  $('sgb').disabled = true; m.className = 'sg-msg'; m.textContent = 'Enviando…';
+  let auth = null; try { auth = JSON.parse(localStorage.getItem('dc-auth') || 'null'); } catch {}
+  const h = { 'Content-Type': 'application/json' }; if (auth?.access_token && auth.access_expires > Date.now()) h.Authorization = 'Bearer ' + auth.access_token;
+  try {
+    const r = await fetch(API + '/sug', { method: 'POST', headers: h, body: JSON.stringify({ txt, name: $('sgname').value.trim() }) });
+    if (r.status === 429) throw new Error('Você já mandou 5 sugestões hoje. Obrigado! Tente amanhã.');
+    if (!r.ok) throw new Error('Não deu certo agora, tente de novo em instantes.');
+    m.className = 'sg-msg ok'; m.textContent = 'Recebido, obrigado! 🙌'; $('sgtxt').value = '';
+  } catch (err) { m.className = 'sg-msg err'; m.textContent = err.message; }
+  $('sgb').disabled = false;
+});
+</script>
+</body>
+</html>

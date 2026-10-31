@@ -47,6 +47,10 @@
   ],
   "rewrites": [
     {
+      "source": "/novidades",
+      "destination": "/novidades.html"
+    },
+    {
       "source": "/status",
       "destination": "/status.html"
     },

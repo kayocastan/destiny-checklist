@@ -55,6 +55,11 @@
   .note{color:var(--muted);font-size:13px;margin:0}
   .msg{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
   button.r{font:inherit;font-size:14px;padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+  .sgi{padding:10px 0;border-bottom:1px solid var(--line)} .sgi:last-child{border-bottom:0}
+  .sgi.new{box-shadow:inset 3px 0 0 var(--arc);padding-left:10px}
+  .sgi-h{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap} .sgi-h small{color:var(--muted);font-size:12px}
+  .sgi p{margin:4px 0 0;white-space:pre-wrap;font-size:14px}
+  .sgdel{margin-left:auto;background:none;border:0;color:var(--muted);cursor:pointer;font-size:13px}
   .top{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap}
 </style>
 </head>
@@ -121,6 +126,10 @@ function render(d) {
     h += meterCard('Tempo de CPU (estimado)', M.cpu, LIM.mCpu, v => nf(v) + ' ms');
   }
   h += '</div></section>';
+  { const S = d.sug || [], nw = S.filter(x => !x.rd).length;
+    h += `<section><h2>Sugestões${nw ? ` · ${nw} nova${nw > 1 ? 's' : ''}` : ''}</h2><p class="note">Enviadas pela página <a href="/novidades">/novidades</a>. Para eu implementar, use "Copiar para o Claude" e cole na conversa.</p>`;
+    h += S.length ? `<div class="links"><button class="r" type="button" id="sgcopy">Copiar para o Claude</button>${nw ? '<button class="r" type="button" id="sgread">Marcar todas como lidas</button>' : ''}</div><div class="card" style="padding:4px 14px">${S.map(x => `<div class="sgi${x.rd ? '' : ' new'}"><div class="sgi-h"><b>${esc(x.name || 'Anônimo')}</b>${x.uid ? ' <small>· logado</small>' : ''}<small>${new Date(x.t).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</small><button class="sgdel" type="button" data-del="${x.id}" aria-label="Apagar">✕</button></div><p>${esc(x.txt)}</p></div>`).join('')}</div>` : '<p class="msg">Nenhuma sugestão ainda.</p>';
+    h += '</section>'; window.__sug = S; }
   { const V = d.visits; if (V) {
     const lbl = x => x.slice(8, 10) + '/' + x.slice(5, 7), since = V.since ? lbl(V.since) : '';
     h += '<section><h2>Acessos únicos</h2><p class="note">Cada navegador conta uma vez por dia; quem está logado conta pela conta (celular + PC = 1). Sem IP nem cookies de rastreio.' + (since ? ` Contando desde ${since}.` : ' A contagem começa agora.') + '</p><div class="grid">';
@@ -170,10 +179,18 @@ async function load() {
     const r = await fetch(api.api + '/stats', { headers: { Authorization: 'Bearer ' + t, 'X-API-Key': cfg.apiKey } });
     if (r.status === 403 || r.status === 401) { location.replace('/'); return; } // quem não é o dono volta para o site, sem ver nada
     if (!r.ok) throw new Error('HTTP ' + r.status);
+    window.__api = api.api; window.__key = cfg.apiKey;
     render(await r.json());
   } catch (e) { $('app').hidden = false; $('out').innerHTML = `<p class="msg">Não foi possível carregar agora (${esc(e.message)}). Tente de novo em instantes.</p>`; $('when').textContent = ''; }
 }
 $('reload').addEventListener('click', load);
+// sugestões: copiar para colar na conversa com o Claude, marcar como lidas, apagar
+$('out').addEventListener('click', async e => {
+  if (e.target.id === 'sgcopy') { const txt = 'Sugestões do site DPI (página /novidades):\n\n' + (window.__sug || []).map((x, i) => `${i + 1}. [${new Date(x.t).toLocaleDateString('pt-BR')}] ${x.name || 'Anônimo'}: ${x.txt}`).join('\n'); try { await navigator.clipboard.writeText(txt); e.target.textContent = 'Copiado!'; } catch { prompt('', txt); } return; }
+  const post = async body => { const t = await token(); await fetch(window.__api + '/sug/read', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t, 'X-API-Key': window.__key }, body: JSON.stringify(body) }); load(); };
+  if (e.target.id === 'sgread') return post({});
+  const d = e.target.closest('[data-del]'); if (d && confirm('Apagar esta sugestão?')) return post({ del: +d.dataset.del });
+});
 load();
 })();
 </script>

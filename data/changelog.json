@@ -1,0 +1,19 @@
+[
+  {
+    "id": "2026-10-31",
+    "de": "2026-10-28",
+    "ate": "2026-10-31",
+    "titulo": "Guias, Ao vivo, lista de desejos e clã",
+    "itens": [
+      ["🗺️", "Guias", "Incursões, masmorras e missões exóticas com vídeos (vários por atividade: baús secretos, desafios, coletáveis) e galeria de mapas e imagens. Atividades fora do jogo somem sozinhas."],
+      ["🔴", "Ao vivo", "Veja o fireteam e a build de cada um, com atalho para a página, os vídeos e as imagens da atividade que vocês estão fazendo."],
+      ["🎯", "Objetivos", "Última sessão com recordes e solo (aparece depois de fechar o jogo), Esta semana em cartões, correios de cada personagem, aviso quando o Destiny 2 atualiza e ☆ Foco para títulos, atividades, exóticos e catalisadores."],
+      ["⭐", "Lista de desejos", "☆ nas armas e armaduras da build e dos vendedores: guarda o rolo da arma ou o atributo principal e secundário da armadura, mostra onde dropa e avisa quando está à venda."],
+      ["🛠️", "Builds", "Metas de build a partir da comparação e um botão Compartilhar: link fixo da build com prévia no Discord (até 5 por conta), link do perfil ou imagem."],
+      ["🛒", "Vendedores", "Xûr completo (exóticas, catalisadores e lendárias) e o foco da semana de Shaxx, Zavala e Saint-14."],
+      ["👥", "Clã", "Nova página do clã com o checklist de quem já fez cada incursão e masmorra e a comparação de conclusões entre guardiões."],
+      ["⚔️", "Atividades", "Filtros por dificuldade, falta arma, falta catalisador, quase lá, menos feitos e A–Z."],
+      ["🧭", "Visual", "Site agora é DPI, duas colunas em tela larga, setas e abas mais claras, dados que se atualizam sozinhos depois de uma atividade."]
+    ]
+  }
+]
