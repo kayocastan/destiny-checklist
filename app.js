@@ -2611,6 +2611,9 @@ if ('serviceWorker' in navigator) addEventListener('load', () => navigator.servi
   if (h?.auth) { auth = h.auth; LS.set('dc-auth', auth); }
   if (location.host === OLD_HOST && !auth) bungie('/GlobalAlerts/', false).catch(() => {});
   setTimeout(sendHit, 5000);
+  // botão Novidades no topo: ponto aceso quando há uma semana nova que você ainda não viu
+  setTimeout(() => fetch('/data/changelog.json', { cache: 'no-cache' }).then(r => r.json()).then(l => { const id = l[0]?.id; if (id && LS.get('dc-cl-seen', '') !== id) $('nbdot').hidden = false; }).catch(() => {}), 2500);
+  { const nb = $('newsbtn'); nb.setAttribute('aria-label', u().newsLink); nb.title = u().newsLink; }
   if (/^\/b\//.test(location.pathname)) setTimeout(openPub, auth ? 1200 : 300);
   const pub = new URLSearchParams(location.search).get('jogador') || new URLSearchParams(location.search).get('player');
   if (auth) { render(); if (pub) openPublic(pub); await start(); if ($('finddlg').open) renderFind(); } else { render(); if (pub) openPublic(pub); }

@@ -74,6 +74,7 @@ const dm = d => { const [y, m, dd] = d.split('-'); return `${dd}/${m}`; };
 // tema igual ao do site
 try { const t = JSON.parse(localStorage.getItem('dc-theme') || 'null'); if (t) document.documentElement.dataset.theme = t; } catch {}
 fetch('/data/changelog.json', { cache: 'no-cache' }).then(r => r.json()).then(l => {
+  try { if (l[0]?.id) localStorage.setItem('dc-cl-seen', JSON.stringify(l[0].id)); } catch {}
   $('list').innerHTML = l.length ? l.map(w => `<article class="wk"><div class="wk-h"><h2>${esc(w.titulo)}</h2><span>${dm(w.de)} a ${dm(w.ate)}</span></div><ul>${w.itens.map(([ic, t, d]) => `<li><span class="ic" aria-hidden="true">${esc(ic)}</span><div><b>${esc(t)}</b><p>${esc(d)}</p></div></li>`).join('')}</ul></article>`).join('') : '<p class="empty">Nada por aqui ainda.</p>';
 }).catch(() => { $('list').innerHTML = '<p class="empty">Não deu para carregar as novidades agora.</p>'; });
 let API = null;

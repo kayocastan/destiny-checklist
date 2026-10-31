@@ -968,3 +968,8 @@ li.is-done .it-ic{width:24px;height:24px;opacity:.6}
 /* regra: painel recolhido continua mostrando a descrição, para identificar sem abrir */
 section.collapsed:not(.q-open) .sec-head>p{display:block}
 section.collapsed .sec-head>p{margin-bottom:2px}
+/* botão Novidades no topo */
+.newsbtn{position:relative;text-decoration:none}
+.gh .newsbtn{color:#e6ebf2}
+.nb-dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--exotic);box-shadow:0 0 0 2px #0d1219}
+@media (max-width:400px){.gh .newsbtn{width:32px;height:32px}}
