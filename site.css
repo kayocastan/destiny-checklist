@@ -965,3 +965,6 @@ li .row > .foc-b{order:0;margin:0 10px 0 0;align-self:center}
 .it-ic{flex:none;width:34px;height:34px;border-radius:5px;background:var(--chip) center/cover no-repeat;margin-right:2px}
 li .it:has(.it-ic){gap:10px}
 li.is-done .it-ic{width:24px;height:24px;opacity:.6}
+/* regra: painel recolhido continua mostrando a descrição, para identificar sem abrir */
+section.collapsed:not(.q-open) .sec-head>p{display:block}
+section.collapsed .sec-head>p{margin-bottom:2px}

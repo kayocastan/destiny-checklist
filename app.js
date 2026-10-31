@@ -2399,7 +2399,7 @@ async function loadClanCk() {
 function clanCkHTML() {
   const W = u(), list = GD?.clan?.list || []; if (!list.length) return '';
   const got = list.filter(x => GMET[x.mid]), pub = got.filter(x => !GMET[x.mid].priv);
-  const head = `<article class="gd clck-a${CLCK.open ? '' : ' shut'}"><button type="button" class="gd-head clck-h" data-clcko aria-expanded="${CLCK.open}"><h2>${esc(W.clckT)}</h2><span class="chev" aria-hidden="true"></span></button>${CLCK.open ? '' : '</article>'}`;
+  const head = `<article class="gd clck-a${CLCK.open ? '' : ' shut'}"><button type="button" class="gd-head clck-h" data-clcko aria-expanded="${CLCK.open}"><h2>${esc(W.clckT)}</h2><span class="chev" aria-hidden="true"></span></button>${CLCK.open ? '' : `<p>${esc(W.clckNote)}</p></article>`}`;
   if (!CLCK.open) return head;
   if (!got.length || CLCK.busy && !CLCK.done) return head + `<p>${esc(W.clckNote)}</p><button type="button" class="char clck-b" data-clck ${CLCK.busy ? 'disabled' : ''}>${esc(CLCK.busy ? W.clckLoading(CLCK.n, list.length) : W.clckBtn(list.length))}</button></article>`;
   const rows = ACT_METRICS().filter(([k]) => CLCK.f === 'all' || CLCK.f === k).map(([k, a]) => { const done = pub.filter(x => GMET[x.mid].m[a.m] > 0), never = pub.filter(x => !(GMET[x.mid].m[a.m] > 0)); return { k, a, done, never }; });
