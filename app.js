@@ -1440,7 +1440,7 @@ function render() {
       ${sec.note ? `<p>${esc(sec.note)}</p>` : ''}${sec.kind ? actStrip(sec) : sec.xm ? xmStrip(sec.xm) : ''}<div class="sec-bar"><i data-sb="${sec.id}"></i></div></div>
       <ul>${sec.items.map(i => {
         const cid = 'c-' + i.id.replace(/[^a-z0-9]+/gi, '-'), first = i.c[0], rest = i.c.slice(1), more = !!(i.d || rest.length || i.loc);
-        const ich = sec.tab === 'exo' && /^x-\d+$/.test(i.id) ? 'DestinyCollectibleDefinition:' + i.id.slice(2) : sec.tab === 'cat' && /^c-\d+$/.test(i.id) ? 'DestinyRecordDefinition:' + i.id.slice(2) : '';
+        const ich = sec.tab === 'exo' && /^x-\d+$/.test(i.id) ? 'DestinyCollectibleDefinition:' + i.id.slice(2) : sec.tab === 'cat' && /^c-\d+$/.test(i.id) ? catIcon(+i.id.slice(2)) : '';
         const head = `${ich ? `<span class="it-ic" data-ich="${ich}" aria-hidden="true"${ICONS[ich] ? ` style="background-image:url('${BNET}${ICONS[ich]}')"` : ''}></span>` : ''}<span class="t">${esc(i.t)}</span>${first ? `<span class="chip ${chipClass(first)}">${esc(first)}</span>` : ''}`;
         return `<li data-li="${esc(i.id)}" data-search="${esc([i.t, i.d, i.loc, ...i.c, sec.title].join(' ').toLowerCase())}"><div class="row"><label class="ck" for="${cid}"><input type="checkbox" id="${cid}" data-id="${esc(i.id)}" aria-label="${esc(i.t)}"${i.auto ? ' checked disabled' : ''}></label>${more ? `<button class="it" type="button" aria-expanded="false">${head}<span class="chev" aria-hidden="true"></span></button>` : `<span class="it">${head}</span>`}${FOCUS_ITEM_TABS.includes(sec.tab) && !isDone(i) ? focBtn('it:' + i.id) : ''}</div>${more ? `<div class="more">${i.loc ? `<div class="loc"><span class="loc-k">${esc(U.where)}</span> ${hiLoc(esc(i.loc))}</div>` : ''}${i.tl ? `<ul class="tl">${i.tl.map(x => `<li class="${x.ok ? 'ok' : ''}"><span class="tl-i" aria-label="${x.ok ? '✓' : '○'}">${x.ok ? '✓' : ''}</span><div><b>${esc(x.n)}${x.pr ? ` <span class="tl-p">${esc(x.pr)}</span>` : ''}</b>${x.d && !x.ok ? `<small>${hiLoc(esc(x.d))}</small>` : ''}</div></li>`).join('')}</ul>` : i.d ? `<div class="d">${hiLoc(esc(i.d))}</div>` : ''}${rest.length ? `<div class="chips">${rest.map(x => `<span class="chip ${chipClass(x)}">${esc(x)}</span>`).join('')}</div>` : ''}</div>` : ''}</li>`;
       }).join('')}</ul></section>`;
@@ -1452,6 +1452,8 @@ function render() {
 const isDone = i => i.auto || marks.has(i.id);
 /* ícones de exóticos e catalisadores: o texto aparece na hora e a imagem chega depois (guardada no navegador para as próximas visitas) */
 const ICONS = LS.get('dc-icons', {});
+// catalisador: o ícone da própria arma (o do triunfo é igual para todos); sem a arma, fica o do triunfo
+const catIcon = rh => { const c = defs.cats.find(x => x.h === rh), e = c && catWeapon(c.n[0].replace(/ Catalyst$/, '')); return e?.h?.[0] ? 'DestinyCollectibleDefinition:' + e.h[0] : 'DestinyRecordDefinition:' + rh; };
 let iconsBusy = false;
 async function loadIcons() {
   if (iconsBusy) return; const els = [...document.querySelectorAll('#list [data-ich]')].filter(e => !e.style.backgroundImage); if (!els.length) return;
