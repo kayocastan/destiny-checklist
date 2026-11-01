@@ -2528,6 +2528,7 @@ const LBO = LS.get('dc-lb-opt', {});
 const LB = { st: 'idle', pieces: null, cid: null, exo: 'any', prio: LS.get('dc-lb-prio', STAT_ORDER.slice()), min: LS.get('dc-lb-min', {}), set: '', need: 2, res: null, n: 0, ms: 0,
   sub: 'cur', wp: LBO.wp || 'cur', w: {}, mods: LBO.mods !== false, art: LBO.art !== false, artSel: '', so: {}, ao: {}, pick: '',
   wpns: [], subs: {}, arts: {}, eq: {}, sk: {}, en: {}, pp: {}, cp: {}, season: 0 };
+const lbWDef = () => { if (LB.wp === 'pick' && !Object.keys(LB.w).length) for (const i of LB.eq[LB.cid] || []) if (WEAPON_B.includes(i.bucketHash)) LB.w[WEAPON_B.indexOf(i.bucketHash)] = i.itemInstanceId; };
 const lbSaveOpt = () => { try { LS.set('dc-lb-opt', { wp: LB.wp, mods: LB.mods, art: LB.art }); } catch {} };
 const ADEF = LS.get('dc-adef', {}), SOCKD = LS.get('dc-sockdef', {}), ACAP = LS.get('dc-acap', {}), lbReq = new Set();
 async function armorDef(h) {
@@ -2586,7 +2587,7 @@ async function lbLoad() {
     LB.wpns = wraw.map(x => ({ id: x.it.itemInstanceId, h: x.it.itemHash, slot: x.slot, eqc: x.eq || '', n: LB.en[x.it.itemHash]?.n || '', ic: LB.en[x.it.itemHash]?.ic || '', exo: LB.en[x.it.itemHash]?.tt === 6 })).filter(w => w.n && w.slot >= 0).sort((p, q) => (q.exo - p.exo) || p.n.localeCompare(q.n));
     const sh = profile?.profile?.data?.currentSeasonHash;
     if (sh && !LB.season) bungie(`/Destiny2/Manifest/DestinySeasonDefinition/${sh}/`, false).then(d => { LB.season = d?.seasonNumber || 0; }).catch(() => {});
-    LB.st = 'ready';
+    LB.st = 'ready'; lbWDef();
     for (const s of new Set(LB.pieces.map(p => p.set).filter(Boolean))) if (!SETDEF[s + ':' + (lang === 'pt' ? 'pt-br' : 'en')]) setDef(s, lang === 'pt' ? 'pt-br' : 'en').then(lbDraw);
   } catch (e) { LB.st = 'err'; }
   lbDraw();
@@ -2708,7 +2709,7 @@ function lbDraw() {
   // 2. exótico (ícones, como no jogo)
   const exos = [...new Map(ps.filter(p => p.exo).map(p => [p.n, p])).values()].sort((a, b) => a.slot - b.slot || a.n.localeCompare(b.n));
   const s2 = `<section class="lbd-s"><h2>${esc(T.s2)}</h2><div class="lbd-chips"><button type="button" class="lbd-chip${LB.exo === 'any' ? ' on' : ''}" data-lbexob="any">${esc(W.lbExoAny)}</button><button type="button" class="lbd-chip${LB.exo === 'none' ? ' on' : ''}" data-lbexob="none">${esc(W.lbExoNone)}</button></div>
-    <div class="lbd-exos">${exos.map(p => `<button type="button" class="lbd-exo${LB.exo === p.n ? ' on' : ''}" data-lbexob="${esc(p.n)}" title="${esc(p.n)}" aria-label="${esc(p.n)}">${p.ic ? `<img src="${BNET}${p.ic}" alt="" loading="lazy">` : esc(p.n.slice(0, 2))}</button>`).join('')}</div>
+    <div class="lbd-exos">${exos.map(p => `<button type="button" class="lbd-exo${LB.exo === p.n ? ' on' : ''}" data-lbexob="${esc(p.n)}" title="${esc(p.n)}" aria-label="${esc(p.n)}">${p.ic ? `<img src="${BNET}${p.ic}" alt="">` : esc(p.n.slice(0, 2))}</button>`).join('')}</div>
     ${LB.exo !== 'any' && LB.exo !== 'none' ? `<p class="lbd-sel">${esc(LB.exo)}</p>` : ''}</section>`;
   // 3. atributos
   const prio = LB.prio.map((h, r) => `<div class="lb-p" data-lbh="${h}"><b>${r + 1}</b><span>${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}${esc(stN(h))}</span><button type="button" data-lbup="${r}" aria-label="↑" ${r ? '' : 'disabled'}>↑</button><button type="button" data-lbdn="${r}" aria-label="↓" ${r < 5 ? '' : 'disabled'}>↓</button><label>${esc(W.lbMin)}<input type="number" min="0" max="250" step="5" data-lbmin="${h}" value="${LB.min[h] || ''}" aria-label="${esc(W.lbMin + ' ' + stN(h))}"></label></div>`).join('');
@@ -2769,7 +2770,7 @@ $('lbdlg').addEventListener('click', e => {
   const d = $('lbdlg'), q = s => e.target.closest(s);
   if (e.target === d || q('.pf-x')) { d.close(); return; }
   const b = q('[data-lb]'); if (b) { if (b.dataset.lb === 'load') lbLoad(); else lbRun(); return; }
-  const c = q('[data-lbch]'); if (c) { if (c.dataset.lbch !== LB.cid) { LB.cid = c.dataset.lbch; LB.sub = 'cur'; LB.artSel = ''; LB.exo = 'any'; LB.set = ''; LB.w = {}; LB.pick = ''; LB.res = null; lbDraw(); } return; }
+  const c = q('[data-lbch]'); if (c) { if (c.dataset.lbch !== LB.cid) { LB.cid = c.dataset.lbch; LB.sub = 'cur'; LB.artSel = ''; LB.exo = 'any'; LB.set = ''; LB.w = {}; lbWDef(); LB.pick = ''; LB.res = null; lbDraw(); } return; }
   const x = q('[data-lbexob]'); if (x) { LB.exo = x.dataset.lbexob; LB.res = null; lbDraw(); return; }
   const sb = q('[data-lbsub]'); if (sb) { LB.sub = sb.dataset.lbsub; LB.pick = ''; lbDraw(); return; }
   const ab = q('[data-lbart]'); if (ab) { LB.artSel = ab.dataset.lbart; LB.pick = ''; lbDraw(); return; }
@@ -2780,7 +2781,7 @@ $('lbdlg').addEventListener('click', e => {
     if (+h === LB.sk[it.itemInstanceId]?.sockets?.[+k]?.plugHash) delete ov[k]; else ov[k] = +h; LB.pick = ''; lbDraw(); return;
   }
   const rs = q('[data-lbreset]'); if (rs) { const it = rs.dataset.lbreset === 'sub' ? lbSubInst() : lbArtInst(); if (it) delete (rs.dataset.lbreset === 'sub' ? LB.so : LB.ao)[it.itemInstanceId]; LB.pick = ''; lbDraw(); return; }
-  const wm = q('[data-lbwpm]'); if (wm) { LB.wp = wm.dataset.lbwpm; if (LB.wp === 'pick' && !Object.keys(LB.w).length) for (const i of LB.eq[LB.cid] || []) if (WEAPON_B.includes(i.bucketHash)) LB.w[WEAPON_B.indexOf(i.bucketHash)] = i.itemInstanceId; lbSaveOpt(); lbDraw(); return; }
+  const wm = q('[data-lbwpm]'); if (wm) { LB.wp = wm.dataset.lbwpm; lbWDef(); lbSaveOpt(); lbDraw(); return; }
   const wt = q('[data-lbwt]'); if (wt) { const [s, id] = wt.dataset.lbwt.split(':'); LB.w[+s] = id; lbDraw(); return; }
   const up = q('[data-lbup]'), dn = q('[data-lbdn]'); const k = up ? +up.dataset.lbup : dn ? +dn.dataset.lbdn : -1;
   if (k >= 0) { const j = up ? k - 1 : k + 1; if (j < 0 || j > 5) return; lbSwap(k, j); }
