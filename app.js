@@ -2555,8 +2555,8 @@ async function lbRun() {
   const score = st => st.reduce((t, v, k) => t + v * wOf[k], 0);
   // por espaço: tira peças piores em tudo que outra do mesmo conjunto/exótico; fica com as melhores
   const slots = [0, 1, 2, 3, 4].map(sl => {
-    let l = LB.pieces.filter(p => p.slot === sl && (LB.exo === 'none' ? !p.exo : LB.exo === 'any' ? true : (p.exo ? String(p.h) === LB.exo : true)));
-    if (LB.exo !== 'any' && LB.exo !== 'none') { const ex = LB.pieces.find(p => String(p.h) === LB.exo); if (ex && ex.slot === sl) l = l.filter(p => String(p.h) === LB.exo); else l = l.filter(p => !p.exo); }
+    let l = LB.pieces.filter(p => p.slot === sl && (LB.exo === 'none' ? !p.exo : LB.exo === 'any' ? true : (p.exo ? p.n === LB.exo : true)));
+    if (LB.exo !== 'any' && LB.exo !== 'none') { const ex = LB.pieces.find(p => p.exo && p.n === LB.exo); if (ex && ex.slot === sl) l = l.filter(p => p.exo && p.n === LB.exo); else l = l.filter(p => !p.exo); }
     l = l.filter(p => !l.some(q => q !== p && q.set === p.set && q.exo === p.exo && q.st.every((v, k) => v >= p.st[k]) && q.st.some((v, k) => v > p.st[k])));
     return l.sort((a, b) => score(b.st) - score(a.st)).slice(0, 22);
   });
@@ -2588,7 +2588,7 @@ function lbHTML() {
   if (LB.st === 'idle' || LB.st === 'err') return head + `${LB.st === 'err' ? `<p class="lb-err">${esc(W.lbErr)}</p>` : ''}<button type="button" class="char" data-lb="load">${esc(W.lbLoad)}</button></article>`;
   if (LB.st === 'loading') return head + `<p class="wait">${esc(W.lbLoading)}</p></article>`;
   const ps = LB.pieces, lc = lang === 'pt' ? 'pt-br' : 'en';
-  const exos = [...new Map(ps.filter(p => p.exo).map(p => [p.h, p])).values()].sort((a, b) => a.slot - b.slot || a.n.localeCompare(b.n));
+  const exos = [...new Map(ps.filter(p => p.exo).map(p => [p.n, p])).values()].sort((a, b) => a.slot - b.slot || a.n.localeCompare(b.n));
   const sets = [...new Set(ps.map(p => p.set).filter(Boolean))].map(h => ({ h, n: SETDEF[h + ':' + lc]?.n || '…', c: ps.filter(p => p.set === h).length })).filter(x => x.c >= 2).sort((a, b) => a.n.localeCompare(b.n));
   const stN = h => D[h]?.n || '…';
   const prio = LB.prio.map((h, r) => `<div class="lb-p"><b>${r + 1}</b><span>${esc(stN(h))}</span><button type="button" data-lbup="${r}" aria-label="↑" ${r ? '' : 'disabled'}>↑</button><button type="button" data-lbdn="${r}" aria-label="↓" ${r < 5 ? '' : 'disabled'}>↓</button><label>${esc(W.lbMin)}<input type="number" min="0" max="250" step="5" data-lbmin="${h}" value="${LB.min[h] || ''}" aria-label="${esc(W.lbMin + ' ' + stN(h))}"></label></div>`).join('');
@@ -2600,7 +2600,7 @@ function lbHTML() {
       <div class="lb-st">${STAT_ORDER.map((h, k) => { const v = r.tot[k], d = v - LB.cur[k]; return `<span${v >= 100 ? ' class="hi"' : ''}>${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}<b>${v}</b><small class="${d > 0 ? 'up' : d < 0 ? 'dn' : ''}">${d ? (d > 0 ? '+' : '') + d : '='}</small></span>`; }).join('')}</div></div>`;
   }).join('');
   return head + `<div class="lb-ctl">
-    <label class="lb-f"><small>${esc(W.lbExo)}</small><select class="tsort-sel" data-lbexo><option value="any"${LB.exo === 'any' ? ' selected' : ''}>${esc(W.lbExoAny)}</option><option value="none"${LB.exo === 'none' ? ' selected' : ''}>${esc(W.lbExoNone)}</option>${exos.map(p => `<option value="${p.h}"${LB.exo === String(p.h) ? ' selected' : ''}>${esc(p.n)}</option>`).join('')}</select></label>
+    <label class="lb-f"><small>${esc(W.lbExo)}</small><select class="tsort-sel" data-lbexo><option value="any"${LB.exo === 'any' ? ' selected' : ''}>${esc(W.lbExoAny)}</option><option value="none"${LB.exo === 'none' ? ' selected' : ''}>${esc(W.lbExoNone)}</option>${exos.map(p => `<option value="${esc(p.n)}"${LB.exo === p.n ? ' selected' : ''}>${esc(p.n)}</option>`).join('')}</select></label>
     <label class="lb-f"><small>${esc(W.lbSet)}</small><select class="tsort-sel" data-lbset><option value="">${esc(W.lbSetAny)}</option>${sets.map(x => `<option value="${x.h}"${String(LB.set) === String(x.h) ? ' selected' : ''}>${esc(x.n)} (${x.c})</option>`).join('')}</select></label>
     ${LB.set ? `<label class="lb-f"><small>${esc(W.lbNeed)}</small><select class="tsort-sel" data-lbneed><option value="2"${LB.need === 2 ? ' selected' : ''}>2</option><option value="4"${LB.need === 4 ? ' selected' : ''}>4</option></select></label>` : ''}
   </div><div class="lb-k">${esc(W.lbPrio)}</div><div class="lb-prio">${prio}</div>
