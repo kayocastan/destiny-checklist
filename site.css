@@ -1156,3 +1156,19 @@ dialog.lbd{width:min(1280px,calc(100vw - 24px))}
 .lbd-wsel small i{width:10px;height:10px;border-radius:50%;background:var(--el)}
 .lbd-wsel.exo{border-color:color-mix(in srgb,var(--exotic) 55%,var(--line))}.lbd-wsel.exo b{color:var(--exotic)}
 .lbd-wsel.none b{color:var(--muted)}
+/* montador: seções recolhíveis e munição */
+.lbd-th{display:flex;align-items:center;gap:10px;cursor:pointer;min-height:28px;margin:-4px 0}
+.lbd-th h2{margin:0;flex:none}.lbd-th h2 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.lbd-th .linkb{margin-left:auto;font-size:12.5px}
+.lbd-sum{flex:1;min-width:0;display:flex;align-items:center;gap:6px;justify-content:flex-end;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lbd-th .linkb+.lbd-car,.lbd-sum+.lbd-car{margin-left:0}
+.lbd-si{width:22px;height:22px;border-radius:4px;flex:none}
+.lbd-car{margin-left:auto;flex:none;width:22px;height:22px;border-radius:6px;border:1px solid var(--line);display:grid;place-items:center}
+.lbd-car::before{content:'';width:7px;height:7px;border-right:2px solid var(--fg);border-bottom:2px solid var(--fg);transform:translateY(-2px) rotate(45deg);transition:transform .2s}
+.lbd-s.col .lbd-car::before{transform:translateY(1px) rotate(-135deg)}
+.lbd-th:hover .lbd-car{border-color:var(--acc)}
+.lbd-s.col>:not(.lbd-th):not(.lbd-wsel){display:none}
+.lbd-s.col{gap:8px}
+.lbd-am{position:absolute;top:2px;right:2px;display:flex;padding:1px 2px;border-radius:3px;background:rgba(8,12,18,.78)}
+.lbd-am svg{height:10px;width:auto}
+.lbd-wsel small svg{height:12px;width:auto}

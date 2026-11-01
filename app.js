@@ -2530,6 +2530,14 @@ const LB = { st: 'idle', pieces: null, cid: null, exo: 'any', prio: LS.get('dc-l
   wpns: [], subs: {}, arts: {}, eq: {}, sk: {}, en: {}, pp: {}, cp: {}, season: 0 };
 const lbWEq = s => (LB.eq[LB.cid] || []).find(i => i.bucketHash === WEAPON_B[s])?.itemInstanceId || '';
 const lbWDef = () => { for (const s of [0, 1, 2]) if (LB.w[s] === undefined) LB.w[s] = lbWEq(s); };
+const LBCOL = Object.assign({ w0: 1, w1: 1, w2: 1, s6: 1, s7: 1 }, LS.get('dc-lb-col', {}));
+// cabeçalho de seção recolhível: fechada, mostra só o título e o resumo da escolha atual
+const lbSec = (k, title, sum, body, extra = '') => `<section class="lbd-s${LBCOL[k] ? ' col' : ''}"><div class="lbd-th" data-lbcol="${k}"><h2><button type="button" aria-expanded="${LBCOL[k] ? 'false' : 'true'}">${esc(title)}</button></h2>${LBCOL[k] && sum ? `<span class="lbd-sum">${sum}</span>` : ''}${extra}<i class="lbd-car" aria-hidden="true"></i></div>${body}</section>`;
+// munição das armas: vem junto com o nome (cache do servidor); o que faltar busca aos poucos e fica guardado
+function lbAmmo() {
+  const need = [...new Set(LB.wpns.map(w => w.h))].filter(h => !IDEF[h]); if (!need.length || lbReq.has('ammo')) return; lbReq.add('ammo'); let i = 0;
+  Promise.all(Array.from({ length: 6 }, async () => { while (i < need.length) { try { await idef(need[i++]); } catch {} } })).then(() => { lbReq.delete('ammo'); lbDraw(); });
+}
 const lbSaveOpt = () => { try { LS.set('dc-lb-opt', { wp: LB.wp, mods: LB.mods, art: LB.art }); } catch {} };
 const ADEF = LS.get('dc-adef', {}), SOCKD = LS.get('dc-sockdef', {}), ACAP = LS.get('dc-acap', {}), lbReq = new Set();
 async function armorDef(h) {
@@ -2589,7 +2597,7 @@ async function lbLoad() {
     LB.wpns = wraw.map(x => { const ii = inst[x.it.itemInstanceId] || {}; return { id: x.it.itemInstanceId, h: x.it.itemHash, slot: x.slot, eqc: x.eq || '', n: LB.en[x.it.itemHash]?.n || '', ic: LB.en[x.it.itemHash]?.ic || '', exo: LB.en[x.it.itemHash]?.tt === 6, pw: ii.primaryStat?.value || 0, el: ELEMENTS[ii.damageType] || '' }; }).filter(w => w.n && w.slot >= 0).sort((p, q) => (q.exo - p.exo) || (q.pw - p.pw) || p.n.localeCompare(q.n));
     const sh = profile?.profile?.data?.currentSeasonHash;
     if (sh && !LB.season) bungie(`/Destiny2/Manifest/DestinySeasonDefinition/${sh}/`, false).then(d => { LB.season = d?.seasonNumber || 0; }).catch(() => {});
-    LB.st = 'ready'; lbWDef();
+    LB.st = 'ready'; lbWDef(); lbAmmo();
     for (const s of new Set(LB.pieces.map(p => p.set).filter(Boolean))) if (!SETDEF[s + ':' + (lang === 'pt' ? 'pt-br' : 'en')]) setDef(s, lang === 'pt' ? 'pt-br' : 'en').then(lbDraw);
   } catch (e) { LB.st = 'err'; }
   lbDraw();
@@ -2709,30 +2717,29 @@ function lbDraw() {
     subBody = !g ? `<p class="lbd-n wait">${esc(W.loadingDefs)}</p>` : `<p class="lbd-n">${esc(T.subTap)}</p>` + g.map(([c, ix, cap]) => `<div class="lbd-sg"><small>${esc(c === 1313488945 ? T.frag(cap) : T.subG[c] || '')}</small><div class="lbd-sks">${lbSockRow('sub', si, ix, ov)}</div>${lbPicker('sub', si, ix, ov, sd)}</div>`).join('')
       + (Object.keys(ov).length ? `<button type="button" class="linkb" data-lbreset="sub">${esc(T.reset)}</button>` : '');
   }
-  const s1 = `<section class="lbd-s"><h2>${esc(T.s1)}</h2>
+  const s1 = lbSec('s1', T.s1, `${si ? lbIc(si.itemHash, ' class="lbd-si"') : ''}${esc((u().classes[ch.classType] || '') + (si ? ' · ' + subN(si) : ''))}`, `
     <div class="lbd-chars">${chars.map(([cid, c]) => `<button type="button" class="lbd-ch${cid === LB.cid ? ' on' : ''}" data-lbch="${cid}"${c.emblemBackgroundPath ? ` style="--em:url('${BNET}${c.emblemBackgroundPath}')"` : ''}><b>${esc(u().classes[c.classType] || '')}</b><small>✦ ${c.light}</small></button>`).join('')}</div>
     <div class="lbd-subs">${subs.map(x => { const on = si && x.itemInstanceId === si.itemInstanceId, id = curSub && x.itemInstanceId === curSub.itemInstanceId ? 'cur' : x.itemInstanceId; return `<button type="button" class="lbd-subb${on ? ' on' : ''}" data-lbsub="${id}" title="${esc(id === 'cur' ? T.subCur(subN(x)) : subN(x))}">${lbIc(x.itemHash)}<span>${esc(subN(x))}</span></button>`; }).join('')}<button type="button" class="lbd-subb none${LB.sub === '' ? ' on' : ''}" data-lbsub="" title="${esc(T.subNone)}"><span>∅</span></button></div>
-    ${subBody}</section>`;
+    ${subBody}`);
   // 2. exótico (ícones, como no jogo)
   const exos = [...new Map(ps.filter(p => p.exo).map(p => [p.n, p])).values()].sort((a, b) => a.slot - b.slot || a.n.localeCompare(b.n));
-  const s2 = `<section class="lbd-s"><h2>${esc(T.s2)}</h2><div class="lbd-chips"><button type="button" class="lbd-chip${LB.exo === 'any' ? ' on' : ''}" data-lbexob="any">${esc(W.lbExoAny)}</button><button type="button" class="lbd-chip${LB.exo === 'none' ? ' on' : ''}" data-lbexob="none">${esc(W.lbExoNone)}</button></div>
+  const s2 = lbSec('s2', T.s2, esc(LB.exo === 'any' ? W.lbExoAny : LB.exo === 'none' ? W.lbExoNone : LB.exo), `<div class="lbd-chips"><button type="button" class="lbd-chip${LB.exo === 'any' ? ' on' : ''}" data-lbexob="any">${esc(W.lbExoAny)}</button><button type="button" class="lbd-chip${LB.exo === 'none' ? ' on' : ''}" data-lbexob="none">${esc(W.lbExoNone)}</button></div>
     <div class="lbd-exos">${exos.map(p => `<button type="button" class="lbd-exo${LB.exo === p.n ? ' on' : ''}" data-lbexob="${esc(p.n)}" title="${esc(p.n)}" aria-label="${esc(p.n)}">${p.ic ? `<img src="${BNET}${p.ic}" alt="">` : esc(p.n.slice(0, 2))}</button>`).join('')}</div>
-    ${LB.exo !== 'any' && LB.exo !== 'none' ? `<p class="lbd-sel">${esc(LB.exo)}</p>` : ''}</section>`;
+    ${LB.exo !== 'any' && LB.exo !== 'none' ? `<p class="lbd-sel">${esc(LB.exo)}</p>` : ''}`);
   // 3. atributos
   const prio = LB.prio.map((h, r) => `<div class="lb-p" data-lbh="${h}"><b>${r + 1}</b><span>${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}${esc(stN(h))}</span><button type="button" data-lbup="${r}" aria-label="↑" ${r ? '' : 'disabled'}>↑</button><button type="button" data-lbdn="${r}" aria-label="↓" ${r < 5 ? '' : 'disabled'}>↓</button><label>${esc(W.lbMin)}<input type="number" min="0" max="250" step="5" data-lbmin="${h}" value="${LB.min[h] || ''}" aria-label="${esc(W.lbMin + ' ' + stN(h))}"></label></div>`).join('');
-  const s3 = `<section class="lbd-s"><h2>${esc(T.s3)}</h2><p class="lbd-n">${esc(T.s3n)}</p><div class="lb-prio">${prio}</div></section>`;
+  const s3 = lbSec('s3', T.s3, esc(LB.prio.slice(0, 3).map(stN).join(' › ')), `<p class="lbd-n">${esc(T.s3n)}</p><div class="lb-prio">${prio}</div>`);
   // 4. conjunto
   const sets = [...new Set(ps.map(p => p.set).filter(Boolean))].map(h => ({ h, n: SETDEF[h + ':' + lc]?.n || '…', c: ps.filter(p => p.set === h).length })).filter(x => x.c >= 2).sort((a, b) => a.n.localeCompare(b.n));
-  const s4 = `<section class="lbd-s"><h2>${esc(T.s4)}</h2><div class="lbd-row"><label class="lb-f"><small>${esc(W.lbSet)}</small><select class="tsort-sel" data-lbset><option value="">${esc(W.lbSetAny)}</option>${sets.map(x => `<option value="${x.h}"${String(LB.set) === String(x.h) ? ' selected' : ''}>${esc(x.n)} (${x.c})</option>`).join('')}</select></label>
-    ${LB.set ? `<label class="lb-f lb-f-s"><small>${esc(W.lbNeed)}</small><select class="tsort-sel" data-lbneed><option value="2"${LB.need === 2 ? ' selected' : ''}>2</option><option value="4"${LB.need === 4 ? ' selected' : ''}>4</option></select></label>` : ''}</div></section>`;
+  const s4 = lbSec('s4', T.s4, esc(LB.set ? (sets.find(x => String(x.h) === String(LB.set))?.n || '') + ' · ' + LB.need : W.lbSetAny), `<div class="lbd-row"><label class="lb-f"><small>${esc(W.lbSet)}</small><select class="tsort-sel" data-lbset><option value="">${esc(W.lbSetAny)}</option>${sets.map(x => `<option value="${x.h}"${String(LB.set) === String(x.h) ? ' selected' : ''}>${esc(x.n)} (${x.c})</option>`).join('')}</select></label>
+    ${LB.set ? `<label class="lb-f lb-f-s"><small>${esc(W.lbNeed)}</small><select class="tsort-sel" data-lbneed><option value="2"${LB.need === 2 ? ' selected' : ''}>2</option><option value="4"${LB.need === 4 ? ' selected' : ''}>4</option></select></label>` : ''}</div>`);
   // 5. armas: quadradinhos por espaço, como as armaduras
   // 5–7. armas: cada espaço na sua seção, em quadradinhos com o poder (como no DIM); começa pelas equipadas
-  const wTile = (s, w, sel) => `<button type="button" class="lbd-wt${w.exo ? ' exo' : ''}${sel === w ? ' on' : ''}${w.eqc === LB.cid ? ' eqd' : ''}" data-lbwt="${s}:${w.id}" title="${esc(w.n + (w.pw ? ' · ' + w.pw : '') + (w.eqc === LB.cid ? ' · ' + T.eqd : ''))}" aria-label="${esc(w.n)}">${w.ic ? `<img src="${BNET}${w.ic}" alt="" loading="lazy">` : esc(w.n.slice(0, 2))}${w.pw ? `<i class="lbd-pw"${w.el ? ` style="--el:${ELEMENT_ACC[w.el]?.[0] || '#c9d3dd'}"` : ''}>${w.pw}</i>` : ''}</button>`;
+  const wTile = (s, w, sel) => `<button type="button" class="lbd-wt${w.exo ? ' exo' : ''}${sel === w ? ' on' : ''}${w.eqc === LB.cid ? ' eqd' : ''}" data-lbwt="${s}:${w.id}" title="${esc(w.n + (w.pw ? ' · ' + w.pw : '') + (IDEF[w.h]?.a ? ' · ' + (W.w.ammo[IDEF[w.h].a] || '') : '') + (w.eqc === LB.cid ? ' · ' + T.eqd : ''))}" aria-label="${esc(w.n)}">${w.ic ? `<img src="${BNET}${w.ic}" alt="" loading="lazy">` : esc(w.n.slice(0, 2))}${IDEF[w.h]?.a ? `<span class="lbd-am a${IDEF[w.h].a}">${ammoSVG(IDEF[w.h].a)}</span>` : ''}${w.pw ? `<i class="lbd-pw"${w.el ? ` style="--el:${ELEMENT_ACC[w.el]?.[0] || '#c9d3dd'}"` : ''}>${w.pw}</i>` : ''}</button>`;
   const wSec = s => {
     const sel = LB.wpns.find(w => w.id === LB.w[s]), list = LB.wpns.filter(w => w.slot === s), eqId = lbWEq(s), chg = (LB.w[s] || '') !== eqId;
-    const pick = sel ? `<div class="lbd-wsel${sel.exo ? ' exo' : ''}">${sel.ic ? `<img src="${BNET}${sel.ic}" alt="">` : ''}<span><b>${esc(sel.n)}</b><small>${sel.pw ? `<i style="--el:${ELEMENT_ACC[sel.el]?.[0] || '#c9d3dd'}"></i>${sel.pw}` : ''}${sel.eqc === LB.cid ? ' · ' + esc(T.eqd) : ''}</small></span></div>` : `<div class="lbd-wsel none"><span class="lbd-wnone">∅</span><span><b>${esc(T.wpNo)}</b><small>${esc(T.wpNoD)}</small></span></div>`;
-    return `<section class="lbd-s"><div class="lbd-sh"><h2>${5 + s}. ${esc(T.wpSlot[s])}</h2>${chg && eqId ? `<button type="button" class="linkb" data-lbwt="${s}:${eqId}">${esc(T.wpBack)}</button>` : ''}</div>${pick}
-      <div class="lbd-wg"><button type="button" class="lbd-wt none${!sel ? ' on' : ''}" data-lbwt="${s}:" title="${esc(T.wpNo)}">∅</button>${list.map(w => wTile(s, w, sel)).join('')}</div></section>`;
+    const pick = sel ? `<div class="lbd-wsel${sel.exo ? ' exo' : ''}">${sel.ic ? `<img src="${BNET}${sel.ic}" alt="">` : ''}<span><b>${esc(sel.n)}</b><small>${sel.pw ? `<i style="--el:${ELEMENT_ACC[sel.el]?.[0] || '#c9d3dd'}"></i>${sel.pw}` : ''}${IDEF[sel.h]?.a ? ` · ${ammoSVG(IDEF[sel.h].a)}${esc(W.w.ammo[IDEF[sel.h].a] || '')}` : ''}${sel.eqc === LB.cid ? ' · ' + esc(T.eqd) : ''}</small></span></div>` : `<div class="lbd-wsel none"><span class="lbd-wnone">∅</span><span><b>${esc(T.wpNo)}</b><small>${esc(T.wpNoD)}</small></span></div>`;
+    return lbSec('w' + s, `${5 + s}. ${T.wpSlot[s]}`, '', `${pick}<div class="lbd-wg"><button type="button" class="lbd-wt none${!sel ? ' on' : ''}" data-lbwt="${s}:" title="${esc(T.wpNo)}">∅</button>${list.map(w => wTile(s, w, sel)).join('')}</div>`, chg && eqId ? `<button type="button" class="linkb" data-lbwt="${s}:${eqId}">${esc(T.wpBack)}</button>` : '');
   };
   const pickExo = [0, 1, 2].map(s => LB.wpns.find(w => w.id === LB.w[s])).filter(w => w?.exo).length > 1;
   const s5 = [0, 1, 2].map(wSec).join('') + (pickExo ? `<p class="lb-err">${esc(T.wpExo)}</p>` : '');
@@ -2745,9 +2752,9 @@ function lbDraw() {
       + (!g ? `<p class="lbd-n wait">${esc(W.loadingDefs)}</p>` : `<p class="lbd-n">${esc(T.artTap)}</p><div class="lbd-sg"><div class="lbd-sks art">${g.map(([, ix]) => `<span class="lbd-col">${lbSockRow('art', ai, ix, ov)}</span>`).join('')}</div>${g.map(([, ix]) => lbPicker('art', ai, ix, ov, sd)).join('')}</div>`)
       + (Object.keys(ov).length ? `<button type="button" class="linkb" data-lbreset="art">${esc(T.reset)}</button>` : '');
   }
-  const s6 = `<section class="lbd-s"><h2>${esc(T.s6)}</h2>${arts.length ? `<label class="lbd-ck"><input type="checkbox" data-lbartck${LB.art ? ' checked' : ''}><span>${esc(T.art)}</span></label>${artBody}` : `<p class="lbd-n">${esc(T.artNo)}</p>`}</section>`;
+  const s6 = lbSec('s6', T.s6, LB.art && ai ? `${lbIc(ai.itemHash, ' class="lbd-si"')}${esc(subN(ai))}` : esc(T.wpNo), `${arts.length ? `<label class="lbd-ck"><input type="checkbox" data-lbartck${LB.art ? ' checked' : ''}><span>${esc(T.art)}</span></label>${artBody}` : `<p class="lbd-n">${esc(T.artNo)}</p>`}`);
   const mods = lbMods();
-  const s7 = `<section class="lbd-s"><h2>${esc(T.s7)}</h2><label class="lbd-ck"><input type="checkbox" data-lbmods${LB.mods ? ' checked' : ''}><span>${esc(T.mods)}<small>${esc(T.modsN(mods.length))}</small></span></label></section>`;
+  const s7 = lbSec('s7', T.s7, esc(LB.mods ? T.modsN(mods.length).split(':')[0] : T.wpNo), `<label class="lbd-ck"><input type="checkbox" data-lbmods${LB.mods ? ' checked' : ''}><span>${esc(T.mods)}<small>${esc(T.modsN(mods.length))}</small></span></label>`);
   const go = `<button type="button" class="lb-run lbd-go" data-lb="run" ${LB.st === 'running' ? 'disabled' : ''}>${esc(LB.st === 'running' ? W.lbRunning : W.lbRun)}</button><button type="button" class="linkb" data-lb="load">${esc(W.lbReload)}</button>`;
   // resultados
   const where = p => p.eqc === LB.cid ? W.lbEquipped : p.where === 'v' ? W.lbVault : (u().classes[profile.characters.data[p.where]?.classType] || '');
@@ -2794,7 +2801,8 @@ $('lbdlg').addEventListener('click', e => {
   const rs = q('[data-lbreset]'); if (rs) { const it = rs.dataset.lbreset === 'sub' ? lbSubInst() : lbArtInst(); if (it) delete (rs.dataset.lbreset === 'sub' ? LB.so : LB.ao)[it.itemInstanceId]; LB.pick = ''; lbDraw(); return; }
   const wt = q('[data-lbwt]'); if (wt) { const [s, id] = wt.dataset.lbwt.split(':'); LB.w[+s] = id; lbDraw(); return; }
   const up = q('[data-lbup]'), dn = q('[data-lbdn]'); const k = up ? +up.dataset.lbup : dn ? +dn.dataset.lbdn : -1;
-  if (k >= 0) { const j = up ? k - 1 : k + 1; if (j < 0 || j > 5) return; lbSwap(k, j); }
+  if (k >= 0) { const j = up ? k - 1 : k + 1; if (j < 0 || j > 5) return; lbSwap(k, j); return; }
+  const cl = q('[data-lbcol]'); if (cl) { const key = cl.dataset.lbcol; if (LBCOL[key]) delete LBCOL[key]; else LBCOL[key] = 1; LB.pick = ''; try { LS.set('dc-lb-col', Object.assign({ w0: 0, w1: 0, w2: 0, s6: 0, s7: 0 }, LBCOL)); } catch {} lbDraw(); }
 });
 $('lbdlg').addEventListener('change', e => {
   const t = e.target, keepRes = t.matches('[data-lbmods],[data-lbartck]'); // o que só muda o link do DIM não refaz a busca
