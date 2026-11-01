@@ -2472,7 +2472,39 @@ function wishStatSel(x) {
 }
 const wishStatTxt = x => { const D = STATD?.d || {}; return x.a && (x.s1 || x.s2) ? [x.s1 && D[x.s1]?.n, x.s2 && D[x.s2]?.n].filter(Boolean).join(' + ') : ''; };
 document.addEventListener('change', e => { const s = e.target.closest('[data-wst]'); if (!s) return; const l = wishList(), x = l.find(y => y.h === +s.dataset.wh); if (!x) return; x[s.dataset.wst] = +s.value || null; LS.set('dc-wish', l); });
-const wishRoll = x => x.p?.length ? `<span class="wish-roll">${x.p.map(p => `<span>${p.ic ? `<img src="${BNET}${p.ic}" alt="" loading="lazy">` : ''}${esc(p.n)}</span>`).join('')}</span>` : '';
+// roll desejado editável: colunas de perks possíveis da arma (definição + conjuntos de encaixe, guardados no aparelho)
+const WCOLS = LS.get('dc-wcols', {}), WRT = { pt: { edit: 'Editar roll', done: 'Pronto', any: 'qualquer', note: 'Toque nos perks que servem em cada coluna (pode marcar mais de um). Coluna sem nada marcado = qualquer.', none: 'Esta arma não tem perks aleatórios.', or: ' ou ' }, en: { edit: 'Edit roll', done: 'Done', any: 'any', note: 'Tap the perks you accept in each column (you can pick more than one). An empty column = any.', none: 'This weapon has no random perks.', or: ' or ' } };
+const wrt = () => WRT[lang === 'pt' ? 'pt' : 'en'];
+let WED = 0; const WCP = new Map();
+const WSKIP_PC = /tracker|masterwork|shader|ornament|skins|mod|intrinsic|memento|catalyst|empty/i;
+function wishCols(h) {
+  if (WCOLS[h]) return WCOLS[h]; if (WCP.has(h)) return null;
+  WCP.set(h, (async () => {
+    const d = await bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${h}/`, false), so = d.sockets || {};
+    const idx = (so.socketCategories || []).find(c => c.socketCategoryHash === 4241085061)?.socketIndexes || [];
+    const cols = (await Promise.all(idx.map(async k => { const e = so.socketEntries?.[k] || {}, ps = e.randomizedPlugSetHash || e.reusablePlugSetHash;
+      if (ps) { try { const p = await bungie(`/Destiny2/Manifest/DestinyPlugSetDefinition/${ps}/`, false); return [...new Set((p.reusablePlugItems || []).filter(x => x.currentlyCanRoll !== false).map(x => x.plugItemHash))]; } catch { return []; } }
+      return [...new Set((e.reusablePlugItems || []).map(x => x.plugItemHash))]; }))).filter(c => c.length > 1);
+    const en = await entities('DestinyInventoryItemDefinition', cols.flat(), lang === 'pt' ? 'pt' : 'en', true);
+    // perk + versão aprimorada com o mesmo ícone: fica um só; colunas de rastreador, ornamento etc. saem
+    WCOLS[h] = cols.map(c => { const seen = new Set(); return c.map(x => en[x]).map((e, i) => e && { h: c[i], n: e.n, ic: e.ic, pc: e.pc }).filter(e => e && e.n && !WSKIP_PC.test(e.pc || '') && !seen.has(e.ic) && seen.add(e.ic)).map(({ h, n, ic }) => ({ h, n, ic })); }).filter(c => c.length > 1);
+    try { LS.set('dc-wcols', WCOLS); } catch {}
+    if (tab === 'obj') render();
+  })().catch(() => { WCOLS[h] = []; }));
+  return null;
+}
+function wishSetRoll(h, fn) { const l = wishList(), x = l.find(y => y.h === h); if (!x) return; fn(x); LS.set('dc-wish', l); render(); }
+function wishEditor(x) {
+  const T = wrt(), cols = wishCols(x.h); if (!cols) return `<p class="wr-n wait">${esc(u().loadingDefs)}</p>`; if (!cols.length) return `<p class="wr-n">${esc(T.none)}</p>`;
+  const r = x.r || cols.map(c => c.filter(o => (x.p || []).some(p => p.ic && p.ic === o.ic)));
+  return `<div class="wr-ed"><p class="wr-n">${esc(T.note)}</p>${cols.map((c, k) => `<div class="wr-col">${c.map(o => { const on = (r[k] || []).some(y => y.h === o.h); return `<button type="button" class="wr-p${on ? ' on' : ''}" data-wrp="${x.h}:${k}:${o.h}" aria-pressed="${on}" title="${esc(o.n)}">${o.ic ? `<img src="${BNET}${o.ic}" alt="">` : ''}<span>${esc(o.n)}</span></button>`; }).join('')}</div>`).join('')}</div>`;
+}
+document.addEventListener('click', e => {
+  const ed = e.target.closest('[data-wre]'); if (ed) { const h = +ed.dataset.wre; WED = WED === h ? 0 : h; render(); return; }
+  const b = e.target.closest('[data-wrp]'); if (!b) return; const [h, k, ph] = b.dataset.wrp.split(':').map(Number), cols = WCOLS[h]; if (!cols) return;
+  wishSetRoll(h, x => { const r = x.r || cols.map(c => c.filter(o => (x.p || []).some(p => p.ic && p.ic === o.ic))); const col = r[k] = r[k] || [], i = col.findIndex(y => y.h === ph); if (i >= 0) col.splice(i, 1); else { const o = cols[k].find(y => y.h === ph); if (o) col.push(o); } x.r = r; });
+});
+const wishRoll = x => x.r ? `<span class="wish-roll wr">${x.r.filter(c => c?.length).map(c => `<span>${c.map(p => `${p.ic ? `<img src="${BNET}${p.ic}" alt="" loading="lazy">` : ''}${esc(p.n)}`).join(`<i>${esc(wrt().or)}</i>`)}</span>`).join('')}</span>` : x.p?.length ? `<span class="wish-roll">${x.p.map(p => `<span>${p.ic ? `<img src="${BNET}${p.ic}" alt="" loading="lazy">` : ''}${esc(p.n)}</span>`).join('')}</span>` : '';
 /* Objetivos: armas da lista de desejos com o rolo guardado, onde dropam (fonte da coleção) e se estão à venda agora */
 let wishLoading = false;
 function wishObjHTML() {
@@ -2482,7 +2514,7 @@ function wishObjHTML() {
   if (need.length && !wishLoading) { wishLoading = true; Promise.all(need.map(x => (COLL[x.h] === undefined ? idef(x.h).then(d => { COLL[x.h] = d.c; }) : Promise.resolve()).then(() => collSrc(x.h)))).finally(() => { wishLoading = false; if (tab === 'obj') render(); }); }
   if (!VEND && !vendLoading && have.a) setTimeout(() => { if (!VEND && !vendLoading) loadVendors(gen); }, 2000);
   const card = x => { const s = sale.find(y => y.h === x.h || wishKey(y.n) === wishKey(x.n)), src = COLL[x.h] ? CSRC[COLL[x.h] + ':' + lang] : ''; const own = COLL[x.h] ? colAcquired([COLL[x.h]]) : null;
-    return `<div class="wo-c${s ? ' sale' : ''}"><div class="wo-h">${x.ic ? `<img src="${BNET}${x.ic}" alt="" loading="lazy">` : ''}<span><b>${esc(x.n)}</b><small>${esc([x.tl, x.an].filter(Boolean).join(' · '))}${own ? ` · ${esc(W.wishHave)}` : ''}</small></span><button type="button" class="wish-b" data-wish="${x.h}" aria-pressed="true" aria-label="${esc(W.glDel)}">★</button></div>${x.a ? wishStatSel(x) : wishRoll(x)}${s ? `<p class="wo-sale">◆ ${esc(W.wishSale(s.who))}</p>` : ''}<p class="wo-src">${src ? esc(src) : esc(wishLoading ? W.loadingDefs : W.wishNoSrc)}</p></div>`; };
+    return `<div class="wo-c${s ? ' sale' : ''}"><div class="wo-h">${x.ic ? `<img src="${BNET}${x.ic}" alt="" loading="lazy">` : ''}<span><b>${esc(x.n)}</b><small>${esc([x.tl, x.an].filter(Boolean).join(' · '))}${own ? ` · ${esc(W.wishHave)}` : ''}</small></span><button type="button" class="wish-b" data-wish="${x.h}" aria-pressed="true" aria-label="${esc(W.glDel)}">★</button></div>${x.a ? wishStatSel(x) : `${wishRoll(x)}<button type="button" class="linkb wr-btn" data-wre="${x.h}" aria-expanded="${WED === x.h}">${esc(WED === x.h ? wrt().done : wrt().edit)}</button>${WED === x.h ? wishEditor(x) : ''}`}${s ? `<p class="wo-sale">◆ ${esc(W.wishSale(s.who))}</p>` : ''}<p class="wo-src">${src ? esc(src) : esc(wishLoading ? W.loadingDefs : W.wishNoSrc)}</p></div>`; };
   return `<section data-sec="wishobj" class="keep wo coll${open ? '' : ' collapsed'}"><div class="sec-head" data-coll="wish-x" role="button" tabindex="0" aria-expanded="${open}"><div class="sec-title"><div class="sec-name"><h2>★ ${esc(W.wishT)}</h2></div><span class="count">${l.length}</span><span class="chev" aria-hidden="true"></span></div><p>${esc(sale.length ? W.wishOnSaleN(sale.length) : W.wishObjNote)}</p></div><div class="wo-g">${l.map(card).join('')}</div></section>`;
 }
 function wishHTML() {
