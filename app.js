@@ -2872,7 +2872,7 @@ const lcEq = id => Object.values(LB.eq).flat().some(i => i.itemInstanceId === id
 function lcArmor() {
   const B = LC.base, out = []; let locked = 0;
   for (const p of LB.pieces) {
-    if (p.eqc || lcEq(p.id)) continue; const a = B[p.id];
+    if (p.eqc || lcEq(p.id)) continue; const a = B[p.id]; if (a.reduce((t, v) => t + v, 0) < 10) continue; // sem atributos (itens antigos/cosméticos): fora
     let best = null;
     for (const q of LB.pieces) {
       if (q === p || q.k !== p.k || q.slot !== p.slot || q.exo !== p.exo || (p.exo && q.h !== p.h) || (p.set && q.set !== p.set)) continue;
