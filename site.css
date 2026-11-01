@@ -1146,3 +1146,13 @@ dialog.lbd{width:min(1280px,calc(100vw - 24px))}
 }
 .lbd-ctl,.lbd-res{display:flex;flex-direction:column}.lbd-ctl>*,.lbd-res>*{flex-shrink:0}
 .lbd-s{overflow:visible;flex-shrink:0}
+/* montador: uma seção por arma */
+.lbd-sh{display:flex;align-items:baseline;justify-content:space-between;gap:10px}.lbd-sh .linkb{font-size:12.5px}
+.lbd-wsel{display:flex;align-items:center;gap:10px;padding:6px;border-radius:10px;background:var(--chip);border:1px solid var(--line)}
+.lbd-wsel img,.lbd-wnone{width:44px;height:44px;border-radius:6px;flex:none}
+.lbd-wnone{display:grid;place-items:center;background:#2b3542;color:var(--muted);font-size:18px}
+.lbd-wsel>span:last-child{display:grid;gap:2px;min-width:0}.lbd-wsel b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lbd-wsel small{display:flex;align-items:center;gap:6px;font:500 12px var(--mono);color:var(--muted)}
+.lbd-wsel small i{width:10px;height:10px;border-radius:50%;background:var(--el)}
+.lbd-wsel.exo{border-color:color-mix(in srgb,var(--exotic) 55%,var(--line))}.lbd-wsel.exo b{color:var(--exotic)}
+.lbd-wsel.none b{color:var(--muted)}
