@@ -115,6 +115,15 @@ async function pubImgGet(req, env, c) {
 }
 let INDEX = null;
 const escH = x => String(x ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+// perfil público /g/<nome>-<código>: a página do site com título e descrição de prévia; não lê nem grava no banco
+async function gPage(req, env, sl) {
+  if (!INDEX || Date.now() - INDEX.t > 600000) { const h = await fetch(SITES[0] + '/index.html', { cf: { cacheTtl: 300 } }).then(r => r.text()); INDEX = { h, t: Date.now() }; }
+  let name = ''; try { name = decodeURIComponent(sl).replace(/-(\d{4})$/, '#$1').slice(0, 40); } catch {}
+  const title = name ? `${name.replace(/#\d+$/, '')} · Perfil no DPI` : 'Perfil · DPI', desc = 'Conclusões de incursões e masmorras, melhores tempos, títulos e a build atual, ao vivo da Bungie.';
+  const tags = `<meta property="og:type" content="profile"><meta property="og:site_name" content="DPI · Destiny Parallel Interface"><meta property="og:title" content="${escH(title)}"><meta property="og:description" content="${escH(desc)}"><meta property="og:url" content="${SITES[0]}/g/${escH(sl)}"><meta name="theme-color" content="#6fd3ff">`;
+  const h = INDEX.h.replace(/<meta (property="og:[^"]*"|name="twitter:[^"]*")[^>]*>\s*/g, '').replace(/<title>[^<]*<\/title>/, `<title>${escH(title)}</title>`).replace(/(src|href)="(?!\/|https?:|#|data:|mailto:)/g, '$1="/').replace('</head>', tags + '</head>');
+  return new Response(h, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=600' } });
+}
 async function pubPage(req, env, c) {
   if (!INDEX || Date.now() - INDEX.t > 600000) { const h = await fetch(SITES[0] + '/index.html', { cf: { cacheTtl: 300 } }).then(r => r.text()); INDEX = { h, t: Date.now() }; }
   let meta = null; if (/^[A-Za-z0-9]{6}$/.test(c)) { const r = await env.DB.prepare('SELECT v FROM pub WHERE c = ?').bind(c).first().catch(() => null); try { meta = r ? JSON.parse(r.v)?.og : null; } catch {} }
@@ -271,7 +280,7 @@ export default {
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(req) });
     const path = new URL(req.url).pathname;
     try {
-      if (path !== '/stats' && path !== '/whoami' && !path.startsWith('/page/') && !(path.startsWith('/pubimg/') && req.method === 'GET') && (await brake(env)) >= 2) return json(req, { error: 'brake' }, 503);
+      if (path !== '/stats' && path !== '/whoami' && !path.startsWith('/page/') && !path.startsWith('/gpage/') && !(path.startsWith('/pubimg/') && req.method === 'GET') && (await brake(env)) >= 2) return json(req, { error: 'brake' }, 503);
       if (path === '/defs' && req.method === 'POST') return await defs(req, env);
       if (path === '/sync' && (req.method === 'GET' || req.method === 'PUT')) return await sync(req, env);
       if (path === '/hit' && req.method === 'POST') return await hit(req, env);
@@ -282,6 +291,7 @@ export default {
       if (path.startsWith('/pubimg/') && req.method === 'GET') return await pubImgGet(req, env, path.slice(8));
       if (path.startsWith('/pub/') && req.method === 'GET') return await pubGet(req, env, path.slice(5));
       if (path.startsWith('/page/') && req.method === 'GET') return await pubPage(req, env, path.slice(6));
+      if (path.startsWith('/gpage/') && req.method === 'GET') return await gPage(req, env, path.slice(7));
       if (path === '/stats' && req.method === 'GET') return await stats(req, env);
       if (path === '/whoami' && req.method === 'GET') { const uid = await who(req, env), owner = !!uid && uid === String(env.OWNER); const sug = owner ? (await env.DB.prepare('SELECT COUNT(*) n FROM sug WHERE rd = 0').first().catch(() => null))?.n || 0 : undefined; return json(req, { uid, owner, sug }); }
       if (path === '/') return json(req, { ok: true, service: 'dni-api' });

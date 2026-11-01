@@ -65,6 +65,10 @@
     {
       "source": "/bi/:c",
       "destination": "https://dni-api.dni-site.workers.dev/pubimg/:c"
+    },
+    {
+      "source": "/g/:s",
+      "destination": "https://dni-api.dni-site.workers.dev/gpage/:s"
     }
   ]
 }
