@@ -963,7 +963,7 @@ const STAT_ORDER = [2996146975, 392767087, 1943323491, 1735777505, 144602215, 42
 let STATD = null, statLoading = null;
 function loadStats() {
   if (STATD && STATD.lang === lang) return; if (statLoading) return;
-  statLoading = entities('DestinyStatDefinition', STAT_ORDER, lang).then(d => { STATD = { lang, d }; statLoading = null; if (buildOpen) renderBuild(); if ($('finddlg').open) renderFind(); renderLive(); }).catch(() => { statLoading = null; });
+  statLoading = entities('DestinyStatDefinition', STAT_ORDER, lang).then(d => { STATD = { lang, d }; statLoading = null; if (buildOpen) renderBuild(); if ($('finddlg').open) renderFind(); if ($('lbdlg')?.open) lbDraw(); renderLive(); }).catch(() => { statLoading = null; });
 }
 const statsOf = C => { if (!C?.p || C.p.ld) return null; const st = C.p.characters?.data?.[C.cid]?.stats; return st && STAT_ORDER.some(h => st[h] != null) ? st : null; };
 function statsHTML(C) {
@@ -2516,52 +2516,77 @@ document.addEventListener('click', e => {
   const f = e.target.closest('[data-clckf]'); if (f) { CLCK.f = f.dataset.clckf; LS.set('dc-clck-f', CLCK.f); render(); return; }
   if (e.target.closest('[data-clck]')) { for (const x of GD?.clan?.list || []) delete GMET[x.mid]; CLCK.done = false; loadClanCk(); } });
 /* ---------- Beta: montador de loadout ----------
-   Lê as armaduras (cofre + personagens) com os atributos de cada peça direto da Bungie, só ao carregar a ferramenta;
-   testa as combinações aqui no navegador e manda a escolhida para o DIM (o DPI não equipa nada). */
-const LB = { st: 'idle', pieces: null, rest: null, cur: null, exo: 'any', prio: LS.get('dc-lb-prio', STAT_ORDER.slice()), min: LS.get('dc-lb-min', {}), set: '', need: 2, res: null, n: 0, ms: 0 };
+   Lê as armaduras e armas (cofre + personagens) direto da Bungie, só quando a ferramenta é aberta;
+   testa as combinações aqui no navegador e manda a escolhida para o DIM (o DPI não equipa nada).
+   Abre numa janela própria (tela cheia no celular): controles à esquerda, resultados à direita. */
+const LBT = {
+  pt: { open: 'Abrir montador', card: 'Monte a melhor combinação de armaduras para qualquer personagem, com subclasse, armas, mods e artefato, e mande para o DIM.', s1: '1. Personagem e subclasse', s2: '2. Exótico', s3: '3. Atributos que importam', s3n: 'Use as setas para ordenar; o mínimo é opcional.', s4: '4. Bônus de conjunto', s5: '5. Levar junto para o DIM', ch: 'Personagem', sub: 'Subclasse', subCur: n => `${n} (como está agora)`, subNone: 'Não levar', subOther: 'só a subclasse: aspectos e fragmentos ficam por sua conta', wp: 'Armas', wpCur: 'As equipadas agora', wpPick: 'Escolher', wpNone: 'Não levar', wpSlot: ['Cinética', 'Energética', 'Pesada'], wpKeep: '— sem arma —', mods: 'Mods de armadura atuais', modsN: n => `${n} mods: o DIM redistribui nas peças novas`, art: 'Artefato atual', artN: n => `${n} vantagens`, artNo: 'sem artefato equipado', res: 'Melhores combinações', meta: (n, s) => `${n} testadas em ${s} s · 4 melhores`, cur: 'Atual', idle: 'Escolha as opções e toque em “Buscar combinações”.', restNote: 'Os totais somam a armadura com o que o personagem já ganha fora dela (subclasse, fragmentos, artefato). Trocar de subclasse pode mudar esses valores.', foot: 'O DPI só lê sua conta: para equipar, abra a combinação no DIM (ou monte no jogo).', exoSel: 'Selecionado', wpExo: 'Duas armas exóticas: o DIM só vai equipar uma.' },
+  en: { open: 'Open builder', card: 'Build the best armor combination for any character, with subclass, weapons, mods and artifact, and send it to DIM.', s1: '1. Character and subclass', s2: '2. Exotic', s3: '3. Stats that matter', s3n: 'Use the arrows to sort; the minimum is optional.', s4: '4. Set bonus', s5: '5. Bring along to DIM', ch: 'Character', sub: 'Subclass', subCur: n => `${n} (as it is now)`, subNone: "Don't include", subOther: 'subclass only: pick aspects and fragments yourself', wp: 'Weapons', wpCur: 'Currently equipped', wpPick: 'Choose', wpNone: "Don't include", wpSlot: ['Kinetic', 'Energy', 'Power'], wpKeep: '— no weapon —', mods: 'Current armor mods', modsN: n => `${n} mods: DIM reassigns them to the new pieces`, art: 'Current artifact', artN: n => `${n} perks`, artNo: 'no artifact equipped', res: 'Best combinations', meta: (n, s) => `${n} tested in ${s} s · top 4`, cur: 'Current', idle: 'Pick your options and tap “Find combinations”.', restNote: 'Totals add the armor to what the character already gets outside it (subclass, fragments, artifact). Switching subclass can change those values.', foot: 'DPI only reads your account: to equip, open the combination in DIM (or build it in game).', exoSel: 'Selected', wpExo: 'Two exotic weapons: DIM will only equip one.' },
+};
+const lw = () => LBT[lang === 'pt' ? 'pt' : 'en'];
+const LBO = LS.get('dc-lb-opt', {});
+const LB = { st: 'idle', pieces: null, cid: null, exo: 'any', prio: LS.get('dc-lb-prio', STAT_ORDER.slice()), min: LS.get('dc-lb-min', {}), set: '', need: 2, res: null, n: 0, ms: 0,
+  sub: 'cur', wp: LBO.wp || 'cur', w: {}, mods: LBO.mods !== false, art: LBO.art !== false, wpns: [], subs: {}, eq: {}, sk: {}, en: {}, season: 0 };
+const lbSaveOpt = () => { try { LS.set('dc-lb-opt', { wp: LB.wp, mods: LB.mods, art: LB.art }); } catch {} };
 const ADEF = LS.get('dc-adef', {});
 async function armorDef(h) {
   if (ADEF[h]) return ADEF[h];
   try { const d = await bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${h}/`, false); ADEF[h] = { k: d.classType, s: d.equippingBlock?.equipableItemSetHash || 0, t: d.inventory?.tierType || 0, b: d.inventory?.bucketTypeHash || 0, n: d.displayProperties?.name || '', ic: d.displayProperties?.icon || '' }; } catch { ADEF[h] = null; }
   return ADEF[h];
 }
+const lbChar = () => profile?.characters?.data?.[LB.cid] || profile?.characters?.data?.[charId];
 async function lbLoad() {
-  if (LB.st === 'loading') return; LB.st = 'loading'; LB.res = null; render();
+  if (LB.st === 'loading') return; LB.st = 'loading'; LB.res = null; LB.cid = LB.cid || charId; lbDraw();
   try {
-    const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=102,201,205,304`);
-    const cls = profile.characters.data[charId].classType, stats = r.itemComponents?.stats?.data || {};
-    const raw = [];
-    for (const it of r.profileInventory?.data?.items || []) if (it.itemInstanceId) raw.push({ it, where: 'v' });
-    for (const [cid, c] of Object.entries(r.characterInventories?.data || {})) for (const it of c.items || []) if (it.itemInstanceId && ARMOR_BUCKETS.includes(it.bucketHash)) raw.push({ it, where: cid });
-    for (const [cid, c] of Object.entries(r.characterEquipment?.data || {})) for (const it of c.items || []) if (it.itemInstanceId && ARMOR_BUCKETS.includes(it.bucketHash)) raw.push({ it, where: cid, eq: cid === charId });
-    // a tabela de itens do site já diz espaço/classe da maioria: só busca a definição de armaduras desta classe (ou desconhecidas)
-    const cand = raw.filter(x => { if (!stats[x.it.itemInstanceId]?.stats) return false; const code = ITEMS[x.it.itemHash]; if (code == null) return true; const sl = Math.floor(code / 100), c = Math.floor(code / 10) % 10; return sl >= 3 && (c === 3 || c === cls); });
+    const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=102,201,205,304,305`);
+    const stats = r.itemComponents?.stats?.data || {}, raw = [], wraw = [], L = lang === 'pt' ? 'pt' : 'en';
+    LB.sk = r.itemComponents?.sockets?.data || {}; LB.eq = {}; LB.subs = {};
+    for (const it of r.profileInventory?.data?.items || []) if (it.itemInstanceId) { const c = ITEMS[it.itemHash]; if (c != null && Math.floor(c / 100) <= 2) wraw.push({ it, slot: Math.floor(c / 100) }); else raw.push({ it, where: 'v' }); }
+    for (const [cid, c] of Object.entries(r.characterInventories?.data || {})) for (const it of c.items || []) if (it.itemInstanceId) {
+      if (ARMOR_BUCKETS.includes(it.bucketHash)) raw.push({ it, where: cid }); else if (WEAPON_B.includes(it.bucketHash)) wraw.push({ it, slot: WEAPON_B.indexOf(it.bucketHash) }); else if (it.bucketHash === SUB_BUCKET) (LB.subs[cid] = LB.subs[cid] || []).push(it);
+    }
+    for (const [cid, c] of Object.entries(r.characterEquipment?.data || {})) { LB.eq[cid] = c.items || []; for (const it of c.items || []) if (it.itemInstanceId) {
+      if (ARMOR_BUCKETS.includes(it.bucketHash)) raw.push({ it, where: cid, eq: cid }); else if (WEAPON_B.includes(it.bucketHash)) wraw.push({ it, slot: WEAPON_B.indexOf(it.bucketHash), eq: cid }); else if (it.bucketHash === SUB_BUCKET) (LB.subs[cid] = LB.subs[cid] || []).unshift(it);
+    } }
+    // a tabela de itens do site já diz espaço/classe da maioria: só busca a definição do que é armadura (ou desconhecido)
+    const cand = raw.filter(x => { if (!stats[x.it.itemInstanceId]?.stats) return false; const code = ITEMS[x.it.itemHash]; return code == null || Math.floor(code / 100) >= 3; });
     const hs = [...new Set(cand.map(x => x.it.itemHash))]; let i = 0;
     await Promise.all(Array.from({ length: 8 }, async () => { while (i < hs.length) await armorDef(hs[i++]); }));
     try { LS.set('dc-adef', ADEF); } catch {}
-    const pieces = cand.map(x => { const d = ADEF[x.it.itemHash]; if (!d || d.k !== cls || !ARMOR_BUCKETS.includes(d.b)) return null; const sv = stats[x.it.itemInstanceId].stats; return { id: x.it.itemInstanceId, h: x.it.itemHash, slot: ARMOR_BUCKETS.indexOf(d.b), set: d.s, exo: d.t === 6, n: d.n, ic: d.ic, where: x.where, eq: !!x.eq, st: STAT_ORDER.map(h => sv[h]?.value || 0) }; }).filter(Boolean);
-    // o resto (subclasse, fragmentos, artefato) = atributos do personagem menos o que a armadura equipada dá
-    const ch = profile.characters.data[charId].stats || {}, eqP = pieces.filter(p => p.eq);
-    LB.cur = STAT_ORDER.map(h => ch[h] || 0); LB.rest = STAT_ORDER.map((h, k) => LB.cur[k] - eqP.reduce((t, p) => t + p.st[k], 0));
-    LB.pieces = pieces; LB.st = 'ready';
-    for (const sh of new Set(pieces.map(p => p.set).filter(Boolean))) if (!SETDEF[sh + ':' + (lang === 'pt' ? 'pt-br' : 'en')]) setDef(sh, lang === 'pt' ? 'pt-br' : 'en').then(() => { if (isGd()) render(); });
+    LB.pieces = cand.map(x => { const d = ADEF[x.it.itemHash]; if (!d || d.k > 2 || !ARMOR_BUCKETS.includes(d.b)) return null; const sv = stats[x.it.itemInstanceId].stats; return { id: x.it.itemInstanceId, h: x.it.itemHash, k: d.k, slot: ARMOR_BUCKETS.indexOf(d.b), set: d.s, exo: d.t === 6, n: d.n, ic: d.ic, where: x.where, eqc: x.eq || '', st: STAT_ORDER.map(h => sv[h]?.value || 0) }; }).filter(Boolean);
+    // nomes de armas, subclasses e encaixes (mods, aspectos, artefato): uma leva só, quase tudo já está no cache
+    const plugs = [];
+    for (const items of Object.values(LB.eq)) for (const it of items) if (ARMOR_BUCKETS.includes(it.bucketHash) || it.bucketHash === SUB_BUCKET || it.bucketHash === ARTIFACT_BUCKET) for (const s of LB.sk[it.itemInstanceId]?.sockets || []) if (s.plugHash) plugs.push(s.plugHash);
+    const names = [...wraw.map(x => x.it.itemHash), ...Object.values(LB.subs).flat().map(x => x.itemHash)];
+    const [a, b] = await Promise.all([entities('DestinyInventoryItemDefinition', names, L), entities('DestinyInventoryItemDefinition', plugs, L, true)]);
+    LB.en = Object.assign({}, a, b);
+    LB.wpns = wraw.map(x => ({ id: x.it.itemInstanceId, h: x.it.itemHash, slot: x.slot, eqc: x.eq || '', n: LB.en[x.it.itemHash]?.n || '', exo: LB.en[x.it.itemHash]?.tt === 6 })).filter(w => w.n && w.slot >= 0).sort((p, q) => p.n.localeCompare(q.n));
+    const sh = profile?.profile?.data?.currentSeasonHash;
+    if (sh && !LB.season) bungie(`/Destiny2/Manifest/DestinySeasonDefinition/${sh}/`, false).then(d => { LB.season = d?.seasonNumber || 0; }).catch(() => {});
+    LB.st = 'ready';
+    for (const s of new Set(LB.pieces.map(p => p.set).filter(Boolean))) if (!SETDEF[s + ':' + (lang === 'pt' ? 'pt-br' : 'en')]) setDef(s, lang === 'pt' ? 'pt-br' : 'en').then(lbDraw);
   } catch (e) { LB.st = 'err'; }
-  if (isGd()) render();
+  lbDraw();
+}
+// o resto (subclasse, fragmentos, artefato) = atributos do personagem menos o que a armadura equipada dá
+function lbRest() {
+  const ch = lbChar(), st = ch?.stats || {}, cur = STAT_ORDER.map(h => st[h] || 0), eqP = (LB.pieces || []).filter(p => p.eqc === LB.cid);
+  return { cur, rest: cur.map((v, k) => v - eqP.reduce((t, p) => t + p.st[k], 0)) };
 }
 async function lbRun() {
-  if (!LB.pieces) return; LB.st = 'running'; render(); await new Promise(r => setTimeout(r, 30));
+  if (!LB.pieces) return; LB.st = 'running'; lbDraw(); await new Promise(r => setTimeout(r, 30));
   const t0 = performance.now(), W8 = [32, 16, 8, 4, 2, 1], prioIdx = LB.prio.map(h => STAT_ORDER.indexOf(h)), wOf = new Array(6).fill(0); prioIdx.forEach((k, r) => { wOf[k] = W8[r]; });
-  const mins = STAT_ORDER.map(h => +LB.min[h] || 0), setH = +LB.set || 0, need = LB.need;
-  const score = st => st.reduce((t, v, k) => t + v * wOf[k], 0);
+  const mins = STAT_ORDER.map(h => +LB.min[h] || 0), setH = +LB.set || 0, need = LB.need, cls = lbChar()?.classType;
+  const score = st => st.reduce((t, v, k) => t + v * wOf[k], 0), mine = LB.pieces.filter(p => p.k === cls);
   // por espaço: tira peças piores em tudo que outra do mesmo conjunto/exótico; fica com as melhores
   const slots = [0, 1, 2, 3, 4].map(sl => {
-    let l = LB.pieces.filter(p => p.slot === sl && (LB.exo === 'none' ? !p.exo : LB.exo === 'any' ? true : (p.exo ? p.n === LB.exo : true)));
-    if (LB.exo !== 'any' && LB.exo !== 'none') { const ex = LB.pieces.find(p => p.exo && p.n === LB.exo); if (ex && ex.slot === sl) l = l.filter(p => p.exo && p.n === LB.exo); else l = l.filter(p => !p.exo); }
+    let l = mine.filter(p => p.slot === sl && (LB.exo === 'none' ? !p.exo : true));
+    if (LB.exo !== 'any' && LB.exo !== 'none') { const ex = mine.find(p => p.exo && p.n === LB.exo); if (ex && ex.slot === sl) l = l.filter(p => p.exo && p.n === LB.exo); else l = l.filter(p => !p.exo); }
     l = l.filter(p => !l.some(q => q !== p && q.set === p.set && q.exo === p.exo && q.st.every((v, k) => v >= p.st[k]) && q.st.some((v, k) => v > p.st[k])));
     return l.sort((a, b) => score(b.st) - score(a.st)).slice(0, 22);
   });
-  const top = [], keep = 10; let n = 0;
-  const [A, Bs, C, D, E] = slots, R = LB.rest;
+  const top = [], keep = 4; let n = 0;
+  const [A, Bs, C, D, E] = slots, R = lbRest().rest;
   for (let a = 0; a < A.length; a++) {
     for (const b of Bs) { for (const c of C) { for (const d of D) { for (const e of E) {
       const ps = [A[a], b, c, d, e]; let ex = 0; for (const p of ps) if (p.exo) ex++; if (ex > 1) continue;
@@ -2574,46 +2599,107 @@ async function lbRun() {
     } } } }
     if (a % 2 === 1) await new Promise(r => setTimeout(r, 0)); // deixa a tela respirar
   }
-  LB.res = top; LB.n = n; LB.ms = Math.round(performance.now() - t0); LB.st = 'ready'; if (isGd()) render();
+  LB.res = top; LB.n = n; LB.ms = Math.round(performance.now() - t0); LB.st = 'ready'; lbDraw();
+}
+const lbSkip = e => !e?.n || SKIP_NAME.test(e.n) || SKIP_PT.test(e.n);
+const lbEqOf = (b) => (LB.eq[LB.cid] || []).find(i => i.bucketHash === b);
+function lbMods() { const out = []; for (const it of LB.eq[LB.cid] || []) if (ARMOR_BUCKETS.includes(it.bucketHash)) for (const s of LB.sk[it.itemInstanceId]?.sockets || []) { const e = LB.en[s.plugHash]; if (s.plugHash && e && pArmorMod(e) && pShow(e)) out.push(s.plugHash); } return out; }
+function lbArt() { const ai = lbEqOf(ARTIFACT_BUCKET); return ai ? (LB.sk[ai.itemInstanceId]?.sockets || []).map(x => x.plugHash).filter(h => h && pShow(LB.en[h])) : []; }
+function lbSubItem() {
+  const list = LB.subs[LB.cid] || [], cur = lbEqOf(SUB_BUCKET);
+  if (LB.sub === '') return null;
+  const it = LB.sub === 'cur' ? cur : list.find(x => x.itemInstanceId === LB.sub); if (!it) return null;
+  const o = { id: it.itemInstanceId, hash: it.itemHash };
+  if (cur && it.itemInstanceId === cur.itemInstanceId) { const so = {}; (LB.sk[it.itemInstanceId]?.sockets || []).forEach((s, k) => { if (s.plugHash && s.isVisible !== false && !lbSkip(LB.en[s.plugHash])) so[k] = s.plugHash; }); o.socketOverrides = so; }
+  return o;
+}
+function lbWeapons() {
+  if (LB.wp === 'none') return [];
+  if (LB.wp === 'cur') return (LB.eq[LB.cid] || []).filter(i => WEAPON_B.includes(i.bucketHash)).map(i => ({ id: i.itemInstanceId, hash: i.itemHash }));
+  return [0, 1, 2].map(s => LB.wpns.find(w => w.id === LB.w[s])).filter(Boolean).map(w => ({ id: w.id, hash: w.h }));
 }
 function lbDim(r) {
-  const ch = profile.characters.data[charId];
-  const lo = { name: 'DPI · ' + (u().classes[ch.classType] || ''), classType: ch.classType, clearSpace: false, equipped: r.ps.map(p => ({ id: p.id, hash: p.h })), unequipped: [] };
+  const ch = lbChar(), sub = lbSubItem(), equipped = [...(sub ? [sub] : []), ...lbWeapons(), ...r.ps.map(p => ({ id: p.id, hash: p.h }))], parameters = {};
+  if (LB.mods) { const m = lbMods(); if (m.length) parameters.mods = m; }
+  if (LB.art && LB.season) { const a = lbArt(); if (a.length) parameters.artifactUnlocks = { unlockedItemHashes: a, seasonNumber: LB.season }; }
+  const sn = sub && LB.en[sub.hash]?.n;
+  const lo = { name: 'DPI · ' + (u().classes[ch.classType] || '') + (sn ? ' · ' + sn : ''), classType: ch.classType, clearSpace: false, equipped, unequipped: [], parameters };
   return 'https://app.destinyitemmanager.com/loadouts?loadout=' + encodeURIComponent(JSON.stringify(lo));
 }
+// cartão pequeno na aba Builds: o montador em si abre na janela
 function lbHTML() {
   if (!have.a || !member) return '';
-  const W = u(), D = STATD?.d || {}; loadStats();
-  const head = `<article class="gd lb"><div class="gd-head"><h2>${esc(W.lbT)} <small class="lb-beta">beta</small></h2></div><p>${esc(W.lbNote)}</p>`;
-  if (LB.st === 'idle' || LB.st === 'err') return head + `${LB.st === 'err' ? `<p class="lb-err">${esc(W.lbErr)}</p>` : ''}<button type="button" class="char" data-lb="load">${esc(W.lbLoad)}</button></article>`;
-  if (LB.st === 'loading') return head + `<p class="wait">${esc(W.lbLoading)}</p></article>`;
-  const ps = LB.pieces, lc = lang === 'pt' ? 'pt-br' : 'en';
-  const exos = [...new Map(ps.filter(p => p.exo).map(p => [p.n, p])).values()].sort((a, b) => a.slot - b.slot || a.n.localeCompare(b.n));
-  const sets = [...new Set(ps.map(p => p.set).filter(Boolean))].map(h => ({ h, n: SETDEF[h + ':' + lc]?.n || '…', c: ps.filter(p => p.set === h).length })).filter(x => x.c >= 2).sort((a, b) => a.n.localeCompare(b.n));
-  const stN = h => D[h]?.n || '…';
-  const prio = LB.prio.map((h, r) => `<div class="lb-p"><b>${r + 1}</b><span>${esc(stN(h))}</span><button type="button" data-lbup="${r}" aria-label="↑" ${r ? '' : 'disabled'}>↑</button><button type="button" data-lbdn="${r}" aria-label="↓" ${r < 5 ? '' : 'disabled'}>↓</button><label>${esc(W.lbMin)}<input type="number" min="0" max="250" step="5" data-lbmin="${h}" value="${LB.min[h] || ''}" aria-label="${esc(W.lbMin + ' ' + stN(h))}"></label></div>`).join('');
-  const where = p => p.where === 'v' ? W.lbVault : (u().classes[profile.characters.data[p.where]?.classType] || '');
-  const res = !LB.res ? '' : !LB.res.length ? `<p class="lb-err">${esc(W.lbNone)}</p>` : `<p class="lb-meta">${esc(W.lbMeta(fmtN(LB.n), (LB.ms / 1000).toFixed(1).replace('.', lang === 'pt' ? ',' : '.')))}</p>` + LB.res.map((r, i) => {
-    const sc = r.ps.filter(p => p.set).reduce((m, p) => (m[p.set] = (m[p.set] || 0) + 1, m), {}), setTxt = Object.entries(sc).filter(([, c]) => c >= 2).map(([h, c]) => `${SETDEF[h + ':' + lc]?.n || ''} ${c}/5`).join(' · ');
-    return `<div class="lb-r"><div class="lb-rh"><b>#${i + 1}</b><span>${esc(setTxt || W.lbNoSet)}</span><a href="${esc(lbDim(r))}" target="_blank" rel="noopener">${esc(W.lbDim)} ↗</a></div>
-      <div class="lb-ps">${r.ps.map(p => `<div class="lb-pc${p.exo ? ' exo' : ''}${p.eq ? ' eq' : ''}">${p.ic ? `<img src="${BNET}${p.ic}" alt="" loading="lazy">` : ''}<b>${esc(p.n)}</b><small>${esc(p.eq ? W.lbEquipped : where(p))}</small></div>`).join('')}</div>
-      <div class="lb-st">${STAT_ORDER.map((h, k) => { const v = r.tot[k], d = v - LB.cur[k]; return `<span${v >= 100 ? ' class="hi"' : ''}>${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}<b>${v}</b><small class="${d > 0 ? 'up' : d < 0 ? 'dn' : ''}">${d ? (d > 0 ? '+' : '') + d : '='}</small></span>`; }).join('')}</div></div>`;
-  }).join('');
-  return head + `<div class="lb-ctl">
-    <label class="lb-f"><small>${esc(W.lbExo)}</small><select class="tsort-sel" data-lbexo><option value="any"${LB.exo === 'any' ? ' selected' : ''}>${esc(W.lbExoAny)}</option><option value="none"${LB.exo === 'none' ? ' selected' : ''}>${esc(W.lbExoNone)}</option>${exos.map(p => `<option value="${esc(p.n)}"${LB.exo === p.n ? ' selected' : ''}>${esc(p.n)}</option>`).join('')}</select></label>
-    <label class="lb-f"><small>${esc(W.lbSet)}</small><select class="tsort-sel" data-lbset><option value="">${esc(W.lbSetAny)}</option>${sets.map(x => `<option value="${x.h}"${String(LB.set) === String(x.h) ? ' selected' : ''}>${esc(x.n)} (${x.c})</option>`).join('')}</select></label>
-    ${LB.set ? `<label class="lb-f"><small>${esc(W.lbNeed)}</small><select class="tsort-sel" data-lbneed><option value="2"${LB.need === 2 ? ' selected' : ''}>2</option><option value="4"${LB.need === 4 ? ' selected' : ''}>4</option></select></label>` : ''}
-  </div><div class="lb-k">${esc(W.lbPrio)}</div><div class="lb-prio">${prio}</div>
-  <div class="lb-go"><button type="button" class="lb-run" data-lb="run" ${LB.st === 'running' ? 'disabled' : ''}>${esc(LB.st === 'running' ? W.lbRunning : W.lbRun)}</button><small>${esc(W.lbPieces(ps.length))}</small><button type="button" class="linkb" data-lb="load">${esc(W.lbReload)}</button></div>${res}</article>`;
+  const W = u(), T = lw();
+  return `<article class="gd lb lb-card"><div class="gd-head"><h2>${esc(W.lbT)} <small class="lb-beta">beta</small></h2></div><p>${esc(T.card)}</p><button type="button" class="lb-run" data-lbopen>${esc(T.open)} ↗</button></article>`;
 }
-document.addEventListener('click', e => {
+function lbOpen() { const d = $('lbdlg'); LB.cid = LB.cid || charId; loadStats(); lbDraw(); if (!d.open) d.showModal(); if (LB.st === 'idle' || LB.st === 'err') lbLoad(); }
+function lbDraw() {
+  const d = $('lbdlg'); if (!d) return;
+  const W = u(), T = lw(), D = STATD?.d || {}, lc = lang === 'pt' ? 'pt-br' : 'en', ch = lbChar();
+  const close = `<button type="button" class="pf-x" aria-label="${esc(W.giClose)}">✕</button>`;
+  const head = `<header class="lbd-hd"><div><small>${esc(W.lbT)} · beta</small><h1>${esc(W.lbT)}</h1></div>${LB.pieces && ch ? `<span>${esc((u().classes[ch.classType] || '') + ' · ' + W.lbPieces(LB.pieces.filter(p => p.k === ch.classType).length))}</span>` : ''}</header>`;
+  if (LB.st === 'idle' || LB.st === 'loading' || LB.st === 'err') { d.innerHTML = `<div class="pf-box lbd-box">${close}${head}${LB.st === 'err' ? `<p class="lb-err">${esc(W.lbErr)}</p><button type="button" class="lb-run" data-lb="load">${esc(W.lbLoad)}</button>` : `<p class="pf-msg wait">${esc(W.lbLoading)}</p>`}</div>`; return; }
+  const box = d.querySelector('.lbd-box'), y1 = box?.scrollTop || 0, y2 = d.querySelector('.lbd-res')?.scrollTop || 0;
+  const cls = ch.classType, ps = LB.pieces.filter(p => p.k === cls), { cur } = lbRest(), stN = h => D[h]?.n || '…';
+  // 1. personagem e subclasse
+  const chars = Object.entries(profile.characters.data).sort((a, b) => new Date(b[1].dateLastPlayed) - new Date(a[1].dateLastPlayed));
+  const subs = LB.subs[LB.cid] || [], curSub = lbEqOf(SUB_BUCKET), subN = it => LB.en[it.itemHash]?.n || '…';
+  const s1 = `<section class="lbd-s"><h2>${esc(T.s1)}</h2>
+    <div class="lbd-chars">${chars.map(([cid, c]) => `<button type="button" class="lbd-ch${cid === LB.cid ? ' on' : ''}" data-lbch="${cid}"${c.emblemBackgroundPath ? ` style="--em:url('${BNET}${c.emblemBackgroundPath}')"` : ''}><b>${esc(u().classes[c.classType] || '')}</b><small>✦ ${c.light}</small></button>`).join('')}</div>
+    <label class="lb-f"><small>${esc(T.sub)}</small><select class="tsort-sel" data-lbsub>${curSub ? `<option value="cur"${LB.sub === 'cur' ? ' selected' : ''}>${esc(T.subCur(subN(curSub)))}</option>` : ''}${subs.filter(x => x.itemInstanceId !== curSub?.itemInstanceId).map(x => `<option value="${x.itemInstanceId}"${LB.sub === x.itemInstanceId ? ' selected' : ''}>${esc(subN(x))}</option>`).join('')}<option value=""${LB.sub === '' ? ' selected' : ''}>${esc(T.subNone)}</option></select></label>
+    ${LB.sub && LB.sub !== 'cur' ? `<p class="lbd-n">${esc(T.subOther)}</p>` : ''}</section>`;
+  // 2. exótico (ícones, como no jogo)
+  const exos = [...new Map(ps.filter(p => p.exo).map(p => [p.n, p])).values()].sort((a, b) => a.slot - b.slot || a.n.localeCompare(b.n));
+  const s2 = `<section class="lbd-s"><h2>${esc(T.s2)}</h2><div class="lbd-chips"><button type="button" class="lbd-chip${LB.exo === 'any' ? ' on' : ''}" data-lbexob="any">${esc(W.lbExoAny)}</button><button type="button" class="lbd-chip${LB.exo === 'none' ? ' on' : ''}" data-lbexob="none">${esc(W.lbExoNone)}</button></div>
+    <div class="lbd-exos">${exos.map(p => `<button type="button" class="lbd-exo${LB.exo === p.n ? ' on' : ''}" data-lbexob="${esc(p.n)}" title="${esc(p.n)}" aria-label="${esc(p.n)}">${p.ic ? `<img src="${BNET}${p.ic}" alt="" loading="lazy">` : esc(p.n.slice(0, 2))}</button>`).join('')}</div>
+    ${LB.exo !== 'any' && LB.exo !== 'none' ? `<p class="lbd-sel">${esc(LB.exo)}</p>` : ''}</section>`;
+  // 3. atributos
+  const prio = LB.prio.map((h, r) => `<div class="lb-p"><b>${r + 1}</b><span>${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}${esc(stN(h))}</span><button type="button" data-lbup="${r}" aria-label="↑" ${r ? '' : 'disabled'}>↑</button><button type="button" data-lbdn="${r}" aria-label="↓" ${r < 5 ? '' : 'disabled'}>↓</button><label>${esc(W.lbMin)}<input type="number" min="0" max="250" step="5" data-lbmin="${h}" value="${LB.min[h] || ''}" aria-label="${esc(W.lbMin + ' ' + stN(h))}"></label></div>`).join('');
+  const s3 = `<section class="lbd-s"><h2>${esc(T.s3)}</h2><p class="lbd-n">${esc(T.s3n)}</p><div class="lb-prio">${prio}</div></section>`;
+  // 4. conjunto
+  const sets = [...new Set(ps.map(p => p.set).filter(Boolean))].map(h => ({ h, n: SETDEF[h + ':' + lc]?.n || '…', c: ps.filter(p => p.set === h).length })).filter(x => x.c >= 2).sort((a, b) => a.n.localeCompare(b.n));
+  const s4 = `<section class="lbd-s"><h2>${esc(T.s4)}</h2><div class="lbd-row"><label class="lb-f"><small>${esc(W.lbSet)}</small><select class="tsort-sel" data-lbset><option value="">${esc(W.lbSetAny)}</option>${sets.map(x => `<option value="${x.h}"${String(LB.set) === String(x.h) ? ' selected' : ''}>${esc(x.n)} (${x.c})</option>`).join('')}</select></label>
+    ${LB.set ? `<label class="lb-f lb-f-s"><small>${esc(W.lbNeed)}</small><select class="tsort-sel" data-lbneed><option value="2"${LB.need === 2 ? ' selected' : ''}>2</option><option value="4"${LB.need === 4 ? ' selected' : ''}>4</option></select></label>` : ''}</div></section>`;
+  // 5. levar junto: armas, mods, artefato
+  const wsel = s => `<label class="lb-f"><small>${esc(T.wpSlot[s])}</small><select class="tsort-sel" data-lbw="${s}"><option value="">${esc(T.wpKeep)}</option>${LB.wpns.filter(w => w.slot === s).map(w => `<option value="${w.id}"${LB.w[s] === w.id ? ' selected' : ''}>${esc((w.exo ? '★ ' : '') + w.n + (w.eqc === LB.cid ? ' · ' + T.cur.toLowerCase() : ''))}</option>`).join('')}</select></label>`;
+  const pickExo = LB.wp === 'pick' && [0, 1, 2].map(s => LB.wpns.find(w => w.id === LB.w[s])).filter(w => w?.exo).length > 1;
+  const mods = lbMods(), art = lbArt();
+  const s5 = `<section class="lbd-s"><h2>${esc(T.s5)}</h2>
+    <label class="lb-f"><small>${esc(T.wp)}</small><select class="tsort-sel" data-lbwp><option value="cur"${LB.wp === 'cur' ? ' selected' : ''}>${esc(T.wpCur)}</option><option value="pick"${LB.wp === 'pick' ? ' selected' : ''}>${esc(T.wpPick)}</option><option value="none"${LB.wp === 'none' ? ' selected' : ''}>${esc(T.wpNone)}</option></select></label>
+    ${LB.wp === 'pick' ? `<div class="lbd-wps">${[0, 1, 2].map(wsel).join('')}</div>${pickExo ? `<p class="lb-err">${esc(T.wpExo)}</p>` : ''}` : ''}
+    <label class="lbd-ck"><input type="checkbox" data-lbmods${LB.mods ? ' checked' : ''}><span>${esc(T.mods)}<small>${esc(T.modsN(mods.length))}</small></span></label>
+    <label class="lbd-ck"><input type="checkbox" data-lbart${LB.art ? ' checked' : ''}${art.length ? '' : ' disabled'}><span>${esc(T.art)}<small>${esc(art.length ? T.artN(art.length) : T.artNo)}</small></span></label></section>`;
+  const go = `<button type="button" class="lb-run lbd-go" data-lb="run" ${LB.st === 'running' ? 'disabled' : ''}>${esc(LB.st === 'running' ? W.lbRunning : W.lbRun)}</button><button type="button" class="linkb" data-lb="load">${esc(W.lbReload)}</button>`;
+  // resultados
+  const where = p => p.eqc === LB.cid ? W.lbEquipped : p.where === 'v' ? W.lbVault : (u().classes[profile.characters.data[p.where]?.classType] || '');
+  const curRow = `<div class="lb-st lbd-cur"><em>${esc(T.cur)}</em>${STAT_ORDER.map((h, k) => `<span>${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}<b>${cur[k]}</b></span>`).join('')}</div>`;
+  const res = !LB.res ? `<p class="lbd-idle">${esc(T.idle)}</p>` : !LB.res.length ? `<p class="lb-err">${esc(W.lbNone)}</p>` : LB.res.map((r, i) => {
+    const sc = r.ps.filter(p => p.set).reduce((m, p) => (m[p.set] = (m[p.set] || 0) + 1, m), {}), setTxt = Object.entries(sc).filter(([, c]) => c >= 2).map(([h, c]) => `${SETDEF[h + ':' + lc]?.n || ''} ${c}/5`).join(' · ');
+    return `<article class="lb-r"><div class="lb-rh"><b>#${i + 1}</b><span>${esc(setTxt || W.lbNoSet)}</span><a href="${esc(lbDim(r))}" target="_blank" rel="noopener">${esc(W.lbDim)} ↗</a></div>
+      <div class="lb-ps">${r.ps.map(p => `<div class="lb-pc${p.exo ? ' exo' : ''}${p.eqc === LB.cid ? ' eq' : ''}">${p.ic ? `<img src="${BNET}${p.ic}" alt="" loading="lazy">` : ''}<b>${esc(p.n)}</b><small>${esc(where(p))}</small></div>`).join('')}</div>
+      <div class="lb-st">${STAT_ORDER.map((h, k) => { const v = r.tot[k], dd = v - cur[k]; return `<span${v >= 100 ? ' class="hi"' : ''} title="${esc(stN(h))}">${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}<b>${v}</b><small class="${dd > 0 ? 'up' : dd < 0 ? 'dn' : ''}">${dd ? (dd > 0 ? '+' : '') + dd : '='}</small></span>`; }).join('')}</div></article>`;
+  }).join('');
+  const meta = LB.res && LB.res.length ? `<span>${esc(T.meta(fmtN(LB.n), (LB.ms / 1000).toFixed(1).replace('.', lang === 'pt' ? ',' : '.')))}</span>` : '';
+  d.innerHTML = `<div class="pf-box lbd-box">${close}${head}<div class="lbd-cols"><aside class="lbd-ctl">${s1}${s2}${s3}${s4}${s5}<div class="lbd-gobar">${go}</div></aside>
+    <section class="lbd-res"><div class="lbd-rh"><h2>${esc(T.res)}</h2>${meta}</div>${curRow}${res}<p class="lbd-n">${esc(T.restNote)}</p><p class="lbd-n">${esc(T.foot)}</p></section></div></div>`;
+  const nb = d.querySelector('.lbd-box'); if (nb) nb.scrollTop = y1; const nr = d.querySelector('.lbd-res'); if (nr) nr.scrollTop = y2;
+}
+document.addEventListener('click', e => { if (e.target.closest('[data-lbopen]')) lbOpen(); });
+$('lbdlg').addEventListener('click', e => {
+  const d = $('lbdlg');
+  if (e.target === d || e.target.closest('.pf-x')) { d.close(); return; }
   const b = e.target.closest('[data-lb]'); if (b) { if (b.dataset.lb === 'load') lbLoad(); else lbRun(); return; }
+  const c = e.target.closest('[data-lbch]'); if (c) { if (c.dataset.lbch !== LB.cid) { LB.cid = c.dataset.lbch; LB.sub = 'cur'; LB.exo = 'any'; LB.set = ''; LB.w = {}; LB.res = null; lbDraw(); } return; }
+  const x = e.target.closest('[data-lbexob]'); if (x) { LB.exo = x.dataset.lbexob; LB.res = null; lbDraw(); return; }
   const up = e.target.closest('[data-lbup]'), dn = e.target.closest('[data-lbdn]'); const k = up ? +up.dataset.lbup : dn ? +dn.dataset.lbdn : -1;
-  if (k >= 0) { const j = up ? k - 1 : k + 1; if (j < 0 || j > 5) return; [LB.prio[k], LB.prio[j]] = [LB.prio[j], LB.prio[k]]; LS.set('dc-lb-prio', LB.prio); LB.res = null; render(); }
+  if (k >= 0) { const j = up ? k - 1 : k + 1; if (j < 0 || j > 5) return; [LB.prio[k], LB.prio[j]] = [LB.prio[j], LB.prio[k]]; LS.set('dc-lb-prio', LB.prio); LB.res = null; lbDraw(); }
 });
-document.addEventListener('change', e => {
-  const t = e.target; if (t.matches('[data-lbexo]')) LB.exo = t.value; else if (t.matches('[data-lbset]')) LB.set = t.value; else if (t.matches('[data-lbneed]')) LB.need = +t.value; else if (t.matches('[data-lbmin]')) { LB.min[t.dataset.lbmin] = +t.value || 0; LS.set('dc-lb-min', LB.min); } else return;
-  LB.res = null; if (!t.matches('[data-lbmin]')) render();
+$('lbdlg').addEventListener('change', e => {
+  const t = e.target, keepRes = t.matches('[data-lbsub],[data-lbwp],[data-lbw],[data-lbmods],[data-lbart]'); // o que só muda o link do DIM não refaz a busca
+  if (t.matches('[data-lbset]')) LB.set = t.value; else if (t.matches('[data-lbneed]')) LB.need = +t.value; else if (t.matches('[data-lbmin]')) { LB.min[t.dataset.lbmin] = +t.value || 0; LS.set('dc-lb-min', LB.min); }
+  else if (t.matches('[data-lbsub]')) LB.sub = t.value; else if (t.matches('[data-lbwp]')) { LB.wp = t.value; if (t.value === 'pick' && !Object.keys(LB.w).length) for (const i of LB.eq[LB.cid] || []) if (WEAPON_B.includes(i.bucketHash)) LB.w[WEAPON_B.indexOf(i.bucketHash)] = i.itemInstanceId; lbSaveOpt(); }
+  else if (t.matches('[data-lbw]')) LB.w[+t.dataset.lbw] = t.value; else if (t.matches('[data-lbmods]')) { LB.mods = t.checked; lbSaveOpt(); } else if (t.matches('[data-lbart]')) { LB.art = t.checked; lbSaveOpt(); } else return;
+  if (!keepRes) LB.res = null; if (!t.matches('[data-lbmin]')) lbDraw();
 });
 /* ---------- Clã: grupo de primeira vez (quem nunca fez a atividade escolhida, online primeiro, e quem pode guiar) ---------- */
 const FIRST = { k: LS.get('dc-first', '') };
