@@ -1172,3 +1172,5 @@ dialog.lbd{width:min(1280px,calc(100vw - 24px))}
 .lbd-am{position:absolute;top:2px;right:2px;display:flex;padding:1px 2px;border-radius:3px;background:rgba(8,12,18,.78)}
 .lbd-am svg{height:10px;width:auto}
 .lbd-wsel small svg{height:12px;width:auto}
+.lbd-car::before{transform:translateY(1px) rotate(-135deg)}
+.lbd-s.col .lbd-car::before{transform:translateY(-2px) rotate(45deg)}
