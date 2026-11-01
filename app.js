@@ -2145,7 +2145,9 @@ async function loadSession() {
     const acts = (await Promise.all(chars.map(c => bungie(`/Destiny2/${member.type}/Account/${member.id}/Character/${c}/Stats/Activities/?count=20&mode=0`, false).then(r => (r.activities || []).map(a => ({ ...a, _c: c }))).catch(() => [])))).flat()
       .map(a => { const v = k => a.values?.[k]?.basic?.value || 0, st = Date.parse(a.period); return { h: a.activityDetails.directorActivityHash || a.activityDetails.referenceId, mode: a.activityDetails.mode, id: a.activityDetails.instanceId, st, end: st + v('activityDurationSeconds') * 1000, dur: v('activityDurationSeconds'), done: v('completed') === 1 && v('completionReason') !== 2, k: v('kills'), d: v('deaths'), pc: v('playerCount') }; })
       .sort((a, b) => b.st - a.st);
-    if (!acts.length || Date.now() - acts[0].end > 24 * 3600e3) { SESSION = { cid: charId, at: Date.now(), none: true }; return; }
+    // sem sessão recente: só atualiza a foto (exóticos, luz, títulos, catalisadores) para servir de ponto de partida da próxima
+    const snapNow = () => { const recOn = have.b && !!profile.profileRecords?.data; return { t: Date.now(), light: Math.max(...Object.values(profile.characters.data).map(c => c.light || 0)), exo: defs.exotics.filter(e => colAcquired(e.h)).map(e => e.h[0]), ...(recOn ? { seal: Object.fromEntries(defs.seals.map(se => [se.cr, se.r.filter(r => recDone(recState(r[0]))).length])), cat: Object.fromEntries(defs.cats.map(c => { const r = recState(c.h); return r && !(r.state & 16) ? [c.h, recDone(r) ? 100 : Math.floor(pct(r) * 100)] : null; }).filter(Boolean)) } : {}) }; };
+    if (!acts.length || Date.now() - acts[0].end > 24 * 3600e3) { try { LS.set('dc-snap-' + member.id, snapNow()); } catch {} SESSION = { cid: charId, at: Date.now(), none: true }; return; }
     const s = [acts[0]]; for (let i = 1; i < acts.length; i++) { if (s[s.length - 1].st - acts[i].end > 45 * 60e3) break; s.push(acts[i]); }
     const start = Math.min(...s.map(a => a.st)), end = Math.max(...s.map(a => a.end)), sid = s[s.length - 1].id;
     const names = await entities('DestinyActivityDefinition', s.map(a => a.h), lang);
