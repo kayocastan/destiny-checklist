@@ -1440,16 +1440,22 @@ function render() {
       ${sec.note ? `<p>${esc(sec.note)}</p>` : ''}${sec.kind ? actStrip(sec) : sec.xm ? xmStrip(sec.xm) : ''}<div class="sec-bar"><i data-sb="${sec.id}"></i></div></div>
       <ul>${sec.items.map(i => {
         const cid = 'c-' + i.id.replace(/[^a-z0-9]+/gi, '-'), first = i.c[0], rest = i.c.slice(1), more = !!(i.d || rest.length || i.loc);
-        const ich = sec.tab === 'exo' && /^x-\d+$/.test(i.id) ? 'DestinyCollectibleDefinition:' + i.id.slice(2) : sec.tab === 'cat' && /^c-\d+$/.test(i.id) ? catIcon(+i.id.slice(2)) : '';
+        const ich = itemIch(sec, i);
         const head = `${ich ? `<span class="it-ic" data-ich="${ich}" aria-hidden="true"${ICONS[ich] ? ` style="background-image:url('${BNET}${ICONS[ich]}')"` : ''}></span>` : ''}<span class="t">${esc(i.t)}</span>${first ? `<span class="chip ${chipClass(first)}">${esc(first)}</span>` : ''}`;
         return `<li data-li="${esc(i.id)}" data-search="${esc([i.t, i.d, i.loc, ...i.c, sec.title].join(' ').toLowerCase())}"><div class="row"><label class="ck" for="${cid}"><input type="checkbox" id="${cid}" data-id="${esc(i.id)}" aria-label="${esc(i.t)}"${i.auto ? ' checked disabled' : ''}></label>${more ? `<button class="it" type="button" aria-expanded="false">${head}<span class="chev" aria-hidden="true"></span></button>` : `<span class="it">${head}</span>`}${FOCUS_ITEM_TABS.includes(sec.tab) && !isDone(i) ? focBtn('it:' + i.id) : ''}</div>${more ? `<div class="more">${i.loc ? `<div class="loc"><span class="loc-k">${esc(U.where)}</span> ${hiLoc(esc(i.loc))}</div>` : ''}${i.tl ? `<ul class="tl">${i.tl.map(x => `<li class="${x.ok ? 'ok' : ''}"><span class="tl-i" aria-label="${x.ok ? '✓' : '○'}">${x.ok ? '✓' : ''}</span><div><b>${esc(x.n)}${x.pr ? ` <span class="tl-p">${esc(x.pr)}</span>` : ''}</b>${x.d && !x.ok ? `<small>${hiLoc(esc(x.d))}</small>` : ''}</div></li>`).join('')}</ul>` : i.d ? `<div class="d">${hiLoc(esc(i.d))}</div>` : ''}${rest.length ? `<div class="chips">${rest.map(x => `<span class="chip ${chipClass(x)}">${esc(x)}</span>`).join('')}</div>` : ''}</div>` : ''}</li>`;
       }).join('')}</ul></section>`;
   }).join('')}<p class="donebar" id="donebar" hidden><span id="donetxt"></span><button class="reset" id="togglecomplete" type="button"></button></p></div>`;
   document.querySelectorAll('#list li[data-li]').forEach(li => { if (openItems.has(li.dataset.li)) { li.classList.add('open'); li.querySelector('button.it')?.setAttribute('aria-expanded', 'true'); } });
   update(); filter();
-  if (tab === 'exo' || tab === 'cat') window.requestIdleCallback ? window.requestIdleCallback(() => loadIcons(), { timeout: 800 }) : setTimeout(loadIcons, 200);
+  if (tab === 'exo' || tab === 'cat' || tab === 'obj') window.requestIdleCallback ? window.requestIdleCallback(() => loadIcons(), { timeout: 800 }) : setTimeout(loadIcons, 200);
 }
 const isDone = i => i.auto || marks.has(i.id);
+const itemIch = (sec, i) => sec?.tab === 'exo' && /^x-\d+$/.test(i.id) ? 'DestinyCollectibleDefinition:' + i.id.slice(2) : sec?.tab === 'cat' && /^c-\d+$/.test(i.id) ? catIcon(+i.id.slice(2)) : '';
+// detalhes de um item (onde, passos, como pegar, etiquetas): o mesmo da lista, usado também nos cartões do Foco
+function itemMore(i, rest) {
+  const U = u();
+  return `${i.loc ? `<div class="loc"><span class="loc-k">${esc(U.where)}</span> ${hiLoc(esc(i.loc))}</div>` : ''}${i.tl ? `<ul class="tl">${i.tl.map(x => `<li class="${x.ok ? 'ok' : ''}"><span class="tl-i" aria-label="${x.ok ? '✓' : '○'}">${x.ok ? '✓' : ''}</span><div><b>${esc(x.n)}${x.pr ? ` <span class="tl-p">${esc(x.pr)}</span>` : ''}</b>${x.d && !x.ok ? `<small>${hiLoc(esc(x.d))}</small>` : ''}</div></li>`).join('')}</ul>` : i.d ? `<div class="d">${hiLoc(esc(i.d))}</div>` : ''}${rest.length ? `<div class="chips">${rest.map(x => `<span class="chip ${chipClass(x)}">${esc(x)}</span>`).join('')}</div>` : ''}`;
+}
 /* ícones de exóticos e catalisadores: o texto aparece na hora e a imagem chega depois (guardada no navegador para as próximas visitas) */
 const ICONS = LS.get('dc-icons', {});
 // catalisador: o ícone da própria arma (o do triunfo é igual para todos); sem a arma, fica o do triunfo
@@ -2366,7 +2372,7 @@ async function livePoll() {
     if (!t || !party.length) { const was = LIVE.on; LIVE.on = false; LIVE.mem = []; LIVE.to = null; renderLive(); if (was) { SESSION = null; autoT = 0; setTimeout(() => autoRefresh(), 45000); if (tab === 'obj') render(); } else ended(); return; }
     const act = Object.values(r.characterActivities?.data || {}).sort((a, b) => new Date(b.dateActivityStarted) - new Date(a.dateActivityStarted))[0];
     LIVE.since = t.currentActivity?.startTime || act?.dateActivityStarted || null;
-    if (act?.currentActivityHash) { const a = await entities('DestinyActivityDefinition', [act.currentActivityHash], lang); LIVE.act = a[act.currentActivityHash]?.n || ''; LIVE.to = await liveTarget(act.currentActivityHash, act.currentActivityModeType); } else { LIVE.act = ''; LIVE.to = null; }
+    if (act?.currentActivityHash) { const a = await entities('DestinyActivityDefinition', [act.currentActivityHash], lang); LIVE.act = a[act.currentActivityHash]?.n || ''; const prevId = LIVE.to?.[1]; LIVE.to = await liveTarget(act.currentActivityHash, act.currentActivityModeType); if (LIVE.to?.[1] !== prevId) { LIVE.x = false; LIVE.xo = new Set(); } } else { LIVE.act = ''; LIVE.to = null; }
     if (prevTo && (!LIVE.to || LIVE.to.join() !== prevTo.join())) ended();
     // você primeiro, depois o resto do grupo
     const ids = [...new Set([member.id, ...party.map(x => x.membershipId)])];
@@ -2403,10 +2409,22 @@ function renderLive() {
       ${(() => { const st = m.ch.stats; if (!st || !STAT_ORDER.some(h => st[h] != null)) return ''; loadStats(); const D = STATD?.d || {}; return `<span class="lv-sts">${STAT_ORDER.map(h => `<span class="${(st[h] || 0) > 100 ? 'hi' : ''}" title="${esc(D[h]?.n || '')}">${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}<b>${st[h] || 0}</b></span>`).join('')}</span>`; })()}
       ${m.priv || !B ? '' : `<span class="lv-eq"><span class="lv-row">${WEAPON_B.map(b => eq.find(x => x.bucketHash === b)).map(x => x ? ic(x, B.en[x.itemHash]?.tt === 6 ? 'ex' : '') : '<i></i>').join('')}</span><span class="lv-row arm">${ARMOR_B.map(b => eq.find(x => x.bucketHash === b)).map(x => x ? ic(x, B.en[x.itemHash]?.tt === 6 ? 'ex' : '') : '<i></i>').join('')}</span></span>`}</button>`;
   };
-  el.innerHTML = `<div class="lv-h"><span class="lv-dot" aria-hidden="true"></span><b>${esc(U.liveT)}</b>${LIVE.act ? (LIVE.to ? `<button type="button" class="lv-go" data-jump="${LIVE.to.join(':')}">${esc(LIVE.act)} <i aria-hidden="true">→</i></button>` : `<span>${esc(LIVE.act)}</span>`) : ''}${LIVE.to ? `<span class="lv-g">${liveGuides(LIVE.to[1])}</span>` : ''}${tm ? `<small>${esc(U.liveSince(tm))}</small>` : ''}</div><div class="lv-l">${LIVE.mem.map(card).join('')}</div>`;
+  el.innerHTML = `<div class="lv-h"><span class="lv-dot" aria-hidden="true"></span><b>${esc(U.liveT)}</b>${LIVE.act ? (LIVE.to ? `<button type="button" class="lv-go" data-lvx aria-expanded="${!!LIVE.x}">${esc(LIVE.act)} <i class="lv-car${LIVE.x ? ' on' : ''}" aria-hidden="true"></i></button>` : `<span>${esc(LIVE.act)}</span>`) : ''}${LIVE.to ? `<span class="lv-g">${liveGuides(LIVE.to[1])}</span>` : ''}${tm ? `<small>${esc(U.liveSince(tm))}</small>` : ''}</div>${LIVE.x && LIVE.to ? liveDetail() : ''}<div class="lv-l">${LIVE.mem.map(card).join('')}</div>`;
   el.hidden = false;
 }
+// atividade do Ao vivo aberta no próprio painel: progresso, histórico e cada encontro/desafio com os detalhes (começa fechada)
+function liveDetail() {
+  const U = u(), W = U.w, sec = SECTIONS.find(x => x.id === LIVE.to[1]); if (!sec) return '';
+  const items = sec.items || [], done = items.filter(isDone).length, xo = LIVE.xo || (LIVE.xo = new Set());
+  const rows = items.map(i => { const ok = isDone(i), more = !!(i.d || i.loc || i.tl || i.c.length > 1), op = xo.has(i.id);
+    return `<li class="lvx-i${ok ? ' ok' : ''}${op ? ' open' : ''}"><button type="button" class="lvx-b" ${more ? `data-lvi="${esc(i.id)}" aria-expanded="${op}"` : 'disabled'}><span class="tl-i" aria-label="${ok ? '✓' : '○'}">${ok ? '✓' : ''}</span><span class="lvx-t">${esc(i.t)}</span>${i.c[0] ? `<span class="chip ${chipClass(i.c[0])}">${esc(i.c[0])}</span>` : ''}${more ? '<span class="chev" aria-hidden="true"></span>' : ''}</button>${op ? `<div class="lvx-m">${itemMore(i, i.c.slice(1))}</div>` : ''}</li>`; }).join('');
+  return `<div class="lvx"><div class="lvx-h"><b>${esc(sec.title)}</b><span class="lvx-n">${done}/${items.length}</span><i class="fo-bar"><u style="width:${items.length ? done / items.length * 100 : 0}%"></u></i></div>
+    ${sec.note ? `<p class="lvx-note">${esc(sec.note)}</p>` : ''}${sec.kind ? actStrip(sec) : sec.xm ? xmStrip(sec.xm) : ''}${rows ? `<ul class="lvx-l">${rows}</ul>` : ''}
+    <button type="button" class="linkb lvx-go" data-jump="${LIVE.to.join(':')}">${esc(W.wkFull)} →</button></div>`;
+}
 $('live').addEventListener('click', e => {
+  if (e.target.closest('[data-lvx]')) { LIVE.x = !LIVE.x; renderLive(); return; }
+  const li = e.target.closest('[data-lvi]'); if (li) { const xo = LIVE.xo || (LIVE.xo = new Set()), id = li.dataset.lvi; xo.has(id) ? xo.delete(id) : xo.add(id); renderLive(); return; }
   const jf = e.target.closest('[data-jump]'); if (jf) { const [t, id] = jf.dataset.jump.split(':'); jumpTo(t, id); return; }
   const b = e.target.closest('[data-lv]'); if (!b) return; const m = LIVE.mem[+b.dataset.lv]; if (!m) return;
   FD.q = ''; FD.results = null;
@@ -2998,7 +3016,8 @@ function focusHTML() {
     }
     const it = findItem(id), sec = it && SECTIONS.find(x => x.items.includes(it)); if (!it) return '';
     const ok = isDone(it);
-    return `<div class="fo-c${ok ? ' ok' : ''}"><div class="fo-h"><span><small>${esc(u().subs[sec?.tab] || '')}${sec ? ' · ' + esc(sec.title) : ''}</small><b>${esc(it.t)}</b></span>${it.c[0] ? `<span class="chip ${chipClass(it.c[0])}">${esc(it.c[0])}</span>` : ''}${focBtn(f.id)}</div>${ok ? `<p class="fo-done">✓ ${esc(W.focDone)}</p>` : it.d ? `<p class="fo-d">${hiLoc(esc(String(it.d).slice(0, 220)))}</p>` : ''}${sec ? `<button type="button" class="fo-go" data-jump="${sec.tab}:${sec.id}">${esc(W.wkFull)} →</button>` : ''}</div>`;
+    const ich = itemIch(sec, it);
+    return `<div class="fo-c fo-it${ok ? ' ok' : ''}"><div class="fo-h">${ich ? `<span class="it-ic fo-ic" data-ich="${ich}" aria-hidden="true"${ICONS[ich] ? ` style="background-image:url('${BNET}${ICONS[ich]}')"` : ''}></span>` : ''}<span><small>${esc(u().subs[sec?.tab] || '')}${sec ? ' · ' + esc(sec.title) : ''}</small><b>${esc(it.t)}</b></span>${it.c[0] ? `<span class="chip ${chipClass(it.c[0])}">${esc(it.c[0])}</span>` : ''}${focBtn(f.id)}</div>${ok ? `<p class="fo-done">✓ ${esc(W.focDone)}</p>` : `<div class="fo-more">${itemMore(it, it.c.slice(1))}</div>`}</div>`;
   }).join('');
   return `<section data-sec="focus" class="keep fo coll${open ? '' : ' collapsed'}"><div class="sec-head" data-coll="foc-x" role="button" tabindex="0" aria-expanded="${open}"><div class="sec-title"><div class="sec-name"><h2>★ ${esc(W.focT)}</h2></div><span class="count">${l.length}</span><span class="chev" aria-hidden="true"></span></div><p>${esc(W.focNote)}</p></div><div class="fo-g">${cards}</div></section>`;
 }

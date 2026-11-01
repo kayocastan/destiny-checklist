@@ -1207,3 +1207,25 @@ dialog.lbd .lcd-box{height:auto;overflow:auto;display:grid;gap:12px}
 .lcd-perks{display:flex;flex-wrap:wrap;gap:4px 10px}.lcd-perks>span{display:inline-flex;align-items:center;gap:4px;font-size:11.5px}.lcd-perks img{width:22px;height:22px;border-radius:50%;background:#2b3542}
 .lcd-where{font-size:11px;color:var(--muted)}
 @media (max-width:860px){.lcd-cols{grid-template-columns:minmax(0,1fr)}.lcd-row{grid-template-columns:auto minmax(0,1fr)}.lcd-row em,.lcd-row>.lcd-pc:last-child{grid-column:2}.lcd-w{grid-template-columns:auto 48px minmax(0,1fr)}.lcd-where{grid-column:3}}
+/* Foco: itens favoritados com imagem e detalhes no próprio cartão */
+.fo-it .fo-h>.fo-ic{flex:none;width:46px;height:46px;border-radius:6px;margin:0}
+.fo-it .fo-h>span:first-child.fo-ic+span{flex:1;min-width:0;display:grid}
+.fo-more{display:grid;gap:6px;font-size:13px}.fo-more .d{white-space:pre-line;color:var(--fg);line-height:1.45}
+.fo-more .tl li{background:color-mix(in srgb,var(--surface) 70%,transparent)}
+.fo-more .chips{display:flex;flex-wrap:wrap;gap:4px}
+/* Ao vivo: atividade aberta no próprio painel */
+.lv-car{display:inline-block;width:7px;height:7px;border-right:2px solid var(--exotic);border-bottom:2px solid var(--exotic);transform:translateY(-2px) rotate(45deg);transition:transform .2s;margin-left:4px}
+.lv-car.on{transform:translateY(1px) rotate(-135deg)}
+.lvx{display:grid;gap:8px;padding:12px;border-radius:12px;border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 85%,transparent);margin:2px 0 4px}
+.lvx-h{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center}.lvx-h b{font-family:var(--display);font-size:20px}
+.lvx-n{font:600 13px var(--mono);color:var(--muted)}.lvx-h .fo-bar{grid-column:1/-1}
+.lvx-note{margin:0;font-size:12.5px;color:var(--muted)}
+.lvx-l{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.lvx-i{border-radius:8px;background:var(--chip)}
+.lvx-b{font:inherit;width:100%;display:flex;align-items:center;gap:10px;padding:8px 10px;background:none;border:0;color:var(--fg);text-align:left;cursor:pointer;font-size:13.5px}
+.lvx-b:disabled{cursor:default}.lvx-t{flex:1;min-width:0}
+.lvx-i.ok .tl-i{border-color:var(--done);background:var(--done);color:var(--surface)}.lvx-i.ok .lvx-t{color:var(--muted)}
+.lvx-i.open .chev{transform:rotate(180deg)}
+.lvx-m{display:grid;gap:6px;padding:0 10px 10px 40px;font-size:13px}.lvx-m .d{white-space:pre-line}
+.lvx-m .chips{display:flex;flex-wrap:wrap;gap:4px}
+.lvx-go{justify-self:start;font-size:12.5px}
