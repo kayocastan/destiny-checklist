@@ -1174,3 +1174,14 @@ dialog.lbd{width:min(1280px,calc(100vw - 24px))}
 .lbd-wsel small svg{height:12px;width:auto}
 .lbd-car::before{transform:translateY(1px) rotate(-135deg)}
 .lbd-s.col .lbd-car::before{transform:translateY(-2px) rotate(45deg)}
+/* montador: salvar, copiar e bônus de conjunto */
+.lbd-acts{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.lb-rh .lbd-acts a{margin-left:0}
+.lbd-btn{font:inherit;font-size:13px;border-radius:8px;padding:6px 11px;border:1px solid var(--line);background:var(--chip);color:var(--fg);cursor:pointer}
+.lbd-btn:hover:not(:disabled){border-color:var(--acc)}.lbd-btn:disabled{color:var(--done);cursor:default}
+.lbd-perks{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.lbd-perks li{display:flex;gap:8px;align-items:flex-start;padding:6px 8px;border-radius:8px;background:var(--chip);opacity:.55}
+.lbd-perks li.on{opacity:1;box-shadow:inset 2px 0 0 var(--done)}
+.lbd-perks img{width:24px;height:24px;flex:none}
+.lbd-perks span{display:grid;gap:2px;font-size:12.5px}.lbd-perks small{font:500 11px var(--mono);color:var(--muted)}.lbd-perks em{font-style:normal;color:var(--muted);font-size:12px;line-height:1.35}
+.lbd-perks span>b{display:inline}

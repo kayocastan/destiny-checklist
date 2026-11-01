@@ -2520,8 +2520,8 @@ document.addEventListener('click', e => {
    testa as combinações aqui no navegador e manda a escolhida para o DIM (o DPI não equipa nada).
    Abre numa janela própria (tela cheia no celular): controles à esquerda, resultados à direita. */
 const LBT = {
-  pt: { open: 'Abrir montador', card: 'Monte a melhor combinação de armaduras para qualquer personagem, com subclasse, armas, mods e artefato, e mande para o DIM.', s1: '1. Personagem e subclasse', s2: '2. Exótico', s3: '3. Atributos que importam', s3n: 'Use as setas para ordenar; o mínimo é opcional.', s4: '4. Bônus de conjunto', s6: '8. Artefato', s7: '9. Mods', ch: 'Personagem', sub: 'Subclasse', subCur: n => `${n} (equipada)`, subNone: 'Não levar subclasse', subTap: 'Toque num encaixe para trocar.', subG: { 309722977: 'Habilidades', 457473665: 'Super', 2140934067: 'Aspectos', 1313488945: 'Fragmentos' }, frag: n => `Fragmentos (${n} encaixes pelos aspectos)`, used: 'já em uso', wpCur: 'Equipadas', wpPick: 'Escolher', wpNone: 'Não levar', wpSlot: ['Cinética', 'Energética', 'Pesada'], wpNo: 'Não levar', wpNoD: 'o DIM mantém a arma que estiver equipada', wpBack: 'Voltar à equipada', mods: 'Levar os mods de armadura atuais', modsN: n => `${n} mods: o DIM redistribui nas peças novas`, art: 'Levar artefato', artNo: 'Nenhum artefato encontrado.', artTap: 'Toque numa vantagem para trocar. Os pontos do artefato continuam valendo no jogo.', res: 'Melhores combinações', meta: (n, s) => `${n} testadas em ${s} s · 4 melhores`, cur: 'Atual', idle: 'Escolha as opções e toque em “Buscar combinações”.', restNote: 'Os totais somam a armadura com o que o personagem já ganha fora dela (subclasse, fragmentos, artefato) hoje. Trocar fragmentos ou artefato pode mudar esses valores no jogo.', foot: 'O DPI só lê sua conta: para equipar, abra a combinação no DIM (ou monte no jogo).', wpExo: 'Duas armas exóticas: o DIM só vai equipar uma.', reset: 'Voltar ao que está equipado', eqd: 'equipada', clan: 'Em teste, por enquanto só para o clã Orla Emaranhada. Pode ter erros: confira no DIM antes de equipar.' },
-  en: { open: 'Open builder', card: 'Build the best armor combination for any character, with subclass, weapons, mods and artifact, and send it to DIM.', s1: '1. Character and subclass', s2: '2. Exotic', s3: '3. Stats that matter', s3n: 'Use the arrows to sort; the minimum is optional.', s4: '4. Set bonus', s6: '8. Artifact', s7: '9. Mods', ch: 'Character', sub: 'Subclass', subCur: n => `${n} (equipped)`, subNone: "Don't include a subclass", subTap: 'Tap a socket to change it.', subG: { 309722977: 'Abilities', 457473665: 'Super', 2140934067: 'Aspects', 1313488945: 'Fragments' }, frag: n => `Fragments (${n} slots from aspects)`, used: 'already in use', wpCur: 'Equipped', wpPick: 'Choose', wpNone: "Don't include", wpSlot: ['Kinetic', 'Energy', 'Power'], wpNo: "Don't include", wpNoD: 'DIM keeps whatever is equipped', wpBack: 'Back to equipped', mods: 'Bring current armor mods', modsN: n => `${n} mods: DIM reassigns them to the new pieces`, art: 'Bring artifact', artNo: 'No artifact found.', artTap: 'Tap a perk to change it. Artifact points still apply in game.', res: 'Best combinations', meta: (n, s) => `${n} tested in ${s} s · top 4`, cur: 'Current', idle: 'Pick your options and tap “Find combinations”.', restNote: 'Totals add the armor to what the character gets outside it today (subclass, fragments, artifact). Changing fragments or artifact can change those values in game.', foot: 'DPI only reads your account: to equip, open the combination in DIM (or build it in game).', wpExo: 'Two exotic weapons: DIM will only equip one.', reset: 'Back to what is equipped', eqd: 'equipped', clan: 'In testing, for now only for the Orla Emaranhada clan. It may have bugs: check in DIM before equipping.' },
+  pt: { open: 'Abrir montador', card: 'Monte a melhor combinação de armaduras para qualquer personagem, com subclasse, armas, mods e artefato, e mande para o DIM.', s1: '1. Personagem e subclasse', s2: '2. Exótico', s3: '3. Atributos que importam', s3n: 'Use as setas para ordenar; o mínimo é opcional.', s4: '4. Bônus de conjunto', s6: '8. Artefato', s7: '9. Mods', ch: 'Personagem', sub: 'Subclasse', subCur: n => `${n} (equipada)`, subNone: 'Não levar subclasse', subTap: 'Toque num encaixe para trocar.', subG: { 309722977: 'Habilidades', 457473665: 'Super', 2140934067: 'Aspectos', 1313488945: 'Fragmentos' }, frag: n => `Fragmentos (${n} encaixes pelos aspectos)`, used: 'já em uso', wpCur: 'Equipadas', wpPick: 'Escolher', wpNone: 'Não levar', wpSlot: ['Cinética', 'Energética', 'Pesada'], wpNo: 'Não levar', wpNoD: 'o DIM mantém a arma que estiver equipada', wpBack: 'Voltar à equipada', mods: 'Levar os mods de armadura atuais', modsN: n => `${n} mods: o DIM redistribui nas peças novas`, art: 'Levar artefato', artNo: 'Nenhum artefato encontrado.', artTap: 'Toque numa vantagem para trocar. Os pontos do artefato continuam valendo no jogo.', res: 'Melhores combinações', meta: (n, s) => `${n} testadas em ${s} s · 4 melhores`, cur: 'Atual', idle: 'Escolha as opções e toque em “Buscar combinações”.', restNote: 'Os totais somam a armadura com o que o personagem já ganha fora dela (subclasse, fragmentos, artefato) hoje. Trocar fragmentos ou artefato pode mudar esses valores no jogo.', foot: 'O DPI só lê sua conta: para equipar, abra a combinação no DIM (ou monte no jogo).', wpExo: 'Duas armas exóticas: o DIM só vai equipar uma.', reset: 'Voltar ao que está equipado', eqd: 'equipada', save: 'Salvar', saved: 'Salva ✓', savedT: n => `Montador · ${n}`, copy: 'Copiar link do DIM', copied: 'Link copiado!', setOn: 'ativo', setOff: c => `com ${c} peças`, clan: 'Em teste, por enquanto só para o clã Orla Emaranhada. Pode ter erros: confira no DIM antes de equipar.' },
+  en: { open: 'Open builder', card: 'Build the best armor combination for any character, with subclass, weapons, mods and artifact, and send it to DIM.', s1: '1. Character and subclass', s2: '2. Exotic', s3: '3. Stats that matter', s3n: 'Use the arrows to sort; the minimum is optional.', s4: '4. Set bonus', s6: '8. Artifact', s7: '9. Mods', ch: 'Character', sub: 'Subclass', subCur: n => `${n} (equipped)`, subNone: "Don't include a subclass", subTap: 'Tap a socket to change it.', subG: { 309722977: 'Abilities', 457473665: 'Super', 2140934067: 'Aspects', 1313488945: 'Fragments' }, frag: n => `Fragments (${n} slots from aspects)`, used: 'already in use', wpCur: 'Equipped', wpPick: 'Choose', wpNone: "Don't include", wpSlot: ['Kinetic', 'Energy', 'Power'], wpNo: "Don't include", wpNoD: 'DIM keeps whatever is equipped', wpBack: 'Back to equipped', mods: 'Bring current armor mods', modsN: n => `${n} mods: DIM reassigns them to the new pieces`, art: 'Bring artifact', artNo: 'No artifact found.', artTap: 'Tap a perk to change it. Artifact points still apply in game.', res: 'Best combinations', meta: (n, s) => `${n} tested in ${s} s · top 4`, cur: 'Current', idle: 'Pick your options and tap “Find combinations”.', restNote: 'Totals add the armor to what the character gets outside it today (subclass, fragments, artifact). Changing fragments or artifact can change those values in game.', foot: 'DPI only reads your account: to equip, open the combination in DIM (or build it in game).', wpExo: 'Two exotic weapons: DIM will only equip one.', reset: 'Back to what is equipped', eqd: 'equipped', save: 'Save', saved: 'Saved ✓', savedT: n => `Builder · ${n}`, copy: 'Copy DIM link', copied: 'Link copied!', setOn: 'active', setOff: c => `with ${c} pieces`, clan: 'In testing, for now only for the Orla Emaranhada clan. It may have bugs: check in DIM before equipping.' },
 };
 const lw = () => LBT[lang === 'pt' ? 'pt' : 'en'];
 const LBO = LS.get('dc-lb-opt', {});
@@ -2529,6 +2529,19 @@ const LB = { st: 'idle', pieces: null, cid: null, exo: 'any', prio: LS.get('dc-l
   sub: 'cur', wp: LBO.wp || 'cur', w: {}, mods: LBO.mods !== false, art: LBO.art !== false, artSel: '', so: {}, ao: {}, pick: '',
   wpns: [], subs: {}, arts: {}, eq: {}, sk: {}, en: {}, pp: {}, cp: {}, season: 0 };
 const lbWEq = s => (LB.eq[LB.cid] || []).find(i => i.bucketHash === WEAPON_B[s])?.itemInstanceId || '';
+// última configuração de cada personagem (só neste aparelho): exótico, conjunto, subclasse e encaixes, armas, artefato
+const LBCFG = LS.get('dc-lb-cfg', {});
+function lbCfgSave() {
+  if (!LB.cid || LB.st !== 'ready') return;
+  LBCFG[LB.cid] = { exo: LB.exo, set: LB.set, need: LB.need, sub: LB.sub, w: LB.w, artSel: LB.artSel, so: LB.so, ao: LB.ao };
+  try { LS.set('dc-lb-cfg', LBCFG); } catch {}
+}
+function lbCfgLoad() {
+  const c = LBCFG[LB.cid] || {}, has = id => !id || id === 'cur' || Object.values(LB.subs).flat().concat(Object.values(LB.arts).flat()).some(x => x.itemInstanceId === id);
+  LB.exo = c.exo || 'any'; LB.set = c.set || ''; LB.need = c.need || 2; LB.sub = has(c.sub) ? (c.sub ?? 'cur') : 'cur'; LB.artSel = has(c.artSel) ? c.artSel || '' : '';
+  LB.so = Object.assign(LB.so, c.so || {}); LB.ao = Object.assign(LB.ao, c.ao || {});
+  LB.w = {}; for (const [k, id] of Object.entries(c.w || {})) if (!id || LB.wpns.some(w => w.id === id)) LB.w[k] = id; lbWDef();
+}
 const lbWDef = () => { for (const s of [0, 1, 2]) if (LB.w[s] === undefined) LB.w[s] = lbWEq(s); };
 const LBCOL = Object.assign({ w0: 1, w1: 1, w2: 1, s6: 1, s7: 1 }, LS.get('dc-lb-col', {}));
 // cabeçalho de seção recolhível: fechada, mostra só o título e o resumo da escolha atual
@@ -2593,11 +2606,11 @@ async function lbLoad() {
     const names = [...wraw.map(x => x.it.itemHash), ...Object.values(LB.subs).flat().map(x => x.itemHash), ...Object.values(LB.arts).flat().map(x => x.itemHash)];
     const [a, b] = await Promise.all([entities('DestinyInventoryItemDefinition', names, L), entities('DestinyInventoryItemDefinition', plugs, L, true)]);
     Object.assign(LB.en, a, b);
-    const inst = r.itemComponents?.instances?.data || {};
+    const inst = LB.inst = r.itemComponents?.instances?.data || {};
     LB.wpns = wraw.map(x => { const ii = inst[x.it.itemInstanceId] || {}; return { id: x.it.itemInstanceId, h: x.it.itemHash, slot: x.slot, eqc: x.eq || '', n: LB.en[x.it.itemHash]?.n || '', ic: LB.en[x.it.itemHash]?.ic || '', exo: LB.en[x.it.itemHash]?.tt === 6, pw: ii.primaryStat?.value || 0, el: ELEMENTS[ii.damageType] || '' }; }).filter(w => w.n && w.slot >= 0).sort((p, q) => (q.exo - p.exo) || (q.pw - p.pw) || p.n.localeCompare(q.n));
     const sh = profile?.profile?.data?.currentSeasonHash;
     if (sh && !LB.season) bungie(`/Destiny2/Manifest/DestinySeasonDefinition/${sh}/`, false).then(d => { LB.season = d?.seasonNumber || 0; }).catch(() => {});
-    LB.st = 'ready'; lbWDef(); lbAmmo();
+    LB.st = 'ready'; lbCfgLoad(); lbAmmo();
     for (const s of new Set(LB.pieces.map(p => p.set).filter(Boolean))) if (!SETDEF[s + ':' + (lang === 'pt' ? 'pt-br' : 'en')]) setDef(s, lang === 'pt' ? 'pt-br' : 'en').then(lbDraw);
   } catch (e) { LB.st = 'err'; }
   lbDraw();
@@ -2633,7 +2646,7 @@ async function lbRun() {
     } } } }
     if (a % 2 === 1) await new Promise(r => setTimeout(r, 0)); // deixa a tela respirar
   }
-  LB.res = top; LB.n = n; LB.ms = Math.round(performance.now() - t0); LB.st = 'ready'; lbDraw();
+  LB.res = top; LB.saved = {}; LB.n = n; LB.ms = Math.round(performance.now() - t0); LB.st = 'ready'; lbDraw();
 }
 const lbSkip = e => !e?.n || SKIP_NAME.test(e.n) || SKIP_PT.test(e.n);
 const lbEqOf = b => (LB.eq[LB.cid] || []).find(i => i.bucketHash === b);
@@ -2673,6 +2686,19 @@ function lbDim(r) {
   const sn = sub && LB.en[sub.hash]?.n;
   const lo = { name: 'DPI · ' + (u().classes[ch.classType] || '') + (sn ? ' · ' + sn : ''), classType: ch.classType, clearSpace: false, equipped, unequipped: [], parameters };
   return 'https://app.destinyitemmanager.com/loadouts?loadout=' + encodeURIComponent(JSON.stringify(lo));
+}
+// salva a combinação em "Builds salvas" no mesmo formato das outras (subclasse e artefato já com as trocas feitas aqui)
+function lbSnap(r) {
+  const ch = lbChar(), items = [], so = {}, io = {}, inst = LB.inst || {};
+  const add = (it, b, ov) => { items.push({ itemHash: it.itemHash ?? it.h, itemInstanceId: it.itemInstanceId ?? it.id, bucketHash: b }); const id = it.itemInstanceId ?? it.id, sk = LB.sk[id]; if (sk) so[id] = ov ? { sockets: sk.sockets.map((x, k) => ov[k] ? { ...x, plugHash: ov[k] } : x) } : sk; if (inst[id]) io[id] = { primaryStat: inst[id].primaryStat }; };
+  const sub = lbSubInst(); if (sub) add(sub, SUB_BUCKET, LB.so[sub.itemInstanceId]);
+  for (const w of lbWeapons()) { const x = LB.wpns.find(y => y.id === w.id); if (x) add(x, WEAPON_B[x.slot]); }
+  for (const p of r.ps) add(p, ARMOR_BUCKETS[p.slot]);
+  const art = LB.art ? lbArtInst() : null; if (art) add(art, ARTIFACT_BUCKET, LB.ao[art.itemInstanceId]);
+  const stats = Object.fromEntries(STAT_ORDER.map((h, k) => [h, r.tot[k]]));
+  const c = { characterId: LB.cid, classType: ch.classType, raceType: ch.raceType, light: ch.light, emblemHash: ch.emblemHash, emblemPath: ch.emblemPath, emblemBackgroundPath: ch.emblemBackgroundPath, stats };
+  const sn = sub && LB.en[sub.itemHash]?.n, t = lw().savedT(charTitle(u().classes[ch.classType] || '', sn));
+  return { k: 'lb|' + Date.now(), name: String(member?.name || '').replace(/#\d+$/, ''), t, at: Date.now(), cid: LB.cid, p: { characters: { data: { [LB.cid]: c } }, characterEquipment: { data: { [LB.cid]: { items } } }, itemComponents: { sockets: { data: so }, instances: { data: io } } } };
 }
 // cartão pequeno na aba Builds: o montador em si abre na janela
 // liberado para o clã Orla Emaranhada (e o dono no /beta); a lista do clã vem com a aba Guardião e fica lembrada no aparelho
@@ -2732,7 +2758,7 @@ function lbDraw() {
   // 4. conjunto
   const sets = [...new Set(ps.map(p => p.set).filter(Boolean))].map(h => ({ h, n: SETDEF[h + ':' + lc]?.n || '…', c: ps.filter(p => p.set === h).length })).filter(x => x.c >= 2).sort((a, b) => a.n.localeCompare(b.n));
   const s4 = lbSec('s4', T.s4, esc(LB.set ? (sets.find(x => String(x.h) === String(LB.set))?.n || '') + ' · ' + LB.need : W.lbSetAny), `<div class="lbd-row"><label class="lb-f"><small>${esc(W.lbSet)}</small><select class="tsort-sel" data-lbset><option value="">${esc(W.lbSetAny)}</option>${sets.map(x => `<option value="${x.h}"${String(LB.set) === String(x.h) ? ' selected' : ''}>${esc(x.n)} (${x.c})</option>`).join('')}</select></label>
-    ${LB.set ? `<label class="lb-f lb-f-s"><small>${esc(W.lbNeed)}</small><select class="tsort-sel" data-lbneed><option value="2"${LB.need === 2 ? ' selected' : ''}>2</option><option value="4"${LB.need === 4 ? ' selected' : ''}>4</option></select></label>` : ''}</div>`);
+    ${LB.set ? `<label class="lb-f lb-f-s"><small>${esc(W.lbNeed)}</small><select class="tsort-sel" data-lbneed><option value="2"${LB.need === 2 ? ' selected' : ''}>2</option><option value="4"${LB.need === 4 ? ' selected' : ''}>4</option></select></label>` : ''}</div>${LB.set && SETDEF[LB.set + ':' + lc]?.perks?.length ? `<ul class="lbd-perks">${SETDEF[LB.set + ':' + lc].perks.map(pk => `<li class="${LB.need >= pk.c ? 'on' : ''}">${pk.ic ? `<img src="${BNET}${pk.ic}" alt="">` : ''}<span><b>${esc(pk.n)}</b> <small>${pk.c}/5</small>${pk.d ? `<em>${esc(pk.d)}</em>` : ''}</span></li>`).join('')}</ul>` : ''}`);
   // 5. armas: quadradinhos por espaço, como as armaduras
   // 5–7. armas: cada espaço na sua seção, em quadradinhos com o poder (como no DIM); começa pelas equipadas
   const wTile = (s, w, sel) => `<button type="button" class="lbd-wt${w.exo ? ' exo' : ''}${sel === w ? ' on' : ''}${w.eqc === LB.cid ? ' eqd' : ''}" data-lbwt="${s}:${w.id}" title="${esc(w.n + (w.pw ? ' · ' + w.pw : '') + (IDEF[w.h]?.a ? ' · ' + (W.w.ammo[IDEF[w.h].a] || '') : '') + (w.eqc === LB.cid ? ' · ' + T.eqd : ''))}" aria-label="${esc(w.n)}">${w.ic ? `<img src="${BNET}${w.ic}" alt="" loading="lazy">` : esc(w.n.slice(0, 2))}${IDEF[w.h]?.a ? `<span class="lbd-am a${IDEF[w.h].a}">${ammoSVG(IDEF[w.h].a)}</span>` : ''}${w.pw ? `<i class="lbd-pw"${w.el ? ` style="--el:${ELEMENT_ACC[w.el]?.[0] || '#c9d3dd'}"` : ''}>${w.pw}</i>` : ''}</button>`;
@@ -2761,14 +2787,17 @@ function lbDraw() {
   const curRow = `<div class="lb-st lbd-cur"><em>${esc(T.cur)}</em>${STAT_ORDER.map((h, k) => `<span>${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}<b>${cur[k]}</b></span>`).join('')}</div>`;
   const res = !LB.res ? `<p class="lbd-idle">${esc(T.idle)}</p>` : !LB.res.length ? `<p class="lb-err">${esc(W.lbNone)}</p>` : LB.res.map((r, i) => {
     const sc = r.ps.filter(p => p.set).reduce((m, p) => (m[p.set] = (m[p.set] || 0) + 1, m), {}), setTxt = Object.entries(sc).filter(([, c]) => c >= 2).map(([h, c]) => `${SETDEF[h + ':' + lc]?.n || ''} ${c}/5`).join(' · ');
-    return `<article class="lb-r"><div class="lb-rh"><b>#${i + 1}</b><span>${esc(setTxt || W.lbNoSet)}</span><a href="${esc(lbDim(r))}" target="_blank" rel="noopener">${esc(W.lbDim)} ↗</a></div>
+    const perks = Object.entries(sc).filter(([, c]) => c >= 2).flatMap(([h, c]) => (SETDEF[h + ':' + lc]?.perks || []).map(pk => ({ ...pk, on: c >= pk.c })));
+    const saved = LB.saved?.[i];
+    return `<article class="lb-r"><div class="lb-rh"><b>#${i + 1}</b><span>${esc(setTxt || W.lbNoSet)}</span><span class="lbd-acts"><button type="button" class="lbd-btn" data-lbsave="${i}"${saved ? ' disabled' : ''}>${esc(saved ? T.saved : T.save)}</button><button type="button" class="lbd-btn" data-lbcopy="${i}">${esc(T.copy)}</button><a href="${esc(lbDim(r))}" target="_blank" rel="noopener">${esc(W.lbDim)} ↗</a></span></div>
+      ${perks.length ? `<ul class="lbd-perks">${perks.map(pk => `<li class="${pk.on ? 'on' : ''}">${pk.ic ? `<img src="${BNET}${pk.ic}" alt="">` : ''}<span><b>${esc(pk.n)}</b> <small>${esc(pk.c + '/5 · ' + (pk.on ? T.setOn : T.setOff(pk.c)))}</small>${pk.d ? `<em>${esc(pk.d)}</em>` : ''}</span></li>`).join('')}</ul>` : ''}
       <div class="lb-ps">${r.ps.map(p => `<div class="lb-pc${p.exo ? ' exo' : ''}${p.eqc === LB.cid ? ' eq' : ''}">${p.ic ? `<img src="${BNET}${p.ic}" alt="" loading="lazy">` : ''}<b>${esc(p.n)}</b><small>${esc(where(p))}</small></div>`).join('')}</div>
       <div class="lb-st">${STAT_ORDER.map((h, k) => { const v = r.tot[k], dd = v - cur[k]; return `<span${v >= 100 ? ' class="hi"' : ''} title="${esc(stN(h))}">${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}<b>${v}</b><small class="${dd > 0 ? 'up' : dd < 0 ? 'dn' : ''}">${dd ? (dd > 0 ? '+' : '') + dd : '='}</small></span>`; }).join('')}</div></article>`;
   }).join('');
   const meta = LB.res && LB.res.length ? `<span>${esc(T.meta(fmtN(LB.n), (LB.ms / 1000).toFixed(1).replace('.', lang === 'pt' ? ',' : '.')))}</span>` : '';
   d.innerHTML = `<div class="pf-box lbd-box">${close}${head}<div class="lbd-cols"><aside class="lbd-ctl">${s1}${s2}${s3}${s4}${s5}${s6}${s7}<div class="lbd-gobar">${go}</div></aside>
     <section class="lbd-res"><div class="lbd-rh"><h2>${esc(T.res)}</h2>${meta}</div>${curRow}${res}<p class="lbd-n">${esc(T.restNote)}</p><p class="lbd-n">${esc(T.foot)}</p><p class="lbd-n lb-clan">${esc(T.clan)}</p></section></div></div>`;
-  const nb = d.querySelector('.lbd-box'); if (nb) nb.scrollTop = y1; const nr = d.querySelector('.lbd-res'); if (nr) nr.scrollTop = y2; const nc = d.querySelector('.lbd-ctl'); if (nc) nc.scrollTop = y3;
+  const nb = d.querySelector('.lbd-box'); if (nb) nb.scrollTop = y1; const nr = d.querySelector('.lbd-res'); if (nr) nr.scrollTop = y2; const nc = d.querySelector('.lbd-ctl'); if (nc) nc.scrollTop = y3; lbCfgSave();
 }
 // animação ao reordenar os atributos: cada linha desliza da posição antiga para a nova (FLIP) e as duas trocadas piscam
 function lbSwap(k, j) {
@@ -2788,7 +2817,7 @@ $('lbdlg').addEventListener('click', e => {
   const d = $('lbdlg'), q = s => e.target.closest(s);
   if (e.target === d || q('.pf-x')) { d.close(); return; }
   const b = q('[data-lb]'); if (b) { if (b.dataset.lb === 'load') lbLoad(); else lbRun(); return; }
-  const c = q('[data-lbch]'); if (c) { if (c.dataset.lbch !== LB.cid) { LB.cid = c.dataset.lbch; LB.sub = 'cur'; LB.artSel = ''; LB.exo = 'any'; LB.set = ''; LB.w = {}; lbWDef(); LB.pick = ''; LB.res = null; lbDraw(); } return; }
+  const c = q('[data-lbch]'); if (c) { if (c.dataset.lbch !== LB.cid) { LB.cid = c.dataset.lbch; lbCfgLoad(); LB.pick = ''; LB.res = null; lbDraw(); } return; }
   const x = q('[data-lbexob]'); if (x) { LB.exo = x.dataset.lbexob; LB.res = null; lbDraw(); return; }
   const sb = q('[data-lbsub]'); if (sb) { LB.sub = sb.dataset.lbsub; LB.pick = ''; lbDraw(); return; }
   const ab = q('[data-lbart]'); if (ab) { LB.artSel = ab.dataset.lbart; LB.pick = ''; lbDraw(); return; }
@@ -2802,6 +2831,8 @@ $('lbdlg').addEventListener('click', e => {
   const wt = q('[data-lbwt]'); if (wt) { const [s, id] = wt.dataset.lbwt.split(':'); LB.w[+s] = id; lbDraw(); return; }
   const up = q('[data-lbup]'), dn = q('[data-lbdn]'); const k = up ? +up.dataset.lbup : dn ? +dn.dataset.lbdn : -1;
   if (k >= 0) { const j = up ? k - 1 : k + 1; if (j < 0 || j > 5) return; lbSwap(k, j); return; }
+  const sv = q('[data-lbsave]'); if (sv) { const i = +sv.dataset.lbsave, r = LB.res?.[i]; if (!r) return; const l = savedList(); l.unshift(lbSnap(r)); try { LS.set('dc-builds', l.slice(0, 20)); } catch {} (LB.saved = LB.saved || {})[i] = 1; lbDraw(); if (isGd()) render(); return; }
+  const cp = q('[data-lbcopy]'); if (cp) { const r = LB.res?.[+cp.dataset.lbcopy]; if (!r) return; navigator.clipboard?.writeText(lbDim(r)).then(() => { cp.textContent = lw().copied; setTimeout(() => { cp.textContent = lw().copy; }, 1800); }).catch(() => {}); return; }
   const cl = q('[data-lbcol]'); if (cl) { const key = cl.dataset.lbcol; if (LBCOL[key]) delete LBCOL[key]; else LBCOL[key] = 1; LB.pick = ''; try { LS.set('dc-lb-col', Object.assign({ w0: 0, w1: 0, w2: 0, s6: 0, s7: 0 }, LBCOL)); } catch {} lbDraw(); }
 });
 $('lbdlg').addEventListener('change', e => {
