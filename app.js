@@ -1425,7 +1425,7 @@ function render() {
   secs.sort((a, b) => secDone(a) - secDone(b));
   const tsBar = SORT_TABS.includes(tab) ? `<div class="tsort"><label class="tsort-k" for="tsortsel">${esc(U.tsK)}</label><select id="tsortsel" class="tsort-sel">${TS_OPTS[tab].map(k => `<option value="${k}"${sortOf(tab) === k ? ' selected' : ''}>${esc(U.tsO[k])}</option>`).join('')}</select></div>${secs.length ? '' : `<p class="empty-msg">${esc(U.tsNone)}</p>`}` : '';
   const wkBar = tab === 'exo' && have.a ? (() => { const n = weekExo().size; return `<div class="wkx"><button type="button" class="char wkx-b" id="wkxbtn" aria-pressed="${WKX.on}" title="${esc(U.w.wkExoTip)}">★ ${esc(U.w.wkExo(n))}</button></div><p class="empty-msg" id="wkxnone" hidden>${esc(U.w.wkExoNone)}</p>`; })() : '';
-  if (tab === 'obj' && have.a && member) loadSession();
+  if (tab === 'obj' && have.a && member && LIVE.checked && !LIVE.on) loadSession();
   if ((tab === 'raid' || tab === 'dg' || tab === 'xm') && have.a && member) loadActHist();
   if (tab === 'xm') loadXmRec();
   $('list').innerHTML = `<div class="panel">${tab === 'obj' ? newsHTML() : ''}${tab === 'obj' ? sessHTML() : ''}${wkBar}${tsBar}${secs.map(sec => {
@@ -2234,7 +2234,7 @@ function weekHTML(sec) {
 }
 function sessHTML() {
   // jogando agora (a Bungie mostra o grupo): a sessão ainda não terminou; aparece quando o jogo é fechado
-  const S = SESSION, W = u().w; if (LIVE.on || !S || S.none || !S.items?.length) return '';
+  const S = SESSION, W = u().w; if (!LIVE.checked || LIVE.on || !S || S.none || !S.items?.length) return '';
   const tm = t => new Date(t).toLocaleTimeString(lang === 'en' ? 'en-US' : 'pt-BR', { hour: '2-digit', minute: '2-digit' });
   const day = (() => { const d = new Date(S.start), n = new Date(); const y = new Date(n); y.setDate(n.getDate() - 1); return d.toDateString() === n.toDateString() ? W.today : d.toDateString() === y.toDateString() ? W.yesterday : d.toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR', { day: '2-digit', month: '2-digit' }); })();
   const badge = b => W.ssBadge[b] || W.ssBadge[b.replace(/\d+$/, '')] || (/^mode/.test(b) ? (W.ssMode[+b.slice(4)] || W.ssBadge.done) : W.ssBadge.done);
@@ -2337,7 +2337,7 @@ async function moveToNew() {
 /* ---------- Ao vivo: o fireteam em que você está agora e a build de cada um ----------
    Lê o grupo pela sua conta (componente 1000) a cada 30 s com a aba aberta; a build de cada membro é pública
    (mesmos dados da busca de guardião). Fora do jogo, a faixa some. */
-const LIVE = { on: false, act: '', since: null, mem: [], seq: 0, timer: null, types: LS.get('dc-mtype', {}), busy: false };
+const LIVE = { checked: false, bt: 0, on: false, act: '', since: null, mem: [], seq: 0, timer: null, types: LS.get('dc-mtype', {}), busy: false };
 async function memType(id) {
   if (LIVE.types[id]) return LIVE.types[id];
   if (id === member?.id) return member.type;
@@ -2373,7 +2373,8 @@ function saveAvail(data) {
 }
 const secAvail = sec => { if (!AVAIL) return true; const d = sec.kind ? actDefOf(sec.kind, sec.key) : sec.xm; return !d?.ah?.length || d.ah.some(h => AVAIL.has(h)); };
 async function livePoll() {
-  if (LIVE.busy || !auth || !member || document.hidden) return; LIVE.busy = true; const my = ++LIVE.seq;
+  if (LIVE.busy && Date.now() - LIVE.bt > 60000) LIVE.busy = false; // pedido travado: não deixa o Ao vivo preso
+  if (LIVE.busy || !auth || !member || document.hidden) return; LIVE.busy = true; LIVE.bt = Date.now(); const my = ++LIVE.seq;
   try {
     const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=1000,204`);
     saveAvail(r.characterActivities?.data);
@@ -2391,7 +2392,7 @@ async function livePoll() {
     if (my !== LIVE.seq) return;
     const was = LIVE.on; LIVE.on = true; LIVE.mem = mem; renderLive(); if (!was && tab === 'obj') render();
   } catch { /* fora do ar ou sem permissão: tenta de novo no próximo ciclo */ }
-  finally { LIVE.busy = false; }
+  finally { if (my === LIVE.seq) LIVE.busy = false; if (!LIVE.checked) { LIVE.checked = true; if (tab === 'obj') render(); } }
 }
 function liveStart() { clearInterval(LIVE.timer); livePoll(); LIVE.timer = setInterval(livePoll, 30000); }
 document.addEventListener('visibilitychange', () => { if (!document.hidden && LIVE.timer) livePoll(); if (!document.hidden && loadedAt && Date.now() - loadedAt > 5 * 60000) autoRefresh(); });
