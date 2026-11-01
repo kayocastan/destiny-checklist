@@ -1102,3 +1102,30 @@ dialog.lbd{width:min(1280px,calc(100vw - 24px))}
 @media (min-width:861px){.lbd-res{position:sticky;top:0}}
 @media (max-width:860px){.lbd-cols{grid-template-columns:minmax(0,1fr)}dialog.lbd{width:100vw;max-height:100dvh;margin:0;height:100dvh}dialog.lbd .lbd-box{max-height:100dvh;height:100dvh;border-radius:0;padding:14px 16px}.lbd-hd h1{font-size:28px}}
 @media (max-width:560px){.lbd-cur{grid-template-columns:repeat(3,minmax(0,1fr))}.lbd-cur em{grid-column:1/-1}}
+/* montador: subclasse, artefato e armas em quadradinhos; animação da ordem */
+.lbd-subs{display:flex;gap:6px;flex-wrap:wrap}
+.lbd-subb{font:inherit;display:flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border-radius:8px;border:1px solid var(--line);background:var(--chip);color:var(--fg);cursor:pointer;font-size:12.5px}
+.lbd-subb img{width:28px;height:28px;border-radius:4px}.lbd-subb.none{padding:4px 12px;min-height:38px}
+.lbd-subb.on{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc);background:color-mix(in srgb,var(--acc) 14%,var(--chip))}
+.lbd-subb.art img{background:#222}
+.lbd-sg{display:grid;gap:6px}.lbd-sg>small{font-size:11.5px;color:var(--muted)}.lbd-sg>small b{color:var(--fg);font-weight:600}.lbd-sg>small b.exo{color:var(--exotic)}
+.lbd-sks{display:flex;gap:6px;flex-wrap:wrap}
+.lbd-sks.art{gap:14px}.lbd-col{display:flex;flex-direction:column;gap:6px}
+.lbd-sk{width:46px;height:46px;padding:0;border-radius:6px;border:1px solid var(--line);background:#2b3542;cursor:pointer;overflow:hidden;position:relative}
+.lbd-sk img{width:100%;height:100%;display:block}
+.lbd-sk.on{border:2px solid var(--acc)}.lbd-sk.chg::after{content:'';position:absolute;top:3px;right:3px;width:8px;height:8px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 2px #0d1219}
+.lbd-sk.static{cursor:default}.lbd-sk.exo{border-color:var(--exotic)}
+.lbd-pk{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px;max-height:260px;overflow:auto;padding:6px;border-radius:10px;border:1px solid var(--acc);background:var(--bg)}
+.lbd-po{font:inherit;display:flex;align-items:center;gap:8px;text-align:left;padding:4px;border-radius:6px;border:1px solid transparent;background:var(--chip);color:var(--fg);cursor:pointer;font-size:12px;min-width:0}
+.lbd-po img{width:32px;height:32px;border-radius:4px;flex:none;background:#2b3542}.lbd-po span{overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.lbd-po.on{border-color:var(--acc)}.lbd-po:disabled{opacity:.35;cursor:default}.lbd-po:not(:disabled):hover{border-color:var(--line)}
+.lbd-wg{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:5px;max-height:204px;overflow:auto;padding:2px}
+.lbd-wt{aspect-ratio:1;padding:0;border-radius:6px;border:1px solid var(--line);background:#2b3542;cursor:pointer;overflow:hidden;position:relative;color:var(--muted);font-size:16px}
+.lbd-wt img{width:100%;height:100%;display:block}
+.lbd-wt.exo{border-color:color-mix(in srgb,var(--exotic) 55%,var(--line))}
+.lbd-wt.on{border:2px solid var(--acc);box-shadow:0 0 0 2px color-mix(in srgb,var(--acc) 35%,transparent)}
+.lbd-wt.eqd::after{content:'';position:absolute;left:3px;bottom:3px;width:7px;height:7px;border-radius:50%;background:var(--done);box-shadow:0 0 0 2px #0d1219}
+.lb-p{position:relative}
+@keyframes lbdFlash{0%,35%{background:color-mix(in srgb,var(--acc) 38%,var(--chip));box-shadow:inset 0 0 0 1px var(--acc)}100%{}}
+.lb-p.lbd-flash{animation:lbdFlash .9s ease-out}
+@media (prefers-reduced-motion:reduce){.lb-p.lbd-flash{animation:none}}
