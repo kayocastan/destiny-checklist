@@ -1145,3 +1145,4 @@ dialog.lbd{width:min(1280px,calc(100vw - 24px))}
   .lbd-res{position:static}
 }
 .lbd-ctl,.lbd-res{display:flex;flex-direction:column}.lbd-ctl>*,.lbd-res>*{flex-shrink:0}
+.lbd-s{overflow:visible;flex-shrink:0}
