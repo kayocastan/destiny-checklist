@@ -1241,7 +1241,7 @@ function gdHTML() {
   const fav = `<article class="gd"><div class="gd-head"><h2>${esc(W.favGT)}</h2></div>${fl.length ? `<ul class="sq">${fl.map(x => { const k = x.name.lastIndexOf('#'); return `<li><button type="button" class="cl-p sq-p fav-p" data-mt="${x.type}" data-mid="${esc(x.id)}" data-name="${esc(x.name)}" title="${esc(W.seeBuild)}"><span class="sq-n">${esc(k > 0 ? x.name.slice(0, k) : x.name)}<small>${esc(k > 0 ? x.name.slice(k) : '')}</small></span><span class="sq-s">${esc([x.t, x.pw ? '✦ ' + x.pw : '', x.at ? W.seenAgo(ago(x.at)) : ''].filter(Boolean).join(' · '))}</span></button></li>`; }).join('')}</ul>` : `<p>${esc(W.favNone)}</p>`}</article>`;
   const sv = savedList();
   const saved = `<article class="gd"><div class="gd-head"><h2>${esc(W.savedT)}</h2></div>${sv.length ? `<ul class="sq">${sv.map((x, i) => `<li><button type="button" class="cl-p sq-p sv-p" data-sv="${i}" title="${esc(W.seeBuild)}"><span class="sq-n">${esc(x.title || x.t)}</span><span class="sq-s">${esc([x.title ? x.t : '', x.name, '✦ ' + (x.p.characters.data[x.cid]?.light || ''), W.savedOn(ago(x.at))].filter(Boolean).join(' · '))}</span>${x.note ? `<span class="sq-s sv-note">${esc(x.note)}</span>` : ''}</button></li>`).join('')}</ul>` : `<p>${esc(W.savedNone)}</p>`}</article>`;
-  return tab === 'gst' ? `<div class="panel">${ranks}${statsA}${clears}${wp}${comm}</div>` : tab === 'gcl' ? `<div class="panel">${clan}${FX ? firstHTML() + clanCkHTML() + cmpGHTML() : ''}</div>` : `<div class="panel">${lbHTML()}${saved}${fav}${FX ? wishHTML() : ''}${rec}${vaultHTML()}${opts}</div>`;
+  return tab === 'gst' ? `<div class="panel">${ranks}${statsA}${clears}${wp}${comm}</div>` : tab === 'gcl' ? `<div class="panel">${clan}${FX ? firstHTML() + clanCkHTML() + cmpGHTML() : ''}</div>` : `<div class="panel">${lbHTML()}${lcHTML()}${saved}${fav}${FX ? wishHTML() : ''}${rec}${vaultHTML()}${opts}</div>`;
 }
 
 /* Título do cabeçalho: subclasse + classe ("Titã Combatente" / "Striker Titan"); se o nome da subclasse já traz a classe ("Titã Prismático"), usa só ele */
@@ -2549,7 +2549,7 @@ const lbSec = (k, title, sum, body, extra = '') => `<section class="lbd-s${LBCOL
 // munição das armas: vem junto com o nome (cache do servidor); o que faltar busca aos poucos e fica guardado
 function lbAmmo() {
   const need = [...new Set(LB.wpns.map(w => w.h))].filter(h => !IDEF[h]); if (!need.length || lbReq.has('ammo')) return; lbReq.add('ammo'); let i = 0;
-  Promise.all(Array.from({ length: 6 }, async () => { while (i < need.length) { try { await idef(need[i++]); } catch {} } })).then(() => { lbReq.delete('ammo'); lbDraw(); });
+  Promise.all(Array.from({ length: 6 }, async () => { while (i < need.length) { try { await idef(need[i++]); } catch {} } })).then(() => { lbReq.delete('ammo'); lbDraw(); if ($('lcdlg')?.open) lcDraw(); });
 }
 const lbSaveOpt = () => { try { LS.set('dc-lb-opt', { wp: LB.wp, mods: LB.mods, art: LB.art }); } catch {} };
 const ADEF = LS.get('dc-adef', {}), SOCKD = LS.get('dc-sockdef', {}), ACAP = LS.get('dc-acap', {}), lbReq = new Set();
@@ -2573,12 +2573,12 @@ function aspCap(h) {
 function lbNames(hs) {
   const need = [...new Set(hs)].filter(h => h && !LB.en[h] && !lbReq.has('e' + h)); if (!need.length) return;
   need.forEach(h => lbReq.add('e' + h));
-  entities('DestinyInventoryItemDefinition', need, lang === 'pt' ? 'pt' : 'en').then(r => { Object.assign(LB.en, r); lbDraw(); }).catch(() => {});
+  entities('DestinyInventoryItemDefinition', need, lang === 'pt' ? 'pt' : 'en').then(r => { Object.assign(LB.en, r); lbDraw(); if ($('lcdlg')?.open) lcDraw(); }).catch(() => {});
 }
 const lbOpts = ps => { const l = (LB.cp[LB.cid] || {})[ps] || LB.pp[ps] || []; return [...new Set(l.filter(x => x.canInsert !== false && x.enabled !== false).map(x => x.plugItemHash))]; };
 const lbChar = () => profile?.characters?.data?.[LB.cid] || profile?.characters?.data?.[charId];
 async function lbLoad() {
-  if (LB.st === 'loading') return; LB.st = 'loading'; LB.res = null; LB.cid = LB.cid || charId; lbDraw();
+  if (LB.st === 'loading') return; LB.st = 'loading'; LB.res = null; LC.base = null; LB.cid = LB.cid || charId; lbDraw();
   try {
     const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=102,201,205,300,304,305`);
     const stats = r.itemComponents?.stats?.data || {}, raw = [], wraw = [], L = lang === 'pt' ? 'pt' : 'en';
@@ -2599,7 +2599,7 @@ async function lbLoad() {
     const hs = [...new Set(cand.map(x => x.it.itemHash))]; let i = 0;
     await Promise.all(Array.from({ length: 8 }, async () => { while (i < hs.length) await armorDef(hs[i++]); }));
     try { LS.set('dc-adef', ADEF); } catch {}
-    LB.pieces = cand.map(x => { const d = ADEF[x.it.itemHash]; if (!d || d.k > 2 || !ARMOR_BUCKETS.includes(d.b)) return null; const sv = stats[x.it.itemInstanceId].stats; return { id: x.it.itemInstanceId, h: x.it.itemHash, k: d.k, slot: ARMOR_BUCKETS.indexOf(d.b), set: d.s, exo: d.t === 6, n: d.n, ic: d.ic, where: x.where, eqc: x.eq || '', st: STAT_ORDER.map(h => sv[h]?.value || 0) }; }).filter(Boolean);
+    LB.pieces = cand.map(x => { const d = ADEF[x.it.itemHash]; if (!d || d.k > 2 || !ARMOR_BUCKETS.includes(d.b)) return null; const sv = stats[x.it.itemInstanceId].stats; return { id: x.it.itemInstanceId, h: x.it.itemHash, k: d.k, slot: ARMOR_BUCKETS.indexOf(d.b), set: d.s, exo: d.t === 6, n: d.n, ic: d.ic, where: x.where, eqc: x.eq || '', lk: !!(x.it.state & 1), st: STAT_ORDER.map(h => sv[h]?.value || 0) }; }).filter(Boolean);
     // nomes de armas, subclasses, artefatos e encaixes atuais: uma leva só, quase tudo já está no cache
     const plugs = [], holders = [...Object.values(LB.eq).flat().filter(it => ARMOR_BUCKETS.includes(it.bucketHash)), ...Object.values(LB.subs).flat(), ...Object.values(LB.arts).flat()];
     for (const it of holders) for (const s of LB.sk[it.itemInstanceId]?.sockets || []) if (s.plugHash) plugs.push(s.plugHash);
@@ -2607,13 +2607,13 @@ async function lbLoad() {
     const [a, b] = await Promise.all([entities('DestinyInventoryItemDefinition', names, L), entities('DestinyInventoryItemDefinition', plugs, L, true)]);
     Object.assign(LB.en, a, b);
     const inst = LB.inst = r.itemComponents?.instances?.data || {};
-    LB.wpns = wraw.map(x => { const ii = inst[x.it.itemInstanceId] || {}; return { id: x.it.itemInstanceId, h: x.it.itemHash, slot: x.slot, eqc: x.eq || '', n: LB.en[x.it.itemHash]?.n || '', ic: LB.en[x.it.itemHash]?.ic || '', exo: LB.en[x.it.itemHash]?.tt === 6, pw: ii.primaryStat?.value || 0, el: ELEMENTS[ii.damageType] || '' }; }).filter(w => w.n && w.slot >= 0).sort((p, q) => (q.exo - p.exo) || (q.pw - p.pw) || p.n.localeCompare(q.n));
+    LB.wpns = wraw.map(x => { const ii = inst[x.it.itemInstanceId] || {}; return { id: x.it.itemInstanceId, h: x.it.itemHash, slot: x.slot, eqc: x.eq || '', lk: !!(x.it.state & 1), n: LB.en[x.it.itemHash]?.n || '', ic: LB.en[x.it.itemHash]?.ic || '', exo: LB.en[x.it.itemHash]?.tt === 6, pw: ii.primaryStat?.value || 0, el: ELEMENTS[ii.damageType] || '' }; }).filter(w => w.n && w.slot >= 0).sort((p, q) => (q.exo - p.exo) || (q.pw - p.pw) || p.n.localeCompare(q.n));
     const sh = profile?.profile?.data?.currentSeasonHash;
     if (sh && !LB.season) bungie(`/Destiny2/Manifest/DestinySeasonDefinition/${sh}/`, false).then(d => { LB.season = d?.seasonNumber || 0; }).catch(() => {});
     LB.st = 'ready'; lbCfgLoad(); lbAmmo();
     for (const s of new Set(LB.pieces.map(p => p.set).filter(Boolean))) if (!SETDEF[s + ':' + (lang === 'pt' ? 'pt-br' : 'en')]) setDef(s, lang === 'pt' ? 'pt-br' : 'en').then(lbDraw);
   } catch (e) { LB.st = 'err'; }
-  lbDraw();
+  lbDraw(); if ($('lcdlg')?.open) lcDraw();
 }
 // o resto (subclasse, fragmentos, artefato) = atributos do personagem menos o que a armadura equipada dá
 function lbRest() {
@@ -2841,6 +2841,99 @@ $('lbdlg').addEventListener('change', e => {
   else if (t.matches('[data-lbmods]')) { LB.mods = t.checked; lbSaveOpt(); } else if (t.matches('[data-lbartck]')) { LB.art = t.checked; LB.pick = ''; lbSaveOpt(); } else return;
   if (!keepRes) LB.res = null; if (!t.matches('[data-lbmin]')) lbDraw();
 });
+/* ---------- Limpeza do cofre (beta, clã) ----------
+   Usa os mesmos dados do montador. Armadura: aponta peças piores em todos os atributos que outra da mesma classe, espaço
+   e conjunto (exótico só contra o mesmo exótico), comparando os atributos de base (sem os mods encaixados).
+   Armas: cópias repetidas da mesma arma, com os perks de cada uma, para você escolher qual fica.
+   Nada é desmontado aqui: o DPI gera a busca para colar no DIM. Trancadas e equipadas nunca entram. */
+const LCT = {
+  pt: { t: 'Limpeza do cofre', card: 'Encontra armaduras piores em tudo que outra que você já tem e armas repetidas, e monta a busca pronta para o DIM.', open: 'Abrir limpeza', arm: 'Armaduras que dá para desmontar', armN: 'Cada peça abaixo tem atributos iguais ou menores em todos os 6 que outra do mesmo espaço, classe e conjunto. Os mods encaixados não contam.', wp: 'Armas repetidas', wpN: 'Você tem mais de uma cópia destas armas. Marque as que podem sair; a de maior poder vem desmarcada.', worse: 'pior que', none: 'Nada para limpar aqui.', locked: n => n ? `${n} trancadas ficaram de fora.` : '', sel: n => `${n} selecionadas`, copy: 'Copiar busca para o DIM', copied: 'Busca copiada! Cole na busca do DIM.', how: 'No DIM, cole na barra de busca: só as peças marcadas aparecem. Confira antes de desmontar.', all: 'Todas', noneB: 'Nenhuma', mods: 'Calculando os atributos sem os mods…', tot: 'total' },
+  en: { t: 'Vault cleanup', card: 'Finds armor that is worse in everything than another piece you already own and duplicate weapons, and builds the search for DIM.', open: 'Open cleanup', arm: 'Armor you can dismantle', armN: 'Each piece below has equal or lower values in all 6 stats than another of the same slot, class and set. Socketed mods are not counted.', wp: 'Duplicate weapons', wpN: 'You own more than one copy of these. Check the ones that can go; the highest power copy starts unchecked.', worse: 'worse than', none: 'Nothing to clean here.', locked: n => n ? `${n} locked items were left out.` : '', sel: n => `${n} selected`, copy: 'Copy search for DIM', copied: 'Search copied! Paste it in DIM search.', how: 'In DIM, paste it in the search bar: only the checked items show up. Double-check before dismantling.', all: 'All', noneB: 'None', mods: 'Working out stats without mods…', tot: 'total' },
+};
+const lcw = () => LCT[lang === 'pt' ? 'pt' : 'en'];
+const LC = { off: new Set(), on: new Set(), base: null, busy: false };
+const MODST = LS.get('dc-modst', {});
+// atributos de base de cada peça: tira o que os mods encaixados (enhancements.*) somam
+async function lcBase() {
+  if (LC.base || LC.busy || !LB.pieces) return; LC.busy = true;
+  try {
+    const L = lang === 'pt' ? 'pt' : 'en', plugs = new Set();
+    for (const p of LB.pieces) for (const s of LB.sk[p.id]?.sockets || []) if (s.plugHash) plugs.add(s.plugHash);
+    Object.assign(LB.en, await entities('DestinyInventoryItemDefinition', [...plugs], L, true));
+    const mods = [...plugs].filter(h => /^enhancements\.(?!ghosts)/.test(LB.en[h]?.pc || '') && !MODST[h]); let i = 0;
+    await Promise.all(Array.from({ length: 6 }, async () => { while (i < mods.length) { const h = mods[i++]; try { const d = await bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${h}/`, false); MODST[h] = Object.fromEntries((d.investmentStats || []).filter(x => STAT_ORDER.includes(x.statTypeHash)).map(x => [x.statTypeHash, x.value])); } catch { MODST[h] = {}; } } }));
+    try { LS.set('dc-modst', MODST); } catch {}
+    LC.base = {};
+    for (const p of LB.pieces) { const st = p.st.slice(); for (const s of LB.sk[p.id]?.sockets || []) { const m = /^enhancements\.(?!ghosts)/.test(LB.en[s.plugHash]?.pc || '') && MODST[s.plugHash]; if (m) STAT_ORDER.forEach((h, k) => { st[k] -= m[h] || 0; }); } LC.base[p.id] = st; }
+  } catch {}
+  LC.busy = false; lcDraw();
+}
+const lcEq = id => Object.values(LB.eq).flat().some(i => i.itemInstanceId === id);
+function lcArmor() {
+  const B = LC.base, out = []; let locked = 0;
+  for (const p of LB.pieces) {
+    if (p.eqc || lcEq(p.id)) continue; const a = B[p.id];
+    let best = null;
+    for (const q of LB.pieces) {
+      if (q === p || q.k !== p.k || q.slot !== p.slot || q.exo !== p.exo || (p.exo && q.h !== p.h) || (p.set && q.set !== p.set)) continue;
+      const b = B[q.id]; if (!b.every((v, k) => v >= a[k])) continue;
+      if (b.every((v, k) => v === a[k]) && q.id > p.id && q.set === p.set) continue; // iguais: fica uma das duas
+      if (!best || b.reduce((t, v) => t + v, 0) > B[best.id].reduce((t, v) => t + v, 0)) best = q;
+    }
+    if (!best) continue; if (p.lk) { locked++; continue; }
+    out.push({ p, q: best });
+  }
+  return { list: out.sort((x, y) => x.p.k - y.p.k || x.p.slot - y.p.slot), locked };
+}
+function lcWeapons() {
+  const by = {}; let locked = 0;
+  for (const w of LB.wpns) (by[w.h] = by[w.h] || []).push(w);
+  const groups = Object.values(by).filter(g => g.length > 1).map(g => g.sort((a, b) => b.pw - a.pw)).sort((a, b) => a[0].n.localeCompare(b[0].n));
+  for (const g of groups) for (const w of g) if (w.lk) locked++;
+  return { groups, locked };
+}
+const LC_PERK = /^(barrels|magazines|magazines_gl|frames|scopes|guards|blades|tubes|arrows|batteries|bowstrings|grips|hafts|stocks|origins)$/;
+function lcPerks(w) { return (LB.sk[w.id]?.sockets || []).map(s => s.plugHash).filter(h => h && LC_PERK.test(LB.en[h]?.pc || '')); }
+function lcSelected() {
+  const sel = [];
+  if (LC.base) for (const { p } of lcArmor().list) if (!LC.off.has(p.id)) sel.push(p.id);
+  for (const g of lcWeapons().groups) g.forEach((w, i) => { if (!w.lk && !lcEq(w.id) && (LC.on.has(w.id) || (i > 0 && !LC.off.has(w.id)))) sel.push(w.id); });
+  return sel;
+}
+function lcHTML() {
+  if (!have.a || !member || !lbAllowed()) return '';
+  const W = u(), T = lcw();
+  return `<article class="gd lb lb-card"><div class="gd-head"><h2>${esc(T.t)} <small class="lb-beta">beta</small></h2></div><p>${esc(T.card)}</p><p class="lb-clan">${esc(lw().clan)}</p><button type="button" class="lb-run" data-lcopen>${esc(T.open)} ↗</button></article>`;
+}
+function lcOpen() { const d = $('lcdlg'); LB.cid = LB.cid || charId; loadStats(); lcDraw(); if (!d.open) d.showModal(); if (LB.st === 'idle' || LB.st === 'err') lbLoad(); else lcBase(); }
+function lcDraw() {
+  const d = $('lcdlg'); if (!d) return;
+  const W = u(), T = lcw(), D = STATD?.d || {};
+  const close = `<button type="button" class="pf-x" aria-label="${esc(W.giClose)}">✕</button>`, head = `<header class="lbd-hd"><div><small>${esc(T.t)} · beta</small><h1>${esc(T.t)}</h1></div></header>`;
+  if (LB.st !== 'ready' && LB.st !== 'running') { d.innerHTML = `<div class="pf-box lbd-box lcd-box">${close}${head}${LB.st === 'err' ? `<p class="lb-err">${esc(W.lbErr)}</p>` : `<p class="pf-msg wait">${esc(W.lbLoading)}</p>`}</div>`; return; }
+  if (!LC.base) { lcBase(); d.innerHTML = `<div class="pf-box lbd-box lcd-box">${close}${head}<p class="pf-msg wait">${esc(T.mods)}</p></div>`; return; }
+  const y = d.querySelector('.lcd-box')?.scrollTop || 0;
+  const where = p => p.where === 'v' ? W.lbVault : (u().classes[profile.characters.data[p.where]?.classType] || '');
+  const stl = (st, ref) => `<span class="lcd-st">${STAT_ORDER.map((h, k) => `<span title="${esc(D[h]?.n || '')}"${ref && st[k] < ref[k] ? ' class="dn"' : ''}>${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}${st[k]}</span>`).join('')}<b>${st.reduce((t, v) => t + v, 0)} <small>${esc(T.tot)}</small></b></span>`;
+  const piece = (p, ref) => `<span class="lcd-pc${p.exo ? ' exo' : ''}">${p.ic ? `<img src="${BNET}${p.ic}" alt="" loading="lazy">` : ''}<span><b>${esc(p.n)}</b><small>${esc(where(p))}</small>${stl(LC.base[p.id], ref)}</span></span>`;
+  const A = lcArmor(), WP = lcWeapons(), sel = new Set(lcSelected());
+  const byCls = [0, 1, 2].map(c => A.list.filter(x => x.p.k === c)).map((l, c) => l.length ? `<h3 class="lcd-h3">${esc(u().classes[c])} · ${l.length}</h3>` + l.map(({ p, q }) => `<label class="lcd-row"><input type="checkbox" data-lcid="${p.id}"${sel.has(p.id) ? ' checked' : ''}>${piece(p, LC.base[q.id])}<em>${esc(T.worse)}</em>${piece(q)}</label>`).join('') : '').join('');
+  const wrows = WP.groups.map(g => `<div class="lcd-wg"><h3 class="lcd-h3">${g[0].ic ? `<img src="${BNET}${g[0].ic}" alt="">` : ''}${esc(g[0].n)} · ${g.length}</h3>${g.map(w => { const dis = w.lk || lcEq(w.id), pk = lcPerks(w); return `<label class="lcd-row lcd-w${dis ? ' dis' : ''}"><input type="checkbox" data-lcid="${w.id}"${sel.has(w.id) ? ' checked' : ''}${dis ? ' disabled' : ''}><span class="lcd-pw">${w.pw || ''}${IDEF[w.h]?.a ? ammoSVG(IDEF[w.h].a) : ''}</span><span class="lcd-perks">${pk.map(h => `<span title="${esc(LB.en[h]?.n || '')}">${LB.en[h]?.ic ? `<img src="${BNET}${LB.en[h].ic}" alt="">` : ''}<small>${esc(LB.en[h]?.n || '')}</small></span>`).join('')}</span><small class="lcd-where">${esc(w.eqc ? W.lbEquipped : w.lk ? '🔒' : '')}</small></label>`; }).join('')}</div>`).join('');
+  lbNames(WP.groups.flat().flatMap(w => (LB.sk[w.id]?.sockets || []).map(s => s.plugHash)));
+  const bar = `<div class="lcd-bar"><span>${esc(T.sel(sel.size))}</span><button type="button" class="lbd-btn" data-lcall="1">${esc(T.all)}</button><button type="button" class="lbd-btn" data-lcall="0">${esc(T.noneB)}</button><button type="button" class="lb-run" data-lccopy${sel.size ? '' : ' disabled'}>${esc(T.copy)}</button></div>`;
+  d.innerHTML = `<div class="pf-box lbd-box lcd-box">${close}${head}${bar}<p class="lbd-n">${esc(T.how)}</p>
+    <div class="lcd-cols"><section class="lbd-s"><h2>${esc(T.arm)} <small>${A.list.length}</small></h2><p class="lbd-n">${esc(T.armN)}</p>${byCls || `<p class="lbd-idle">${esc(T.none)}</p>`}${A.locked ? `<p class="lbd-n">${esc(T.locked(A.locked))}</p>` : ''}</section>
+    <section class="lbd-s"><h2>${esc(T.wp)} <small>${WP.groups.length}</small></h2><p class="lbd-n">${esc(T.wpN)}</p>${wrows || `<p class="lbd-idle">${esc(T.none)}</p>`}</section></div>
+    <p class="lbd-n lb-clan">${esc(lw().clan)}</p></div>`;
+  const nb = d.querySelector('.lcd-box'); if (nb) nb.scrollTop = y;
+}
+document.addEventListener('click', e => { if (e.target.closest('[data-lcopen]')) lcOpen(); });
+$('lcdlg').addEventListener('click', e => {
+  const d = $('lcdlg'); if (e.target === d || e.target.closest('.pf-x')) { d.close(); return; }
+  const all = e.target.closest('[data-lcall]'); if (all) { const on = all.dataset.lcall === '1'; LC.off.clear(); LC.on.clear(); if (!on) { for (const { p } of lcArmor().list) LC.off.add(p.id); for (const g of lcWeapons().groups) for (const w of g) LC.off.add(w.id); } else for (const g of lcWeapons().groups) for (const w of g) LC.on.add(w.id); lcDraw(); return; }
+  const cp = e.target.closest('[data-lccopy]'); if (cp) { const ids = lcSelected(); if (!ids.length) return; navigator.clipboard?.writeText(ids.map(id => 'id:' + id).join(' or ')).then(() => { cp.textContent = lcw().copied; setTimeout(() => { cp.textContent = lcw().copy; }, 2200); }).catch(() => {}); }
+});
+$('lcdlg').addEventListener('change', e => { const t = e.target.closest('[data-lcid]'); if (!t) return; const id = t.dataset.lcid; if (t.checked) { LC.off.delete(id); LC.on.add(id); } else { LC.on.delete(id); LC.off.add(id); } lcDraw(); });
 /* ---------- Clã: grupo de primeira vez (quem nunca fez a atividade escolhida, online primeiro, e quem pode guiar) ---------- */
 const FIRST = { k: LS.get('dc-first', '') };
 function firstHTML() {
