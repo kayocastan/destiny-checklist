@@ -1129,3 +1129,5 @@ dialog.lbd{width:min(1280px,calc(100vw - 24px))}
 @keyframes lbdFlash{0%,35%{background:color-mix(in srgb,var(--acc) 38%,var(--chip));box-shadow:inset 0 0 0 1px var(--acc)}100%{}}
 .lb-p.lbd-flash{animation:lbdFlash .9s ease-out}
 @media (prefers-reduced-motion:reduce){.lb-p.lbd-flash{animation:none}}
+.lbd-wg{grid-template-columns:repeat(auto-fill,minmax(44px,1fr));grid-auto-rows:46px;align-content:start}
+.lbd-wt{aspect-ratio:auto;width:100%;height:100%}
