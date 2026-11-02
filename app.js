@@ -3252,12 +3252,18 @@ async function copyToMe(C, title) {
   box(`<p class="pf-msg wait">${esc(wt().reading)}</p>`);
   let F; try { F = await wFresh(); } catch (e) { box(`<p class="lb-err">${esc(wMsg(e))}</p>`); return; }
   const theirs = C.p.characterEquipment.data[C.cid].items, tsk = C.p.itemComponents?.sockets?.data || {}, en = B.en || {};
-  const mineByHash = h => Object.values(F.loc).filter(L => L.it.itemHash === h && (L.w === 'v' || profile.characters.data[L.w]?.classType === cls || WEAPON_B.includes(L.it.bucketHash))).sort((a, b) => (b.w === cid) - (a.w === cid) || (b.eq ? 1 : 0) - (a.eq ? 1 : 0))[0];
+  // o mesmo item pode ter outro número (versões diferentes): compara pelo número e, se não achar, pelo nome no mesmo espaço e classe
+  const mine = Object.values(F.loc).filter(L => { const c = ITEMS[L.it.itemHash]; if (c == null) return false; const sl = Math.floor(c / 100), k = Math.floor(c / 10) % 10; return sl <= 2 || k === 3 || k === cls; });
+  const MN = await entities('DestinyInventoryItemDefinition', [...new Set([...mine.map(L => L.it.itemHash), ...Object.values(F.eq[cid] || {}).map(i => i.itemHash)])], lang === 'pt' ? 'pt' : 'en').catch(() => ({}));
+  const key = n => String(n || '').toLowerCase().replace(/\s*\((adept|adepta|aprimorad[ao])\)$/, '').trim();
+  const pick = l => l.sort((a, b) => (b.w === cid) - (a.w === cid) || (b.eq ? 1 : 0) - (a.eq ? 1 : 0))[0];
+  const mineByHash = (h, b) => { const sl = ITEMS[h] != null ? Math.floor(ITEMS[h] / 100) : null, sameSlot = L => sl == null || Math.floor(ITEMS[L.it.itemHash] / 100) === sl;
+    return pick(mine.filter(L => L.it.itemHash === h)) || pick(mine.filter(L => sameSlot(L) && key(MN[L.it.itemHash]?.n) && key(MN[L.it.itemHash]?.n) === key(nm(h)))); };
   const rows = [], items = [], so = {}, io = {}; let missing = 0;
   for (const b of [SUB_BUCKET, ...WEAPON_B, ...ARMOR_B]) {
     const t = theirs.find(i => i.bucketHash === b); if (!t) continue;
-    let L = b === SUB_BUCKET ? Object.values(F.loc).find(x => x.it.itemHash === t.itemHash && x.w === cid) : mineByHash(t.itemHash), got = !!L;
-    if (!L) { const cur = F.eq[cid]?.[b]; missing++; rows.push({ n: nm(t.itemHash), ok: false, e: cur ? (LB.en?.[cur.itemHash]?.n || nm(cur.itemHash) || '?') : T.none }); if (!cur) continue; L = { it: cur, w: cid, eq: true }; }
+    let L = b === SUB_BUCKET ? Object.values(F.loc).find(x => x.it.itemHash === t.itemHash && x.w === cid) : mineByHash(t.itemHash, b), got = !!L;
+    if (!L) { const cur = F.eq[cid]?.[b]; missing++; rows.push({ n: nm(t.itemHash), ok: false, e: cur ? (MN[cur.itemHash]?.n || LB.en?.[cur.itemHash]?.n || '?') : T.none }); if (!cur) continue; L = { it: cur, w: cid, eq: true }; }
     else rows.push({ n: nm(t.itemHash), ok: true });
     const it = L.it, id = it.itemInstanceId; items.push({ itemHash: it.itemHash, itemInstanceId: id, bucketHash: b });
     const mySk = F.sk[id]?.sockets || [];
