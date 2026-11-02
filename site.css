@@ -1386,3 +1386,6 @@ dialog.navd::backdrop{background:rgba(5,8,14,.6)}
 .gh-strip>.menubtn{flex:none;margin-right:2px}
 .nav-fzg{padding:10px 12px;border-radius:12px;background:var(--chip)}
 .gh-strip>.title-actions{margin-left:auto}
+/* builds salvas: "Copiar para mim" ao lado, como o "Aplicar" */
+.sq li:has(.sv-cp){display:flex;align-items:center;gap:8px}.sq li:has(.sv-cp)>.sq-p{flex:1;min-width:0}
+.sq li>.sv-cp,.sq li>.wr-btn{flex:none;align-self:stretch;min-height:40px;display:inline-flex;align-items:center;justify-content:center;width:132px;box-sizing:border-box;white-space:nowrap}
