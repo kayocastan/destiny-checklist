@@ -39,7 +39,7 @@ const UI = {
     heroList: ['O site só lê os seus dados; não altera nada no jogo.', 'Sua senha fica na Bungie; o site nunca vê.', 'Marcações, favoritos e builds salvas sincronizam entre celular e PC.'],
     login: 'Entrar com Bungie.net', notConfigured: 'O site ainda não foi configurado: faltam as chaves da Bungie nas variáveis de ambiente da Vercel.',
     loading: 'Carregando sua conta…', loadingDefs: 'Buscando nomes de missões e itens…', loadingPlaces: 'Buscando locais das missões…', cached: t => `Mostrando dados das ${t}; atualizando…`, updated: t => `Atualizado às ${t}`,
-    authError: m => `Não deu para entrar: ${m}. Tente de novo.`, apiError: m => `Erro ao falar com a Bungie: ${m}`,
+    relogNote: 'Atualizamos o acesso do site com a Bungie: entre de novo, uma vez, para continuar (suas marcações e favoritos continuam salvos).', authError: m => `Não deu para entrar: ${m}. Tente de novo.`, apiError: m => `Erro ao falar com a Bungie: ${m}`,
     maintenance: 'A API da Bungie está em manutenção agora. Tente de novo em alguns minutos.',
     noChars: 'Nenhum personagem de Destiny 2 encontrado nesta conta.',
     done1: (n, t) => `${n} de ${t} feitos`, dg: (n, t) => `${n} de ${t} masmorras concluídas`, raid: (n, t) => `${n} de ${t} incursões concluídas`,
@@ -94,7 +94,7 @@ const UI = {
     heroList: ['The site only reads your data; it never changes anything in the game.', 'Your password stays with Bungie; the site never sees it.', 'Checkmarks, favorites and saved builds sync between phone and PC.'],
     login: 'Sign in with Bungie.net', notConfigured: "The site isn't configured yet: the Bungie keys are missing from the Vercel environment variables.",
     loading: 'Loading your account…', loadingDefs: 'Fetching quest and item names…', loadingPlaces: 'Fetching quest locations…', cached: t => `Showing data from ${t}; updating…`, updated: t => `Updated at ${t}`,
-    authError: m => `Couldn't sign in: ${m}. Please try again.`, apiError: m => `Error talking to Bungie: ${m}`,
+    relogNote: 'We updated the site access with Bungie: sign in again, once, to continue (your marks and favorites are still saved).', authError: m => `Couldn't sign in: ${m}. Please try again.`, apiError: m => `Error talking to Bungie: ${m}`,
     maintenance: 'The Bungie API is down for maintenance. Try again in a few minutes.',
     noChars: 'No Destiny 2 characters found on this account.',
     done1: (n, t) => `${n} of ${t} done`, dg: (n, t) => `${n} of ${t} dungeons cleared`, raid: (n, t) => `${n} of ${t} raids cleared`,
@@ -3499,6 +3499,13 @@ if ('serviceWorker' in navigator) addEventListener('load', () => navigator.servi
   } catch { cfg = { configured: false }; showMessage(`<p class="notice">${esc(u().notConfigured)}</p>`); return; }
   if (h?.error) { render(); $('list').insertAdjacentHTML('afterbegin', `<p class="notice">${esc(u().authError(h.error))}</p>`); return; }
   if (h?.auth) { auth = h.auth; LS.set('dc-auth', auth); }
+  // versão do acesso: quando o site passa a pedir uma permissão nova da Bungie, quem entrou antes precisa entrar de novo (uma vez)
+  const AUTH_V = 2; // 2: mover e equipar itens (nov/2026)
+  let relog = false;
+  if (h?.auth) LS.set('dc-authv', AUTH_V);
+  else if (auth && LS.get('dc-authv', 1) < AUTH_V) { relog = true; LS.set('dc-authv', AUTH_V); logout(); }
+  else if (!auth) LS.set('dc-authv', AUTH_V);
+  if (relog) setTimeout(() => $('list').insertAdjacentHTML('afterbegin', `<p class="notice">${esc(u().relogNote)}</p>`), 0);
   if (location.host === OLD_HOST && !auth) bungie('/GlobalAlerts/', false).catch(() => {});
   setTimeout(sendHit, 5000);
   // dono do site: aviso de sugestões novas (envelope com o número, leva ao painel); a conta é conferida uma vez por dia nos outros navegadores
