@@ -1351,3 +1351,6 @@ dialog.wr::backdrop{background:rgba(5,8,14,.8)}
 /* preparar atividade */
 .chip.prep{font:inherit;font-size:inherit;font-weight:600;cursor:pointer;color:var(--fg);background:color-mix(in srgb,var(--exotic) 16%,transparent);border-color:var(--exotic)}
 .prep-more summary{cursor:pointer;font-size:13px;color:var(--acc);margin:4px 0 8px}
+.ld-wrap{grid-column:1/-1;display:grid;gap:12px}
+.ld-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(420px,100%),1fr));gap:12px;align-items:start}
+.ld-wrap .ld-intro{margin:0}
