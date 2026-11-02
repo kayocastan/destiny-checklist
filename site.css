@@ -1361,3 +1361,4 @@ dialog.wr::backdrop{background:rgba(5,8,14,.8)}
 .ld-del{margin-left:auto;color:var(--muted)}
 .ld-del:hover{color:var(--hard);border-color:var(--hard)}
 .ld-del.on{color:#fff;background:var(--hard);border-color:var(--hard)}
+.fd-ib.cp-btn{font:inherit;font-size:13px;font-weight:600;padding:6px 12px;border-radius:8px;border:1px solid var(--acc);background:color-mix(in srgb,var(--acc) 16%,transparent);color:var(--fg);cursor:pointer;white-space:nowrap}
