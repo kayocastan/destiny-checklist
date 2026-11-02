@@ -1244,7 +1244,7 @@ function gdHTML() {
   const sv = savedList();
   const saved = `<article class="gd"><div class="gd-head"><h2>${esc(W.savedT)}</h2></div>${sv.length ? `<ul class="sq">${sv.map((x, i) => `<li><button type="button" class="cl-p sq-p sv-p" data-sv="${i}" title="${esc(W.seeBuild)}"><span class="sq-n">${esc(x.title || x.t)}</span><span class="sq-s">${esc([x.title ? x.t : '', x.name, '✦ ' + (x.p.characters.data[x.cid]?.light || ''), W.savedOn(ago(x.at))].filter(Boolean).join(' · '))}</span>${x.note ? `<span class="sq-s sv-note">${esc(x.note)}</span>` : ''}</button>${profile?.characters?.data?.[x.cid] ? wBtn(`data-svap="${i}"`) : member ? `<button type="button" class="lbd-btn sv-cp" data-svcp="${i}">${esc(cpt().short)}</button>` : ''}</li>`).join('')}</ul>` : `<p>${esc(W.savedNone)}</p>`}</article>`;
   if (tab === 'grep') return `<div class="panel">${repHTML()}</div>`;
-  return tab === 'gst' ? `<div class="panel">${seasonHTML()}${grHTML()}${statsA}${clears}${wp}${comm}</div>` : tab === 'gcl' ? `<div class="panel">${clvHTML()}${clan}${FX ? firstHTML() + clanCkHTML() + cmpGHTML() : ''}</div>` : `<div class="panel">${lbHTML()}${lpaHTML()}${saved}${fav}${FX ? wishHTML() : ''}${rec}${vaultHTML()}${opts}</div>`;
+  return tab === 'gst' ? `<div class="panel">${seasonHTML()}${grHTML()}${statsA}${clears}${wp}${comm}</div>` : tab === 'gcl' ? `<div class="panel">${clvHTML()}${clan}${FX ? clanBoardHTML() + firstHTML() + clanCkHTML() + cmpGHTML() : ''}</div>` : `<div class="panel">${lbHTML()}${lpaHTML()}${saved}${fav}${FX ? wishHTML() : ''}${rec}${vaultHTML()}${opts}</div>`;
 }
 
 /* Título do cabeçalho: subclasse + classe ("Titã Combatente" / "Striker Titan"); se o nome da subclasse já traz a classe ("Titã Prismático"), usa só ele */
@@ -1650,6 +1650,7 @@ function pfRender() {
   if (!P) { d.innerHTML = `<div class="pf-box">${close}<p class="pf-msg wait">${esc(W.loadingDefs)}</p></div>`; return; }
   const chars = Object.entries(P.characters?.data || {}).sort((a, b) => new Date(b[1].dateLastPlayed) - new Date(a[1].dateLastPlayed)), main = chars[0]?.[1];
   const mt = P.metrics?.data?.metrics || {}, met = h => mt[h]?.objectiveProgress?.progress || 0;
+  if (!MDEF.b) mdefLoad().then(() => { if ($('profdlg').open) pfRender(); });
   const acts = ACT_METRICS().map(([k, a]) => ({ k, a, c: met(a.m), f: PF.fast?.[k + ':' + a.k] || 0 }));
   const raids = acts.filter(x => x.k === 'raid').reduce((t, x) => t + x.c, 0), dgs = acts.filter(x => x.k === 'dg').reduce((t, x) => t + x.c, 0);
   const hours = Math.round(chars.reduce((t, [, c]) => t + (+c.minutesPlayedTotal || 0), 0) / 60);
@@ -1664,7 +1665,7 @@ function pfRender() {
       <div class="pf-acts"><button type="button" class="pf-cmp">${esc(W.pfCmp)}</button><button type="button" class="pf-link">${esc(W.pfCopy)}</button></div></div>
       <div class="pf-chars">${chars.map(([cid, c]) => `<button type="button" class="pf-ch" data-pfc="${cid}"><span><b>${esc(u().classes[c.classType] || '')}</b><small>${esc(W.pfPlayed(new Date(c.dateLastPlayed).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })))}</small></span><b class="pf-l">✦ ${c.light}</b></button>`).join('')}</div></section>
     <div class="pf-kpi">${[[W.subs.raid, fmtN(raids), W.pfClears], [W.subs.dg, fmtN(dgs), W.pfClears], [W.subs.tit, PF.rec ? fmtN(sealsDone) : '…', W.pfSeals], [W.pfHours, fmtN(hours), W.pfAllChars]].map(([k, v, s]) => `<div><small>${esc(k)}</small><b>${v}</b><span>${esc(s)}</span></div>`).join('')}</div>
-    <div class="pf-cols"><section class="pf-card pf-tb"><h2>${esc(W.pfActs)}</h2>${done.length ? `<table><thead><tr><th>${esc(W.pfAct)}</th><th>${esc(W.pfClearsH)}</th><th>${esc(W.pfFast)}</th></tr></thead><tbody>${done.map(x => `<tr><td><small>${esc(x.k === 'raid' ? W.w.raidW : W.w.dgW)}</small>${esc(L(x.a.n))}</td><td>${fmtN(x.c)}</td><td>${PF.fast ? (x.f ? fmtDur(x.f) : '—') : '…'}</td></tr>`).join('')}</tbody></table>` : `<p class="pf-msg">${esc(W.pfNone)}</p>`}${rest && done.length ? `<p class="pf-note">${esc(W.pfRest(rest))}</p>` : ''}</section>
+    <div class="pf-cols"><section class="pf-card pf-tb"><h2>${esc(W.pfActs)}</h2>${done.length ? `<table><thead><tr><th>${esc(W.pfAct)}</th><th>${esc(W.pfClearsH)}</th><th>${esc(W.pfFast)}</th></tr></thead><tbody>${done.map(x => { const bc = badgeChips(actBadges(x.a, met)); return `<tr><td><small>${esc(x.k === 'raid' ? W.w.raidW : W.w.dgW)}</small>${esc(L(x.a.n))}${bc ? `<span class="bdgs">${bc}</span>` : ''}</td><td>${fmtN(x.c)}</td><td>${PF.fast ? (x.f ? fmtDur(x.f) : '—') : '…'}</td></tr>`; }).join('')}</tbody></table>` : `<p class="pf-msg">${esc(W.pfNone)}</p>`}${rest && done.length ? `<p class="pf-note">${esc(W.pfRest(rest))}</p>` : ''}</section>
       <aside class="pf-side"><section class="pf-card"><h2>${esc(W.subs.tit)}</h2>${!PF.rec ? `<p class="pf-msg wait">${esc(W.loadingDefs)}</p>` : topSeals.length ? topSeals.map(x => `<div class="pf-t${x.done === x.tot ? ' ok' : ''}"><div><b>${esc(L(x.s.t))}</b><span>${x.done}/${x.tot}</span></div><i><u style="width:${Math.round(x.done / x.tot * 100)}%"></u></i></div>`).join('') : `<p class="pf-msg">${esc(W.pfPriv)}</p>`}</section>
       <section class="pf-card"><h2>${esc(W.pfBuild)}</h2><p class="pf-note">${esc(W.pfBuildNote)}</p><button type="button" class="pf-build">${esc(W.pfBuildBtn)}</button></section></aside></div>
     <p class="pf-foot">${esc(W.pfFoot)}</p></div>`;
@@ -2561,15 +2562,72 @@ function todayHTML() {
 const GMET = LS.get('dc-gmet', {});
 const ACT_METRICS = () => [...defs.raids.map(a => ['raid', a]), ...defs.dungeons.map(a => ['dg', a])].filter(([, a]) => a.m);
 async function guardianMetrics(mt, mid) {
-  const c = GMET[mid]; if (c && Date.now() - c.at < 864e5) return c;
+  const c = GMET[mid]; if (c && c.v === 2 && Date.now() - c.at < 864e5) return c;
   let v;
-  try { const r = await bungie(`/Destiny2/${mt}/Profile/${mid}/?components=100,1100`, false); const m = r.metrics?.data?.metrics; v = { at: Date.now(), priv: !m, gr: r.profile?.data?.currentGuardianRank || 0, m: m ? Object.fromEntries(ACT_METRICS().map(([, a]) => [a.m, m[a.m]?.objectiveProgress?.progress || 0])) : {} }; }
-  catch { v = { at: Date.now(), priv: true, m: {} }; }
+  await mdefLoad();
+  try {
+    const r = await bungie(`/Destiny2/${mt}/Profile/${mid}/?components=100,200,1100`, false), m = r.metrics?.data?.metrics, g = h => m?.[h]?.objectiveProgress?.progress || 0, ch = Object.values(r.characters?.data || {});
+    v = { at: Date.now(), v: 2, priv: !m, gr: r.profile?.data?.currentGuardianRank || 0, m: m ? Object.fromEntries(ACT_METRICS().map(([, a]) => [a.m, g(a.m)])) : {},
+      hrs: Math.round(ch.reduce((t, c) => t + (+c.minutesPlayedTotal || 0), 0) / 60), lt: Math.max(0, ...ch.map(c => c.light || 0)), se: g(MET_SEALS), tri: g(MET_TRI),
+      x: m && MDEF.b ? Object.fromEntries(Object.keys(MDEF.b).map(h => [h, g(h)]).filter(([, n]) => n > 0)) : {} };
+    const tot = Object.values(v.m).reduce((a, b) => a + b, 0);
+    if (c && !c.priv && c.v === 2) { const ct = Object.values(c.m).reduce((a, b) => a + b, 0); v.w0 = c.w0 && Date.now() - c.w0.at < 7 * 864e5 ? c.w0 : { at: c.at, tot: ct }; } else v.w0 = { at: Date.now(), tot };
+  } catch { v = { at: Date.now(), v: 2, priv: true, m: {} }; }
   GMET[mid] = v; try { LS.set('dc-gmet', GMET); } catch {} return v;
 }
+/* Métricas que viram insígnias (guiados, impecável, solo), lidas do manifesto da Bungie uma vez por versão e guardadas no aparelho */
+const MET_SEALS = 1069213998, MET_TRI = 3329916678;
+const MDEF = { b: null, p: null };
+const actNorm = t => String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/["“”'«»:.,]/g, ' ').replace(/\b(a|o|as|os|da|do|de|na|no|em|the|of|masmorra|incursao|epica|raid|dungeon)\b/g, ' ').replace(/\s+/g, ' ').trim();
+function mdefLoad() {
+  if (MDEF.b) return Promise.resolve(); if (MDEF.p) return MDEF.p;
+  MDEF.p = (async () => {
+    const lc = lang === 'pt' ? 'pt-br' : 'en';
+    try {
+      const m = await bungie('/Destiny2/Manifest/', false), ver = m.version + ':' + lc; let c = await idbGet('mdef1');
+      if (!c || c.v !== ver) {
+        const D = await fetch(BNET + m.jsonWorldComponentContentPaths[lc].DestinyMetricDefinition).then(r => r.json()), b = {};
+        for (const [h, d] of Object.entries(D)) { const n = d.displayProperties?.name || '', t = /^(guiad|guided|sherpa)/i.test(n) ? 'g' : /impec|flawless/i.test(n) ? (/solo/i.test(n) ? 's' : 'f') : ''; if (t) b[h] = [t, actNorm(n)]; }
+        c = { v: ver, b }; idbSet('mdef1', c);
+      }
+      MDEF.b = c.b;
+    } catch { MDEF.b = {}; }
+  })();
+  return MDEF.p;
+}
+// insígnias de uma atividade a partir de um mapa de métricas {hash: valor}
+function actBadges(a, val) {
+  const n = actNorm(L(a.n)); if (!MDEF.b || !n) return { g: 0, f: 0, s: 0 };
+  const o = { g: 0, f: 0, s: 0 }; for (const [h, [t, mn]] of Object.entries(MDEF.b)) if (mn.includes(n)) o[t] += val(h) || 0; return o;
+}
+const BDGT = { pt: { g: n => `Guiou ${n}`, f: n => `Impecável ×${n}`, s: n => `Solo impecável ×${n}`, first: 'Primeira vez!', flaw: 'Sem mortes', low: n => n === 1 ? 'Solo' : n === 2 ? 'Dupla' : 'Trio', gTip: 'Quantas pessoas guiou até a primeira conclusão' },
+  en: { g: n => `Guided ${n}`, f: n => `Flawless ×${n}`, s: n => `Solo flawless ×${n}`, first: 'First clear!', flaw: 'Flawless', low: n => n === 1 ? 'Solo' : n === 2 ? 'Duo' : 'Trio', gTip: 'How many players they guided to a first clear' } };
+const bdgt = () => BDGT[lang === 'pt' ? 'pt' : 'en'];
+const badgeChips = b => { const T = bdgt(); return [b.g ? `<span class="bdg g" title="${esc(T.gTip)}">🧭 ${esc(T.g(b.g))}</span>` : '', b.s ? `<span class="bdg s">◆ ${esc(T.s(b.s))}</span>` : '', b.f ? `<span class="bdg f">✦ ${esc(T.f(b.f))}</span>` : ''].join(''); };
+/* Placar do clã: quem lidera em conclusões, patente, horas, títulos, triunfos e guiados; "semana" compara com a leitura de uns dias atrás neste aparelho */
+const LBDT = { pt: { t: 'Placar do clã', note: 'Usa os mesmos dados do checklist do clã (atualizados uma vez por dia).', k: { cl: 'Conclusões', wk: 'Na semana', gr: 'Patente', hrs: 'Horas', se: 'Títulos', tri: 'Triunfos', g: 'Guiados' }, wkN: 'Conclusões de incursões e masmorras desde a leitura de alguns dias atrás, neste aparelho.', none: 'Sem dados ainda.', more: n => `+ ${n}` },
+  en: { t: 'Clan leaderboard', note: 'Uses the same data as the clan checklist (refreshed once a day).', k: { cl: 'Clears', wk: 'This week', gr: 'Rank', hrs: 'Hours', se: 'Titles', tri: 'Triumphs', g: 'Guided' }, wkN: 'Raid and dungeon clears since the reading a few days ago, on this device.', none: 'No data yet.', more: n => `+ ${n}` } };
+const LBD = { k: LS.get('dc-lbd-k', 'cl'), all: false };
+function clanBoardHTML() {
+  const T = LBDT[lang === 'pt' ? 'pt' : 'en'], list = clanAll(); if (list.length < 2) return '';
+  const pub = list.filter(x => GMET[x.mid] && !GMET[x.mid].priv && GMET[x.mid].v === 2);
+  const tot = g => Object.values(g.m).reduce((a, b) => a + b, 0);
+  const val = { cl: tot, wk: g => g.w0 && Date.now() - g.w0.at > 864e5 ? Math.max(0, tot(g) - g.w0.tot) : 0, gr: g => g.gr, hrs: g => g.hrs, se: g => g.se, tri: g => g.tri, g: g => Object.entries(g.x || {}).reduce((t, [h, n]) => t + (MDEF.b?.[h]?.[0] === 'g' ? n : 0), 0) }[LBD.k];
+  const rows = pub.map(x => ({ x, v: val(GMET[x.mid]) || 0 })).filter(r => r.v > 0).sort((a, b) => b.v - a.v), top = rows[0]?.v || 1, show = LBD.all ? rows : rows.slice(0, 10);
+  const tabs = Object.entries(T.k).map(([k, t]) => `<button type="button" class="lbd-chip${LBD.k === k ? ' on' : ''}" data-lbdk="${k}">${esc(t)}</button>`).join('');
+  const body = !pub.length ? `<p>${esc(T.note)}</p><button type="button" class="char clck-b" data-clck ${CLCK.busy ? 'disabled' : ''}>${esc(CLCK.busy ? u().clckLoading(CLCK.n, list.length) : u().clckBtn(list.length))}</button>`
+    : rows.length ? `<ol class="lbd-ol">${show.map((r, i) => `<li class="${r.x.mid === member?.id ? 'me' : ''}"><span class="lbd-pos">${i < 3 ? ['🥇', '🥈', '🥉'][i] : i + 1}</span><button type="button" class="lbd-nm" data-mt="${r.x.mt}" data-mid="${esc(r.x.mid)}" data-name="${esc(r.x.full || r.x.n)}">${esc(r.x.n)}</button><i class="sea-bar"><u style="width:${Math.max(4, r.v / top * 100)}%"></u></i><b>${fmtN(r.v)}</b></li>`).join('')}</ol>${rows.length > 10 ? `<button type="button" class="char" data-lbdall>${esc(LBD.all ? '−' : T.more(rows.length - 10))}</button>` : ''}${LBD.k === 'wk' ? `<p class="lbd-n">${esc(T.wkN)}</p>` : ''}` : `<p class="lbd-n">${esc(T.none)}${LBD.k === 'wk' ? ' ' + T.wkN : ''}</p>`;
+  return `<article class="gd lbd-a"><div class="gd-head"><h2>🏆 ${esc(T.t)}</h2></div><div class="lbd-chips">${tabs}</div>${body}</article>`;
+}
+document.addEventListener('click', e => {
+  const k = e.target.closest('[data-lbdk]'); if (k) { LBD.k = k.dataset.lbdk; LS.set('dc-lbd-k', LBD.k); if (LBD.k === 'g') mdefLoad(); render(); return; }
+  if (e.target.closest('[data-lbdall]')) { LBD.all = !LBD.all; render(); return; }
+  const n = e.target.closest('.lbd-nm'); if (n) { FD.q = ''; FD.results = null; openFind({ name: n.dataset.name, type: +n.dataset.mt, id: n.dataset.mid }); }
+});
 const CLCK = { busy: false, n: 0, open: LS.get('dc-clck-open', true), f: LS.get('dc-clck-f', 'all') };
+const clanAll = () => GD?.clan?.list?.length ? [...GD.clan.list, { n: (member.name || '').replace(/#\d+$/, ''), full: member.name || '', mt: member.type, mid: member.id }] : [];
 async function loadClanCk() {
-  const list = GD?.clan?.list || []; if (CLCK.busy || !list.length) return; CLCK.busy = true; CLCK.n = 0; render();
+  const list = clanAll(); if (CLCK.busy || !list.length) return; CLCK.busy = true; CLCK.n = 0; render();
   let i = 0; const next = async () => { while (i < list.length) { const x = list[i++]; await guardianMetrics(x.mt, x.mid); CLCK.n++; if (CLCK.n % 4 === 0 && isGd()) render(); } };
   await Promise.all(Array.from({ length: 5 }, next)); CLCK.busy = false; CLCK.done = true; if (isGd()) render();
 }
@@ -2586,7 +2644,7 @@ function clanCkHTML() {
 document.addEventListener('click', e => {
   if (e.target.closest('[data-clcko]')) { CLCK.open = !CLCK.open; LS.set('dc-clck-open', CLCK.open); render(); return; }
   const f = e.target.closest('[data-clckf]'); if (f) { CLCK.f = f.dataset.clckf; LS.set('dc-clck-f', CLCK.f); render(); return; }
-  if (e.target.closest('[data-clck]')) { for (const x of GD?.clan?.list || []) delete GMET[x.mid]; CLCK.done = false; loadClanCk(); } });
+  if (e.target.closest('[data-clck]')) { for (const x of clanAll()) { const g = GMET[x.mid]; if (g) g.at = 0; } CLCK.done = false; loadClanCk(); } });
 /* ---------- Beta: montador de loadout ----------
    Lê as armaduras, armas, subclasses e artefatos (cofre + personagens) direto da Bungie, só quando a ferramenta é aberta;
    testa as combinações aqui no navegador e manda a escolhida para o DIM (o DPI não equipa nada).
@@ -3529,9 +3587,17 @@ async function repOpen(id) {
       for (const w of e.extended?.weapons || []) p.w[w.referenceId] = (p.w[w.referenceId] || 0) + (w.values?.uniqueWeaponKills?.basic?.value || 0); }
     const pl = Object.values(by).sort((a, b) => b.k - a.k), wh = [...new Set(pl.flatMap(p => Object.keys(p.w)))].map(Number);
     Object.assign(REP.wn, await entities('DestinyInventoryItemDefinition', wh.filter(h => !REP.wn[h]), lang).catch(() => ({})));
+    const xx = REP.list?.find(y => y.id === id); if (xx?.ok) pool(pl.filter(p => p.ok && p.mid), async p => { await guardianMetrics(p.mt, p.mid); }, 3).then(() => { try { LS.set('dc-gmet', GMET); } catch {} if (tab === 'grep') render(); });
     REP.pg[id] = { pl, fresh: P.activityWasStartedFromBeginning !== false && !P.startingPhaseIndex, at: Date.parse(P.period) };
   } catch { REP.pg[id] = { err: true }; }
   if (tab === 'grep') render();
+}
+function repBadges(p, x) {
+  const g = GMET[p.mid]; if (!g || g.priv || g.v !== 2 || !x?.kk) return '';
+  const a = (x.kk.kind === 'raid' ? defs.raids : defs.dungeons).find(y => y.k === x.kk.k); if (!a) return '';
+  const B = bdgt(), first = p.ok && g.m[a.m] === 1, b = actBadges(a, h => g.x?.[h]);
+  const h = (first ? `<span class="bdg first">★ ${esc(B.first)}</span>` : '') + (b.g ? `<span class="bdg g" title="${esc(B.gTip)}">🧭 ${esc(B.g(b.g))}</span>` : '');
+  return h ? `<span class="bdgs">${h}</span>` : '';
 }
 function repHTML() {
   const T = rept(), W = u(); if (!member) return '';
@@ -3548,9 +3614,9 @@ function repHTML() {
   let main = `<p class="lbd-n">${esc(T.pick)}</p>`;
   if (x) {
     const im = img(x), kind = kindOf(x), best = ACTH?.d?.[x.kk?.k]?.fast, rec = x.ok && best && Math.abs(best / 1000 - x.dur) < 2;
-    const head = `<div class="rep-hd"${im ? ` style="--rep-img:url('${BNET}${im}')"` : ''}><small>${esc(T.kind[kind] + ' · ' + (x.ok ? T.done : T.left) + ' · ' + fmt(x.at))}</small><h2>${esc(REP.names[x.h]?.n || '…')}</h2><div class="rep-meta"><span>⏱ <b>${fmtDur(x.dur * 1000)}</b></span><span>${esc(T.players(x.pc || 1))}</span>${P?.pl ? `<span>${P.pl.reduce((t, p) => t + p.k, 0)} ${esc(T.k.toLowerCase())} · ${P.pl.reduce((t, p) => t + p.d, 0)} ${esc(T.d.toLowerCase())}</span><span>${esc(P.fresh ? T.fresh : T.cp)}</span>` : ''}${rec ? `<span class="rep-rec">⏱ ${esc(T.rec)}</span>` : ''}</div></div>`;
+    const head = `<div class="rep-hd"${im ? ` style="--rep-img:url('${BNET}${im}')"` : ''}><small>${esc(T.kind[kind] + ' · ' + (x.ok ? T.done : T.left) + ' · ' + fmt(x.at))}</small><h2>${esc(REP.names[x.h]?.n || '…')}</h2><div class="rep-meta"><span>⏱ <b>${fmtDur(x.dur * 1000)}</b></span><span>${esc(T.players(x.pc || 1))}</span>${P?.pl ? `<span>${P.pl.reduce((t, p) => t + p.k, 0)} ${esc(T.k.toLowerCase())} · ${P.pl.reduce((t, p) => t + p.d, 0)} ${esc(T.d.toLowerCase())}</span><span>${esc(P.fresh ? T.fresh : T.cp)}</span>` : ''}${rec ? `<span class="rep-rec">⏱ ${esc(T.rec)}</span>` : ''}</div>${(() => { const B = bdgt(), pc = x.pc || P?.pl?.length || 0, out = []; if (x.ok && P?.pl && P.pl.every(p => !p.d)) out.push(`<span class="bdg f">✦ ${esc(B.flaw)}</span>`); if (x.ok && pc && pc <= (kind === 'raid' ? 3 : 2)) out.push(`<span class="bdg s">◆ ${esc(B.low(pc))}</span>`); return out.length ? `<div class="bdgs">${out.join('')}</div>` : ''; })()}</div>`;
     const wIc = h => REP.wn[h]?.ic ? `<img src="${BNET}${REP.wn[h].ic}" alt="" title="${esc(REP.wn[h]?.n || '')}">` : '';
-    const rows = !P ? `<p class="wait">${esc(W.loadingDefs)}</p>` : P.err ? `<p class="lb-err">${esc(W.unavailable)}</p>` : `<div class="rep-tb"><div class="rep-th"><span>${esc(T.team)}</span><span>${esc(T.k)}</span><span>${esc(T.d)}</span><span>${esc(T.a)}</span><span>${esc(T.kd)}</span><span>${esc(T.pr)}</span><span>${esc(T.ab)}</span><span>${esc(T.wp)}</span></div>${P.pl.map(p => { const ws = Object.entries(p.w).sort((a, b) => b[1] - a[1]).slice(0, 3); return `<div class="rep-tr${p.mid === member.id ? ' me' : ''}${p.ok ? '' : ' left'}"><button type="button" class="rep-p" data-mt="${p.mt}" data-mid="${esc(p.mid)}" data-name="${esc(p.full)}" title="${esc(T.build)}"><span class="rep-em"${p.em ? ` style="background-image:url('${BNET}${p.em}')"` : ''}></span><span><b>${esc(p.n)}</b><small>${esc([p.cls, p.l ? '✦ ' + p.l : '', fmtDur(p.t * 1000)].filter(Boolean).join(' · '))}</small></span></button><b data-l="${esc(T.k)}">${p.k}</b><b data-l="${esc(T.d)}">${p.d}</b><span data-l="${esc(T.a)}">${p.a}</span><span data-l="${esc(T.kd)}">${(p.k / Math.max(1, p.d)).toFixed(1)}</span><span data-l="${esc(T.pr)}">${p.pr}</span><span data-l="${esc(T.abS)}">${p.su} / ${p.gr} / ${p.me}</span><span class="rep-w">${ws.map(([h, k]) => `<span>${wIc(h)}<small>${esc(REP.wn[h]?.n || '')} · ${k}</small></span>`).join('')}</span></div>`; }).join('')}</div>`;
+    const rows = !P ? `<p class="wait">${esc(W.loadingDefs)}</p>` : P.err ? `<p class="lb-err">${esc(W.unavailable)}</p>` : `<div class="rep-tb"><div class="rep-th"><span>${esc(T.team)}</span><span>${esc(T.k)}</span><span>${esc(T.d)}</span><span>${esc(T.a)}</span><span>${esc(T.kd)}</span><span>${esc(T.pr)}</span><span>${esc(T.ab)}</span><span>${esc(T.wp)}</span></div>${P.pl.map(p => { const ws = Object.entries(p.w).sort((a, b) => b[1] - a[1]).slice(0, 3); return `<div class="rep-tr${p.mid === member.id ? ' me' : ''}${p.ok ? '' : ' left'}"><button type="button" class="rep-p" data-mt="${p.mt}" data-mid="${esc(p.mid)}" data-name="${esc(p.full)}" title="${esc(T.build)}"><span class="rep-em"${p.em ? ` style="background-image:url('${BNET}${p.em}')"` : ''}></span><span><b>${esc(p.n)}</b><small>${esc([p.cls, p.l ? '✦ ' + p.l : '', fmtDur(p.t * 1000)].filter(Boolean).join(' · '))}</small>${repBadges(p, x)}</span></button><b data-l="${esc(T.k)}">${p.k}</b><b data-l="${esc(T.d)}">${p.d}</b><span data-l="${esc(T.a)}">${p.a}</span><span data-l="${esc(T.kd)}">${(p.k / Math.max(1, p.d)).toFixed(1)}</span><span data-l="${esc(T.pr)}">${p.pr}</span><span data-l="${esc(T.abS)}">${p.su} / ${p.gr} / ${p.me}</span><span class="rep-w">${ws.map(([h, k]) => `<span>${wIc(h)}<small>${esc(REP.wn[h]?.n || '')} · ${k}</small></span>`).join('')}</span></div>`; }).join('')}</div>`;
     main = `${head}${rows}<p class="lbd-n">${esc(T.buildN)}</p><p class="rep-ext">${esc(T.ext)} <a href="https://${kind === 'raid' ? 'raid' : 'dungeon'}.report/pgcr/${x.id}" target="_blank" rel="noopener">${kind === 'raid' ? 'raid' : 'dungeon'}.report ↗</a></p>`;
   }
   return `<article class="gd rep"><div class="gd-head"><h2>${esc(T.t)}</h2></div><p>${esc(T.note)}</p><div class="rep-cols">${side}<section class="rep-main">${main}</section></div></article>`;
