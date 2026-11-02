@@ -1471,7 +1471,7 @@ dialog.navd::backdrop{background:rgba(5,8,14,.6)}
 }
 /* relatórios: sem a faixa azul das seções; no celular cada jogador vira um cartão */
 .rep-main,.tr-main{border:0!important;box-shadow:none!important;background:none!important;padding:0!important}
-@media (max-width:700px){
+@media (max-width:860px){
  .rep-th{display:none}
  .rep-tr{min-width:0;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 10px;padding:10px 12px}
  .rep-tr>.rep-p,.rep-tr>.rep-w{grid-column:1/-1}
@@ -1500,3 +1500,5 @@ dialog.navd::backdrop{background:rgba(5,8,14,.6)}
 .ghm{flex-wrap:nowrap;visibility:hidden;transition:transform .22s ease,visibility 0s .22s}.ghm.on{visibility:visible;transition:transform .22s ease}
 .ghm-lang{white-space:nowrap}.ghm-lang *{white-space:nowrap}
 @media (max-width:420px){.ghm-lang{display:none!important}.ghm-n{max-width:130px}}
+.ghm-lang{display:inline-flex;align-items:center;gap:3px}.ghm-lang .sep{opacity:.4}.ghm-lang span:not(.sep){opacity:.6}
+.ghm-ld{display:inline-flex;align-items:center}
