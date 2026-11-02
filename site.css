@@ -1497,3 +1497,6 @@ dialog.navd::backdrop{background:rgba(5,8,14,.6)}
 .ghm-sp{flex:1}
 @media (max-width:860px){.ghm-tabs{display:none}}
 @media (max-width:520px){.ghm-n{max-width:110px;font-size:15px}.ghm [data-ghp=searchbtn]{display:none}.ghm{gap:4px}.ghm-b{min-width:32px;height:32px;padding:0 6px}}
+.ghm{flex-wrap:nowrap;visibility:hidden;transition:transform .22s ease,visibility 0s .22s}.ghm.on{visibility:visible;transition:transform .22s ease}
+.ghm-lang{white-space:nowrap}.ghm-lang *{white-space:nowrap}
+@media (max-width:420px){.ghm-lang{display:none!important}.ghm-n{max-width:130px}}
