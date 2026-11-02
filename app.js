@@ -3926,7 +3926,7 @@ async function openPublic(name) {
   let on = false;
   let raf = 0;
   const check = () => { raf = 0; const n = gh.getBoundingClientRect().bottom < 0; if (n === on) return; on = n; if (on) fill(); bar.classList.toggle('on', on); bar.setAttribute('aria-hidden', String(!on)); };
-  addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(check); }, { passive: true }); addEventListener('resize', check); check();
+  addEventListener('scroll', check, { passive: true }); addEventListener('resize', check); check();
   bar.addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
     if (b.dataset.ghtop !== undefined) { scrollTo({ top: 0, behavior: 'smooth' }); return; }
