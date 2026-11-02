@@ -1336,3 +1336,18 @@ dialog.wr::backdrop{background:rgba(5,8,14,.8)}
 /* cofre: limpeza dentro da ilha */
 .vb-lc{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--chip)}
 .vb-lc>span{flex:1;min-width:200px;display:grid;gap:2px}.vb-lc small{font-size:12.5px;color:var(--muted)}
+/* montagem: atributos da peça escolhida em linha */
+.lbd-ast{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;font:600 12px var(--mono)}
+.lbd-ast>span{display:inline-flex;align-items:center;gap:3px}.lbd-ast img{width:13px;height:13px}
+.lbd-wsel>span:last-child{flex:1}
+/* loadouts: no jogo × criados no site */
+.ld-sec{grid-column:1/-1;display:grid;gap:2px;margin-top:6px}.ld-sec h3{margin:0;font-family:var(--display);font-size:20px}.ld-sec h3 small{font:500 13px var(--mono);color:var(--muted)}.ld-sec p{margin:0;font-size:12.5px;color:var(--muted)}
+.ld-tag{display:inline-block;font:600 9.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;border-radius:4px;padding:1px 5px;margin-right:4px;vertical-align:1px}
+.ld-tag.game{color:var(--acc);border:1px solid color-mix(in srgb,var(--acc) 55%,transparent)}
+.ld-tag.site{color:var(--exotic);border:1px solid color-mix(in srgb,var(--exotic) 55%,transparent)}
+.ld-site{cursor:default;border-left-color:var(--exotic)}
+.ld-acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.ld-acts>*{min-height:36px;box-sizing:border-box;display:inline-flex;align-items:center}
+.wr-slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}.wr-slots .lbd-btn{justify-content:flex-start;gap:8px;min-height:40px;text-align:left}.wr-slots b{font-family:var(--mono);color:var(--acc)}
+/* preparar atividade */
+.chip.prep{font:inherit;font-size:inherit;font-weight:600;cursor:pointer;color:var(--fg);background:color-mix(in srgb,var(--exotic) 16%,transparent);border-color:var(--exotic)}
+.prep-more summary{cursor:pointer;font-size:13px;color:var(--acc);margin:4px 0 8px}
