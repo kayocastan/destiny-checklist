@@ -511,6 +511,17 @@ function maxPower(cls) {
 const recState = h => profile.profileRecords?.data?.records?.[h] || profile.characterRecords?.data?.[charId]?.records?.[h] || null;
 const recDone = r => !!r && (!!(r.state & 1) || !(r.state & 4));
 const recObjs = r => (r && (r.objectives?.length ? r.objectives : r.intervalObjectives)) || [];
+// texto de progresso para qualquer triunfo: um objetivo (12/50), vários (2/3 objetivos) ou por níveis (próximo nível)
+const progAny = r => { const o = recObjs(r); if (!o.length || recDone(r)) return ''; if (o.length === 1) return o[0].completionValue > 1 ? `${Math.min(o[0].progress || 0, o[0].completionValue)}/${o[0].completionValue}` : ''; if (r.objectives?.length) { if (o.every(x => (x.completionValue || 1) <= 1)) return `${o.filter(x => x.complete).length}/${o.length}`; return Math.floor(pct(r) * 100) + '%'; } const nx = o.find(x => !x.complete) || o[o.length - 1]; return `${Math.min(nx.progress || 0, nx.completionValue)}/${nx.completionValue}`; };
+// lista de objetivos (para abrir no item): nome vem da Bungie, guardado no aparelho
+const OBJN = LS.get('dc-objn-' + (lang === 'en' ? 'en' : 'pt'), {}), objReq = new Set(); let objT = null;
+function objList(r) {
+  const o = r?.objectives?.length > 1 ? r.objectives : r?.intervalObjectives?.length > 1 ? r.intervalObjectives : null; if (!o) return null;
+  const need = o.map(x => x.objectiveHash).filter(h => OBJN[h] == null && !objReq.has(h));
+  if (need.length) { need.forEach(h => objReq.add(h)); const lc = lang === 'en' ? 'en' : 'pt-br'; pool(need, async h => { try { const d = await bungie(`/Destiny2/Manifest/DestinyObjectiveDefinition/${h}/?lc=${lc}`, false); OBJN[h] = d.progressDescription || d.displayProperties?.name || ''; } catch { OBJN[h] = ''; } }, 6).then(() => { try { LS.set('dc-objn-' + (lang === 'en' ? 'en' : 'pt'), OBJN); } catch {} clearTimeout(objT); objT = setTimeout(() => { if (profile && (tab === 'tit' || tab === 'tri')) { build(); render(); } }, 200); }); }
+  const tier = !r.objectives?.length; let prev = 0;
+  return o.map((x, i) => { const cv = x.completionValue || 1, p = Math.min(x.progress || 0, cv), nm = OBJN[x.objectiveHash] || (tier ? `${lang === 'en' ? 'Level' : 'Nível'} ${i + 1}` : `#${i + 1}`); const t = { ok: !!x.complete, n: nm, pr: cv > 1 && !x.complete ? `${p}/${cv}` : '' }; prev = cv; return t; });
+}
 const progText = r => { const o = recObjs(r); if (o.length !== 1 || !o[0].completionValue || o[0].completionValue <= 1) return ''; return `${Math.min(o[0].progress || 0, o[0].completionValue)}/${o[0].completionValue}`; };
 const pct = r => { const o = recObjs(r); let a = 0, b = 0; for (const x of o) { a += Math.min(x.progress || 0, x.completionValue || 1); b += x.completionValue || 1; } return b ? a / b : 0; };
 const colStates = hashes => hashes.map(h => profile.profileCollectibles?.data?.collectibles?.[h]?.state ?? profile.characterCollectibles?.data?.[charId]?.collectibles?.[h]?.state).filter(s => s !== undefined);
@@ -638,7 +649,7 @@ function build() {
   if (!recOK) out.push(S('tit', 'tit-wait', '', s.loadingRecords, [], { empty: true }), S('cat', 'cat-wait', '', s.loadingRecords, [], { empty: true }));
   const ordered = sealStats.slice().sort((a, b) => (a.se.tier - b.se.tier) || (b.done / b.total - a.done / a.total));
   for (const x of ordered) {
-    const items = x.recs.map(r => { const st = recState(r[0]); return I('t-' + r[0], L(r[1]), L(r[2]), [progText(st) || U.chip[['Fácil', 'Médio', 'Difícil', 'Muito difícil', 'Evento'][x.se.tier - 1]]].filter(Boolean), recDone(st)); });
+    const items = x.recs.map(r => { const st = recState(r[0]), dn = recDone(st), tl = !dn && st ? objList(st) : null; return I('t-' + r[0], L(r[1]), L(r[2]), [(!dn && progAny(st)) || U.chip[['Fácil', 'Médio', 'Difícil', 'Muito difícil', 'Evento'][x.se.tier - 1]]].filter(Boolean), dn, tl ? { tl } : undefined); });
     out.push(S('tit', 'seal-' + x.se.cr, L(x.se.t), s.tierNote[x.se.tier - 1] + '. ' + L(x.se.ds), items, { coll: true, titleSeal: true, tier: x.se.tier }));
   }
   // Drops: exóticos
@@ -1443,7 +1454,7 @@ function render() {
       <div class="sec-head"${coll ? ` data-coll="${sec.id}" role="button" tabindex="0" aria-expanded="${open}"` : ''}><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2>${sec.kind ? secMeta(sec) : sec.tier || sec.xm ? `<div class="sec-meta">${titMeta(sec)}${sec.xm ? actYt('xm', sec.xm.k) : ''}</div>` : ''}</div><span class="count" data-sc="${sec.id}"></span>${FOCUS_TABS.includes(sec.tab) ? focBtn('sec:' + sec.id) : ''}${coll ? '<span class="chev" aria-hidden="true"></span>' : ''}</div>
       ${sec.note ? `<p>${esc(sec.note)}</p>` : ''}${sec.kind ? actStrip(sec) : sec.xm ? xmStrip(sec.xm) : ''}<div class="sec-bar"><i data-sb="${sec.id}"></i></div></div>
       <ul>${sec.items.map(i => {
-        const cid = 'c-' + i.id.replace(/[^a-z0-9]+/gi, '-'), first = i.c[0], rest = i.c.slice(1), more = !!(i.d || rest.length || i.loc);
+        const cid = 'c-' + i.id.replace(/[^a-z0-9]+/gi, '-'), first = i.c[0], rest = i.c.slice(1), more = !!(i.d || rest.length || i.loc || i.tl?.length);
         const ich = itemIch(sec, i);
         const head = `${ich ? `<span class="it-ic" data-ich="${ich}" aria-hidden="true"${ICONS[ich] ? ` style="background-image:url('${BNET}${ICONS[ich]}')"` : ''}></span>` : ''}<span class="t">${esc(i.t)}</span>${first ? `<span class="chip ${chipClass(first)}">${esc(first)}</span>` : ''}`;
         return `<li data-li="${esc(i.id)}" data-search="${esc([i.t, i.d, i.loc, ...i.c, sec.title].join(' ').toLowerCase())}"><div class="row"><label class="ck" for="${cid}"><input type="checkbox" id="${cid}" data-id="${esc(i.id)}" aria-label="${esc(i.t)}"${i.auto ? ' checked disabled' : ''}></label>${more ? `<button class="it" type="button" aria-expanded="false">${head}<span class="chev" aria-hidden="true"></span></button>` : `<span class="it">${head}</span>`}${FOCUS_ITEM_TABS.includes(sec.tab) && !isDone(i) ? focBtn('it:' + i.id) : ''}</div>${more ? `<div class="more">${i.loc ? `<div class="loc"><span class="loc-k">${esc(U.where)}</span> ${hiLoc(esc(i.loc))}</div>` : ''}${i.tl ? `<ul class="tl">${i.tl.map(x => `<li class="${x.ok ? 'ok' : ''}"><span class="tl-i" aria-label="${x.ok ? '✓' : '○'}">${x.ok ? '✓' : ''}</span><div><b>${esc(x.n)}${x.pr ? ` <span class="tl-p">${esc(x.pr)}</span>` : ''}</b>${x.d && !x.ok ? `<small>${hiLoc(esc(x.d))}</small>` : ''}</div></li>`).join('')}</ul>` : i.d ? `<div class="d">${hiLoc(esc(i.d))}</div>` : ''}${rest.length ? `<div class="chips">${rest.map(x => `<span class="chip ${chipClass(x)}">${esc(x)}</span>`).join('')}</div>` : ''}</div>` : ''}</li>`;
@@ -2732,7 +2743,7 @@ async function lbLoad() {
     const hs = [...new Set(cand.map(x => x.it.itemHash))]; let i = 0;
     await Promise.all(Array.from({ length: 8 }, async () => { while (i < hs.length) await armorDef(hs[i++]); }));
     try { LS.set('dc-adef', ADEF); } catch {}
-    LB.pieces = cand.map(x => { const d = ADEF[x.it.itemHash]; if (!d || d.k > 2 || !ARMOR_BUCKETS.includes(d.b)) return null; const sv = stats[x.it.itemInstanceId].stats; return { id: x.it.itemInstanceId, h: x.it.itemHash, k: d.k, slot: ARMOR_BUCKETS.indexOf(d.b), set: d.s, exo: d.t === 6, n: d.n, ic: d.ic, where: x.where, eqc: x.eq || '', lk: !!(x.it.state & 1), st: STAT_ORDER.map(h => sv[h]?.value || 0) }; }).filter(Boolean);
+    LB.pieces = cand.map(x => { const d = ADEF[x.it.itemHash]; if (!d || d.k > 2 || !ARMOR_BUCKETS.includes(d.b)) return null; const sv = stats[x.it.itemInstanceId].stats; return { id: x.it.itemInstanceId, h: x.it.itemHash, k: d.k, slot: ARMOR_BUCKETS.indexOf(d.b), set: d.s, exo: d.t === 6, n: d.n, ic: d.ic, where: x.where, eqc: x.eq || '', lk: !!(x.it.state & 1), pw: r.itemComponents?.instances?.data?.[x.it.itemInstanceId]?.primaryStat?.value || 0, st: STAT_ORDER.map(h => sv[h]?.value || 0) }; }).filter(Boolean);
     // nomes de armas, subclasses, artefatos e encaixes atuais: uma leva só, quase tudo já está no cache
     const plugs = [], holders = [...Object.values(LB.eq).flat().filter(it => ARMOR_BUCKETS.includes(it.bucketHash)), ...Object.values(LB.subs).flat(), ...Object.values(LB.arts).flat()];
     for (const it of holders) for (const s of LB.sk[it.itemInstanceId]?.sockets || []) if (s.plugHash) plugs.push(s.plugHash);
@@ -2953,8 +2964,8 @@ function lbDraw() {
     const tot = p => p.st.reduce((t, v) => t + v, 0), stTip = p => STAT_ORDER.map((h, k) => `${stN(h)} ${p.st[k]}`).join(' · ');
     const aSec = sl => {
       const list = ps.filter(p => p.slot === sl).sort((a, b) => (b.exo - a.exo) || tot(b) - tot(a)), sel = ps.find(p => p.id === LB.a[sl]), eqP = ps.find(p => p.slot === sl && p.eqc === LB.cid), chg = (LB.a[sl] || '') !== (eqP?.id || '');
-      const pick = sel ? `<div class="lbd-wsel${sel.exo ? ' exo' : ''}">${sel.ic ? `<img src="${BNET}${sel.ic}" alt="">` : ''}<span><b>${esc(sel.n)}</b><span class="lbd-ast">${STAT_ORDER.map((h, k) => `<span title="${esc(stN(h))}">${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}${sel.st[k]}</span>`).join('')}</span><small>${tot(sel)} ${esc(T.tot)}${sel.eqc === LB.cid ? ' · ' + esc(T.eqd) : ''}</small></span></div>` : `<div class="lbd-wsel none"><span class="lbd-wnone">∅</span><span><b>${esc(T.wpNo)}</b><small>${esc(T.wpNoD)}</small></span></div>`;
-      const grid = list.length ? `<div class="lbd-wg"><button type="button" class="lbd-wt none${!sel ? ' on' : ''}" data-lbat="${sl}:" title="${esc(T.wpNo)}">∅</button>${list.map(p => `<button type="button" class="lbd-wt${p.exo ? ' exo' : ''}${sel === p ? ' on' : ''}${p.eqc === LB.cid ? ' eqd' : ''}" data-lbat="${sl}:${p.id}" title="${esc(p.n + ' · ' + stTip(p))}" aria-label="${esc(p.n)}">${p.ic ? `<img src="${BNET}${p.ic}" alt="" loading="lazy">` : esc(p.n.slice(0, 2))}<i class="lbd-pw">${tot(p)}</i></button>`).join('')}</div>` : `<p class="lbd-n">${esc(T.aNo)}</p>`;
+      const pick = sel ? `<div class="lbd-wsel${sel.exo ? ' exo' : ''}">${sel.ic ? `<img src="${BNET}${sel.ic}" alt="">` : ''}<span><b>${sel.pw ? `<span class="lbd-lt">✦ ${sel.pw}</span>` : ''}${esc(sel.n)}</b><span class="lbd-ast">${STAT_ORDER.map((h, k) => `<span title="${esc(stN(h))}">${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}${sel.st[k]}</span>`).join('')}</span><small>${tot(sel)} ${esc(T.tot)}${sel.eqc === LB.cid ? ' · ' + esc(T.eqd) : ''}</small></span></div>` : `<div class="lbd-wsel none"><span class="lbd-wnone">∅</span><span><b>${esc(T.wpNo)}</b><small>${esc(T.wpNoD)}</small></span></div>`;
+      const grid = list.length ? `<div class="lbd-wg"><button type="button" class="lbd-wt none${!sel ? ' on' : ''}" data-lbat="${sl}:" title="${esc(T.wpNo)}">∅</button>${list.map(p => `<button type="button" class="lbd-wt${p.exo ? ' exo' : ''}${sel === p ? ' on' : ''}${p.eqc === LB.cid ? ' eqd' : ''}" data-lbat="${sl}:${p.id}" title="${esc((p.pw ? '✦ ' + p.pw + ' · ' : '') + p.n + ' · ' + stTip(p))}" aria-label="${esc(p.n)}">${p.ic ? `<img src="${BNET}${p.ic}" alt="" loading="lazy">` : esc(p.n.slice(0, 2))}<i class="lbd-pw">${tot(p)}</i></button>`).join('')}</div>` : `<p class="lbd-n">${esc(T.aNo)}</p>`;
       return lbSec('a' + sl, T.aSlot[sl], '', pick + grid, chg && eqP ? `<button type="button" class="linkb" data-lbat="${sl}:${eqP.id}">${esc(T.wpBack)}</button>` : '');
     };
     const selP = [0, 1, 2, 3, 4].map(sl => ps.find(p => p.id === LB.a[sl])).filter(Boolean), R0 = lbRest().rest;
@@ -3485,9 +3496,9 @@ async function triLoad() {
 const triVis = h => { const r = recState(h); return r && !(r.state & 16) ? r : null; };
 function triRow(h, path) {
   const x = TRI.R[h], r = triVis(h); if (!x || !r) return '';
-  const ok = recDone(r), w = ok ? 100 : Math.floor(pct(r) * 100), pt = progText(r);
+  const ok = recDone(r), w = ok ? 100 : Math.floor(pct(r) * 100), pt = progAny(r), ol = !ok ? objList(r) : null;
   const ext = ` data-focn="${esc(x.n)}" data-foci="${esc(x.ic)}" data-focd="${esc(x.d.slice(0, 140))}"`;
-  return `<li class="tr-r${ok ? ' ok' : ''}">${x.ic ? `<span class="tr-ic" aria-hidden="true" style="background-image:url('${BNET}${x.ic}')"></span>` : '<span class="tr-ic" aria-hidden="true"></span>'}<span class="tr-t"><b>${esc(x.n)}</b><small>${esc(x.d)}</small>${path ? `<small class="tr-p">${esc(path)}</small>` : ''}</span><span class="tr-v"><small>${ok ? '✓' : pt || w + '%'}</small><i class="sea-bar"><u style="width:${w}%"></u></i></span>${focBtn('tri:' + h, ext)}</li>`;
+  return `<li class="tr-r${ok ? ' ok' : ''}">${x.ic ? `<span class="tr-ic" aria-hidden="true" style="background-image:url('${BNET}${x.ic}')"></span>` : '<span class="tr-ic" aria-hidden="true"></span>'}<span class="tr-t"><b>${esc(x.n)}</b><small>${esc(x.d)}</small>${ol ? `<span class="tr-ob">${ol.map(o => `<small class="${o.ok ? 'ok' : ''}">${o.ok ? '✓' : '○'} ${esc(o.n)}${o.pr ? ` <b>${esc(o.pr)}</b>` : ''}</small>`).join('')}</span>` : ''}${path ? `<small class="tr-p">${esc(path)}</small>` : ''}</span><span class="tr-v"><small>${ok ? '✓' : pt || w + '%'}</small><i class="sea-bar"><u style="width:${w}%"></u></i></span>${focBtn('tri:' + h, ext)}</li>`;
 }
 function triList() {
   const T = trt(), q = TRI.q.trim().toLowerCase(); let rows = [];

@@ -1566,3 +1566,11 @@ dialog.navd::backdrop{background:rgba(5,8,14,.6)}
 .nav-i small{font:500 10.5px var(--mono);color:var(--muted);margin-left:6px}
 @media (max-width:600px){.pal-in kbd,.nav-i small{display:none}.paldlg{margin-top:12px}}
 @media (max-width:520px){.gh-strip #langbtn{display:none}}
+/* janelas em tela cheia no celular: respeita a área do relógio/bateria (iPhone) */
+@media (max-width:860px){
+ dialog[open]>.pf-box{padding-top:max(14px,calc(env(safe-area-inset-top) + 8px))!important}
+ dialog[open] .pf-x{top:calc(env(safe-area-inset-top) + 10px)!important}
+}
+/* poder da armadura e objetivos dos triunfos */
+.lbd-lt{font:700 .9em var(--mono);color:#f2d36b;margin-right:7px;white-space:nowrap}
+.tr-ob{display:grid;gap:2px;margin-top:3px}.tr-ob small{font-size:12px;color:var(--fg)!important}.tr-ob small.ok{color:var(--muted)!important;text-decoration:line-through}.tr-ob b{font:600 11.5px var(--mono);color:var(--acc)}
