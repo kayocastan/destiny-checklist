@@ -2598,7 +2598,7 @@ function mdefLoad() {
 // insígnias de uma atividade a partir de um mapa de métricas {hash: valor}
 function actBadges(a, val) {
   const n = actNorm(L(a.n)); if (!MDEF.b || !n) return { g: 0, f: 0, s: 0 };
-  const o = { g: 0, f: 0, s: 0 }; for (const [h, [t, mn]] of Object.entries(MDEF.b)) if (mn.includes(n)) o[t] += val(h) || 0; return o;
+  const o = { g: 0, f: 0, s: 0 }; for (const [h, [t, mn]] of Object.entries(MDEF.b)) if (mn.includes(n)) o[t] = Math.max(o[t], val(h) || 0); return o; // métricas repetidas por temporada: vale a maior
 }
 const BDGT = { pt: { g: n => `Guiou ${n}`, f: n => `Impecável ×${n}`, s: n => `Solo impecável ×${n}`, first: 'Primeira vez!', flaw: 'Sem mortes', low: n => n === 1 ? 'Solo' : n === 2 ? 'Dupla' : 'Trio', gTip: 'Quantas pessoas guiou até a primeira conclusão' },
   en: { g: n => `Guided ${n}`, f: n => `Flawless ×${n}`, s: n => `Solo flawless ×${n}`, first: 'First clear!', flaw: 'Flawless', low: n => n === 1 ? 'Solo' : n === 2 ? 'Duo' : 'Trio', gTip: 'How many players they guided to a first clear' } };
@@ -2612,7 +2612,7 @@ function clanBoardHTML() {
   const T = LBDT[lang === 'pt' ? 'pt' : 'en'], list = clanAll(); if (list.length < 2) return '';
   const pub = list.filter(x => GMET[x.mid] && !GMET[x.mid].priv && GMET[x.mid].v === 2);
   const tot = g => Object.values(g.m).reduce((a, b) => a + b, 0);
-  const val = { cl: tot, wk: g => g.w0 && Date.now() - g.w0.at > 864e5 ? Math.max(0, tot(g) - g.w0.tot) : 0, gr: g => g.gr, hrs: g => g.hrs, se: g => g.se, tri: g => g.tri, g: g => Object.entries(g.x || {}).reduce((t, [h, n]) => t + (MDEF.b?.[h]?.[0] === 'g' ? n : 0), 0) }[LBD.k];
+  const val = { cl: tot, wk: g => g.w0 && Date.now() - g.w0.at > 864e5 ? Math.max(0, tot(g) - g.w0.tot) : 0, gr: g => g.gr, hrs: g => g.hrs, se: g => g.se, tri: g => g.tri, g: g => Object.values(Object.entries(g.x || {}).reduce((t, [h, n]) => { const d = MDEF.b?.[h]; if (d?.[0] === 'g') t[d[1]] = Math.max(t[d[1]] || 0, n); return t; }, {})).reduce((a, b) => a + b, 0) }[LBD.k];
   const rows = pub.map(x => ({ x, v: val(GMET[x.mid]) || 0 })).filter(r => r.v > 0).sort((a, b) => b.v - a.v), top = rows[0]?.v || 1, show = LBD.all ? rows : rows.slice(0, 10);
   const tabs = Object.entries(T.k).map(([k, t]) => `<button type="button" class="lbd-chip${LBD.k === k ? ' on' : ''}" data-lbdk="${k}">${esc(t)}</button>`).join('');
   const body = !pub.length ? `<p>${esc(T.note)}</p><button type="button" class="char clck-b" data-clck ${CLCK.busy ? 'disabled' : ''}>${esc(CLCK.busy ? u().clckLoading(CLCK.n, list.length) : u().clckBtn(list.length))}</button>`
