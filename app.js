@@ -1242,7 +1242,7 @@ function gdHTML() {
   const fl = favs();
   const fav = `<article class="gd"><div class="gd-head"><h2>${esc(W.favGT)}</h2></div>${fl.length ? `<ul class="sq">${fl.map(x => { const k = x.name.lastIndexOf('#'); return `<li><button type="button" class="cl-p sq-p fav-p" data-mt="${x.type}" data-mid="${esc(x.id)}" data-name="${esc(x.name)}" title="${esc(W.seeBuild)}"><span class="sq-n">${esc(k > 0 ? x.name.slice(0, k) : x.name)}<small>${esc(k > 0 ? x.name.slice(k) : '')}</small></span><span class="sq-s">${esc([x.t, x.pw ? '✦ ' + x.pw : '', x.at ? W.seenAgo(ago(x.at)) : ''].filter(Boolean).join(' · '))}</span></button></li>`; }).join('')}</ul>` : `<p>${esc(W.favNone)}</p>`}</article>`;
   const sv = savedList();
-  const saved = `<article class="gd"><div class="gd-head"><h2>${esc(W.savedT)}</h2></div>${sv.length ? `<ul class="sq">${sv.map((x, i) => `<li><button type="button" class="cl-p sq-p sv-p" data-sv="${i}" title="${esc(W.seeBuild)}"><span class="sq-n">${esc(x.title || x.t)}</span><span class="sq-s">${esc([x.title ? x.t : '', x.name, '✦ ' + (x.p.characters.data[x.cid]?.light || ''), W.savedOn(ago(x.at))].filter(Boolean).join(' · '))}</span>${x.note ? `<span class="sq-s sv-note">${esc(x.note)}</span>` : ''}</button>${profile?.characters?.data?.[x.cid] ? wBtn(`data-svap="${i}"`) : ''}</li>`).join('')}</ul>` : `<p>${esc(W.savedNone)}</p>`}</article>`;
+  const saved = `<article class="gd"><div class="gd-head"><h2>${esc(W.savedT)}</h2></div>${sv.length ? `<ul class="sq">${sv.map((x, i) => `<li><button type="button" class="cl-p sq-p sv-p" data-sv="${i}" title="${esc(W.seeBuild)}"><span class="sq-n">${esc(x.title || x.t)}</span><span class="sq-s">${esc([x.title ? x.t : '', x.name, '✦ ' + (x.p.characters.data[x.cid]?.light || ''), W.savedOn(ago(x.at))].filter(Boolean).join(' · '))}</span>${x.note ? `<span class="sq-s sv-note">${esc(x.note)}</span>` : ''}</button>${profile?.characters?.data?.[x.cid] ? wBtn(`data-svap="${i}"`) : member ? `<button type="button" class="lbd-btn sv-cp" data-svcp="${i}">${esc(cpt().short)}</button>` : ''}</li>`).join('')}</ul>` : `<p>${esc(W.savedNone)}</p>`}</article>`;
   return tab === 'gst' ? `<div class="panel">${grHTML()}${ranks}${statsA}${clears}${wp}${comm}</div>` : tab === 'gcl' ? `<div class="panel">${clan}${FX ? firstHTML() + clanCkHTML() + cmpGHTML() : ''}</div>` : `<div class="panel">${lbHTML()}${lpaHTML()}${saved}${fav}${FX ? wishHTML() : ''}${rec}${vaultHTML()}${opts}</div>`;
 }
 
@@ -3240,10 +3240,10 @@ $('wrdlg').addEventListener('click', e => {
   if (q('[data-wrrelog]')) { WR.needPerm = false; logout(); login(); }
 });
 // salvar a build de outra pessoa no seu personagem: usa as suas cópias dos mesmos itens; o que você não tem fica com o que está equipado hoje
-const CPT = { pt: { btn: 'Salvar no meu personagem', t: 'Salvar no meu personagem', noCls: c => `Você não tem um personagem ${c}.`, have: 'você tem', miss: e => `você não tem · fica: ${e}`, none: 'vazio', ok: 'Salva em “Criados no site” (botão Loadouts).', okN: n => n ? `${n} ${n === 1 ? 'item ficou' : 'itens ficaram'} com o que você usa hoje.` : 'Você tem todos os itens desta build.', sub: 'Subclasse e fragmentos vêm da build; o que você ainda não liberou fica de fora ao aplicar.', apply: 'Aplicar agora', name: n => `${n} (cópia)` },
-  en: { btn: 'Save to my character', t: 'Save to my character', noCls: c => `You don't have a ${c} character.`, have: 'you have it', miss: e => `you don't have it · keeping: ${e}`, none: 'empty', ok: 'Saved in “Made on the site” (Loadouts button).', okN: n => n ? `${n} ${n === 1 ? 'item kept' : 'items kept'} what you use today.` : 'You have every item in this build.', sub: 'Subclass and fragments come from the build; anything you have not unlocked is skipped when applying.', apply: 'Apply now', name: n => `${n} (copy)` } };
+const CPT = { pt: { btn: 'Salvar no meu personagem', short: 'Copiar para mim', t: 'Salvar no meu personagem', noCls: c => `Você não tem um personagem ${c}.`, have: 'você tem', miss: e => `você não tem · fica: ${e}`, none: 'vazio', ok: 'Salva em “Criados no site” (botão Loadouts).', okN: n => n ? `${n} ${n === 1 ? 'item ficou' : 'itens ficaram'} com o que você usa hoje.` : 'Você tem todos os itens desta build.', sub: 'Subclasse e fragmentos vêm da build; o que você ainda não liberou fica de fora ao aplicar.', apply: 'Aplicar agora', name: n => `${n} (cópia)` },
+  en: { btn: 'Save to my character', short: 'Copy to me', t: 'Save to my character', noCls: c => `You don't have a ${c} character.`, have: 'you have it', miss: e => `you don't have it · keeping: ${e}`, none: 'empty', ok: 'Saved in “Made on the site” (Loadouts button).', okN: n => n ? `${n} ${n === 1 ? 'item kept' : 'items kept'} what you use today.` : 'You have every item in this build.', sub: 'Subclass and fragments come from the build; anything you have not unlocked is skipped when applying.', apply: 'Apply now', name: n => `${n} (copy)` } };
 const cpt = () => CPT[lang === 'pt' ? 'pt' : 'en'];
-async function copyToMe(C, title) {
+async function copyToMe(C, title, from) {
   const T = cpt(), W = u(), d = $('wrdlg'), B = C.B || {}, nm = h => (B.loc?.[h] || B.en?.[h] || {}).n || '…';
   const cls = C.p.characters.data[C.cid]?.classType, cid = profile.characters.data[charId]?.classType === cls ? charId : Object.keys(profile.characters.data).find(k => profile.characters.data[k].classType === cls);
   WR.st = 'pick'; WR.plan = null;
@@ -3273,7 +3273,7 @@ async function copyToMe(C, title) {
   }
   const ch = profile.characters.data[cid], c = { characterId: cid, classType: ch.classType, raceType: ch.raceType, light: ch.light, emblemHash: ch.emblemHash, emblemPath: ch.emblemPath, emblemBackgroundPath: ch.emblemBackgroundPath, stats: ch.stats };
   const x = { k: 'cp|' + Date.now(), name: String(member?.name || '').replace(/#\d+$/, ''), t: T.name(title), title: T.name(title), at: Date.now(), cid, p: { characters: { data: { [cid]: c } }, characterEquipment: { data: { [cid]: { items } } }, itemComponents: { sockets: { data: so }, instances: { data: io } } } };
-  const l = savedList(); l.unshift(x); try { LS.set('dc-builds', l.slice(0, 30)); } catch {}
+  x.from = from || ''; const l = savedList().filter(y => !(x.from && y.from === x.from)); l.unshift(x); try { LS.set('dc-builds', l.slice(0, 30)); } catch {}
   if (isGd()) render();
   box(`<ul class="wr-l">${rows.map(r => `<li class="${r.ok ? 'ok' : 'part'}"><span class="tl-i">${r.ok ? '✓' : '!'}</span><span>${esc(r.n)}<small>${esc(r.ok ? T.have : T.miss(r.e))}</small></span></li>`).join('')}</ul>
     <p class="wr-ok">${esc(T.ok)}</p><p class="lbd-n">${esc(T.okN(missing))} ${esc(T.sub)}</p>
@@ -3282,7 +3282,8 @@ async function copyToMe(C, title) {
 }
 let CP_LAST = null;
 document.addEventListener('click', async e => {
-  const b = e.target.closest('[data-cpme]'); if (b) { e.stopPropagation(); copyToMe(fdCtx(), (FD.sel?.name || '').replace(/#\d+$/, '')); return; }
+  const b = e.target.closest('[data-cpme]'); if (b) { e.stopPropagation(); const C = fdCtx(); copyToMe(C, (FD.sel?.name || '').replace(/#\d+$/, ''), FD.sel?.k || (String(C.name).replace(/#\d+$/, '') + '|' + buildSig(C))); return; }
+  const sc = e.target.closest('[data-svcp]'); if (sc) { e.stopPropagation(); const x = savedList()[+sc.dataset.svcp]; if (!x) return; const B = await fetchBuild(x.p, x.cid); copyToMe({ p: x.p, cid: x.cid, B, name: x.name }, x.title || x.t, x.k); return; }
   const a = e.target.closest('[data-cpapply]'); if (a && CP_LAST) { e.stopPropagation(); const B = await fetchBuild(CP_LAST.p, CP_LAST.cid); wOpen(wPlanFromCtx({ p: CP_LAST.p, cid: CP_LAST.cid, B }, CP_LAST.title)); }
 }, true);
 // escolher o espaço de loadout do jogo onde gravar uma build salva
