@@ -3359,6 +3359,33 @@ document.addEventListener('click', async e => {
   const del = q('[data-lpadel]'); if (del) { LPA.list.splice(+del.dataset.lpadel, 1); lpaSave(); render(); return; }
   const go = q('[data-lpago]'), br = q('[data-lpabring]'); if (go || br) { const x = LPA.list[+(go || br).dataset[go ? 'lpago' : 'lpabring']]; if (!x) return; const p = await lpaPlan(x, !!br); if (p) wOpen(p); return; }
 }, true);
+/* ---------- Beta: menu (hambúrguer) e tamanho da letra ----------
+   O menu leva a qualquer página do site num toque; o tamanho da letra amplia o site todo (fica salvo neste aparelho). */
+const FZ = [0.9, 1, 1.1, 1.2, 1.35];
+const NVT = { pt: { t: 'Menu', go: 'Ir para', more: 'Atalhos', ld: 'Loadouts', find: 'Buscar guardião', news: 'Novidades e sugestões', fz: 'Tamanho da letra', fzD: 'Aumenta ou diminui o site todo, só neste aparelho.', theme: 'Tema claro/escuro', lang: 'English', out: 'Sair', close: 'Fechar', smaller: 'Diminuir a letra', bigger: 'Aumentar a letra' },
+  en: { t: 'Menu', go: 'Go to', more: 'Shortcuts', ld: 'Loadouts', find: 'Find a guardian', news: "What's new & suggestions", fz: 'Text size', fzD: 'Makes the whole site bigger or smaller, on this device only.', theme: 'Light/dark theme', lang: 'Português', out: 'Sign out', close: 'Close', smaller: 'Smaller text', bigger: 'Bigger text' } };
+const nvt = () => NVT[lang === 'pt' ? 'pt' : 'en'];
+function fzApply() { const z = BETA ? LS.get('dc-fz', 1) : 1; document.querySelector('.wrap').style.zoom = z === 1 ? '' : String(z); }
+function navDraw() {
+  const d = $('navdlg'), T = nvt(), U = u(), cur = tab, z = LS.get('dc-fz', 1), zi = FZ.indexOf(z);
+  d.innerHTML = `<div class="nav-box"><div class="nav-hd"><b>${esc(T.t)}</b><button type="button" class="nav-x" data-navx aria-label="${esc(T.close)}">✕</button></div>
+    <nav class="nav-l" aria-label="${esc(T.go)}">${GROUPS.map(g => `<div class="nav-g"><span class="nav-gt">${esc(U.tabs[g.id])}</span>${g.subs.map(sb => `<button type="button" class="nav-i${sb === cur ? ' on' : ''}" data-navgo="${sb}"${sb === cur ? ' aria-current="page"' : ''}>${esc(g.subs.length === 1 ? U.tabs[g.id] : (U.subs[sb] || sb))}</button>`).join('')}</div>`).join('')}</nav>
+    <div class="nav-g"><span class="nav-gt">${esc(T.more)}</span>${have.c ? `<button type="button" class="nav-i${cur === 'ld' ? ' on' : ''}" data-navgo="ld">${esc(T.ld)}</button>` : ''}<button type="button" class="nav-i" data-navfind>${esc(T.find)}</button><a class="nav-i" href="/novidades">${esc(T.news)}</a></div>
+    <div class="nav-g"><span class="nav-gt">${esc(T.fz)}</span><div class="nav-fz"><button type="button" class="nav-fzb" data-navfz="-1" aria-label="${esc(T.smaller)}"${zi <= 0 ? ' disabled' : ''}>A−</button><b>${Math.round(z * 100)}%</b><button type="button" class="nav-fzb big" data-navfz="1" aria-label="${esc(T.bigger)}"${zi >= FZ.length - 1 ? ' disabled' : ''}>A+</button></div><small>${esc(T.fzD)}</small></div>
+    <div class="nav-g nav-row"><button type="button" class="nav-i" data-navtheme>${esc(T.theme)}</button><button type="button" class="nav-i" data-navlang>${esc(T.lang)}</button>${auth ? `<button type="button" class="nav-i out" data-navout>${esc(T.out)}</button>` : ''}</div></div>`;
+}
+if (BETA) { $('menubtn').hidden = false; fzApply(); }
+$('menubtn').addEventListener('click', () => { navDraw(); $('navdlg').showModal(); });
+$('navdlg').addEventListener('click', e => {
+  const d = $('navdlg'), q = s => e.target.closest(s);
+  if (e.target === d || q('[data-navx]')) { d.close(); return; }
+  const g = q('[data-navgo]'); if (g) { d.close(); const t = g.dataset.navgo; if (t === 'ld') { if (tab !== 'ld') { prevTab = tab; go('ld'); } } else go(t); window.scrollTo({ top: 0 }); return; }
+  if (q('[data-navfind]')) { d.close(); openFind(); return; }
+  const f = q('[data-navfz]'); if (f) { const i = Math.max(0, Math.min(FZ.length - 1, FZ.indexOf(LS.get('dc-fz', 1)) + +f.dataset.navfz)); LS.set('dc-fz', FZ[i] ?? 1); fzApply(); navDraw(); return; }
+  if (q('[data-navtheme]')) { $('themebtn').click(); return; }
+  if (q('[data-navlang]')) { d.close(); $('langbtn').click(); return; }
+  if (q('[data-navout]')) { d.close(); $('logout').click(); }
+});
 /* ---------- Clã: grupo de primeira vez (quem nunca fez a atividade escolhida, online primeiro, e quem pode guiar) ---------- */
 const FIRST = { k: LS.get('dc-first', '') };
 function firstHTML() {
