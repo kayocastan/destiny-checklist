@@ -3388,10 +3388,10 @@ setInterval(() => { if (!document.hidden && isGd() && tab === 'gcl' && GD?.clan?
 function clvHTML() {
   const T = clvt(), W = u(), list = GD?.clan?.list || []; if (!list.length) return '';
   const on = list.filter(x => x.on); if (on.length && !CLV.at) setTimeout(() => clvLoad(), 0);
-  const rows = on.map(x => ({ x, r: CLV.rows[x.mid] })).map(o => { const r = o.r || {}, k = CLV.kinds[r.h], soc = !r.h || W_SOC.has(r.h) || r.mode === 40; return { ...o, k, soc }; });
+  const rows = on.map(x => ({ x, r: CLV.rows[x.mid] })).map(o => { const r = o.r || {}, k = CLV.kinds[r.h], soc = !r.h || W_SOC.has(r.h) || r.mode === 40 || !CLV.names[r.h]?.n; return { ...o, k, soc }; });
   const vis = rows.filter(o => CLV.f === 'all' || (CLV.f === 'act' ? !!o.k : o.soc)).sort((a, b) => (!!b.k - !!a.k) || ((a.r?.st || 0) - (b.r?.st || 0)));
   const mins = t => { const m = Math.max(1, Math.round((Date.now() - t) / 60000)); return m < 60 ? m + ' min' : Math.floor(m / 60) + 'h' + String(m % 60).padStart(2, '0'); };
-  const card = o => { const r = o.r || {}, ch = r.ch, nm = r.h ? (CLV.names[r.h]?.n || (o.soc ? T.orbit : '…')) : T.orbit, raid = !!o.k, sz = (r.party || []).length;
+  const card = o => { const r = o.r || {}, ch = r.ch, nm = (r.h && CLV.names[r.h]?.n) || T.orbit, raid = !!o.k, sz = (r.party || []).length;
     return `<button type="button" class="clv-c${raid ? ' raid' : ''}" data-mt="${o.x.mt}" data-mid="${esc(o.x.mid)}" data-name="${esc(o.x.full)}"><span class="clv-em"${ch?.emblemBackgroundPath ? ` style="background-image:url('${BNET}${ch.emblemBackgroundPath}')"` : ''}></span><span class="clv-t"><b>${esc(o.x.n)}</b><span class="clv-a">${esc(r.priv ? T.priv : nm || '—')}</span><small>${esc([ch ? u().classes[ch.classType] : '', sz > 1 ? T.grp(sz) : sz === 1 ? T.solo : ''].filter(Boolean).join(' · '))}</small></span><span class="clv-r">${ch ? `<b>✦ ${ch.light}</b>` : ''}${r.st ? `<small>${esc(T.since(mins(r.st)))}</small>` : ''}</span></button>`; };
   // jogando juntos: membros do clã no mesmo grupo (pela lista do grupo; sem ela, mesma incursão/masmorra)
   const groups = [], seen = new Set();
