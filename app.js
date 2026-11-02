@@ -662,6 +662,7 @@ function build() {
   if (FX) {
     for (const x of out) if (x.tab === 'obj' && /^(contracts|quests|nearcats|neartitles)/.test(x.id)) x.tab = 'prog';
     out.push(S('obj', 'goals', '', null, [], { html: true }));
+    out.push(S('obj', 'grank', '', null, [], { html: true }));
     out.push(S('obj', 'focus', '', null, [], { html: true }));
     out.push(S('obj', 'wishobj', '', null, [], { html: true }));
     out.push(S('obj', 'post', '', null, [], { html: true }));
@@ -1221,7 +1222,7 @@ function gdHTML() {
   const wait = `<p class="gd-wait wait" role="status">${esc(u().loadingDefs)}</p>`, pend = k => !G || (G.partial && G[k] === undefined);
   const gr = p.profile?.data?.currentGuardianRank;
   const ranks = `<article class="gd"><div class="gd-head"><h2>${esc(W.ranksT)}</h2></div>${!have.a ? wait : `<div class="gd-grid">
-    ${gr ? st(gr, W.gRank) : ''}${G?.pass ? st(G.pass.lvl, `${W.pass} ${G.pass.n}`, pc(G.pass.a, G.pass.b)) : ''}
+    ${G?.pass ? st(G.pass.lvl, `${W.pass} ${G.pass.n}`, pc(G.pass.a, G.pass.b)) : ''}
     ${RANK_PROGS.map(h => { const x = cp?.progressions?.[h]; const n = G?.names?.[h]?.n; return x && n && (x.level || x.currentProgress) ? st(x.level, n, x.nextLevelAt ? pc(x.progressToNextLevel, x.nextLevelAt) : null) : ''; }).join('')}</div>`}</article>`;
   const rows = (kind, list) => { const done = list.filter(a => metric(a.m) > 0).sort((a, b) => metric(b.m) - metric(a.m)), z = list.length - done.length; return done.map(a => `<tr><td>${esc((kind === 'dg' ? W.dgW : W.raidW) + ' ' + L(a.n))}</td><td class="n">${fmtN(metric(a.m))}</td></tr>`).join('') + (z ? `<tr><td class="z">${esc(W.others(kind, z, done.length))}</td><td class="n z">${esc(W.noneYet)}</td></tr>` : ''); };
   const clears = `<article class="gd"><div class="gd-head"><h2>${esc(W.clearsT)}</h2></div>${!have.a ? wait : `<div class="gd-grid">${COUNT_METRICS.map(h => G?.metricNames?.[h]?.n ? st(fmtN(metric(h)), G.metricNames[h].n) : '').join('')}</div><table>${rows('dg', defs.dungeons)}${rows('raid', defs.raids)}</table>`}</article>`;
@@ -1241,7 +1242,7 @@ function gdHTML() {
   const fav = `<article class="gd"><div class="gd-head"><h2>${esc(W.favGT)}</h2></div>${fl.length ? `<ul class="sq">${fl.map(x => { const k = x.name.lastIndexOf('#'); return `<li><button type="button" class="cl-p sq-p fav-p" data-mt="${x.type}" data-mid="${esc(x.id)}" data-name="${esc(x.name)}" title="${esc(W.seeBuild)}"><span class="sq-n">${esc(k > 0 ? x.name.slice(0, k) : x.name)}<small>${esc(k > 0 ? x.name.slice(k) : '')}</small></span><span class="sq-s">${esc([x.t, x.pw ? '✦ ' + x.pw : '', x.at ? W.seenAgo(ago(x.at)) : ''].filter(Boolean).join(' · '))}</span></button></li>`; }).join('')}</ul>` : `<p>${esc(W.favNone)}</p>`}</article>`;
   const sv = savedList();
   const saved = `<article class="gd"><div class="gd-head"><h2>${esc(W.savedT)}</h2></div>${sv.length ? `<ul class="sq">${sv.map((x, i) => `<li><button type="button" class="cl-p sq-p sv-p" data-sv="${i}" title="${esc(W.seeBuild)}"><span class="sq-n">${esc(x.title || x.t)}</span><span class="sq-s">${esc([x.title ? x.t : '', x.name, '✦ ' + (x.p.characters.data[x.cid]?.light || ''), W.savedOn(ago(x.at))].filter(Boolean).join(' · '))}</span>${x.note ? `<span class="sq-s sv-note">${esc(x.note)}</span>` : ''}</button></li>`).join('')}</ul>` : `<p>${esc(W.savedNone)}</p>`}</article>`;
-  return tab === 'gst' ? `<div class="panel">${ranks}${statsA}${clears}${wp}${comm}</div>` : tab === 'gcl' ? `<div class="panel">${clan}${FX ? firstHTML() + clanCkHTML() + cmpGHTML() : ''}</div>` : `<div class="panel">${lbHTML()}${lcHTML()}${saved}${fav}${FX ? wishHTML() : ''}${rec}${vaultHTML()}${opts}</div>`;
+  return tab === 'gst' ? `<div class="panel">${grHTML()}${ranks}${statsA}${clears}${wp}${comm}</div>` : tab === 'gcl' ? `<div class="panel">${clan}${FX ? firstHTML() + clanCkHTML() + cmpGHTML() : ''}</div>` : `<div class="panel">${lbHTML()}${lcHTML()}${saved}${fav}${FX ? wishHTML() : ''}${rec}${vaultHTML()}${opts}</div>`;
 }
 
 /* Título do cabeçalho: subclasse + classe ("Titã Combatente" / "Striker Titan"); se o nome da subclasse já traz a classe ("Titã Prismático"), usa só ele */
@@ -1429,7 +1430,7 @@ function render() {
   if ((tab === 'raid' || tab === 'dg' || tab === 'xm') && have.a && member) loadActHist();
   if (tab === 'xm') loadXmRec();
   $('list').innerHTML = `<div class="panel">${tab === 'obj' ? newsHTML() : ''}${tab === 'obj' ? sessHTML() : ''}${wkBar}${tsBar}${secs.map(sec => {
-    if (sec.html) return sec.id === 'vendors' ? vendorsHTML() : sec.id === 'xmissions' ? xmHTML() : sec.id === 'goals' ? goalsHTML() : sec.id === 'post' ? postHTML() : sec.id === 'wishobj' ? wishObjHTML() : sec.id === 'focus' ? focusHTML() : '';
+    if (sec.html) return sec.id === 'vendors' ? vendorsHTML() : sec.id === 'xmissions' ? xmHTML() : sec.id === 'goals' ? goalsHTML() : sec.id === 'post' ? postHTML() : sec.id === 'wishobj' ? wishObjHTML() : sec.id === 'focus' ? focusHTML() : sec.id === 'grank' ? grObjHTML() : '';
     if (FX && sec.id === 'week' && sec.items.length) return weekHTML(sec);
     if (sec.empty) return `<p class="empty-msg${/…$/.test(sec.note || '') ? ' wait' : ''}">${esc(sec.note)}</p>`;
     if (!sec.items.length) return `<section data-sec="${sec.id}"><div class="sec-head"><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2></div></div><p>${esc(sec.note)}</p></div></section>`;
@@ -3063,6 +3064,55 @@ function focusHTML() {
     return `<div class="fo-c fo-it${ok ? ' ok' : ''}"><div class="fo-h">${ich ? `<span class="it-ic fo-ic" data-ich="${ich}" aria-hidden="true"${ICONS[ich] ? ` style="background-image:url('${BNET}${ICONS[ich]}')"` : ''}></span>` : ''}<span><small>${esc(u().subs[sec?.tab] || '')}${sec ? ' · ' + esc(sec.title) : ''}</small><b>${esc(it.t)}</b></span>${it.c[0] ? `<span class="chip ${chipClass(it.c[0])}">${esc(it.c[0])}</span>` : ''}${focBtn(f.id)}</div>${ok ? `<p class="fo-done">✓ ${esc(W.focDone)}</p>` : `<div class="fo-more">${itemMore(it, it.c.slice(1))}</div>`}</div>`;
   }).join('');
   return `<section data-sec="focus" class="keep fo coll${open ? '' : ' collapsed'}"><div class="sec-head" data-coll="foc-x" role="button" tabindex="0" aria-expanded="${open}"><div class="sec-title"><div class="sec-name"><h2>★ ${esc(W.focT)}</h2></div><span class="count">${l.length}</span><span class="chev" aria-hidden="true"></span></div><p>${esc(W.focNote)}</p></div><div class="fo-g">${cards}</div></section>`;
+}
+/* ---------- Patente de Guardião: nível atual e o que falta para o próximo ----------
+   O progresso vem dos triunfos que o site já carrega; nomes e imagens da Bungie, uma vez por patente, guardados no aparelho. */
+const GRT = { pt: { t: 'Patente de Guardião', cur: 'Atual', hi: n => `maior já alcançada: ${n}`, next: n => `Para a patente ${n}`, left: n => n ? `Faltam ${n} ${n === 1 ? 'objetivo' : 'objetivos'}` : 'Tudo pronto: a patente sobe ao entrar no jogo', max: 'Você está na patente máxima.', note: 'O que falta para subir de patente, com o seu progresso.' },
+  en: { t: 'Guardian Rank', cur: 'Current', hi: n => `highest reached: ${n}`, next: n => `For rank ${n}`, left: n => n ? `${n} ${n === 1 ? 'objective' : 'objectives'} left` : 'All done: the rank goes up when you log in', max: 'You are at the highest rank.', note: 'What is left to rank up, with your progress.' } };
+const grt = () => GRT[lang === 'pt' ? 'pt' : 'en'];
+const GRD = LS.get('dc-grank1', {}), grdP = {};
+function grDef(n) {
+  const lc = lang === 'pt' ? 'pt-br' : 'en', k = n + ':' + lc; if (GRD[k]) return GRD[k]; if (grdP[k]) return null;
+  grdP[k] = (async () => {
+    const d = await bungie(`/Destiny2/Manifest/DestinyGuardianRankDefinition/${n}/?lc=${lc}`, false);
+    const groups = [];
+    if (d.presentationNodeHash) {
+      const node = await bungie(`/Destiny2/Manifest/DestinyPresentationNodeDefinition/${d.presentationNodeHash}/?lc=${lc}`, false);
+      for (const c of node.children?.presentationNodes || []) {
+        const g = await bungie(`/Destiny2/Manifest/DestinyPresentationNodeDefinition/${c.presentationNodeHash}/?lc=${lc}`, false);
+        const recs = await Promise.all((g.children?.records || []).map(r => bungie(`/Destiny2/Manifest/DestinyRecordDefinition/${r.recordHash}/?lc=${lc}`, false).then(rd => ({ h: r.recordHash, n: rd.displayProperties?.name || '', d: rd.displayProperties?.description || '', ic: rd.displayProperties?.icon || '' })).catch(() => null)));
+        groups.push({ n: g.displayProperties?.name || '', recs: recs.filter(Boolean) });
+      }
+    }
+    GRD[k] = { n: d.displayProperties?.name || '', d: d.displayProperties?.description || '', img: d.foregroundImagePath || '', groups };
+    try { LS.set('dc-grank1', GRD); } catch {}
+    if (tab === 'obj' || isGd()) render();
+  })().catch(() => { delete grdP[k]; });
+  return null;
+}
+// estado de cada objetivo: feito, progresso (a/b) ou sem informação
+function grRec(h) { const r = recState(h); if (!r) return { na: true }; const o = (r.objectives || [])[0]; return { ok: recDone(r), a: o?.progress ?? 0, b: o?.completionValue ?? 0 }; }
+function grInfo() {
+  const pd = profile?.profile?.data, cur = pd?.currentGuardianRank; if (!cur) return null;
+  const next = cur < 11 ? grDef(cur + 1) : null, me = grDef(cur);
+  const left = next ? next.groups.flatMap(g => g.recs).filter(r => { const x = grRec(r.h); return !x.na && !x.ok; }).length : 0;
+  return { cur, hi: pd.lifetimeHighestGuardianRank || cur, me, next, nextN: cur + 1, max: cur >= 11, left };
+}
+function grList(G) {
+  return G.next.groups.filter(g => g.recs.length).map(g => `<div class="gr-g"><small>${esc(g.n)}</small><ul>${g.recs.map(r => { const x = grRec(r.h), p = x.b ? Math.min(100, x.a / x.b * 100) : x.ok ? 100 : 0;
+    return `<li class="${x.ok ? 'ok' : ''}${x.na ? ' na' : ''}" title="${esc(r.d)}"><span class="tl-i">${x.ok ? '✓' : ''}</span><span class="gr-n"><b>${esc(r.n)}</b>${r.d && !x.ok ? `<small>${esc(r.d)}</small>` : ''}</span>${x.na ? '<span class="gr-v">—</span>' : `<span class="gr-v">${fmtN(x.a)}/${fmtN(x.b)}</span>`}${x.na ? '' : `<i class="gr-bar"><u style="width:${p}%"></u></i>`}</li>`; }).join('')}</ul></div>`).join('');
+}
+// Guardião › Estatísticas: cartão completo
+function grHTML() {
+  const G = grInfo(); if (!G) return ''; const T = grt(), W = u();
+  const head = `<div class="gr-hd">${G.me?.img ? `<img src="${BNET}${G.me.img}" alt="">` : `<span class="gr-num">${G.cur}</span>`}<span><small>${esc(T.cur)}</small><b>${G.cur} · ${esc(G.me?.n || '')}</b><small>${esc(T.hi(G.hi))}</small></span></div>`;
+  const body = G.max ? `<p>${esc(T.max)}</p>` : !G.next ? `<p class="wait">${esc(W.loadingDefs)}</p>` : `<div class="gr-nx"><b>${esc(T.next(G.nextN))} · ${esc(G.next.n)}</b><span class="gr-left${G.left ? '' : ' ok'}">${esc(T.left(G.left))}</span></div>${grList(G)}`;
+  return `<article class="gd gr"><div class="gd-head"><h2>${esc(T.t)}</h2></div>${head}${body}</article>`;
+}
+// Objetivos: o que falta para a próxima patente (recolhível, fechado mostra o resumo)
+function grObjHTML() {
+  const G = grInfo(); if (!G || G.max) return ''; const T = grt(), W = u(), open = openSecs.has('grank-x');
+  return `<section data-sec="grank" class="keep gr coll${open ? '' : ' collapsed'}"><div class="sec-head" data-coll="grank-x" role="button" tabindex="0" aria-expanded="${open}"><div class="sec-title"><div class="sec-name"><h2>${esc(T.t)} ${G.cur} → ${G.nextN}${G.next ? ' · ' + esc(G.next.n) : ''}</h2></div><span class="count">${G.next ? esc(T.left(G.left).replace(/:.*/, '')) : ''}</span><span class="chev" aria-hidden="true"></span></div><p>${esc(T.note)}</p></div>${G.next ? `<div class="gr-body">${grList(G)}</div>` : `<p class="wait">${esc(W.loadingDefs)}</p>`}</section>`;
 }
 /* ---------- Correios (beta): o que está parado no Postmaster de cada personagem; usa o inventário já carregado ---------- */
 const POST_BUCKET = 215593132, POSTN = {};

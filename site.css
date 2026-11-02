@@ -1241,3 +1241,21 @@ dialog.lbd .lcd-box{height:auto;overflow:auto;display:grid;gap:12px}
 /* Última sessão: progresso de títulos e catalisadores */
 .ss-bar{display:block;height:4px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:4px}.ss-bar u{display:block;height:100%;background:var(--acc)}
 .ss-c.gold .ss-bar u{background:var(--exotic)}
+/* Patente de Guardião */
+.gr-hd{display:flex;align-items:center;gap:14px}
+.gr-hd img{width:64px;height:64px;flex:none}
+.gr-num{width:64px;height:64px;display:grid;place-items:center;border-radius:12px;background:var(--chip);font:700 30px var(--display)}
+.gr-hd>span{display:grid;gap:2px}.gr-hd b{font-family:var(--display);font-size:24px}.gr-hd small{font-size:12px;color:var(--muted)}
+.gr-hd small:first-child{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.gr-nx{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:6px}.gr-nx b{font-size:15px}
+.gr-left{font:600 12.5px var(--mono);color:var(--exotic)}.gr-left.ok{color:var(--done)}
+.gr-g{display:grid;gap:4px;margin-top:8px}.gr-g>small{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.gr-g ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.gr-g li{display:grid;grid-template-columns:20px minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:8px 10px;border-radius:8px;background:var(--chip)}
+.gr-g li.ok .tl-i{border-color:var(--done);background:var(--done);color:var(--surface)}.gr-g li.ok b{color:var(--done)}
+.gr-g li.na{opacity:.6}
+.gr-n{display:grid;gap:2px;min-width:0}.gr-n b{font-size:13.5px;font-weight:600}.gr-n small{font-size:12px;color:var(--muted);line-height:1.35}
+.gr-v{font:600 12.5px var(--mono);color:var(--muted)}
+.gr-bar{grid-column:2/-1;display:block;height:4px;border-radius:2px;background:rgba(255,255,255,.1);overflow:hidden}.gr-bar u{display:block;height:100%;background:var(--acc)}
+.gr-g li.ok .gr-bar u{background:var(--done)}
+section.gr .gr-body{padding:0 16px 14px}
