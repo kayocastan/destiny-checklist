@@ -3404,7 +3404,7 @@ function firstHTML() {
     body = `${meNever ? `<p class="fg-me">${esc(W.fgMe)}</p>` : ''}
       <div class="fg-k">${esc(W.fgOn(on.length))}</div><p class="fg-l">${on.length ? on.map(x => chip(x)).join('') : `<span class="fg-none">${esc(W.fgNoneOn)}</span>`}</p>
       ${off.length ? `<div class="fg-k">${esc(W.fgOff)}</div><p class="fg-l">${off.map(x => chip(x)).join('')}</p>` : ''}
-      <div class="fg-k">${esc(W.fgGuides(did.length))}</div><p class="fg-l">${did.filter(x => x.on).concat(did.filter(x => !x.on)).slice(0, 10).map(x => chip(x, '×' + cnt(x.mid))).join('') || `<span class="fg-none">—</span>`}</p>`;
+      ${all ? '' : `<div class="fg-k">${esc(W.fgGuides(did.length))}</div><p class="fg-l">${did.filter(x => x.on).concat(did.filter(x => !x.on)).slice(0, 10).map(x => chip(x, '×' + cnt(x.mid))).join('') || `<span class="fg-none">—</span>`}</p>`}`;
   }
   return `<article class="gd"><div class="gd-head"><h2>${esc(W.fgT)}</h2></div><p>${esc(W.fgNote)}</p>${sel}${body}</article>`;
 }
