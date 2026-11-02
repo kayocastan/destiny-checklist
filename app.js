@@ -34,7 +34,7 @@ const UI = {
     newsLink: 'Novidades e sugestões', newsShort: 'Novidades', sugNew: n => n === 1 ? '1 sugestão nova' : `${n} sugestões novas`, disclaimer: 'Dados lidos da sua conta pela API oficial da Bungie. Este site não é afiliado à Bungie.',
     loadouts: 'Loadouts', checklist: 'Central', outQ: 'Confirmar?', liveT: 'Ao vivo', liveYou: 'você', liveSince: t => `desde ${t}`, livePriv: 'Build privada', liveTap: 'Toque para ver a build completa', statsT: 'Atributos', glT: 'Metas de build', ssRec: 'Novo recorde', ssRecBest: 'seu melhor tempo até hoje', ssRecSub: (o, d) => `antes ${o} · ${d} mais rápido`, ssSolo: 'Solo', ssSoloFl: 'Solo sem morrer', wkFeatT: 'Em destaque', wkFull: 'Abrir página', wkAllDone: 'Tudo feito aqui.', wkRwSt: { red: 'resgatada', earn: 'pronta para resgatar', todo: 'falta fazer' }, wkKind: { ch: 'Desafio', rw: 'Recompensas', q: 'Missão' }, glNote: 'Builds que você quer montar: cada item se marca sozinho quando você libera ou pega.', glAdd: n => `Faltam ${n} itens para você usar esta build.`, glBtn: '＋ Virar objetivo', glDone: 'Já é um objetivo', glView: 'Ver build', glDel: 'Remover', glAt: d => `adicionada em ${d}`, glSet: (n, k) => `Conjunto ${n}: ${k} ${k === 1 ? 'peça' : 'peças'}`, glSetSrc: 'qualquer peça do conjunto, para os bônus', glRef: 'Atributos da build', glYou: 'você', glNone: 'Nenhuma meta ainda. Na comparação de builds, use “Virar objetivo” no que falta.', glSrcPlug: 'Liberar no menu da subclasse', glG: { asp: 'Aspectos', fr: 'Fragmentos', ab: 'Habilidades', w: 'Armas', a: 'Armadura' }, tsK: 'Ordenar', ytGuide: 'Guia em vídeo', postT: 'Correios', lbT: 'Montador de loadout', lbNote: 'Escolha o exótico e a ordem dos atributos: o DPI testa as combinações das suas armaduras (cofre e personagens) e manda a escolhida para o DIM.', lbLoad: 'Carregar minhas armaduras', lbLoading: 'Lendo as armaduras e os atributos de cada peça…', lbErr: 'Não deu para ler as armaduras agora.', lbExo: 'Exótico', lbExoAny: 'Qualquer um', lbExoNone: 'Nenhum', lbSet: 'Bônus de conjunto', lbSetAny: 'Não importa', lbNeed: 'Peças do conjunto', lbPrio: 'Atributos em ordem de importância (mínimo opcional)', lbMin: 'mín.', lbRun: 'Buscar combinações', lbRunning: 'Testando…', lbPieces: n => `${n} peças desta classe`, lbReload: 'Recarregar armaduras', lbMeta: (n, s) => `${n} combinações testadas em ${s} s · 10 melhores`, lbNone: 'Nenhuma combinação atende aos mínimos escolhidos.', lbNoSet: 'Sem bônus de conjunto', lbDim: 'Abrir no DIM', lbVault: 'Cofre', lbEquipped: 'Equipada', pfNotFound: n => `Não encontrei o guardião ${n}.`, pfErr: 'Não deu para carregar o perfil agora.', pfRank: n => `Patente de Guardião ${n}`, pfCmp: 'Comparar comigo', pfCopy: 'Copiar link', pfPlayed: d => `jogou em ${d}`, pfClears: 'conclusões no total', pfSeals: 'títulos completos', pfHours: 'Horas jogadas', pfAllChars: 'em todos os personagens', pfActs: 'Incursões e masmorras', pfAct: 'Atividade', pfClearsH: 'Conclusões', pfFast: 'Mais rápida', pfNone: 'Nenhuma incursão ou masmorra concluída ainda (ou perfil privado).', pfRest: n => `${n} ainda não concluídas não aparecem aqui.`, pfPriv: 'Triunfos privados.', pfBuild: 'Build atual', pfBuildNote: 'O que está equipado agora no personagem jogado por último, com perks e mods.', pfBuildBtn: 'Ver build completa', pfFoot: 'Dados ao vivo da API da Bungie.', pubB: 'Link público da build', pubWait: 'Gerando link…', pubImg: 'Gerando a prévia…', pubOk: 'Link copiado!', pubRepl: t => `Link copiado · substituiu o mais antigo (${t})`, pubErr: 'Não deu certo, tente de novo', shrT: 'Compartilhar', shrPub: 'Link desta build', shrPubD: 'Fica igual para sempre e mostra prévia no Discord. Até 5 por conta: o 6º substitui o mais antigo.', shrProf: 'Link do perfil', shrProfD: 'Sempre mostra a build que está em uso no momento.', shrImg: 'Imagem da build', shrImgD: 'Gera uma imagem para mandar como foto.', wishT: 'Lista de desejos', wishHave: 'já tem na coleção', focT: 'Foco', focNote: 'O que você marcou com ☆ em títulos, incursões, masmorras, missões, exóticos e catalisadores.', focMore: n => `+ ${n} itens`, focDone: 'Tudo feito!', wishAny: 'Qualquer', wishSt1: 'Atributo principal', wishSt2: 'Secundário', wishNoSrc: 'Fonte não informada pela Bungie.', wishObjNote: 'Armas e armaduras que você marcou com ☆: o rolo ou os atributos que você quer e onde dropam.', wishOnSaleN: n => n === 1 ? '1 está à venda agora!' : `${n} estão à venda agora!`, wishShort: 'Desejo', wishNote: 'Toque na ☆ de uma arma nos vendedores para guardar aqui. Quando ela estiver à venda, aparece em Hoje.', wishNone: 'Nada na lista ainda.', wishSale: who => `à venda agora com ${who}`, todayT: 'Hoje', todayReset: t => `Reseta em ${t} (14h de Brasília).`, todayNone: 'Nenhuma arma nova nos vendedores hoje.', todayNote: 'Armas que os vendedores trocam todo dia; ☆ guarda na lista de desejos.', clckT: 'Checklist do clã', clckNote: 'Quem do clã já fez cada incursão e masmorra, para montar grupos de primeira vez.', clckBtn: n => `Carregar (${n} membros)`, clckLoading: (a, b) => `Carregando ${a}/${b}…`, clckNever: 'Nunca fizeram:', clckAll: 'Todo mundo já fez.', clckPriv: n => n ? `${n} com perfil privado ficaram de fora.` : '', clckRe: 'Atualizar', clckAllF: 'Todas', fgT: 'Grupo de primeira vez', fgAnyAll: 'Nunca fez nenhuma incursão nem masmorra', fgAnyRaid: 'Nunca fez nenhuma incursão', fgAnyDg: 'Nunca fez nenhuma masmorra', fgNote: 'Escolha a incursão ou masmorra: aparece quem do clã nunca fez (online primeiro) e quem já fez e pode guiar.', fgLoad: 'Carregar dados do clã', fgMe: 'Você também nunca fez esta: boa hora para montar o grupo!', fgOn: n => `Online agora e nunca fizeram (${n})`, fgNoneOn: 'Ninguém online que nunca fez.', fgOff: 'Nunca fizeram (jogaram por último)', fgGuides: n => `Já fizeram e podem guiar (${n})`, cmpgT: 'Comparar guardiões', cmpgNote: 'Conclusões de cada incursão e masmorra, lado a lado.', cmpgPick: 'Escolha um favorito ou alguém do clã…', cmpgYou: 'Você', cmpgTot: 'Total', cmpgPriv: 'Esse guardião tem o perfil privado.', postEmpty: 'Nada parado nos correios dos seus personagens.', postFull: 'Correio quase cheio: com 21 itens, o que chegar depois se perde.', postNote: 'Pegue no Postmaster, na Torre. Os exóticos aparecem em dourado.', newsT: t => `Destiny 2 atualizou: ${t.replace(/^Destiny 2\s*/i, '')}`, newsAgo: d => d <= 0 ? 'hoje' : d === 1 ? 'ontem' : `há ${d} dias`, newsRead: 'Ler as notas ↗', ytMany: n => `Vídeos (${n})`, giBtn: n => `Imagens (${n})`, giFull: 'Tamanho original', giClose: 'Fechar', tsO: { tier: 'Dificuldade', wpn: 'Falta arma', cat: 'Falta catalisador', near: 'Quase lá', low: 'Menos feitos', name: 'A–Z' }, tsNone: 'Nada aqui com esse filtro.', statsHi: 'acima de 100: bônus extra',
     tabs: { obj: 'Objetivos', act: 'Atividades', drops: 'Arsenal', gd: 'Guardião' },
-    subs: { obj: 'Principal', prog: 'Em andamento', camp: 'Campanhas', raid: 'Incursões', dg: 'Masmorras', xm: 'Missões exóticas', tit: 'Títulos', exo: 'Exóticos', cat: 'Catalisadores', vend: 'Vendedores', gd: 'Builds', gcl: 'Clã', grep: 'Relatórios', gst: 'Estatísticas' },
+    subs: { obj: 'Principal', prog: 'Em andamento', camp: 'Campanhas', raid: 'Incursões', dg: 'Masmorras', xm: 'Missões exóticas', tit: 'Títulos', tri: 'Triunfos', exo: 'Exóticos', cat: 'Catalisadores', vend: 'Vendedores', gd: 'Builds', gcl: 'Clã', grep: 'Relatórios', gst: 'Estatísticas' },
     heroTitle: 'Central do Guardião', heroText: 'Entre com a sua conta Bungie.net para verificar seus objetivos, acompanhar a rotação semanal, completar seu arsenal exótico e compartilhar suas builds.', lsQ: 'Buscar guardião: Nome#1234', lsBtn: 'Buscar', lsHint: 'Veja a build equipada de qualquer jogador, sem precisar entrar.',
     heroList: ['O site só lê os seus dados; não altera nada no jogo.', 'Sua senha fica na Bungie; o site nunca vê.', 'Marcações, favoritos e builds salvas sincronizam entre celular e PC.'],
     login: 'Entrar com Bungie.net', notConfigured: 'O site ainda não foi configurado: faltam as chaves da Bungie nas variáveis de ambiente da Vercel.',
@@ -89,7 +89,7 @@ const UI = {
     newsLink: "What's new & suggestions", newsShort: "What's new", sugNew: n => n === 1 ? '1 new suggestion' : `${n} new suggestions`, disclaimer: 'Data read from your account through the official Bungie API. This site is not affiliated with Bungie.',
     loadouts: 'Loadouts', checklist: 'Hub', outQ: 'Confirm?', liveT: 'Live', liveYou: 'you', liveSince: t => `since ${t}`, livePriv: 'Private build', liveTap: 'Tap to see the full build', statsT: 'Stats', glT: 'Build goals', ssRec: 'New record', ssRecBest: 'your best time ever', ssRecSub: (o, d) => `was ${o} · ${d} faster`, ssSolo: 'Solo', ssSoloFl: 'Solo flawless', wkFeatT: 'Featured', wkFull: 'Open page', wkAllDone: 'All done here.', wkRwSt: { red: 'claimed', earn: 'ready to claim', todo: 'to do' }, wkKind: { ch: 'Challenge', rw: 'Rewards', q: 'Quest' }, glNote: 'Builds you want to put together: each item checks itself off when you unlock or get it.', glAdd: n => `You're missing ${n} items to run this build.`, glBtn: '＋ Make it a goal', glDone: 'Already a goal', glView: 'View build', glDel: 'Remove', glAt: d => `added ${d}`, glSet: (n, k) => `${n} set: ${k} ${k === 1 ? 'piece' : 'pieces'}`, glSetSrc: 'any piece of the set, for the bonuses', glRef: 'Build stats', glYou: 'you', glNone: 'No goals yet. In build comparison, use “Make it a goal” on what is missing.', glSrcPlug: 'Unlock in the subclass menu', glG: { asp: 'Aspects', fr: 'Fragments', ab: 'Abilities', w: 'Weapons', a: 'Armor' }, tsK: 'Sort', ytGuide: 'Video guide', postT: 'Postmaster', lbT: 'Loadout builder', lbNote: 'Pick the exotic and the stat order: DPI tests the combinations of your armor (vault and characters) and sends the one you pick to DIM.', lbLoad: 'Load my armor', lbLoading: 'Reading your armor and each piece stats…', lbErr: "Couldn't read your armor right now.", lbExo: 'Exotic', lbExoAny: 'Any', lbExoNone: 'None', lbSet: 'Set bonus', lbSetAny: "Doesn't matter", lbNeed: 'Set pieces', lbPrio: 'Stats in order of importance (optional minimum)', lbMin: 'min.', lbRun: 'Find combinations', lbRunning: 'Testing…', lbPieces: n => `${n} pieces for this class`, lbReload: 'Reload armor', lbMeta: (n, s) => `${n} combinations tested in ${s} s · top 10`, lbNone: 'No combination meets the chosen minimums.', lbNoSet: 'No set bonus', lbDim: 'Open in DIM', lbVault: 'Vault', lbEquipped: 'Equipped', pfNotFound: n => `Couldn't find the guardian ${n}.`, pfErr: "Couldn't load the profile right now.", pfRank: n => `Guardian Rank ${n}`, pfCmp: 'Compare with me', pfCopy: 'Copy link', pfPlayed: d => `played ${d}`, pfClears: 'total clears', pfSeals: 'titles completed', pfHours: 'Hours played', pfAllChars: 'across all characters', pfActs: 'Raids and dungeons', pfAct: 'Activity', pfClearsH: 'Clears', pfFast: 'Fastest', pfNone: 'No raid or dungeon clears yet (or private profile).', pfRest: n => `${n} not cleared yet are hidden.`, pfPriv: 'Triumphs are private.', pfBuild: 'Current build', pfBuildNote: 'What is equipped right now on the last played character, with perks and mods.', pfBuildBtn: 'See full build', pfFoot: 'Live data from the Bungie API.', pubB: 'Public build link', pubWait: 'Creating link…', pubImg: 'Making the preview…', pubOk: 'Link copied!', pubRepl: t => `Link copied · replaced the oldest (${t})`, pubErr: 'Something went wrong, try again', shrT: 'Share', shrPub: 'Link to this build', shrPubD: 'Stays the same forever and shows a preview on Discord. Up to 5 per account: the 6th replaces the oldest.', shrProf: 'Profile link', shrProfD: 'Always shows the build in use right now.', shrImg: 'Build image', shrImgD: 'Makes an image to send as a picture.', wishT: 'Wishlist', wishHave: 'already in collection', focT: 'Focus', focNote: 'What you starred in titles, raids, dungeons, missions, exotics and catalysts.', focMore: n => `+ ${n} more`, focDone: 'All done!', wishAny: 'Any', wishSt1: 'Primary stat', wishSt2: 'Secondary', wishNoSrc: 'No source listed by Bungie.', wishObjNote: 'Weapons and armor you starred: the roll or stats you want and where they drop.', wishOnSaleN: n => n === 1 ? '1 is for sale now!' : `${n} are for sale now!`, wishShort: 'Wish', wishNote: 'Tap the ☆ on a vendor weapon to save it here. When it is for sale, it shows up in Today.', wishNone: 'Nothing on the list yet.', wishSale: who => `for sale now at ${who}`, todayT: 'Today', todayReset: t => `Resets in ${t} (17:00 UTC).`, todayNone: 'No new weapons at the vendors today.', todayNote: 'Weapons the vendors swap every day; ☆ saves to your wishlist.', clckT: 'Clan checklist', clckNote: 'Who in the clan has done each raid and dungeon, to build first-timer groups.', clckBtn: n => `Load (${n} members)`, clckLoading: (a, b) => `Loading ${a}/${b}…`, clckNever: 'Never done:', clckAll: 'Everyone has done it.', clckPriv: n => n ? `${n} with private profiles left out.` : '', clckRe: 'Refresh', clckAllF: 'All', fgT: 'First-timer group', fgAnyAll: 'Never done any raid or dungeon', fgAnyRaid: 'Never done any raid', fgAnyDg: 'Never done any dungeon', fgNote: 'Pick the raid or dungeon: see who in the clan has never done it (online first) and who has and can guide.', fgLoad: 'Load clan data', fgMe: 'You have never done this one either: good time to build the group!', fgOn: n => `Online now, never done (${n})`, fgNoneOn: 'Nobody online who has never done it.', fgOff: 'Never done (most recently played)', fgGuides: n => `Done it and can guide (${n})`, cmpgT: 'Compare guardians', cmpgNote: 'Clears for every raid and dungeon, side by side.', cmpgPick: 'Pick a favorite or a clanmate…', cmpgYou: 'You', cmpgTot: 'Total', cmpgPriv: 'This guardian has a private profile.', postEmpty: 'Nothing waiting at the Postmaster on your characters.', postFull: 'Postmaster almost full: at 21 items, anything new is lost.', postNote: 'Pick them up from the Postmaster in the Tower. Gold ones are exotics.', newsT: t => `Destiny 2 updated: ${t.replace(/^Destiny 2\s*/i, '')}`, newsAgo: d => d <= 0 ? 'today' : d === 1 ? 'yesterday' : `${d} days ago`, newsRead: 'Read the notes ↗', ytMany: n => `Videos (${n})`, giBtn: n => `Images (${n})`, giFull: 'Full size', giClose: 'Close', tsO: { tier: 'Difficulty', wpn: 'Missing weapon', cat: 'Missing catalyst', near: 'Almost done', low: 'Least done', name: 'A–Z' }, tsNone: 'Nothing here with this filter.', statsHi: 'above 100: extra bonus',
     tabs: { obj: 'Objectives', act: 'Activities', drops: 'Arsenal', gd: 'Guardian' },
-    subs: { obj: 'Main', prog: 'In progress', camp: 'Campaigns', raid: 'Raids', dg: 'Dungeons', xm: 'Exotic missions', tit: 'Titles', exo: 'Exotics', cat: 'Catalysts', vend: 'Vendors', gd: 'Builds', gcl: 'Clan', grep: 'Reports', gst: 'Stats' },
+    subs: { obj: 'Main', prog: 'In progress', camp: 'Campaigns', raid: 'Raids', dg: 'Dungeons', xm: 'Exotic missions', tit: 'Titles', tri: 'Triumphs', exo: 'Exotics', cat: 'Catalysts', vend: 'Vendors', gd: 'Builds', gcl: 'Clan', grep: 'Reports', gst: 'Stats' },
     heroTitle: 'Guardian Hub', heroText: 'Sign in with your Bungie.net account to check your goals, follow the weekly rotation, complete your exotic arsenal and share your builds.', lsQ: 'Search guardian: Name#1234', lsBtn: 'Search', lsHint: "See any player's equipped build, no sign-in needed.",
     heroList: ['The site only reads your data; it never changes anything in the game.', 'Your password stays with Bungie; the site never sees it.', 'Checkmarks, favorites and saved builds sync between phone and PC.'],
     login: 'Sign in with Bungie.net', notConfigured: "The site isn't configured yet: the Bungie keys are missing from the Vercel environment variables.",
@@ -152,7 +152,7 @@ let charId = null, tab = LS.get('dc-tab', 'obj'), prevTab = 'obj', query = '';
 const lastSub = LS.get('dc-subs', {});
 let marks = new Set(), SECTIONS = [], LOADOUTS = [], loadedAt = null;
 const openSecs = new Set(), openItems = new Set();
-const GROUPS = [{ id: 'obj', subs: ['obj'] }, { id: 'act', subs: ['camp', 'raid', 'dg', 'xm', 'tit'] }, { id: 'drops', subs: ['exo', 'cat', 'vend'] }, { id: 'gd', subs: ['gd', 'gcl', 'grep', 'gst'] }];
+const GROUPS = [{ id: 'obj', subs: ['obj'] }, { id: 'act', subs: ['camp', 'raid', 'dg', 'xm', 'tit', 'tri'] }, { id: 'drops', subs: ['exo', 'cat', 'vend'] }, { id: 'gd', subs: ['gd', 'gcl', 'grep', 'gst'] }];
 const isGd = () => tab === 'gd' || tab === 'gcl' || tab === 'gst' || tab === 'grep'; // Guardião: builds/favoritos/clã e estatísticas
 // Página de teste (/beta): só para o dono do site; recursos novos aparecem aqui antes de ir para todos
 const BETA = location.pathname.replace(/\/+$/, '') === '/beta'; // página de testes do dono (/beta)
@@ -288,7 +288,7 @@ async function idbDel(k) { try { const db = await idb(); db.transaction('kv', 'r
 // 201 também em c: a Bungie só manda instâncias (300) dos itens incluídos na mesma resposta
 const PARTS = { id: '200,205', q: '201,301', a: '100,202,800,1100,1400', b: '900', c: '102,201,205,206,300', g: '205,300,305' };
 // parte de que cada aba depende: ela é pedida logo depois do cabeçalho
-const TAB_PART = { xm: 'a', vend: 'a', obj: 'q', camp: 'q', raid: 'a', dg: 'a', exo: 'a', cat: 'b', tit: 'b', ld: 'c', gd: 'a' };
+const TAB_PART = { xm: 'a', vend: 'a', obj: 'q', camp: 'q', raid: 'a', dg: 'a', exo: 'a', cat: 'b', tit: 'b', tri: 'b', ld: 'c', gd: 'a' };
 let have = { id: false, q: false, a: false, b: false, c: false, g: false };
 function pickChar() {
   const chars = Object.values(profile.characters?.data || {});
@@ -1406,7 +1406,8 @@ function render() {
   else { st.hidden = true; st.innerHTML = ''; }
   $('ldbtn').setAttribute('aria-pressed', tab === 'ld'); $('ldbtn').textContent = tab === 'ld' ? U.checklist : U.loadouts;
   document.body.classList.toggle('on-ld', tab === 'ld'); document.body.classList.toggle('no-clears', !OPTS.clears);
-  $('overall').hidden = isGd() || tab === 'vend';
+  $('overall').hidden = isGd() || tab === 'vend' || tab === 'tri';
+  if (tab === 'tri') { $('list').innerHTML = triHTML(); return; }
   if (tab === 'vend' && !VEND && have.a && member) loadVendors(gen);
   if (isGd()) { $('list').innerHTML = gdHTML(); if (!GD && have.a) loadGuardian(gen); if (!VAULT && have.c) loadVault(gen); return; }
   if (tab === 'ld') {
@@ -1449,7 +1450,7 @@ function render() {
       }).join('')}</ul></section>`;
   }).join('')}<p class="donebar" id="donebar" hidden><span id="donetxt"></span><button class="reset" id="togglecomplete" type="button"></button></p></div>`;
   document.querySelectorAll('#list li[data-li]').forEach(li => { if (openItems.has(li.dataset.li)) { li.classList.add('open'); li.querySelector('button.it')?.setAttribute('aria-expanded', 'true'); } });
-  update(); filter();
+  update(); filter(); sideRail();
   if (tab === 'exo' || tab === 'cat' || tab === 'obj') window.requestIdleCallback ? window.requestIdleCallback(() => loadIcons(), { timeout: 800 }) : setTimeout(loadIcons, 200);
 }
 const isDone = i => i.auto || marks.has(i.id);
@@ -3360,6 +3361,94 @@ document.addEventListener('click', async e => {
   const del = q('[data-lpadel]'); if (del) { LPA.list.splice(+del.dataset.lpadel, 1); lpaSave(); render(); return; }
   const go = q('[data-lpago]'), br = q('[data-lpabring]'); if (go || br) { const x = LPA.list[+(go || br).dataset[go ? 'lpago' : 'lpabring']]; if (!x) return; const p = await lpaPlan(x, !!br); if (p) wOpen(p); return; }
 }, true);
+/* ---------- Triunfos: todas as categorias do jogo, com busca ao lado e ☆ para o Foco ----------
+   Nomes e árvore vêm dos arquivos do manifesto da Bungie (direto do CDN deles, uma vez por versão do jogo),
+   enxugados e guardados no aparelho (IndexedDB). O progresso é o dos triunfos que o site já carrega. */
+const TRT = { pt: { load: 'Baixando a lista de triunfos da Bungie (só na primeira vez de cada atualização do jogo)…', err: 'Não deu para baixar a lista de triunfos agora.', retry: 'Tentar de novo', q: 'Buscar triunfo', cats: 'Categorias', hide: 'Esconder concluídos', res: q => `Resultados para “${q}”`, n: n => `${n} triunfo${n === 1 ? '' : 's'}`, more: n => `Mostrar mais ${n}`, pins: '★ Acompanhando (aparecem no Foco, em Objetivos)', pinNo: 'Toque na ☆ de um triunfo para acompanhar aqui e no Foco.', none: 'Nada aqui com esse filtro.', all: 'Tudo concluído nesta categoria!', wait: 'Carregando seus triunfos…' },
+  en: { load: 'Downloading the triumph list from Bungie (only the first time after each game update)…', err: "Couldn't download the triumph list right now.", retry: 'Try again', q: 'Search triumphs', cats: 'Categories', hide: 'Hide completed', res: q => `Results for “${q}”`, n: n => `${n} triumph${n === 1 ? '' : 's'}`, more: n => `Show ${n} more`, pins: '★ Tracking (shown in Focus, on Main)', pinNo: 'Tap the ☆ on a triumph to track it here and in Focus.', none: 'Nothing here with this filter.', all: 'All done in this category!', wait: 'Loading your triumphs…' } };
+const trt = () => TRT[lang === 'pt' ? 'pt' : 'en'];
+const TRI = { st: null, lc: '', cats: [], R: {}, cat: LS.get('dc-tri-cat', 0), q: '', hide: LS.get('dc-tri-hide', true), lim: 80 };
+async function triLoad() {
+  const lc = lang === 'pt' ? 'pt-br' : 'en'; if (TRI.st === 'load' || (TRI.st === 'ok' && TRI.lc === lc)) return;
+  TRI.st = 'load'; TRI.lc = lc;
+  try {
+    const m = await bungie('/Destiny2/Manifest/', false), ver = m.version + ':' + lc;
+    let c = await idbGet('tri1');
+    if (!c || c.v !== ver) {
+      const p = m.jsonWorldComponentContentPaths[lc];
+      const [RD, ND] = await Promise.all([fetch(BNET + p.DestinyRecordDefinition).then(r => r.json()), fetch(BNET + p.DestinyPresentationNodeDefinition).then(r => r.json())]);
+      const rootH = profile.profileRecords?.data?.recordCategoriesRootNodeHash, root = ND[rootH];
+      const kids = n => (n?.children?.presentationNodes || []).map(x => ND[x.presentationNodeHash]).filter(x => x && !x.redacted);
+      const top = kids(root), cats = [], R = {};
+      // 1º filho = Triunfos (suas categorias viram as da lateral); depois Medalhas etc., menos Histórias (lore) e Catalisadores (já têm aba)
+      const catNodes = [...kids(top[0]), ...top.slice(1).filter(n => !(n.children?.presentationNodes || []).some(c => (ND[c.presentationNodeHash]?.children?.records || []).some(r => RD[r.recordHash]?.loreHash)) && !/catal/i.test(n.displayProperties?.name || ''))];
+      for (const cn of catNodes) {
+        const recs = [], paths = [], seen = new Set();
+        const walk = (n, path, d) => { if (d > 6) return; for (const r of n.children?.records || []) { const x = RD[r.recordHash]; if (!x || x.redacted || !x.displayProperties?.name || seen.has(r.recordHash)) continue; seen.add(r.recordHash); if (!R[r.recordHash]) R[r.recordHash] = { n: x.displayProperties.name, d: x.displayProperties.description || '', ic: x.displayProperties.icon || '' }; let pi = paths.indexOf(path); if (pi < 0) pi = paths.push(path) - 1; recs.push([r.recordHash, pi]); } for (const k of kids(n)) walk(k, path ? path + ' › ' + k.displayProperties.name : k.displayProperties.name, d + 1); };
+        walk(cn, '', 0);
+        if (recs.length) cats.push({ n: cn.displayProperties.name, ic: cn.displayProperties.icon || '', recs, paths });
+      }
+      c = { v: ver, cats, R }; idbSet('tri1', c);
+    }
+    TRI.cats = c.cats; TRI.R = c.R; TRI.st = 'ok'; if (TRI.cat >= TRI.cats.length) TRI.cat = 0;
+  } catch (e) { console.warn('triunfos', e); TRI.st = 'err'; }
+  if (tab === 'tri') render();
+}
+const triVis = h => { const r = recState(h); return r && !(r.state & 16) ? r : null; };
+function triRow(h, path) {
+  const x = TRI.R[h], r = triVis(h); if (!x || !r) return '';
+  const ok = recDone(r), w = ok ? 100 : Math.floor(pct(r) * 100), pt = progText(r);
+  const ext = ` data-focn="${esc(x.n)}" data-foci="${esc(x.ic)}" data-focd="${esc(x.d.slice(0, 140))}"`;
+  return `<li class="tr-r${ok ? ' ok' : ''}">${x.ic ? `<span class="tr-ic" aria-hidden="true" style="background-image:url('${BNET}${x.ic}')"></span>` : '<span class="tr-ic" aria-hidden="true"></span>'}<span class="tr-t"><b>${esc(x.n)}</b><small>${esc(x.d)}</small>${path ? `<small class="tr-p">${esc(path)}</small>` : ''}</span><span class="tr-v"><small>${ok ? '✓' : pt || w + '%'}</small><i class="sea-bar"><u style="width:${w}%"></u></i></span>${focBtn('tri:' + h, ext)}</li>`;
+}
+function triList() {
+  const T = trt(), q = TRI.q.trim().toLowerCase(); let rows = [];
+  if (q.length >= 2) { for (const c of TRI.cats) for (const [h, pi] of c.recs) { const x = TRI.R[h]; if (x && (x.n + ' ' + x.d).toLowerCase().includes(q)) rows.push([h, c.n + (c.paths[pi] ? ' › ' + c.paths[pi] : '')]); } rows = rows.filter((r, i, a) => a.findIndex(y => y[0] === r[0]) === i); }
+  else { const c = TRI.cats[TRI.cat]; if (c) rows = c.recs.map(([h, pi]) => [h, c.paths[pi]]); }
+  rows = rows.filter(([h]) => { const r = triVis(h); return r && (!TRI.hide || !recDone(r)); });
+  if (!q) rows.sort((a, b) => pct(triVis(b[0])) - pct(triVis(a[0])));
+  const shown = rows.slice(0, TRI.lim).map(([h, p]) => triRow(h, p)).join('');
+  const head = `<div class="tr-hd"><h2>${esc(q.length >= 2 ? T.res(TRI.q.trim()) : TRI.cats[TRI.cat]?.n || '')}</h2><small>${esc(T.n(rows.length))}</small><label class="tr-hide"><input type="checkbox" id="trhide"${TRI.hide ? ' checked' : ''}> ${esc(T.hide)}</label></div>`;
+  return head + (rows.length ? `<ul class="tr-l">${shown}</ul>${rows.length > TRI.lim ? `<button type="button" class="char tr-more" data-trmore>${esc(T.more(Math.min(100, rows.length - TRI.lim)))}</button>` : ''}` : `<p class="empty-msg">${esc(!q && TRI.hide ? T.all : T.none)}</p>`);
+}
+function triPinsHTML() {
+  const T = trt(), l = focList().filter(f => f.id.startsWith('tri:'));
+  return `<div class="tr-pins"><span class="sea-k">${esc(T.pins)}</span>${l.length ? `<ul class="tr-l">${l.map(f => triRow(+f.id.slice(4), '')).join('')}</ul>` : `<small class="sea-l">${esc(T.pinNo)}</small>`}</div>`;
+}
+function triPins() { const e = document.querySelector('#list .tr-pins'); if (e) e.outerHTML = triPinsHTML(); }
+function triHTML() {
+  const T = trt();
+  if (!have.b) return `<div class="panel"><p class="empty-msg wait">${esc(T.wait)}</p></div>`;
+  if (TRI.st !== 'ok' || TRI.lc !== (lang === 'pt' ? 'pt-br' : 'en')) { if (TRI.st !== 'load' && TRI.st !== 'err') setTimeout(triLoad); return `<div class="panel">${TRI.st === 'err' ? `<p class="empty-msg">${esc(T.err)} <button type="button" class="char" data-trretry>${esc(T.retry)}</button></p>` : `<p class="empty-msg wait" role="status">${esc(T.load)}</p>`}</div>`; }
+  const catPct = c => { let a = 0, b = 0; for (const [h] of c.recs) { const r = triVis(h); if (r) { b++; if (recDone(r)) a++; } } return b ? Math.floor(a / b * 100) : 0; };
+  return `<div class="panel tr-wrap"><aside class="tr-side"><label class="tr-q">${esc(T.q)}<input type="search" id="trq" value="${esc(TRI.q)}" autocomplete="off"></label><span class="sea-k">${esc(T.cats)}</span><div class="tr-cats">${TRI.cats.map((c, i) => `<button type="button" class="tr-cat" data-trcat="${i}" aria-pressed="${i === TRI.cat && TRI.q.trim().length < 2}">${c.ic ? `<span class="tr-cic" aria-hidden="true" style="background-image:url('${BNET}${c.ic}')"></span>` : ''}<span>${esc(c.n)}</span><small>${catPct(c)}%</small></button>`).join('')}</div></aside>
+    <section class="tr-main">${triPinsHTML()}<div class="tr-box" id="trbox">${triList()}</div></section></div>`;
+}
+const triRedraw = () => { const b = $('trbox'); if (b) b.innerHTML = triList(); };
+document.addEventListener('input', e => { if (e.target.id !== 'trq') return; TRI.q = e.target.value; TRI.lim = 80; triRedraw(); document.querySelectorAll('[data-trcat]').forEach(b => b.setAttribute('aria-pressed', +b.dataset.trcat === TRI.cat && TRI.q.trim().length < 2)); });
+document.addEventListener('change', e => { if (e.target.id !== 'trhide') return; TRI.hide = e.target.checked; LS.set('dc-tri-hide', TRI.hide); TRI.lim = 80; triRedraw(); });
+document.addEventListener('click', e => {
+  const c = e.target.closest('[data-trcat]'); if (c) { TRI.cat = +c.dataset.trcat; LS.set('dc-tri-cat', TRI.cat); TRI.q = ''; TRI.lim = 80; const q = $('trq'); if (q) q.value = ''; document.querySelectorAll('[data-trcat]').forEach(b => b.setAttribute('aria-pressed', b === c)); triRedraw(); if (innerWidth < 760) $('trbox')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+  if (e.target.closest('[data-trmore]')) { TRI.lim += 100; triRedraw(); return; }
+  if (e.target.closest('[data-trretry]')) { TRI.st = null; render(); }
+});
+/* ---------- Busca ao lado (Títulos, Exóticos, Catalisadores): campo de busca + atalhos para cada seção ---------- */
+const SIDE_TABS = ['tit', 'exo', 'cat'];
+function sideRail() {
+  if (!SIDE_TABS.includes(tab)) return; const pnl = $('list').querySelector(':scope > .panel'); if (!pnl) return;
+  const secs = [...pnl.querySelectorAll(':scope > section[data-sec]')].filter(x => x.querySelector('h2') && x.querySelector('li[data-li]')); if (secs.length < 2) return;
+  const T = trt(), wrap = document.createElement('div'); wrap.className = 'sr-wrap';
+  const side = document.createElement('aside'); side.className = 'tr-side sr-side';
+  side.innerHTML = `<label class="tr-q">${esc(u().search)}<input type="search" id="srq" value="${esc(query)}" autocomplete="off"></label><span class="sea-k">${esc(T.cats)}</span><div class="tr-cats">${secs.map(x => { const n = x.querySelectorAll('li[data-li]').length, d = [...x.querySelectorAll('li[data-li]')].filter(li => li.querySelector('input[type=checkbox]')?.checked).length; return `<button type="button" class="tr-cat" data-srjump="${esc(x.dataset.sec)}"><span>${esc(x.querySelector('h2').textContent)}</span><small>${d}/${n}</small></button>`; }).join('')}</div>`;
+  pnl.before(wrap); wrap.append(side, pnl);
+}
+document.addEventListener('input', e => { if (e.target.id !== 'srq') return; query = e.target.value; const q = $('q'); if (q) q.value = query; filter(); });
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-srjump]'); if (!b) return;
+  const sec = document.querySelector(`#list section[data-sec="${CSS.escape(b.dataset.srjump)}"]`); if (!sec) return;
+  if (sec.classList.contains('collapsed')) { const h = sec.querySelector('.sec-head[data-coll]'); if (h) toggleSec(h); }
+  sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
 /* ---------- Temporada: passe, artefato, poder e reputações num cartão só (topo de Estatísticas) ---------- */
 const SEAT = { pt: { t: 'Temporada', ends: d => d > 0 ? `termina em ${d} dias` : 'termina hoje', reset: t => `reset semanal em ${t}`, pass: 'Passe de recompensas', next: p => `${p}% para o próximo nível`, art: 'Artefato', artP: 'poder extra', artN: (p, n) => `${p}% para o próximo · ${n} pontos de vantagem`, pw: 'Poder', base: n => `base ${n}`, max: n => `máximo com o que você tem: ${n}`, reps: 'Reputações', lvl: n => `nível ${n}`, resets: n => n ? ` · ${n} reset${n === 1 ? '' : 's'}` : '' },
   en: { t: 'Season', ends: d => d > 0 ? `ends in ${d} days` : 'ends today', reset: t => `weekly reset in ${t}`, pass: 'Rewards pass', next: p => `${p}% to the next level`, art: 'Artifact', artP: 'bonus power', artN: (p, n) => `${p}% to the next · ${n} perk points`, pw: 'Power', base: n => `base ${n}`, max: n => `max with what you own: ${n}`, reps: 'Reputations', lvl: n => `level ${n}`, resets: n => n ? ` · ${n} reset${n === 1 ? '' : 's'}` : '' } };
@@ -3559,20 +3648,24 @@ document.addEventListener('change', e => { if (e.target.id !== 'cmpgsel') return
 const FOCUS_TABS = ['tit', 'raid', 'dg', 'xm'], FOCUS_ITEM_TABS = ['exo', 'cat'];
 const focList = () => LS.get('dc-focus', []);
 const focHas = id => focList().some(x => x.id === id);
-const focBtn = id => `<button type="button" class="foc-b" data-foc="${esc(id)}" aria-pressed="${focHas(id)}" title="${esc(u().focT)}" aria-label="${esc(u().focT)}">${focHas(id) ? '★' : '☆'}</button>`;
+const focBtn = (id, ext = '') => `<button type="button" class="foc-b" data-foc="${esc(id)}"${ext} aria-pressed="${focHas(id)}" title="${esc(u().focT)}" aria-label="${esc(u().focT)}">${focHas(id) ? '★' : '☆'}</button>`;
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-foc]'); if (!b) return; e.stopPropagation(); e.preventDefault();
   const id = b.dataset.foc, l = focList(), i = l.findIndex(x => x.id === id);
-  if (i >= 0) l.splice(i, 1); else l.unshift({ id, at: Date.now() });
+  if (i >= 0) l.splice(i, 1); else l.unshift({ id, at: Date.now(), ...(b.dataset.focn ? { n: b.dataset.focn, ic: b.dataset.foci || '', d: b.dataset.focd || '' } : {}) });
   LS.set('dc-focus', l.slice(0, 30));
   document.querySelectorAll(`[data-foc="${CSS.escape(id)}"]`).forEach(x => { const on = i < 0; x.setAttribute('aria-pressed', on); x.textContent = on ? '★' : '☆'; });
-  if (tab === 'obj') render();
+  if (tab === 'obj') render(); if (tab === 'tri') triPins();
 }, true);
 function focusHTML() {
   const l = focList(); if (!l.length) return '';
   const W = u(), open = !openSecs.has('foc-x');
   const cards = l.map(f => {
     const [k, id] = [f.id.slice(0, f.id.indexOf(':')), f.id.slice(f.id.indexOf(':') + 1)];
+    if (k === 'tri') {
+      const r = recState(+id), ok = recDone(r), pt = progText(r);
+      return `<div class="fo-c fo-it${ok ? ' ok' : ''}"><div class="fo-h">${f.ic ? `<span class="it-ic fo-ic" aria-hidden="true" style="background-image:url('${BNET}${f.ic}')"></span>` : ''}<span><small>${esc(u().subs.tri)}</small><b>${esc(f.n || '')}</b></span><span class="fo-n">${ok ? '✓' : pt || Math.floor(pct(r) * 100) + '%'}</span>${focBtn(f.id)}</div><i class="fo-bar"><u style="width:${ok ? 100 : Math.floor(pct(r) * 100)}%"></u></i>${f.d ? `<p class="fo-d">${esc(f.d)}</p>` : ''}</div>`;
+    }
     if (k === 'sec') {
       const sec = SECTIONS.find(x => x.id === id); if (!sec) return '';
       const done = sec.items.filter(isDone).length, left = sec.items.filter(i => !isDone(i));
