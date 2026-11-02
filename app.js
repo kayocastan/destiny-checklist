@@ -1243,7 +1243,7 @@ function gdHTML() {
   const fav = `<article class="gd"><div class="gd-head"><h2>${esc(W.favGT)}</h2></div>${fl.length ? `<ul class="sq">${fl.map(x => { const k = x.name.lastIndexOf('#'); return `<li><button type="button" class="cl-p sq-p fav-p" data-mt="${x.type}" data-mid="${esc(x.id)}" data-name="${esc(x.name)}" title="${esc(W.seeBuild)}"><span class="sq-n">${esc(k > 0 ? x.name.slice(0, k) : x.name)}<small>${esc(k > 0 ? x.name.slice(k) : '')}</small></span><span class="sq-s">${esc([x.t, x.pw ? '✦ ' + x.pw : '', x.at ? W.seenAgo(ago(x.at)) : ''].filter(Boolean).join(' · '))}</span></button></li>`; }).join('')}</ul>` : `<p>${esc(W.favNone)}</p>`}</article>`;
   const sv = savedList();
   const saved = `<article class="gd"><div class="gd-head"><h2>${esc(W.savedT)}</h2></div>${sv.length ? `<ul class="sq">${sv.map((x, i) => `<li><button type="button" class="cl-p sq-p sv-p" data-sv="${i}" title="${esc(W.seeBuild)}"><span class="sq-n">${esc(x.title || x.t)}</span><span class="sq-s">${esc([x.title ? x.t : '', x.name, '✦ ' + (x.p.characters.data[x.cid]?.light || ''), W.savedOn(ago(x.at))].filter(Boolean).join(' · '))}</span>${x.note ? `<span class="sq-s sv-note">${esc(x.note)}</span>` : ''}</button>${profile?.characters?.data?.[x.cid] ? wBtn(`data-svap="${i}"`) : member ? `<button type="button" class="lbd-btn sv-cp" data-svcp="${i}">${esc(cpt().short)}</button>` : ''}</li>`).join('')}</ul>` : `<p>${esc(W.savedNone)}</p>`}</article>`;
-  return tab === 'gst' ? `<div class="panel">${grHTML()}${ranks}${statsA}${clears}${wp}${comm}</div>` : tab === 'gcl' ? `<div class="panel">${clan}${FX ? firstHTML() + clanCkHTML() + cmpGHTML() : ''}</div>` : `<div class="panel">${lbHTML()}${lpaHTML()}${saved}${fav}${FX ? wishHTML() : ''}${rec}${vaultHTML()}${opts}</div>`;
+  return tab === 'gst' ? `<div class="panel">${grHTML()}${ranks}${statsA}${clears}${wp}${comm}</div>` : tab === 'gcl' ? `<div class="panel">${clvHTML()}${clan}${FX ? firstHTML() + clanCkHTML() + cmpGHTML() : ''}</div>` : `<div class="panel">${lbHTML()}${lpaHTML()}${saved}${fav}${FX ? wishHTML() : ''}${rec}${vaultHTML()}${opts}</div>`;
 }
 
 /* Título do cabeçalho: subclasse + classe ("Titã Combatente" / "Striker Titan"); se o nome da subclasse já traz a classe ("Titã Prismático"), usa só ele */
@@ -3359,6 +3359,51 @@ document.addEventListener('click', async e => {
   const del = q('[data-lpadel]'); if (del) { LPA.list.splice(+del.dataset.lpadel, 1); lpaSave(); render(); return; }
   const go = q('[data-lpago]'), br = q('[data-lpabring]'); if (go || br) { const x = LPA.list[+(go || br).dataset[go ? 'lpago' : 'lpabring']]; if (!x) return; const p = await lpaPlan(x, !!br); if (p) wOpen(p); return; }
 }, true);
+/* ---------- Clã ao vivo: o que cada membro online está jogando agora ----------
+   Só busca quando a página do clã está aberta (um pedido à Bungie por membro online) e atualiza a cada minuto. */
+const CLVT = { pt: { t: 'Clã ao vivo', on: (a, b) => `${a} online de ${b}`, note: 'O que cada um está jogando agora. Atualiza sozinho a cada minuto com esta página aberta; toque num cartão para ver a build.', all: 'Todos', act: 'Em incursão/masmorra', soc: 'Na órbita/Torre', none: 'Ninguém do clã online agora.', priv: 'perfil privado', together: 'Jogando juntos', solo: 'solo', grp: n => `grupo de ${n}`, since: t => `há ${t}`, load: 'Lendo o que o clã está jogando…', none2: 'Ninguém neste filtro.' },
+  en: { t: 'Clan live', on: (a, b) => `${a} online of ${b}`, note: 'What everyone is playing right now. Refreshes every minute while this page is open; tap a card to see the build.', all: 'All', act: 'In raid/dungeon', soc: 'In orbit/Tower', none: 'Nobody from the clan is online right now.', priv: 'private profile', together: 'Playing together', solo: 'solo', grp: n => `fireteam of ${n}`, since: t => `${t} ago`, load: 'Reading what the clan is playing…', none2: 'Nobody in this filter.' } };
+const clvt = () => CLVT[lang === 'pt' ? 'pt' : 'en'];
+const CLV = { at: 0, busy: false, rows: {}, f: 'all', names: {}, kinds: {} };
+const W_SOC = new Set([82913930]);
+async function clvLoad(force) {
+  const list = (GD?.clan?.list || []).filter(x => x.on); if (CLV.busy || (!force && Date.now() - CLV.at < 55000)) return;
+  CLV.busy = true; CLV.at = Date.now();
+  try {
+    const out = {}; let i = 0;
+    await Promise.all(Array.from({ length: 4 }, async () => { while (i < list.length) { const x = list[i++]; try {
+      const p = await bungie(`/Destiny2/${x.mt}/Profile/${x.mid}/?components=100,200,204,1000`, false);
+      const ch = Object.values(p.characters?.data || {}).sort((a, b) => new Date(b.dateLastPlayed) - new Date(a.dateLastPlayed))[0];
+      const a = ch && p.characterActivities?.data?.[ch.characterId], pm = p.profileTransitoryData?.data?.partyMembers || [];
+      out[x.mid] = ch ? { ch, h: a?.currentActivityHash || 0, mode: a?.currentActivityModeType, st: a?.dateActivityStarted ? Date.parse(a.dateActivityStarted) : 0, party: pm.map(m => m.membershipId), priv: !a } : { priv: true };
+    } catch { out[x.mid] = { priv: true }; } } }));
+    const hs = [...new Set(Object.values(out).map(r => r.h).filter(Boolean))];
+    Object.assign(CLV.names, await entities('DestinyActivityDefinition', hs.filter(h => !CLV.names[h]), lang).catch(() => ({})));
+    Object.assign(CLV.kinds, await mapActs(hs.filter(h => !CLV.kinds[h]), h => Object.values(out).find(r => r.h === h)?.mode).catch(() => ({})));
+    CLV.rows = out;
+  } catch {}
+  CLV.busy = false; if (isGd() && tab === 'gcl') render();
+}
+setInterval(() => { if (!document.hidden && isGd() && tab === 'gcl' && GD?.clan?.list) clvLoad(); }, 60000);
+function clvHTML() {
+  const T = clvt(), W = u(), list = GD?.clan?.list || []; if (!list.length) return '';
+  const on = list.filter(x => x.on); if (on.length && !CLV.at) setTimeout(() => clvLoad(), 0);
+  const rows = on.map(x => ({ x, r: CLV.rows[x.mid] })).map(o => { const r = o.r || {}, k = CLV.kinds[r.h], soc = !r.h || W_SOC.has(r.h) || r.mode === 40; return { ...o, k, soc }; });
+  const vis = rows.filter(o => CLV.f === 'all' || (CLV.f === 'act' ? !!o.k : o.soc)).sort((a, b) => (!!b.k - !!a.k) || ((a.r?.st || 0) - (b.r?.st || 0)));
+  const mins = t => { const m = Math.max(1, Math.round((Date.now() - t) / 60000)); return m < 60 ? m + ' min' : Math.floor(m / 60) + 'h' + String(m % 60).padStart(2, '0'); };
+  const card = o => { const r = o.r || {}, ch = r.ch, nm = r.h ? (CLV.names[r.h]?.n || '…') : '', raid = !!o.k, sz = (r.party || []).length;
+    return `<button type="button" class="clv-c${raid ? ' raid' : ''}" data-mt="${o.x.mt}" data-mid="${esc(o.x.mid)}" data-name="${esc(o.x.full)}"><span class="clv-em"${ch?.emblemBackgroundPath ? ` style="background-image:url('${BNET}${ch.emblemBackgroundPath}')"` : ''}></span><span class="clv-t"><b>${esc(o.x.n)}</b><span class="clv-a">${esc(r.priv ? T.priv : nm || '—')}</span><small>${esc([ch ? u().classes[ch.classType] : '', sz > 1 ? T.grp(sz) : sz === 1 ? T.solo : ''].filter(Boolean).join(' · '))}</small></span><span class="clv-r">${ch ? `<b>✦ ${ch.light}</b>` : ''}${r.st ? `<small>${esc(T.since(mins(r.st)))}</small>` : ''}</span></button>`; };
+  // jogando juntos: membros do clã no mesmo grupo (pela lista do grupo; sem ela, mesma incursão/masmorra)
+  const groups = [], seen = new Set();
+  for (const o of rows.filter(o => o.k)) { if (seen.has(o.x.mid)) continue; const mates = rows.filter(p => p.k && p.r?.h === o.r.h && (o.r.party?.includes(p.x.mid) || p.r.party?.includes(o.x.mid) || (!o.r.party?.length && Math.abs((p.r.st || 0) - (o.r.st || 0)) < 600000))); if (mates.length > 1) { mates.forEach(p => seen.add(p.x.mid)); groups.push({ h: o.r.h, k: o.k, m: mates.map(p => p.x.n), sz: Math.max(...mates.map(p => p.r.party?.length || 0)) }); } }
+  const chip = (v, t) => `<button type="button" class="lbd-chip${CLV.f === v ? ' on' : ''}" data-clvf="${v}">${esc(t)}</button>`;
+  const body = !on.length ? `<p class="lbd-n">${esc(T.none)}</p>` : !CLV.at || (CLV.busy && !Object.keys(CLV.rows).length) ? `<p class="wait">${esc(T.load)}</p>` : `<div class="clv-g">${vis.map(card).join('') || `<p class="lbd-n">${esc(T.none2)}</p>`}</div>${groups.length ? `<div class="clv-tog"><span>${esc(T.together)}</span>${groups.map(g => `<p><b>${esc(CLV.names[g.h]?.n || '')}:</b> ${g.m.map(esc).join(', ')}${g.sz ? ` · ${g.m.length}/${g.sz > 6 ? 6 : Math.max(g.sz, g.m.length)}` : ''} ${actYt(g.k.kind, g.k.k)}</p>`).join('')}</div>` : ''}`;
+  return `<article class="gd clv"><div class="gd-head"><h2><i class="clv-dot" aria-hidden="true"></i>${esc(T.t)} <small>${esc(T.on(on.length, list.length + 1))}</small></h2></div><p>${esc(T.note)}</p><div class="lbd-chips">${chip('all', T.all)}${chip('act', T.act)}${chip('soc', T.soc)}</div>${body}</article>`;
+}
+document.addEventListener('click', e => {
+  const f = e.target.closest('[data-clvf]'); if (f) { CLV.f = f.dataset.clvf; render(); return; }
+  const c = e.target.closest('.clv-c'); if (c) { FD.q = ''; FD.results = null; openFind({ name: c.dataset.name, type: +c.dataset.mt, id: c.dataset.mid }); }
+});
 /* ---------- Menu (hambúrguer) e tamanho da letra ----------
    O menu leva a qualquer página do site num toque; o tamanho da letra amplia o site todo (fica salvo neste aparelho). */
 const FZ = [0.9, 1, 1.1, 1.2, 1.35];

@@ -1389,3 +1389,16 @@ dialog.navd::backdrop{background:rgba(5,8,14,.6)}
 /* builds salvas: "Copiar para mim" ao lado, como o "Aplicar" */
 .sq li:has(.sv-cp){display:flex;align-items:center;gap:8px}.sq li:has(.sv-cp)>.sq-p{flex:1;min-width:0}
 .sq li>.sv-cp,.sq li>.wr-btn{flex:none;align-self:stretch;min-height:40px;display:inline-flex;align-items:center;justify-content:center;width:132px;box-sizing:border-box;white-space:nowrap}
+/* clã ao vivo */
+.clv{grid-column:1/-1}
+.clv h2 small{font:500 13px var(--mono);color:var(--muted);margin-left:6px}
+.clv-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--done);box-shadow:0 0 0 4px color-mix(in srgb,var(--done) 22%,transparent);margin-right:10px;vertical-align:3px}
+.clv-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(380px,100%),1fr));gap:8px;margin-top:10px}
+.clv-c{font:inherit;color:var(--fg);text-align:left;display:grid;grid-template-columns:80px minmax(0,1fr) auto;gap:12px;align-items:center;padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:var(--chip);cursor:pointer}
+.clv-c:hover{border-color:var(--acc)}
+.clv-c.raid{border-color:color-mix(in srgb,var(--exotic) 55%,var(--line));background:linear-gradient(90deg,color-mix(in srgb,var(--exotic) 10%,var(--chip)),var(--chip))}
+.clv-em{width:80px;height:48px;border-radius:7px;background:#2b3542 left/cover no-repeat}
+.clv-t{display:grid;gap:2px;min-width:0}.clv-t b{font-size:14.5px}.clv-a{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.clv-c.raid .clv-a{color:var(--exotic)}.clv-t small{font-size:12px;color:var(--muted)}
+.clv-r{display:grid;justify-items:end;gap:3px}.clv-r b{font:700 18px var(--display);color:var(--exotic)}.clv-r small{font:500 11.5px var(--mono);color:var(--muted)}
+.clv-tog{margin-top:10px;padding:10px 12px;border-radius:12px;border:1px solid color-mix(in srgb,var(--acc) 40%,transparent);background:color-mix(in srgb,var(--acc) 6%,transparent);display:grid;gap:4px}
+.clv-tog>span{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc)}.clv-tog p{margin:0;font-size:14px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
