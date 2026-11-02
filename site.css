@@ -1354,3 +1354,7 @@ dialog.wr::backdrop{background:rgba(5,8,14,.8)}
 .ld-wrap{grid-column:1/-1;display:grid;gap:12px}
 .ld-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(420px,100%),1fr));gap:12px;align-items:start}
 .ld-wrap .ld-intro{margin:0}
+/* montagem: respiro nas bordas da coluna de resultados */
+.lbd-res{padding:16px 18px;box-sizing:border-box}
+.lbd-res>.lbd-idle{margin:0}
+@media (max-width:860px){.lbd-res{padding:14px}}
