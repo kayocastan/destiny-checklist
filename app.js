@@ -3675,8 +3675,9 @@ document.addEventListener('click', e => {
 /* ---------- Menu (hambúrguer) e tamanho da letra ----------
    O menu leva a qualquer página do site num toque; o tamanho da letra amplia o site todo (fica salvo neste aparelho). */
 const FZ = [0.9, 1, 1.1, 1.2, 1.35];
-const NVT = { pt: { t: 'Menu', go: 'Ir para', more: 'Atalhos', ld: 'Loadouts', find: 'Buscar guardião', news: 'Novidades e sugestões', fz: 'Tamanho da letra', fzD: 'Aumenta ou diminui o site todo, só neste aparelho.', theme: 'Tema claro/escuro', lang: 'English', out: 'Sair', close: 'Fechar', smaller: 'Diminuir a letra', bigger: 'Aumentar a letra' },
+const NVT = { pt: { all: 'Buscar tudo', allK: 'Ctrl K', inst: 'Instalar como app', instIos: 'No iPhone: toque em Compartilhar e depois em “Adicionar à Tela de Início”.', t: 'Menu', go: 'Ir para', more: 'Atalhos', ld: 'Loadouts', find: 'Buscar guardião', news: 'Novidades e sugestões', fz: 'Tamanho da letra', fzD: 'Aumenta ou diminui o site todo, só neste aparelho.', theme: 'Tema claro/escuro', lang: 'English', out: 'Sair', close: 'Fechar', smaller: 'Diminuir a letra', bigger: 'Aumentar a letra' },
   en: { t: 'Menu', go: 'Go to', more: 'Shortcuts', ld: 'Loadouts', find: 'Find a guardian', news: "What's new & suggestions", fz: 'Text size', fzD: 'Makes the whole site bigger or smaller, on this device only.', theme: 'Light/dark theme', lang: 'Português', out: 'Sign out', close: 'Close', smaller: 'Smaller text', bigger: 'Bigger text' } };
+NVT.en = Object.assign({ all: 'Search everything', allK: 'Ctrl K', inst: 'Install as app', instIos: 'On iPhone: tap Share, then “Add to Home Screen”.' }, NVT.en);
 const nvt = () => NVT[lang === 'pt' ? 'pt' : 'en'];
 function fzApply() { const z = LS.get('dc-fz', 1); document.querySelector('.wrap').style.zoom = z === 1 ? '' : String(z); }
 function navDraw() {
@@ -3684,7 +3685,7 @@ function navDraw() {
   d.innerHTML = `<div class="nav-box"><div class="nav-hd"><b>${esc(T.t)}</b><button type="button" class="nav-x" data-navx aria-label="${esc(T.close)}">✕</button></div>
     <div class="nav-g nav-fzg"><span class="nav-gt">${esc(T.fz)}</span><div class="nav-fz"><button type="button" class="nav-fzb" data-navfz="-1" aria-label="${esc(T.smaller)}"${zi <= 0 ? ' disabled' : ''}>A−</button><b>${Math.round(z * 100)}%</b><button type="button" class="nav-fzb big" data-navfz="1" aria-label="${esc(T.bigger)}"${zi >= FZ.length - 1 ? ' disabled' : ''}>A+</button></div><small>${esc(T.fzD)}</small></div>
     <nav class="nav-l" aria-label="${esc(T.go)}">${GROUPS.map(g => `<div class="nav-g"><span class="nav-gt">${esc(U.tabs[g.id])}</span>${g.subs.map(sb => `<button type="button" class="nav-i${sb === cur ? ' on' : ''}" data-navgo="${sb}"${sb === cur ? ' aria-current="page"' : ''}>${esc(g.subs.length === 1 ? U.tabs[g.id] : (U.subs[sb] || sb))}</button>`).join('')}</div>`).join('')}</nav>
-    <div class="nav-g"><span class="nav-gt">${esc(T.more)}</span>${have.c ? `<button type="button" class="nav-i${cur === 'ld' ? ' on' : ''}" data-navgo="ld">${esc(T.ld)}</button>` : ''}<button type="button" class="nav-i" data-navfind>${esc(T.find)}</button><a class="nav-i" href="/novidades">${esc(T.news)}</a></div>
+    <div class="nav-g"><span class="nav-gt">${esc(T.more)}</span>${have.c ? `<button type="button" class="nav-i${cur === 'ld' ? ' on' : ''}" data-navgo="ld">${esc(T.ld)}</button>` : ''}<button type="button" class="nav-i" data-navall>🔎 ${esc(T.all)} <small>${esc(T.allK)}</small></button><button type="button" class="nav-i" data-navfind>${esc(T.find)}</button>${!matchMedia('(display-mode: standalone)').matches && (INST.ev || /iphone|ipad/i.test(navigator.userAgent)) ? `<button type="button" class="nav-i" data-navinst>📲 ${esc(T.inst)}</button>` : ''}<a class="nav-i" href="/novidades">${esc(T.news)}</a></div>
     <div class="nav-g nav-row"><button type="button" class="nav-i" data-navtheme>${esc(T.theme)}</button><button type="button" class="nav-i" data-navlang>${esc(T.lang)}</button>${auth ? `<button type="button" class="nav-i out" data-navout>${esc(T.out)}</button>` : ''}</div></div>`;
 }
 $('menubtn').hidden = false; fzApply();
@@ -3694,6 +3695,8 @@ $('navdlg').addEventListener('click', e => {
   if (e.target === d || q('[data-navx]')) { d.close(); return; }
   const g = q('[data-navgo]'); if (g) { d.close(); const t = g.dataset.navgo; if (t === 'ld') { if (tab !== 'ld') { prevTab = tab; go('ld'); } } else go(t); window.scrollTo({ top: 0 }); return; }
   if (q('[data-navfind]')) { d.close(); openFind(); return; }
+  if (q('[data-navall]')) { d.close(); palOpen(); return; }
+  if (q('[data-navinst]')) { if (INST.ev) { d.close(); INST.ev.prompt(); INST.ev.userChoice.finally(() => { INST.ev = null; }); } else { const b = q('[data-navinst]'); b.textContent = nvt().instIos; b.disabled = true; } return; }
   const f = q('[data-navfz]'); if (f) { const i = Math.max(0, Math.min(FZ.length - 1, FZ.indexOf(LS.get('dc-fz', 1)) + +f.dataset.navfz)); LS.set('dc-fz', FZ[i] ?? 1); fzApply(); navDraw(); return; }
   if (q('[data-navtheme]')) { $('themebtn').click(); return; }
   if (q('[data-navlang]')) { d.close(); $('langbtn').click(); return; }
@@ -4015,6 +4018,50 @@ async function openPublic(name) {
   history.replaceState(null, '', location.pathname + location.hash); // o endereço volta a ser o do site; quem abriu continua vendo a build
   try { const r = await searchPlayers(name); if (r.length === 1) showPlayer(r[0]); else { FD.results = r; renderFind(); } } catch { FD.status = 'error'; renderFind(); }
 }
+/* ---------- Instalar como app (PWA): o navegador oferece; guardamos o convite para o botão do menu ---------- */
+const INST = { ev: null };
+addEventListener('beforeinstallprompt', e => { e.preventDefault(); INST.ev = e; });
+/* ---------- Busca geral (Ctrl+K): abas, atividades, títulos, exóticos, catalisadores, triunfos, membros do clã e guardiões ---------- */
+const PALT = { pt: { ph: 'Buscar abas, atividades, exóticos, títulos, triunfos, clã…', tab: 'Aba', clan: 'Clã', tri: 'Triunfo', player: q => `Procurar o guardião “${q}”`, filter: q => `Filtrar esta tela por “${q}”`, empty: 'Digite para buscar. ↑↓ para escolher, Enter para abrir.', none: 'Nada encontrado.' },
+  en: { ph: 'Search tabs, activities, exotics, titles, triumphs, clan…', tab: 'Tab', clan: 'Clan', tri: 'Triumph', player: q => `Look up guardian “${q}”`, filter: q => `Filter this screen by “${q}”`, empty: 'Type to search. ↑↓ to pick, Enter to open.', none: 'Nothing found.' } };
+const palt = () => PALT[lang === 'pt' ? 'pt' : 'en'];
+const PAL = { q: '', i: 0, res: [] };
+const palNorm = t => String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+function palIndex() {
+  const U = u(), T = palt(), out = [];
+  for (const g of GROUPS) for (const sb of g.subs) out.push({ t: g.subs.length === 1 ? U.tabs[g.id] : U.subs[sb], s: T.tab + ' · ' + U.tabs[g.id], ic: '▸', go: () => { go(sb); scrollTo({ top: 0 }); } });
+  if (have.c) out.push({ t: U.loadouts, s: T.tab, ic: '▸', go: () => { if (tab !== 'ld') { prevTab = tab; go('ld'); } } });
+  for (const sec of SECTIONS) {
+    if (!sec.title || sec.html || sec.empty || !secAvail(sec)) continue;
+    out.push({ t: sec.title, s: U.subs[sec.tab] || '', ic: sec.kind === 'raid' || sec.kind === 'dg' ? '⚔' : '◆', go: () => jumpTo(sec.tab, sec.id) });
+    if (['exo', 'cat', 'tit'].includes(sec.tab)) for (const i of sec.items || []) out.push({ t: i.t, s: (U.subs[sec.tab] || '') + ' · ' + sec.title, ic: isDone(i) ? '✓' : '○', go: () => { jumpTo(sec.tab, sec.id); setTimeout(() => { const li = document.querySelector(`li[data-li="${CSS.escape(i.id)}"]`); if (li) { li.scrollIntoView({ behavior: 'smooth', block: 'center' }); li.classList.add('pal-hit'); setTimeout(() => li.classList.remove('pal-hit'), 2200); } }, 350); } });
+  }
+  for (const x of GD?.clan?.list || []) out.push({ t: x.n, s: T.clan, ic: '👤', go: () => { FD.q = ''; FD.results = null; openFind({ name: x.full || x.n, type: x.mt, id: x.mid }); } });
+  return out;
+}
+function palSearch() {
+  const T = palt(), q = palNorm(PAL.q.trim()); if (!q) { PAL.res = []; return; }
+  const words = q.split(/\s+/), sc = x => { const n = palNorm(x.t), s2 = palNorm(x.s); if (!words.every(w => n.includes(w) || s2.includes(w))) return -1; return (n.startsWith(q) ? 3 : n.includes(q) ? 2 : 1); };
+  let res = palIndex().map(x => [sc(x), x]).filter(([v]) => v > 0).sort((a, b) => b[0] - a[0] || a[1].t.length - b[1].t.length).slice(0, 14).map(([, x]) => x);
+  if (TRI.st === 'ok' && q.length >= 3) { let n = 0; for (const c of TRI.cats) { for (const [h] of c.recs) { const r = TRI.R[h]; if (r && palNorm(r.n).includes(q) && !res.some(y => y.h === h)) { res.push({ h, t: r.n, s: T.tri + ' · ' + c.n, ic: '🏆', go: () => { TRI.q = r.n; go('tri'); } }); if (++n >= 5) break; } } if (n >= 5) break; } }
+  const raw = PAL.q.trim();
+  if (raw.length >= 3) res.push({ t: T.player(raw), s: '', ic: '🔍', go: () => openPublic(raw) });
+  if (raw && !isGd() && tab !== 'ld' && tab !== 'tri') res.push({ t: T.filter(raw), s: '', ic: '⌕', go: () => { const qq = $('q'); qq.hidden = false; $('searchbtn').setAttribute('aria-expanded', 'true'); qq.value = raw; query = raw; filter(); } });
+  PAL.res = res; PAL.i = Math.min(PAL.i, Math.max(0, res.length - 1));
+}
+function palDraw() {
+  const d = $('paldlg'), T = palt(); if (!d) return;
+  const list = PAL.q.trim() ? (PAL.res.length ? PAL.res.map((x, i) => `<button type="button" class="pal-i${i === PAL.i ? ' on' : ''}" data-pali="${i}"><span class="pal-ic" aria-hidden="true">${x.ic}</span><span><b>${esc(x.t)}</b>${x.s ? `<small>${esc(x.s)}</small>` : ''}</span></button>`).join('') : `<p class="pal-e">${esc(T.none)}</p>`) : `<p class="pal-e">${esc(T.empty)}</p>`;
+  const l = d.querySelector('.pal-l'); if (l) { l.innerHTML = list; l.querySelector('.on')?.scrollIntoView({ block: 'nearest' }); return; }
+  d.innerHTML = `<div class="pal-box"><div class="pal-in"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/></svg><input id="palq" type="search" autocomplete="off" placeholder="${esc(T.ph)}" value="${esc(PAL.q)}"><kbd>Esc</kbd></div><div class="pal-l" role="listbox">${list}</div></div>`;
+}
+function palOpen() {
+  let d = $('paldlg'); if (!d) { d = document.createElement('dialog'); d.id = 'paldlg'; d.className = 'paldlg'; document.body.append(d); d.addEventListener('click', e => { if (e.target === d) d.close(); const b = e.target.closest('[data-pali]'); if (b) palGo(+b.dataset.pali); }); d.addEventListener('input', e => { if (e.target.id !== 'palq') return; PAL.q = e.target.value; PAL.i = 0; palSearch(); palDraw(); }); d.addEventListener('keydown', e => { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); PAL.i = Math.max(0, Math.min(PAL.res.length - 1, PAL.i + (e.key === 'ArrowDown' ? 1 : -1))); palDraw(); } else if (e.key === 'Enter') { e.preventDefault(); palGo(PAL.i); } }); }
+  if (!auth || !profile) return; if (!TRI.st && have.b) triLoad();
+  PAL.q = ''; PAL.i = 0; PAL.res = []; d.innerHTML = ''; palDraw(); if (!d.open) d.showModal(); d.querySelector('#palq')?.focus();
+}
+function palGo(i) { const x = PAL.res[i]; if (!x) return; $('paldlg').close(); x.go(); }
+addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); if ($('paldlg')?.open) $('paldlg').close(); else palOpen(); } else if (e.key === '/' && !/input|textarea|select/i.test(document.activeElement?.tagName || '') && !document.querySelector('dialog[open]')) { e.preventDefault(); palOpen(); } });
 /* ---------- Barra compacta: quando o cabeçalho sai da tela, aparece uma barra fina no topo com os botões de utilidade ---------- */
 (function miniBar() {
   const gh = $('gh'); if (!gh) return;
@@ -4043,7 +4090,7 @@ async function openPublic(name) {
     if (b.dataset.ghtop !== undefined) { scrollTo({ top: 0, behavior: 'smooth' }); return; }
     if (b.dataset.ghtab) { document.querySelector(`#tabs [data-group="${b.dataset.ghtab}"]`)?.click(); scrollTo({ top: 0 }); return; }
     const t = $(b.dataset.ghp); if (!t) return;
-    if (b.dataset.ghp === 'searchbtn') { scrollTo({ top: 0 }); if ($('q').hidden) t.click(); else $('q').focus(); return; }
+    if (b.dataset.ghp === 'searchbtn') { palOpen(); return; }
     if (b.dataset.ghp === 'ldbtn') scrollTo({ top: 0 });
     t.click(); setTimeout(() => { if (on) fill(); }, 50);
   });
