@@ -1358,3 +1358,6 @@ dialog.wr::backdrop{background:rgba(5,8,14,.8)}
 .lbd-res{padding:16px 18px;box-sizing:border-box}
 .lbd-res>.lbd-idle{margin:0}
 @media (max-width:860px){.lbd-res{padding:14px}}
+.ld-del{margin-left:auto;color:var(--muted)}
+.ld-del:hover{color:var(--hard);border-color:var(--hard)}
+.ld-del.on{color:#fff;background:var(--hard);border-color:var(--hard)}
