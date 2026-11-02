@@ -1242,7 +1242,7 @@ function gdHTML() {
   const fav = `<article class="gd"><div class="gd-head"><h2>${esc(W.favGT)}</h2></div>${fl.length ? `<ul class="sq">${fl.map(x => { const k = x.name.lastIndexOf('#'); return `<li><button type="button" class="cl-p sq-p fav-p" data-mt="${x.type}" data-mid="${esc(x.id)}" data-name="${esc(x.name)}" title="${esc(W.seeBuild)}"><span class="sq-n">${esc(k > 0 ? x.name.slice(0, k) : x.name)}<small>${esc(k > 0 ? x.name.slice(k) : '')}</small></span><span class="sq-s">${esc([x.t, x.pw ? '✦ ' + x.pw : '', x.at ? W.seenAgo(ago(x.at)) : ''].filter(Boolean).join(' · '))}</span></button></li>`; }).join('')}</ul>` : `<p>${esc(W.favNone)}</p>`}</article>`;
   const sv = savedList();
   const saved = `<article class="gd"><div class="gd-head"><h2>${esc(W.savedT)}</h2></div>${sv.length ? `<ul class="sq">${sv.map((x, i) => `<li><button type="button" class="cl-p sq-p sv-p" data-sv="${i}" title="${esc(W.seeBuild)}"><span class="sq-n">${esc(x.title || x.t)}</span><span class="sq-s">${esc([x.title ? x.t : '', x.name, '✦ ' + (x.p.characters.data[x.cid]?.light || ''), W.savedOn(ago(x.at))].filter(Boolean).join(' · '))}</span>${x.note ? `<span class="sq-s sv-note">${esc(x.note)}</span>` : ''}</button></li>`).join('')}</ul>` : `<p>${esc(W.savedNone)}</p>`}</article>`;
-  return tab === 'gst' ? `<div class="panel">${grHTML()}${ranks}${statsA}${clears}${wp}${comm}</div>` : tab === 'gcl' ? `<div class="panel">${clan}${FX ? firstHTML() + clanCkHTML() + cmpGHTML() : ''}</div>` : `<div class="panel">${lbHTML()}${lcHTML()}${saved}${fav}${FX ? wishHTML() : ''}${rec}${vaultHTML()}${opts}</div>`;
+  return tab === 'gst' ? `<div class="panel">${grHTML()}${ranks}${statsA}${clears}${wp}${comm}</div>` : tab === 'gcl' ? `<div class="panel">${clan}${FX ? firstHTML() + clanCkHTML() + cmpGHTML() : ''}</div>` : `<div class="panel">${lbHTML()}${lcHTML()}${lpaHTML()}${saved}${fav}${FX ? wishHTML() : ''}${rec}${vaultHTML()}${opts}</div>`;
 }
 
 /* Título do cabeçalho: subclasse + classe ("Titã Combatente" / "Striker Titan"); se o nome da subclasse já traz a classe ("Titã Prismático"), usa só ele */
@@ -1600,7 +1600,7 @@ function renderFind() {
       const r = rtf(), ago = ch.dateLastPlayed && r ? (() => { const d = (Date.parse(ch.dateLastPlayed) - Date.now()) / 1000, a = Math.abs(d); return a < 3600 ? r.format(Math.round(d / 60), 'minute') : a < 86400 ? r.format(Math.round(d / 3600), 'hour') : r.format(Math.round(d / 86400), 'day'); })() : '';
       body = `<div class="fd-hero" style="--a1:${a1};--a2:${a2}"><div class="fd-band"${ch.emblemBackgroundPath ? ` style="background-image:url('${BNET}${ch.emblemBackgroundPath}')"` : ''}><div class="fd-id"><div class="fd-who"><span>${esc(FD.sel.name)}</span>${FD.sel.id ? `<button type="button" class="fd-fav" aria-pressed="${isFav(FD.sel)}" title="${esc(isFav(FD.sel) ? W.unfav : W.fav)}" aria-label="${esc(isFav(FD.sel) ? W.unfav : W.fav)}">${STAR_ICON(isFav(FD.sel))}</button>` : ''}</div><div class="fd-ttl">${esc(charTitle(u().classes[ch.classType] || '', sn))}</div></div><div class="fd-pw"><b>${ch.light}</b><span>${esc(FD.sel.note || (ago ? W.lastPlayed(ago) : u().power))}</span></div></div>
         ${chars.length > 1 ? `<div class="fd-chars">${chars.map(c => `<button type="button" class="char" data-fdc="${c.characterId}" aria-pressed="${c.characterId === FD.cid}">${esc(u().classes[c.classType])}<span class="pw">${c.light}</span></button>`).join('')}</div>` : ''}
-        ${FD.B ? `<div class="fd-act"><span class="fd-act-k">${esc(FD.cmp ? W.cmpOn : W.subclass)}</span>${profile ? `<button type="button" class="fd-ib fd-cmpbtn" aria-pressed="${!!FD.cmp}" title="${esc(FD.cmp ? W.cmpClose : W.compare)}" aria-label="${esc(FD.cmp ? W.cmpClose : W.compare)}">${FD.cmp ? CLOSE_ICON : CMP_ICON}</button>` : ''}<button type="button" class="fd-ib fd-save" aria-pressed="${!!savedKey(fdCtx())}" title="${esc(savedKey(fdCtx()) ? W.unsaveB : W.saveB)}" aria-label="${esc(savedKey(fdCtx()) ? W.unsaveB : W.saveB)}">${SAVE_ICON(!!savedKey(fdCtx()))}</button><a class="fd-ib fd-dim" href="${esc(dimLink(fdCtx()))}" target="_blank" rel="noopener" title="${esc(W.toDim)}" aria-label="${esc(W.toDim)}">${EXPORT_ICON}<span>DIM</span></a>${shareMenu('fd', true, !!FD.sel.id)}</div>` : ''}
+        ${FD.B ? `<div class="fd-act"><span class="fd-act-k">${esc(FD.cmp ? W.cmpOn : W.subclass)}</span>${profile ? `<button type="button" class="fd-ib fd-cmpbtn" aria-pressed="${!!FD.cmp}" title="${esc(FD.cmp ? W.cmpClose : W.compare)}" aria-label="${esc(FD.cmp ? W.cmpClose : W.compare)}">${FD.cmp ? CLOSE_ICON : CMP_ICON}</button>` : ''}<button type="button" class="fd-ib fd-save" aria-pressed="${!!savedKey(fdCtx())}" title="${esc(savedKey(fdCtx()) ? W.unsaveB : W.saveB)}" aria-label="${esc(savedKey(fdCtx()) ? W.unsaveB : W.saveB)}">${SAVE_ICON(!!savedKey(fdCtx()))}</button><a class="fd-ib fd-dim" href="${esc(dimLink(fdCtx()))}" target="_blank" rel="noopener" title="${esc(W.toDim)}" aria-label="${esc(W.toDim)}">${EXPORT_ICON}<span>DIM</span></a>${!FD.cmp && wOk() && profile?.characters?.data?.[FD.cid] && (FD.sel?.k || FD.sel?.ld != null) ? `<button type="button" class="fd-ib wr-btn" data-wrfd>${esc(wt().apply)} <small>beta</small></button>` : ''}${shareMenu('fd', true, !!FD.sel.id)}</div>` : ''}
         ${FD.B && !FD.cmp && savedKey(fdCtx()) ? (() => { const x = savedList().find(y => y.k === savedKey(fdCtx())); return `<div class="fd-sv" data-svk="${esc(x.k)}"><input class="fd-svn" type="text" maxlength="40" value="${esc(x.title || '')}" placeholder="${esc(W.svName(x.t))}" aria-label="${esc(W.svNameL)}"><textarea class="fd-svd" rows="2" maxlength="200" placeholder="${esc(W.svNote)}" aria-label="${esc(W.svNote)}">${esc(x.note || '')}</textarea><div class="fd-svb"><span class="fd-svs" aria-live="polite"></span><button type="button" class="fd-svok" disabled>${esc(W.svSave)}</button></div></div>`; })() : ''}${!profile && FD.B ? `<p class="fd-pub">${esc(W.publicNote)}</p>` : ''}${FD.cmp && FD.B && BUILD ? cmpSrcHTML() + (cmpMine() ? compareHTML(cmpMine(), fdCtx()) : `<p class="fd-msg fd-pad${FD.ldErr ? '' : ' wait'}">${esc(FD.ldErr ? W.ldEmpty : W.loadingLd)}</p>`) : `<div class="build fd-build">${FD.B ? buildHTML(fdCtx()) : `<p class="b-note wait" role="status">${esc(W.findLoadingP)}</p>`}</div>`}</div>`;
     }
     b.innerHTML = `<button type="button" class="reset fd-back">← ${esc(FD.cmp ? W.backBuild : W.back)}</button>${body}`;
@@ -1832,7 +1832,7 @@ async function openSaved(i) {
 }
 async function openLoadout(i) {
   const C = await getLdCtx(i); if (!C) return;
-  openCtx({ name: `${(member?.name || '').replace(/#\d+$/, '')} · ${C.name}`, note: 'Loadout' }, { ...C, name: C.name });
+  openCtx({ name: `${(member?.name || '').replace(/#\d+$/, '')} · ${C.name}`, note: 'Loadout', ld: i, ldn: C.name }, { ...C, name: C.name });
 }
 async function getLdCtx(i) { const k = charId + ':' + i + ':' + lang; try { await loadLdCtx(i); } catch {} if (!LDCTX[k]) LDCTX[k] = { p: null, B: null, name: '' }; return LDCTX[k].B ? LDCTX[k] : null; }
 /* comparar com um dos seus loadouts salvos no jogo, além da build equipada */
@@ -2381,8 +2381,9 @@ async function livePoll() {
     saveAvail(r.characterActivities?.data);
     const prevTo = LIVE.to, ended = () => { if (prevTo) setTimeout(() => autoRefresh(), 45000); }; // saiu de incursão/masmorra/missão: a Bungie leva ~1 min para contar; depois recarrega
     const t = r.profileTransitoryData?.data, party = t?.partyMembers || [];
-    if (!t || !party.length) { const was = LIVE.on; LIVE.on = false; LIVE.mem = []; LIVE.to = null; renderLive(); if (was) { SESSION = null; autoT = 0; setTimeout(() => autoRefresh(), 45000); if (tab === 'obj') render(); } else ended(); return; }
+    if (!t || !party.length) { wPendingCheck(null); const was = LIVE.on; LIVE.on = false; LIVE.mem = []; LIVE.to = null; renderLive(); if (was) { SESSION = null; autoT = 0; setTimeout(() => autoRefresh(), 45000); if (tab === 'obj') render(); } else ended(); return; }
     const act = Object.values(r.characterActivities?.data || {}).sort((a, b) => new Date(b.dateActivityStarted) - new Date(a.dateActivityStarted))[0];
+    wPendingCheck(act);
     LIVE.since = t.currentActivity?.startTime || act?.dateActivityStarted || null;
     if (act?.currentActivityHash) { const a = await entities('DestinyActivityDefinition', [act.currentActivityHash], lang); LIVE.act = a[act.currentActivityHash]?.n || ''; const prevId = LIVE.to?.[1]; LIVE.to = await liveTarget(act.currentActivityHash, act.currentActivityModeType); if (LIVE.to?.[1] !== prevId) { LIVE.x = false; LIVE.xo = new Set(); } } else { LIVE.act = ''; LIVE.to = null; }
     if (prevTo && (!LIVE.to || LIVE.to.join() !== prevTo.join())) ended();
@@ -2421,7 +2422,7 @@ function renderLive() {
       ${(() => { const st = m.ch.stats; if (!st || !STAT_ORDER.some(h => st[h] != null)) return ''; loadStats(); const D = STATD?.d || {}; return `<span class="lv-sts">${STAT_ORDER.map(h => `<span class="${(st[h] || 0) > 100 ? 'hi' : ''}" title="${esc(D[h]?.n || '')}">${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}<b>${st[h] || 0}</b></span>`).join('')}</span>`; })()}
       ${m.priv || !B ? '' : `<span class="lv-eq"><span class="lv-row">${WEAPON_B.map(b => eq.find(x => x.bucketHash === b)).map(x => x ? ic(x, B.en[x.itemHash]?.tt === 6 ? 'ex' : '') : '<i></i>').join('')}</span><span class="lv-row arm">${ARMOR_B.map(b => eq.find(x => x.bucketHash === b)).map(x => x ? ic(x, B.en[x.itemHash]?.tt === 6 ? 'ex' : '') : '<i></i>').join('')}</span></span>`}</button>`;
   };
-  el.innerHTML = `<div class="lv-h"><span class="lv-dot" aria-hidden="true"></span><b>${esc(U.liveT)}</b>${LIVE.act ? (LIVE.to ? `<button type="button" class="lv-go" data-lvx aria-expanded="${!!LIVE.x}">${esc(LIVE.act)} <i class="lv-car${LIVE.x ? ' on' : ''}" aria-hidden="true"></i></button>` : `<span>${esc(LIVE.act)}</span>`) : ''}${LIVE.to ? `<span class="lv-g">${liveGuides(LIVE.to[1])}</span>` : ''}${tm ? `<small>${esc(U.liveSince(tm))}</small>` : ''}</div>${LIVE.x && LIVE.to ? liveDetail() : ''}<div class="lv-l">${LIVE.mem.map(card).join('')}</div>`;
+  el.innerHTML = `<div class="lv-h"><span class="lv-dot" aria-hidden="true"></span><b>${esc(U.liveT)}</b>${LIVE.act ? (LIVE.to ? `<button type="button" class="lv-go" data-lvx aria-expanded="${!!LIVE.x}">${esc(LIVE.act)} <i class="lv-car${LIVE.x ? ' on' : ''}" aria-hidden="true"></i></button>` : `<span>${esc(LIVE.act)}</span>`) : ''}${LIVE.to ? `<span class="lv-g">${liveGuides(LIVE.to[1])}</span>` : ''}${tm ? `<small>${esc(U.liveSince(tm))}</small>` : ''}</div>${lpaLive()}${LIVE.x && LIVE.to ? liveDetail() : ''}<div class="lv-l">${LIVE.mem.map(card).join('')}</div>`;
   el.hidden = false;
 }
 // atividade do Ao vivo aberta no próprio painel: progresso, histórico e cada encontro/desafio com os detalhes (começa fechada)
@@ -2582,8 +2583,8 @@ document.addEventListener('click', e => {
    testa as combinações aqui no navegador e manda a escolhida para o DIM (o DPI não equipa nada).
    Abre numa janela própria (tela cheia no celular): controles à esquerda, resultados à direita. */
 const LBT = {
-  pt: { open: 'Abrir montador', card: 'Monte a melhor combinação de armaduras para qualquer personagem, com subclasse, armas, mods e artefato, e mande para o DIM.', s1: '1. Personagem e subclasse', s2: '2. Exótico', s3: '3. Atributos que importam', s3n: 'Use as setas para ordenar; o mínimo é opcional.', s4: '4. Bônus de conjunto', s6: '8. Artefato', s7: '9. Mods', ch: 'Personagem', sub: 'Subclasse', subCur: n => `${n} (equipada)`, subNone: 'Não levar subclasse', subTap: 'Toque num encaixe para trocar.', subG: { 309722977: 'Habilidades', 457473665: 'Super', 2140934067: 'Aspectos', 1313488945: 'Fragmentos' }, frag: n => `Fragmentos (${n} encaixes pelos aspectos)`, used: 'já em uso', wpCur: 'Equipadas', wpPick: 'Escolher', wpNone: 'Não levar', wpSlot: ['Cinética', 'Energética', 'Pesada'], wpNo: 'Não levar', wpNoD: 'o DIM mantém a arma que estiver equipada', wpBack: 'Voltar à equipada', mods: 'Levar os mods de armadura atuais', modsN: n => `${n} mods: o DIM redistribui nas peças novas`, art: 'Levar artefato', artNo: 'Nenhum artefato encontrado.', artTap: 'Toque numa vantagem para trocar. Os pontos do artefato continuam valendo no jogo.', res: 'Melhores combinações', meta: (n, s) => `${n} testadas em ${s} s · 4 melhores`, cur: 'Atual', idle: 'Escolha as opções e toque em “Buscar combinações”.', restNote: 'Os totais somam a armadura com o que o personagem já ganha fora dela (subclasse, fragmentos, artefato) hoje. Trocar fragmentos ou artefato pode mudar esses valores no jogo.', foot: 'O DPI só lê sua conta: para equipar, abra a combinação no DIM (ou monte no jogo).', wpExo: 'Duas armas exóticas: o DIM só vai equipar uma.', reset: 'Voltar ao que está equipado', eqd: 'equipada', save: 'Salvar', saved: 'Salva ✓', savedT: n => `Montador · ${n}`, copy: 'Copiar link do DIM', copied: 'Link copiado!', setOn: 'ativo', setOff: c => `com ${c} peças`, clan: 'Em teste, por enquanto só para o clã Orla Emaranhada. Pode ter erros: confira no DIM antes de equipar.' },
-  en: { open: 'Open builder', card: 'Build the best armor combination for any character, with subclass, weapons, mods and artifact, and send it to DIM.', s1: '1. Character and subclass', s2: '2. Exotic', s3: '3. Stats that matter', s3n: 'Use the arrows to sort; the minimum is optional.', s4: '4. Set bonus', s6: '8. Artifact', s7: '9. Mods', ch: 'Character', sub: 'Subclass', subCur: n => `${n} (equipped)`, subNone: "Don't include a subclass", subTap: 'Tap a socket to change it.', subG: { 309722977: 'Abilities', 457473665: 'Super', 2140934067: 'Aspects', 1313488945: 'Fragments' }, frag: n => `Fragments (${n} slots from aspects)`, used: 'already in use', wpCur: 'Equipped', wpPick: 'Choose', wpNone: "Don't include", wpSlot: ['Kinetic', 'Energy', 'Power'], wpNo: "Don't include", wpNoD: 'DIM keeps whatever is equipped', wpBack: 'Back to equipped', mods: 'Bring current armor mods', modsN: n => `${n} mods: DIM reassigns them to the new pieces`, art: 'Bring artifact', artNo: 'No artifact found.', artTap: 'Tap a perk to change it. Artifact points still apply in game.', res: 'Best combinations', meta: (n, s) => `${n} tested in ${s} s · top 4`, cur: 'Current', idle: 'Pick your options and tap “Find combinations”.', restNote: 'Totals add the armor to what the character gets outside it today (subclass, fragments, artifact). Changing fragments or artifact can change those values in game.', foot: 'DPI only reads your account: to equip, open the combination in DIM (or build it in game).', wpExo: 'Two exotic weapons: DIM will only equip one.', reset: 'Back to what is equipped', eqd: 'equipped', save: 'Save', saved: 'Saved ✓', savedT: n => `Builder · ${n}`, copy: 'Copy DIM link', copied: 'Link copied!', setOn: 'active', setOff: c => `with ${c} pieces`, clan: 'In testing, for now only for the Orla Emaranhada clan. It may have bugs: check in DIM before equipping.' },
+  pt: { open: 'Abrir montador', card: 'Monte a melhor combinação de armaduras para qualquer personagem, com subclasse, armas, mods e artefato, e mande para o DIM.', s1: '1. Personagem e subclasse', s2: '2. Exótico', s3: '3. Atributos que importam', s3n: 'Use as setas para ordenar; o mínimo é opcional.', s4: '4. Bônus de conjunto', s6: '8. Artefato', s7: '9. Mods', ch: 'Personagem', sub: 'Subclasse', subCur: n => `${n} (equipada)`, subNone: 'Não levar subclasse', subTap: 'Toque num encaixe para trocar.', subG: { 309722977: 'Habilidades', 457473665: 'Super', 2140934067: 'Aspectos', 1313488945: 'Fragmentos' }, frag: n => `Fragmentos (${n} encaixes pelos aspectos)`, used: 'já em uso', wpCur: 'Equipadas', wpPick: 'Escolher', wpNone: 'Não levar', wpSlot: ['Cinética', 'Energética', 'Pesada'], wpNo: 'Não levar', wpNoD: 'o DIM mantém a arma que estiver equipada', wpBack: 'Voltar à equipada', mods: 'Levar os mods de armadura atuais', modsN: n => `${n} mods: o DIM redistribui nas peças novas`, art: 'Levar artefato', artNo: 'Nenhum artefato encontrado.', artTap: 'Toque numa vantagem para trocar. Os pontos do artefato continuam valendo no jogo.', res: 'Melhores combinações', meta: (n, s) => `${n} testadas em ${s} s · 4 melhores`, cur: 'Atual', idle: 'Escolha as opções e toque em “Buscar combinações”.', restNote: 'Os totais somam a armadura com o que o personagem já ganha fora dela (subclasse, fragmentos, artefato) hoje. Trocar fragmentos ou artefato pode mudar esses valores no jogo.', foot: '“Aplicar” (beta) monta direto na sua conta, com confirmação antes; “Abrir no DIM” continua como opção.', wpExo: 'Duas armas exóticas: o DIM só vai equipar uma.', reset: 'Voltar ao que está equipado', eqd: 'equipada', save: 'Salvar', saved: 'Salva ✓', savedT: n => `Montador · ${n}`, copy: 'Copiar link do DIM', copied: 'Link copiado!', setOn: 'ativo', setOff: c => `com ${c} peças`, clan: 'Em teste, por enquanto só para o clã Orla Emaranhada. Pode ter erros: confira no DIM antes de equipar.' },
+  en: { open: 'Open builder', card: 'Build the best armor combination for any character, with subclass, weapons, mods and artifact, and send it to DIM.', s1: '1. Character and subclass', s2: '2. Exotic', s3: '3. Stats that matter', s3n: 'Use the arrows to sort; the minimum is optional.', s4: '4. Set bonus', s6: '8. Artifact', s7: '9. Mods', ch: 'Character', sub: 'Subclass', subCur: n => `${n} (equipped)`, subNone: "Don't include a subclass", subTap: 'Tap a socket to change it.', subG: { 309722977: 'Abilities', 457473665: 'Super', 2140934067: 'Aspects', 1313488945: 'Fragments' }, frag: n => `Fragments (${n} slots from aspects)`, used: 'already in use', wpCur: 'Equipped', wpPick: 'Choose', wpNone: "Don't include", wpSlot: ['Kinetic', 'Energy', 'Power'], wpNo: "Don't include", wpNoD: 'DIM keeps whatever is equipped', wpBack: 'Back to equipped', mods: 'Bring current armor mods', modsN: n => `${n} mods: DIM reassigns them to the new pieces`, art: 'Bring artifact', artNo: 'No artifact found.', artTap: 'Tap a perk to change it. Artifact points still apply in game.', res: 'Best combinations', meta: (n, s) => `${n} tested in ${s} s · top 4`, cur: 'Current', idle: 'Pick your options and tap “Find combinations”.', restNote: 'Totals add the armor to what the character gets outside it today (subclass, fragments, artifact). Changing fragments or artifact can change those values in game.', foot: '“Apply” (beta) sets it up right on your account, with a confirmation first; “Open in DIM” is still an option.', wpExo: 'Two exotic weapons: DIM will only equip one.', reset: 'Back to what is equipped', eqd: 'equipped', save: 'Save', saved: 'Saved ✓', savedT: n => `Builder · ${n}`, copy: 'Copy DIM link', copied: 'Link copied!', setOn: 'active', setOff: c => `with ${c} pieces`, clan: 'In testing, for now only for the Orla Emaranhada clan. It may have bugs: check in DIM before equipping.' },
 };
 const lw = () => LBT[lang === 'pt' ? 'pt' : 'en'];
 const LBO = LS.get('dc-lb-opt', {});
@@ -2762,6 +2763,14 @@ function lbSnap(r) {
   const sn = sub && LB.en[sub.itemHash]?.n, t = lw().savedT(charTitle(u().classes[ch.classType] || '', sn));
   return { k: 'lb|' + Date.now(), name: String(member?.name || '').replace(/#\d+$/, ''), t, at: Date.now(), cid: LB.cid, p: { characters: { data: { [LB.cid]: c } }, characterEquipment: { data: { [LB.cid]: { items } } }, itemComponents: { sockets: { data: so }, instances: { data: io } } } };
 }
+// plano de aplicação de um resultado do montador: armaduras, armas escolhidas, subclasse com as trocas e os mods atuais por espaço
+function lbPlan(r) {
+  const items = [...r.ps.map(p => ({ id: p.id, h: p.h, b: ARMOR_BUCKETS[p.slot] })), ...lbWeapons().map(w => { const x = LB.wpns.find(y => y.id === w.id); return { id: w.id, h: w.hash, b: WEAPON_B[x?.slot ?? 0] }; })];
+  const s = lbSubItem(), mods = {};
+  if (LB.mods) for (const it of LB.eq[LB.cid] || []) { const sl = ARMOR_BUCKETS.indexOf(it.bucketHash); if (sl < 0) continue; const tgt = r.ps.find(p => p.slot === sl); if (!tgt) continue; (LB.sk[it.itemInstanceId]?.sockets || []).forEach((x, k) => { const e = LB.en[x.plugHash]; if (x.plugHash && e && /^enhancements\.(?!ghosts)/.test(e.pc || '') && pShow(e)) (mods[tgt.id] = mods[tgt.id] || {})[k] = x.plugHash; }); }
+  const sn = s && LB.en[s.hash]?.n, ch = lbChar();
+  return { cid: LB.cid, name: lw().savedT(charTitle(u().classes[ch.classType] || '', sn)), items, sub: s ? { id: s.id, h: s.hash, so: s.socketOverrides } : null, mods, art: !!LB.art };
+}
 // cartão pequeno na aba Builds: o montador em si abre na janela
 // liberado para o clã Orla Emaranhada (e o dono no /beta); a lista do clã vem com a aba Guardião e fica lembrada no aparelho
 const LB_CLAN = 'orla emaranhada';
@@ -2851,7 +2860,7 @@ function lbDraw() {
     const sc = r.ps.filter(p => p.set).reduce((m, p) => (m[p.set] = (m[p.set] || 0) + 1, m), {}), setTxt = Object.entries(sc).filter(([, c]) => c >= 2).map(([h, c]) => `${SETDEF[h + ':' + lc]?.n || ''} ${c}/5`).join(' · ');
     const perks = Object.entries(sc).filter(([, c]) => c >= 2).flatMap(([h, c]) => (SETDEF[h + ':' + lc]?.perks || []).map(pk => ({ ...pk, on: c >= pk.c })));
     const saved = LB.saved?.[i];
-    return `<article class="lb-r"><div class="lb-rh"><b>#${i + 1}</b><span>${esc(setTxt || W.lbNoSet)}</span><span class="lbd-acts"><button type="button" class="lbd-btn" data-lbsave="${i}"${saved ? ' disabled' : ''}>${esc(saved ? T.saved : T.save)}</button><button type="button" class="lbd-btn" data-lbcopy="${i}">${esc(T.copy)}</button><a href="${esc(lbDim(r))}" target="_blank" rel="noopener">${esc(W.lbDim)} ↗</a></span></div>
+    return `<article class="lb-r"><div class="lb-rh"><b>#${i + 1}</b><span>${esc(setTxt || W.lbNoSet)}</span><span class="lbd-acts"><button type="button" class="lbd-btn" data-lbsave="${i}"${saved ? ' disabled' : ''}>${esc(saved ? T.saved : T.save)}</button><button type="button" class="lbd-btn" data-lbcopy="${i}">${esc(T.copy)}</button><a href="${esc(lbDim(r))}" target="_blank" rel="noopener">${esc(W.lbDim)} ↗</a>${wBtn(`data-lbapply="${i}"`)}</span></div>
       ${perks.length ? `<ul class="lbd-perks">${perks.map(pk => `<li class="${pk.on ? 'on' : ''}">${pk.ic ? `<img src="${BNET}${pk.ic}" alt="">` : ''}<span><b>${esc(pk.n)}</b> <small>${esc(pk.c + '/5 · ' + (pk.on ? T.setOn : T.setOff(pk.c)))}</small>${pk.d ? `<em>${esc(pk.d)}</em>` : ''}</span></li>`).join('')}</ul>` : ''}
       <div class="lb-ps">${r.ps.map(p => `<div class="lb-pc${p.exo ? ' exo' : ''}${p.eqc === LB.cid ? ' eq' : ''}">${p.ic ? `<img src="${BNET}${p.ic}" alt="" loading="lazy">` : ''}<b>${esc(p.n)}</b><small>${esc(where(p))}</small></div>`).join('')}</div>
       <div class="lb-st">${STAT_ORDER.map((h, k) => { const v = r.tot[k], dd = v - cur[k]; return `<span${v >= 100 ? ' class="hi"' : ''} title="${esc(stN(h))}">${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}<b>${v}</b><small class="${dd > 0 ? 'up' : dd < 0 ? 'dn' : ''}">${dd ? (dd > 0 ? '+' : '') + dd : '='}</small></span>`; }).join('')}</div></article>`;
@@ -2893,6 +2902,7 @@ $('lbdlg').addEventListener('click', e => {
   const wt = q('[data-lbwt]'); if (wt) { const [s, id] = wt.dataset.lbwt.split(':'); LB.w[+s] = id; lbDraw(); return; }
   const up = q('[data-lbup]'), dn = q('[data-lbdn]'); const k = up ? +up.dataset.lbup : dn ? +dn.dataset.lbdn : -1;
   if (k >= 0) { const j = up ? k - 1 : k + 1; if (j < 0 || j > 5) return; lbSwap(k, j); return; }
+  const ap = q('[data-lbapply]'); if (ap) { const r = LB.res?.[+ap.dataset.lbapply]; if (r) wOpen(lbPlan(r)); return; }
   const sv = q('[data-lbsave]'); if (sv) { const i = +sv.dataset.lbsave, r = LB.res?.[i]; if (!r) return; const l = savedList(); l.unshift(lbSnap(r)); try { LS.set('dc-builds', l.slice(0, 20)); } catch {} (LB.saved = LB.saved || {})[i] = 1; lbDraw(); if (isGd()) render(); return; }
   const cp = q('[data-lbcopy]'); if (cp) { const r = LB.res?.[+cp.dataset.lbcopy]; if (!r) return; navigator.clipboard?.writeText(lbDim(r)).then(() => { cp.textContent = lw().copied; setTimeout(() => { cp.textContent = lw().copy; }, 1800); }).catch(() => {}); return; }
   const cl = q('[data-lbcol]'); if (cl) { const key = cl.dataset.lbcol; if (LBCOL[key]) delete LBCOL[key]; else LBCOL[key] = 1; LB.pick = ''; try { LS.set('dc-lb-col', Object.assign({ w0: 0, w1: 0, w2: 0, s6: 0, s7: 0 }, LBCOL)); } catch {} lbDraw(); }
@@ -2909,8 +2919,8 @@ $('lbdlg').addEventListener('change', e => {
    Armas: cópias repetidas da mesma arma, com os perks de cada uma, para você escolher qual fica.
    Nada é desmontado aqui: o DPI gera a busca para colar no DIM. Trancadas e equipadas nunca entram. */
 const LCT = {
-  pt: { t: 'Limpeza do cofre', card: 'Encontra armaduras piores em tudo que outra que você já tem e armas repetidas, e monta a busca pronta para o DIM.', open: 'Abrir limpeza', arm: 'Armaduras que dá para desmontar', armN: 'Cada peça abaixo tem atributos iguais ou menores em todos os 6 que outra do mesmo espaço, classe e conjunto. Os mods encaixados não contam.', wp: 'Armas repetidas', wpN: 'Você tem mais de uma cópia destas armas. Marque as que podem sair; a de maior poder vem desmarcada.', worse: 'pior que', none: 'Nada para limpar aqui.', locked: n => n ? `${n} trancadas ficaram de fora.` : '', sel: n => `${n} selecionadas`, copy: 'Copiar busca', copied: 'Busca copiada!', dim: n => `Abrir ${n} no DIM ↗`, how: 'O link abre o Organizador do DIM (no computador) já filtrado com os itens marcados: lá dá para conferir e desmontar em lote. No celular o Organizador não abre; use “Copiar busca” e cole na busca do DIM.', all: 'Todas', noneB: 'Nenhuma', mods: 'Calculando os atributos sem os mods…', tot: 'total' },
-  en: { t: 'Vault cleanup', card: 'Finds armor that is worse in everything than another piece you already own and duplicate weapons, and builds the search for DIM.', open: 'Open cleanup', arm: 'Armor you can dismantle', armN: 'Each piece below has equal or lower values in all 6 stats than another of the same slot, class and set. Socketed mods are not counted.', wp: 'Duplicate weapons', wpN: 'You own more than one copy of these. Check the ones that can go; the highest power copy starts unchecked.', worse: 'worse than', none: 'Nothing to clean here.', locked: n => n ? `${n} locked items were left out.` : '', sel: n => `${n} selected`, copy: 'Copy search', copied: 'Search copied!', dim: n => `Open ${n} in DIM ↗`, how: 'The link opens the DIM Organizer (on desktop) already filtered to the checked items: check them there and dismantle in bulk. The Organizer does not open on phones; use “Copy search” and paste it in DIM search.', all: 'All', noneB: 'None', mods: 'Working out stats without mods…', tot: 'total' },
+  pt: { t: 'Limpeza do cofre', card: 'Encontra armaduras piores em tudo que outra que você já tem e armas repetidas, e monta a busca pronta para o DIM.', open: 'Abrir limpeza', arm: 'Armaduras que dá para desmontar', armN: 'Cada peça abaixo tem atributos iguais ou menores em todos os 6 que outra do mesmo espaço, classe e conjunto. Os mods encaixados não contam.', wp: 'Armas repetidas', wpN: 'Você tem mais de uma cópia destas armas. Marque as que podem sair; a de maior poder vem desmarcada.', worse: 'pior que', none: 'Nada para limpar aqui.', locked: n => n ? `${n} trancadas ficaram de fora.` : '', sel: n => `${n} selecionadas`, copy: 'Copiar busca', copied: 'Busca copiada!', dim: n => `Abrir ${n} no DIM ↗`, move: n => `Levar ${n} para o personagem`, moveN: '“Levar para o personagem” (beta) põe os itens marcados no inventário do personagem atual, até 9 por tipo: aí é só desmontar no jogo. A Bungie não deixa desmontar pelo site (nem pelo DIM).', how: 'O link abre o Organizador do DIM (no computador) já filtrado com os itens marcados: lá dá para conferir e desmontar em lote. No celular o Organizador não abre; use “Copiar busca” e cole na busca do DIM.', all: 'Todas', noneB: 'Nenhuma', mods: 'Calculando os atributos sem os mods…', tot: 'total' },
+  en: { t: 'Vault cleanup', card: 'Finds armor that is worse in everything than another piece you already own and duplicate weapons, and builds the search for DIM.', open: 'Open cleanup', arm: 'Armor you can dismantle', armN: 'Each piece below has equal or lower values in all 6 stats than another of the same slot, class and set. Socketed mods are not counted.', wp: 'Duplicate weapons', wpN: 'You own more than one copy of these. Check the ones that can go; the highest power copy starts unchecked.', worse: 'worse than', none: 'Nothing to clean here.', locked: n => n ? `${n} locked items were left out.` : '', sel: n => `${n} selected`, copy: 'Copy search', copied: 'Search copied!', dim: n => `Open ${n} in DIM ↗`, move: n => `Move ${n} to the character`, moveN: '“Move to the character” (beta) puts the checked items in the current character inventory, up to 9 per type: then just dismantle them in game. Bungie does not allow dismantling from the site (nor from DIM).', how: 'The link opens the DIM Organizer (on desktop) already filtered to the checked items: check them there and dismantle in bulk. The Organizer does not open on phones; use “Copy search” and paste it in DIM search.', all: 'All', noneB: 'None', mods: 'Working out stats without mods…', tot: 'total' },
 };
 const lcw = () => LCT[lang === 'pt' ? 'pt' : 'en'];
 const LC = { off: new Set(), on: new Set(), base: null, busy: false };
@@ -2987,7 +2997,7 @@ function lcDraw() {
   const wrows = WP.groups.map(g => `<div class="lcd-wg"><h3 class="lcd-h3">${g[0].ic ? `<img src="${BNET}${g[0].ic}" alt="">` : ''}${esc(g[0].n)} · ${g.length}</h3>${g.map(w => { const dis = w.lk || lcEq(w.id), pk = lcPerks(w); return `<label class="lcd-row lcd-w${dis ? ' dis' : ''}"><input type="checkbox" data-lcid="${w.id}"${sel.has(w.id) ? ' checked' : ''}${dis ? ' disabled' : ''}><span class="lcd-pw">${w.pw || ''}${IDEF[w.h]?.a ? ammoSVG(IDEF[w.h].a) : ''}</span><span class="lcd-perks">${pk.map(h => `<span title="${esc(LB.en[h]?.n || '')}">${LB.en[h]?.ic ? `<img src="${BNET}${LB.en[h].ic}" alt="">` : ''}<small>${esc(LB.en[h]?.n || '')}</small></span>`).join('')}</span><small class="lcd-where">${esc(w.eqc ? W.lbEquipped : w.lk ? '🔒' : '')}</small></label>`; }).join('')}</div>`).join('');
   lbNames(WP.groups.flat().flatMap(w => (LB.sk[w.id]?.sockets || []).map(s => s.plugHash)));
   const wIds = WP.groups.flat().map(w => w.id).filter(id => sel.has(id));
-  const bar = `<div class="lcd-bar"><span>${esc(T.sel(sel.size))}</span><button type="button" class="lbd-btn" data-lcall="1">${esc(T.all)}</button><button type="button" class="lbd-btn" data-lcall="0">${esc(T.noneB)}</button><button type="button" class="lbd-btn" data-lccopy${sel.size ? '' : ' disabled'}>${esc(T.copy)}</button></div>`;
+  const bar = `<div class="lcd-bar"><span>${esc(T.sel(sel.size))}</span><button type="button" class="lbd-btn" data-lcall="1">${esc(T.all)}</button><button type="button" class="lbd-btn" data-lcall="0">${esc(T.noneB)}</button><button type="button" class="lbd-btn" data-lccopy${sel.size ? '' : ' disabled'}>${esc(T.copy)}</button>${sel.size ? wBtn('data-lcmove', T.move(sel.size)) : ''}</div>${wOk() ? `<p class="lbd-n">${esc(T.moveN)}</p>` : ''}`;
   d.innerHTML = `<div class="pf-box lbd-box lcd-box">${close}${head}${bar}<div class="lcd-scroll"><p class="lbd-n">${esc(T.how)}</p>
     <div class="lcd-cols"><section class="lbd-s"><h2>${esc(T.arm)} <small>${A.list.length}</small></h2><p class="lbd-n">${esc(T.armN)}</p>${byCls || `<p class="lbd-idle">${esc(T.none)}</p>`}${A.locked ? `<p class="lbd-n">${esc(T.locked(A.locked))}</p>` : ''}</section>
     <section class="lbd-s"><div class="lcd-sh"><h2>${esc(T.wp)} <small>${WP.groups.length}</small></h2>${lcLink(wIds, 1)}</div><p class="lbd-n">${esc(T.wpN)}</p>${wrows || `<p class="lbd-idle">${esc(T.none)}</p>`}</section></div>
@@ -2998,9 +3008,226 @@ document.addEventListener('click', e => { if (e.target.closest('[data-lcopen]'))
 $('lcdlg').addEventListener('click', e => {
   const d = $('lcdlg'); if (e.target === d || e.target.closest('.pf-x')) { d.close(); return; }
   const all = e.target.closest('[data-lcall]'); if (all) { const on = all.dataset.lcall === '1'; LC.off.clear(); LC.on.clear(); if (!on) { for (const { p } of lcArmor().list) LC.off.add(p.id); for (const g of lcWeapons().groups) for (const w of g) LC.off.add(w.id); } else for (const g of lcWeapons().groups) for (const w of g) LC.on.add(w.id); lcDraw(); return; }
+  if (e.target.closest('[data-lcmove]')) { const ids = lcSelected(), items = ids.map(id => { const p = LB.pieces.find(x => x.id === id); if (p) return { id, h: p.h, b: ARMOR_BUCKETS[p.slot] }; const w = LB.wpns.find(x => x.id === id); return w ? { id, h: w.h, b: WEAPON_B[w.slot] } : null; }).filter(Boolean); if (items.length) wOpen({ cid: charId, name: lcw().t, items, only: true }); return; }
   const cp = e.target.closest('[data-lccopy]'); if (cp) { const ids = lcSelected(); if (!ids.length) return; navigator.clipboard?.writeText(ids.map(id => 'id:' + id).join(' or ')).then(() => { cp.textContent = lcw().copied; setTimeout(() => { cp.textContent = lcw().copy; }, 2200); }).catch(() => {}); }
 });
 $('lcdlg').addEventListener('change', e => { const t = e.target.closest('[data-lcid]'); if (!t) return; const id = t.dataset.lcid; if (t.checked) { LC.off.delete(id); LC.on.add(id); } else { LC.on.delete(id); LC.off.add(id); } lcDraw(); });
+/* ---------- Beta (clã): ações na conta — trazer do cofre, equipar, subclasse e mods, loadouts do jogo ----------
+   Tudo pela API da Bungie, direto do navegador (nada passa pelo Cloudflare). Precisa da permissão "mover e equipar itens":
+   sem ela a Bungie recusa (2108) e o site pede para entrar de novo. Equipar só funciona em órbita, na Torre ou offline (1671):
+   aí o site traz os itens para o inventário e deixa o resto para quando você voltar à órbita. */
+const WRT_ = {
+  pt: { t: 'Aplicar na conta', beta: 'beta', apply: 'Aplicar', applyN: n => `Aplicar ${n}`, confirm: 'Confirmar e aplicar', cancel: 'Cancelar', close: 'Fechar', reading: 'Lendo a sua conta…',
+    sum: 'O que vai mudar', move: n => `Trazer ${n} ${n === 1 ? 'item' : 'itens'} para o personagem`, equip: n => `Equipar ${n} ${n === 1 ? 'item' : 'itens'}`, sub: n => `Subclasse: ${n} ${n === 1 ? 'encaixe' : 'encaixes'}`, mods: n => `Mods de armadura: ${n}`, ld: n => `Equipar o loadout do jogo “${n}”`, toChar: n => `Levar ${n} ${n === 1 ? 'item' : 'itens'} para o personagem`,
+    already: 'Tudo isso já está equipado.', done: 'Pronto!', ok: 'feito', skip: 'já estava', fail: 'falhou', run: 'aplicando…', wait: 'na fila',
+    e: { 2108: 'O DPI ainda não tem permissão para mexer no equipamento.', 1671: 'Dentro de uma atividade a Bungie não deixa equipar.', 1642: 'Sem espaço no destino.', 1623: 'Item não encontrado (foi movido ou desmontado?).', 1641: 'Só dá para usar um exótico desse tipo.', 1640: 'Este item não pode ser equipado agora.', 1663: 'A Bungie não permite esta ação.', 1678: 'Este encaixe não pode ser trocado agora.', eqOther: 'Está equipado em outro personagem e não há outro item para pôr no lugar.', full: 'O inventário está cheio e não há o que mandar para o cofre.', other: 'Não deu certo.' },
+    perm: 'Para o DPI aplicar loadouts, a Bungie precisa da sua permissão para mover e equipar itens. Saia e entre de novo para autorizar.', relog: 'Sair e entrar de novo',
+    inAct: 'Os itens já foram trazidos para o personagem. Equipe pelo menu do jogo ou deixe para quando você voltar à órbita.', later: 'Aplicar ao voltar à órbita', laterOn: 'Combinado: aplico quando você voltar à órbita.', pendT: 'Aplicação pendente', pendGo: 'Voltou à órbita: aplicando o loadout que ficou pendente.',
+    art: 'Vantagens do artefato: troque no jogo (a Bungie não deixa pelo site).', note: 'Beta: confira o resultado no jogo. Nada é desmontado ou apagado.' },
+  en: { t: 'Apply to account', beta: 'beta', apply: 'Apply', applyN: n => `Apply ${n}`, confirm: 'Confirm and apply', cancel: 'Cancel', close: 'Close', reading: 'Reading your account…',
+    sum: 'What will change', move: n => `Bring ${n} ${n === 1 ? 'item' : 'items'} to the character`, equip: n => `Equip ${n} ${n === 1 ? 'item' : 'items'}`, sub: n => `Subclass: ${n} ${n === 1 ? 'socket' : 'sockets'}`, mods: n => `Armor mods: ${n}`, ld: n => `Equip the in-game loadout “${n}”`, toChar: n => `Move ${n} ${n === 1 ? 'item' : 'items'} to the character`,
+    already: 'All of this is already equipped.', done: 'Done!', ok: 'done', skip: 'already there', fail: 'failed', run: 'applying…', wait: 'queued',
+    e: { 2108: 'DPI does not have permission to change your gear yet.', 1671: 'Bungie does not allow equipping inside an activity.', 1642: 'No room at the destination.', 1623: 'Item not found (moved or dismantled?).', 1641: 'Only one exotic of this kind can be equipped.', 1640: 'This item cannot be equipped right now.', 1663: 'Bungie does not allow this action.', 1678: 'This socket cannot be changed right now.', eqOther: 'Equipped on another character with nothing to put in its place.', full: 'Inventory is full and there is nothing to send to the vault.', other: 'Something went wrong.' },
+    perm: 'To apply loadouts, Bungie needs your permission for DPI to move and equip items. Sign out and back in to authorize.', relog: 'Sign out and back in',
+    inAct: 'The items are already on the character. Equip them from the game menu or leave it for when you are back in orbit.', later: 'Apply when back in orbit', laterOn: 'Got it: I will apply when you are back in orbit.', pendT: 'Pending apply', pendGo: 'Back in orbit: applying the pending loadout.',
+    art: 'Artifact perks: change them in game (Bungie does not allow it from the site).', note: 'Beta: check the result in game. Nothing is dismantled or deleted.' },
+};
+const wt = () => WRT_[lang === 'pt' ? 'pt' : 'en'];
+const WR = { plan: null, steps: [], st: 'idle', err: '', pending: null, fresh: null };
+const wSleep = ms => new Promise(r => setTimeout(r, ms));
+const wErr = (code, msg) => Object.assign(new Error(msg || String(code)), { code });
+const wMsg = e => wt().e[e?.code] || wt().e[e?.why] || (e?.message && !/^\d+$/.test(e.message) ? e.message : wt().e.other);
+const wExo = h => { const c = ITEMS?.[h]; return c != null ? c % 2 === 1 : LB.en?.[h]?.tt === 6; };
+// POST de ação com espera quando a Bungie pede calma
+async function wPost(path, body) {
+  for (let t = 0; t < 6; t++) {
+    const r = await fetch(API + path, { method: 'POST', headers: { 'X-API-Key': cfg.apiKey, 'Content-Type': 'application/json', Authorization: 'Bearer ' + await token() }, body: JSON.stringify({ ...body, membershipType: member.type }) });
+    const j = await r.json().catch(() => null);
+    if (!j) throw wErr('http', `HTTP ${r.status}`);
+    if (j.ErrorCode === 1) { await wSleep(120); return j.Response; }
+    if ([31, 35, 36, 37, 1672].includes(j.ErrorCode)) { await wSleep(Math.max(1000, (j.ThrottleSeconds || 1) * 1000)); continue; }
+    if (j.ErrorCode === 2108) { WR.needPerm = true; }
+    throw wErr(j.ErrorCode, j.Message);
+  }
+  throw wErr(36);
+}
+// foto atual da conta: onde está cada item (cofre, inventário ou equipado em qual personagem) e os encaixes
+async function wFresh() {
+  const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=102,201,205,305`);
+  const loc = {}, inv = {}, eq = {};
+  for (const it of r.profileInventory?.data?.items || []) if (it.itemInstanceId) loc[it.itemInstanceId] = { w: 'v', it };
+  for (const [cid, c] of Object.entries(r.characterInventories?.data || {})) for (const it of c.items || []) if (it.itemInstanceId) { loc[it.itemInstanceId] = { w: cid, it }; ((inv[cid] = inv[cid] || {})[it.bucketHash] = inv[cid][it.bucketHash] || []).push(it); }
+  for (const [cid, c] of Object.entries(r.characterEquipment?.data || {})) for (const it of c.items || []) if (it.itemInstanceId) { loc[it.itemInstanceId] = { w: cid, eq: true, it }; (eq[cid] = eq[cid] || {})[it.bucketHash] = it; }
+  return { loc, inv, eq, sk: r.itemComponents?.sockets?.data || {} };
+}
+// plano a partir de uma build (sua atual, salva ou do montador): itens, subclasse com encaixes e mods por peça
+function wPlanFromCtx(C, name) {
+  const eqs = C.p.characterEquipment?.data?.[C.cid]?.items || [], sk = C.p.itemComponents?.sockets?.data || {}, en = C.B?.en || {};
+  const items = eqs.filter(i => i.itemInstanceId && (WEAPON_B.includes(i.bucketHash) || ARMOR_B.includes(i.bucketHash))).map(i => ({ id: i.itemInstanceId, h: i.itemHash, b: i.bucketHash }));
+  const s = eqs.find(i => i.bucketHash === SUB_BUCKET), so = {};
+  if (s) (sk[s.itemInstanceId]?.sockets || []).forEach((x, k) => { const e = en[x.plugHash]; if (x.plugHash && x.isVisible !== false && e && !SKIP_NAME.test(e.n || '') && !SKIP_PT.test(e.n || '')) so[k] = x.plugHash; });
+  const mods = {}; for (const i of items) if (ARMOR_B.includes(i.b)) (sk[i.id]?.sockets || []).forEach((x, k) => { const e = en[x.plugHash]; if (x.plugHash && e && pArmorMod(e) && pShow(e)) (mods[i.id] = mods[i.id] || {})[k] = x.plugHash; });
+  return { cid: C.cid, name, items, sub: s ? { id: s.itemInstanceId, h: s.itemHash, so } : null, mods };
+}
+// confere o plano contra a conta agora e diz o que vai mudar
+function wDiff(plan, F) {
+  const cid = plan.cid, here = id => F.loc[id]?.w === cid, on = id => here(id) && F.loc[id]?.eq;
+  const move = plan.items.filter(i => !here(i.id)), equip = plan.items.filter(i => !on(i.id)).length + (plan.sub && !on(plan.sub.id) ? 1 : 0);
+  const cur = plan.sub ? F.sk[plan.sub.id]?.sockets || [] : [], sub = plan.sub ? Object.entries(plan.sub.so || {}).filter(([k, h]) => cur[k]?.plugHash !== h).length : 0;
+  let mods = 0; for (const [id, m] of Object.entries(plan.mods || {})) { const c = F.sk[id]?.sockets || []; for (const [k, h] of Object.entries(m)) if (c[k]?.plugHash !== h) mods++; }
+  return { move, equip, sub, mods };
+}
+async function wOpen(plan) {
+  WR.plan = plan; WR.st = 'reading'; WR.steps = []; WR.err = ''; WR.diff = null; wDraw(); const d = $('wrdlg'); if (!d.open) d.showModal();
+  try { WR.fresh = await wFresh(); if (plan.ld == null && !plan.only) WR.diff = wDiff(plan, WR.fresh); WR.st = 'confirm'; } catch (e) { WR.st = 'err'; WR.err = wMsg(e); }
+  wDraw();
+}
+const wStep = (t) => { const s = { t, st: 'wait', m: '' }; WR.steps.push(s); return s; };
+// garante espaço no inventário do personagem para aquele tipo de item (manda um que não é do plano para o cofre)
+async function wRoom(F, cid, b, keep) {
+  const l = (F.inv[cid] = F.inv[cid] || {})[b] = F.inv[cid][b] || [];
+  if (l.length < 9) return;
+  const v = l.find(x => !keep.has(x.itemInstanceId) && !(x.state & 1)) || l.find(x => !keep.has(x.itemInstanceId)); if (!v) throw wErr('full');
+  await wPost('/Destiny2/Actions/Items/TransferItem/', { itemReferenceHash: v.itemHash, stackSize: 1, transferToVault: true, itemId: v.itemInstanceId, characterId: cid });
+  l.splice(l.indexOf(v), 1); F.loc[v.itemInstanceId] = { w: 'v', it: v };
+}
+async function wMove(F, i, cid, keep) {
+  const L = F.loc[i.id]; if (!L) throw wErr(1623);
+  if (L.w === cid) return false;
+  if (L.w !== 'v') {
+    if (L.eq) { // equipado em outro personagem: põe outro no lugar antes
+      const alt = (F.inv[L.w]?.[i.b] || []).find(x => !keep.has(x.itemInstanceId) && !wExo(x.itemHash)); if (!alt) throw wErr('eqOther');
+      await wPost('/Destiny2/Actions/Items/EquipItem/', { itemId: alt.itemInstanceId, characterId: L.w });
+      F.inv[L.w][i.b].splice(F.inv[L.w][i.b].indexOf(alt), 1); F.loc[alt.itemInstanceId] = { w: L.w, eq: true, it: alt };
+    } else { const l = F.inv[L.w]?.[i.b] || []; const k = l.findIndex(x => x.itemInstanceId === i.id); if (k >= 0) l.splice(k, 1); }
+    await wPost('/Destiny2/Actions/Items/TransferItem/', { itemReferenceHash: i.h, stackSize: 1, transferToVault: true, itemId: i.id, characterId: L.w });
+    F.loc[i.id] = { w: 'v', it: L.it };
+  }
+  await wRoom(F, cid, i.b, keep);
+  await wPost('/Destiny2/Actions/Items/TransferItem/', { itemReferenceHash: i.h, stackSize: 1, transferToVault: false, itemId: i.id, characterId: cid });
+  F.inv[cid][i.b].push(L.it); F.loc[i.id] = { w: cid, it: L.it };
+  return true;
+}
+async function wRun() {
+  const T = wt(), plan = WR.plan, F = WR.fresh || await wFresh(), cid = plan.cid; WR.st = 'run'; WR.steps = []; wDraw();
+  const keep = new Set([...(plan.items || []).map(i => i.id), plan.sub?.id].filter(Boolean));
+  let inAct = false;
+  try {
+    // loadout salvo no próprio jogo: um pedido só
+    if (plan.ld != null) { const s = wStep(T.ld(plan.name)); s.st = 'run'; wDraw(); try { await wPost('/Destiny2/Actions/Loadouts/EquipLoadout/', { loadoutIndex: plan.ld, characterId: cid }); s.st = 'ok'; } catch (e) { s.st = 'fail'; s.m = wMsg(e); if (e.code === 1671) inAct = true; } return wEnd(inAct); }
+    // 1. trazer os itens para o personagem
+    const toMove = plan.items.filter(i => F.loc[i.id]?.w !== cid);
+    const sMove = toMove.length ? wStep(plan.only ? T.toChar(toMove.length) : T.move(toMove.length)) : null; let moved = 0, mFail = '';
+    if (sMove) { sMove.st = 'run'; wDraw(); for (const i of toMove) { try { await wMove(F, i, cid, keep); moved++; sMove.t = (plan.only ? T.toChar(toMove.length) : T.move(toMove.length)) + ` · ${moved}/${toMove.length}`; wDraw(); } catch (e) { mFail = wMsg(e); } } sMove.st = mFail ? (moved ? 'part' : 'fail') : 'ok'; sMove.m = mFail; wDraw(); }
+    if (plan.only) return wEnd(false);
+    // 2. equipar (subclasse primeiro; exóticos por último para não brigar com o exótico que sai)
+    const ids = [plan.sub?.id, ...plan.items.filter(i => !wExo(i.h)).map(i => i.id), ...plan.items.filter(i => wExo(i.h)).map(i => i.id)].filter(id => id && F.loc[id]?.w === cid && !F.loc[id]?.eq);
+    if (ids.length) {
+      const s = wStep(T.equip(ids.length)); s.st = 'run'; wDraw();
+      try { const r = await wPost('/Destiny2/Actions/Items/EquipItems/', { itemIds: ids, characterId: cid }); const bad = (r?.equipResults || []).filter(x => x.equipStatus !== 1); if (bad.some(x => x.equipStatus === 1671)) inAct = true; s.st = bad.length ? (bad.length === ids.length ? 'fail' : 'part') : 'ok'; if (bad.length) s.m = wMsg({ code: bad[0].equipStatus }); }
+      catch (e) { s.st = 'fail'; s.m = wMsg(e); if (e.code === 1671) inAct = true; }
+      wDraw();
+    }
+    if (inAct) return wEnd(true);
+    // 3. subclasse: aspectos antes dos fragmentos (os fragmentos dependem dos aspectos)
+    if (plan.sub && Object.keys(plan.sub.so || {}).length) {
+      const cur = F.sk[plan.sub.id]?.sockets || [], ch = Object.entries(plan.sub.so).filter(([k, h]) => cur[k]?.plugHash !== h);
+      if (ch.length) { const s = wStep(T.sub(ch.length)); s.st = 'run'; wDraw(); let ok = 0, er = '';
+        for (const [k, h] of ch) { try { await wPost('/Destiny2/Actions/Items/InsertSocketPlugFree/', { plug: { socketIndex: +k, socketArrayType: 0, plugItemHash: h }, itemId: plan.sub.id, characterId: cid }); ok++; } catch (e) { er = wMsg(e); if (e.code === 1671) { inAct = true; break; } } }
+        s.st = er ? (ok ? 'part' : 'fail') : 'ok'; s.m = er; wDraw(); }
+    }
+    // 4. mods de cada peça
+    const mods = Object.entries(plan.mods || {}).flatMap(([id, m]) => Object.entries(m).map(([k, h]) => [id, +k, h])).filter(([id, k, h]) => F.sk[id]?.sockets?.[k]?.plugHash !== h);
+    if (mods.length && !inAct) { const s = wStep(T.mods(mods.length)); s.st = 'run'; wDraw(); let ok = 0, er = '';
+      for (const [id, k, h] of mods) { try { await wPost('/Destiny2/Actions/Items/InsertSocketPlugFree/', { plug: { socketIndex: k, socketArrayType: 0, plugItemHash: h }, itemId: id, characterId: cid }); ok++; s.t = T.mods(mods.length) + ` · ${ok}/${mods.length}`; wDraw(); } catch (e) { er = wMsg(e); if (e.code === 1671) { inAct = true; break; } } }
+      s.st = er ? (ok ? 'part' : 'fail') : 'ok'; s.m = er; wDraw(); }
+    return wEnd(inAct);
+  } catch (e) { WR.st = 'err'; WR.err = wMsg(e); wDraw(); }
+}
+function wEnd(inAct) { WR.st = inAct ? 'inact' : 'done'; WR.fresh = null; wDraw(); setTimeout(() => { if (typeof start === 'function' && !document.hidden) { SESSION = null; autoT = 0; autoRefresh(); } }, 1500); }
+function wDraw() {
+  const d = $('wrdlg'); if (!d) return; const T = wt(), W = u(), P = WR.plan;
+  const close = `<button type="button" class="pf-x" aria-label="${esc(W.giClose)}">✕</button>`;
+  const head = `<header class="wr-hd"><small>${esc(T.t)} · ${esc(T.beta)}</small><h1>${esc(P?.name || '')}</h1>${P?.cid && profile?.characters?.data?.[P.cid] ? `<span>${esc(u().classes[profile.characters.data[P.cid].classType] || '')}</span>` : ''}</header>`;
+  let body = '';
+  if (WR.needPerm || (WR.st === 'err' && /permiss/i.test(WR.err))) body = `<p class="wr-warn">${esc(T.perm)}</p><div class="wr-acts"><button type="button" class="lb-run" data-wrrelog>${esc(T.relog)}</button></div>`;
+  else if (WR.st === 'reading') body = `<p class="pf-msg wait">${esc(T.reading)}</p>`;
+  else if (WR.st === 'err') body = `<p class="lb-err">${esc(WR.err)}</p>`;
+  else if (WR.st === 'confirm') {
+    const D = WR.diff, rows = P.ld != null ? [T.ld(P.name)] : P.only ? [T.toChar(P.items.filter(i => WR.fresh.loc[i.id]?.w !== P.cid).length)] : [D.move.length && T.move(D.move.length), D.equip && T.equip(D.equip), D.sub && T.sub(D.sub), D.mods && T.mods(D.mods)].filter(Boolean);
+    body = rows.length ? `<b class="wr-k">${esc(T.sum)}</b><ul class="wr-l">${rows.map(r => `<li><span class="tl-i"></span><span>${esc(r)}</span></li>`).join('')}</ul>${P.art ? `<p class="lbd-n">${esc(T.art)}</p>` : ''}<p class="lbd-n">${esc(T.note)}</p><div class="wr-acts"><button type="button" class="lb-run" data-wrgo>${esc(T.confirm)}</button><button type="button" class="lbd-btn" data-wrx>${esc(T.cancel)}</button></div>` : `<p>${esc(T.already)}</p><div class="wr-acts"><button type="button" class="lbd-btn" data-wrx>${esc(T.close)}</button></div>`;
+  } else {
+    const ic = s => s === 'ok' ? '✓' : s === 'fail' ? '✕' : s === 'part' ? '!' : '';
+    body = `<ul class="wr-l">${WR.steps.map(s => `<li class="${s.st}"><span class="tl-i">${ic(s.st)}</span><span>${esc(s.t)}${s.m ? `<small>${esc(s.m)}</small>` : ''}</span><small class="wr-s">${esc(s.st === 'run' ? T.run : s.st === 'wait' ? T.wait : s.st === 'ok' ? T.ok : T.fail)}</small></li>`).join('')}</ul>`
+      + (WR.st === 'done' ? `<p class="wr-ok">${esc(T.done)}</p><div class="wr-acts"><button type="button" class="lbd-btn" data-wrx>${esc(T.close)}</button></div>` : '')
+      + (WR.st === 'inact' ? `<p class="wr-warn">${esc(T.e[1671])} ${esc(T.inAct)}</p><div class="wr-acts">${WR.pending === P ? `<span class="wr-ok">${esc(T.laterOn)}</span>` : `<button type="button" class="lb-run" data-wrlater>${esc(T.later)}</button>`}<button type="button" class="lbd-btn" data-wrx>${esc(T.close)}</button></div>` : '');
+  }
+  d.innerHTML = `<div class="pf-box wr-box">${close}${head}${body}<p class="lbd-n lb-clan">${esc(lw().clan)}</p></div>`;
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('[data-wrfd]')) return;
+  if (FD.sel?.ld != null) wOpen({ cid: FD.cid, name: FD.sel.ldn || FD.sel.name, ld: FD.sel.ld });
+  else wOpen(wPlanFromCtx(fdCtx(), FD.sel?.title || FD.sel?.name || ''));
+});
+$('wrdlg').addEventListener('click', e => {
+  const d = $('wrdlg'), q = s => e.target.closest(s);
+  if (e.target === d || q('.pf-x') || q('[data-wrx]')) { if (WR.st !== 'run') d.close(); return; }
+  if (q('[data-wrgo]')) { wRun(); return; }
+  if (q('[data-wrlater]')) { WR.pending = WR.plan; wDraw(); return; }
+  if (q('[data-wrrelog]')) { WR.needPerm = false; logout(); login(); }
+});
+// aplicação pendente: roda sozinha quando o Ao vivo vê que você saiu da atividade (órbita, Torre ou jogo fechado)
+const W_SOCIAL = new Set([82913930]); // órbita
+function wPendingCheck(act) {
+  if (!WR.pending || WR.st === 'run') return;
+  const free = !act || !act.currentActivityHash || W_SOCIAL.has(act.currentActivityHash) || act.currentActivityModeType === 40;
+  if (!free) return;
+  const p = WR.pending; WR.pending = null; WR.plan = p;
+  const d = $('wrdlg'); if (!d.open) d.showModal(); wFresh().then(F => { WR.fresh = F; wRun(); }).catch(() => {});
+}
+const wOk = () => !!member && lbAllowed();
+const wBtn = (attr, label) => wOk() ? `<button type="button" class="wr-btn" ${attr}>${esc(label || wt().apply)} <small>beta</small></button>` : '';
+
+/* Loadouts por atividade: você associa builds salvas ou loadouts do jogo a incursões, masmorras e missões; o Ao vivo oferece na hora */
+const LPA = { list: LS.get('dc-actlo', []) }; // [{a: 'raid-xxx', src: 's:<chave>' | 'ld:<i>:<cid>', n: 'nome', enc: 'encontro opcional'}]
+const lpaSave = () => { try { LS.set('dc-actlo', LPA.list); } catch {} };
+const LPT = { pt: { t: 'Loadouts por atividade', note: 'Associe uma build salva ou um loadout do jogo a uma incursão, masmorra ou missão: no Ao vivo ele aparece na hora, para trazer do cofre ou aplicar.', src: 'Build ou loadout', act: 'Atividade', enc: 'Encontro (opcional)', encPh: 'ex.: Templários', add: 'Associar', none: 'Nenhuma associação ainda.', del: 'Remover', live: 'Loadout desta atividade', bring: 'Trazer do cofre', apply: 'Aplicar', orbit: 'Aplicar agora', pick: 'Próxima atividade', ldG: 'Loadouts do jogo', svG: 'Builds salvas' },
+  en: { t: 'Loadouts by activity', note: 'Link a saved build or an in-game loadout to a raid, dungeon or mission: Live shows it right away, to bring from the vault or apply.', src: 'Build or loadout', act: 'Activity', enc: 'Encounter (optional)', encPh: 'e.g. Templar', add: 'Link', none: 'No links yet.', del: 'Remove', live: 'Loadout for this activity', bring: 'Bring from vault', apply: 'Apply', orbit: 'Apply now', pick: 'Next activity', ldG: 'In-game loadouts', svG: 'Saved builds' } };
+const lpt = () => LPT[lang === 'pt' ? 'pt' : 'en'];
+const lpaActs = () => [...(defs.raids || []).map(a => ['raid-' + a.k, L(a.n)]), ...(defs.dungeons || []).map(a => ['dg-' + a.k, L(a.n)]), ...(defs.xmissions || []).map(a => ['xm-' + a.k, L(a.n)])];
+function lpaSrcs() {
+  const out = [];
+  for (const x of savedList()) if (profile?.characters?.data?.[x.cid]) out.push({ v: 's:' + x.k, n: x.title || x.t || x.name, g: 's' });
+  for (const [cid, c] of Object.entries(profile?.characterLoadouts?.data || {})) (c.loadouts || []).forEach((l, i) => { if ((l.items || []).some(x => x.itemInstanceId && x.itemInstanceId !== '0')) out.push({ v: `ld:${i}:${cid}`, n: `${u().classes[profile.characters.data[cid]?.classType] || ''} · ${loadoutNames[l.nameHash]?.n || 'Loadout ' + (i + 1)}`, g: 'l' }); });
+  return out;
+}
+// transforma uma associação num plano de aplicação
+async function lpaPlan(x, only) {
+  if (x.src.startsWith('ld:')) { const [, i, cid] = x.src.split(':'); return { cid, name: x.n, ld: +i }; }
+  const s = savedList().find(y => 's:' + y.k === x.src); if (!s) return null;
+  const B = await fetchBuild(s.p, s.cid); const plan = wPlanFromCtx({ p: s.p, cid: s.cid, B }, x.n);
+  if (only) { plan.only = true; delete plan.sub; plan.mods = {}; }
+  return plan;
+}
+function lpaHTML() {
+  if (!wOk()) return ''; const T = lpt(), acts = lpaActs(), srcs = lpaSrcs(), an = Object.fromEntries(acts);
+  const opt = (g, label) => { const l = srcs.filter(s => s.g === g); return l.length ? `<optgroup label="${esc(label)}">${l.map(s => `<option value="${esc(s.v)}">${esc(s.n)}</option>`).join('')}</optgroup>` : ''; };
+  const rows = LPA.list.map((x, i) => `<li><span><b>${esc(an[x.a] || x.a)}</b>${x.enc ? ` <small>· ${esc(x.enc)}</small>` : ''}<small>${esc(x.n)}</small></span><button type="button" class="wr-btn" data-lpago="${i}">${esc(T.apply)} <small>beta</small></button><button type="button" class="lbd-btn" data-lpadel="${i}" aria-label="${esc(T.del)}">✕</button></li>`).join('');
+  return `<article class="gd lb lpa"><div class="gd-head"><h2>${esc(T.t)} <small class="lb-beta">beta</small></h2></div><p>${esc(T.note)}</p>
+    <div class="lpa-f"><label class="lb-f"><small>${esc(T.src)}</small><select class="tsort-sel" id="lpasrc">${opt('s', T.svG)}${opt('l', T.ldG)}</select></label><label class="lb-f"><small>${esc(T.act)}</small><select class="tsort-sel" id="lpaact">${acts.map(([k, n]) => `<option value="${esc(k)}">${esc(n)}</option>`).join('')}</select></label><label class="lb-f"><small>${esc(T.enc)}</small><input class="lpa-in" id="lpaenc" type="text" maxlength="40" placeholder="${esc(T.encPh)}"></label><button type="button" class="lb-run" data-lpaadd${srcs.length ? '' : ' disabled'}>${esc(T.add)}</button></div>
+    ${rows ? `<ul class="lpa-l">${rows}</ul>` : `<p class="lbd-n">${esc(T.none)}</p>`}<p class="lb-clan">${esc(lw().clan)}</p></article>`;
+}
+// no Ao vivo: os loadouts associados à atividade em que você está
+function lpaLive() {
+  if (!wOk() || !LIVE.to) return ''; const l = LPA.list.map((x, i) => ({ x, i })).filter(o => o.x.a === LIVE.to[1]); if (!l.length) return ''; const T = lpt();
+  return `<div class="lpa-live"><b>${esc(T.live)}</b>${l.map(({ x, i }) => `<span class="lpa-c"><span>${esc(x.n)}${x.enc ? ` <small>· ${esc(x.enc)}</small>` : ''}</span>${x.src.startsWith('s:') ? `<button type="button" class="lbd-btn" data-lpabring="${i}">${esc(T.bring)}</button>` : ''}<button type="button" class="wr-btn" data-lpago="${i}">${esc(T.apply)} <small>beta</small></button></span>`).join('')}</div>`;
+}
+document.addEventListener('click', async e => {
+  const q = s => e.target.closest(s);
+  const add = q('[data-lpaadd]'); if (add) { const s = $('lpasrc'), a = $('lpaact'), en = $('lpaenc'); if (!s?.value) return; LPA.list.push({ a: a.value, src: s.value, n: s.selectedOptions[0]?.textContent || '', enc: (en.value || '').trim().slice(0, 40) }); lpaSave(); render(); return; }
+  const del = q('[data-lpadel]'); if (del) { LPA.list.splice(+del.dataset.lpadel, 1); lpaSave(); render(); return; }
+  const go = q('[data-lpago]'), br = q('[data-lpabring]'); if (go || br) { const x = LPA.list[+(go || br).dataset[go ? 'lpago' : 'lpabring']]; if (!x) return; const p = await lpaPlan(x, !!br); if (p) wOpen(p); return; }
+}, true);
 /* ---------- Clã: grupo de primeira vez (quem nunca fez a atividade escolhida, online primeiro, e quem pode guiar) ---------- */
 const FIRST = { k: LS.get('dc-first', '') };
 function firstHTML() {
