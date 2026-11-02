@@ -3906,7 +3906,7 @@ async function openPublic(name) {
 }
 /* ---------- Barra compacta: quando o cabeçalho sai da tela, aparece uma barra fina no topo com os botões de utilidade ---------- */
 (function miniBar() {
-  const gh = $('gh'); if (!gh || !window.IntersectionObserver) return;
+  const gh = $('gh'); if (!gh) return;
   const bar = document.createElement('div'); bar.className = 'ghm'; bar.id = 'ghm'; bar.setAttribute('aria-hidden', 'true'); document.body.append(bar);
   const ico = (d) => `<svg viewBox="0 0 20 20" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">${d}</svg>`;
   const fill = () => {
@@ -3924,7 +3924,9 @@ async function openPublic(name) {
       <button type="button" class="ghm-b" data-ghtop aria-label="Topo">${ico('<path d="M10 16V4M5 9l5-5 5 5"/>')}</button>`;
   };
   let on = false;
-  new IntersectionObserver(([e]) => { on = !e.isIntersecting && e.boundingClientRect.top < 0; if (on) fill(); bar.classList.toggle('on', on); bar.setAttribute('aria-hidden', String(!on)); }, { threshold: 0 }).observe(gh);
+  let raf = 0;
+  const check = () => { raf = 0; const n = gh.getBoundingClientRect().bottom < 0; if (n === on) return; on = n; if (on) fill(); bar.classList.toggle('on', on); bar.setAttribute('aria-hidden', String(!on)); };
+  addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(check); }, { passive: true }); addEventListener('resize', check); check();
   bar.addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
     if (b.dataset.ghtop !== undefined) { scrollTo({ top: 0, behavior: 'smooth' }); return; }
