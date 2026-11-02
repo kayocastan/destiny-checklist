@@ -1565,3 +1565,4 @@ dialog.navd::backdrop{background:rgba(5,8,14,.6)}
 .pal-hit{outline:2px solid var(--acc);outline-offset:2px;border-radius:10px;transition:outline-color 1s}
 .nav-i small{font:500 10.5px var(--mono);color:var(--muted);margin-left:6px}
 @media (max-width:600px){.pal-in kbd,.nav-i small{display:none}.paldlg{margin-top:12px}}
+@media (max-width:520px){.gh-strip #langbtn{display:none}}
