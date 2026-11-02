@@ -3283,7 +3283,7 @@ async function copyToMe(C, title, from) {
 let CP_LAST = null;
 document.addEventListener('click', async e => {
   const b = e.target.closest('[data-cpme]'); if (b) { e.stopPropagation(); const C = fdCtx(); copyToMe(C, (FD.sel?.name || '').replace(/#\d+$/, ''), FD.sel?.k || (String(C.name).replace(/#\d+$/, '') + '|' + buildSig(C))); return; }
-  const sc = e.target.closest('[data-svcp]'); if (sc) { e.stopPropagation(); const x = savedList()[+sc.dataset.svcp]; if (!x) return; const B = await fetchBuild(x.p, x.cid); copyToMe({ p: x.p, cid: x.cid, B, name: x.name }, x.title || x.t, x.k); return; }
+  const sc = e.target.closest('[data-svcp]'); if (sc) { e.stopPropagation(); const x = savedList()[+sc.dataset.svcp]; if (!x) return; const B = await fetchBuild(x.p, x.cid); copyToMe({ p: x.p, cid: x.cid, B, name: x.name }, `${x.title || x.t} · ${x.name}`, x.k); return; }
   const a = e.target.closest('[data-cpapply]'); if (a && CP_LAST) { e.stopPropagation(); const B = await fetchBuild(CP_LAST.p, CP_LAST.cid); wOpen(wPlanFromCtx({ p: CP_LAST.p, cid: CP_LAST.cid, B }, CP_LAST.title)); }
 }, true);
 // escolher o espaço de loadout do jogo onde gravar uma build salva
