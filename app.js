@@ -3521,7 +3521,7 @@ function repHTML() {
     const im = img(x), kind = kindOf(x), best = ACTH?.d?.[x.kk?.k]?.fast, rec = x.ok && best && Math.abs(best / 1000 - x.dur) < 2;
     const head = `<div class="rep-hd"${im ? ` style="--rep-img:url('${BNET}${im}')"` : ''}><small>${esc(T.kind[kind] + ' · ' + (x.ok ? T.done : T.left) + ' · ' + fmt(x.at))}</small><h2>${esc(REP.names[x.h]?.n || '…')}</h2><div class="rep-meta"><span>⏱ <b>${fmtDur(x.dur * 1000)}</b></span><span>${esc(T.players(x.pc || 1))}</span>${P?.pl ? `<span>${P.pl.reduce((t, p) => t + p.k, 0)} ${esc(T.k.toLowerCase())} · ${P.pl.reduce((t, p) => t + p.d, 0)} ${esc(T.d.toLowerCase())}</span><span>${esc(P.fresh ? T.fresh : T.cp)}</span>` : ''}${rec ? `<span class="rep-rec">⏱ ${esc(T.rec)}</span>` : ''}</div></div>`;
     const wIc = h => REP.wn[h]?.ic ? `<img src="${BNET}${REP.wn[h].ic}" alt="" title="${esc(REP.wn[h]?.n || '')}">` : '';
-    const rows = !P ? `<p class="wait">${esc(W.loadingDefs)}</p>` : P.err ? `<p class="lb-err">${esc(W.unavailable)}</p>` : `<div class="rep-tb"><div class="rep-th"><span>${esc(T.team)}</span><span>${esc(T.k)}</span><span>${esc(T.d)}</span><span>${esc(T.a)}</span><span>${esc(T.kd)}</span><span>${esc(T.pr)}</span><span>${esc(T.ab)}</span><span>${esc(T.wp)}</span></div>${P.pl.map(p => { const ws = Object.entries(p.w).sort((a, b) => b[1] - a[1]).slice(0, 3); return `<div class="rep-tr${p.mid === member.id ? ' me' : ''}${p.ok ? '' : ' left'}"><button type="button" class="rep-p" data-mt="${p.mt}" data-mid="${esc(p.mid)}" data-name="${esc(p.full)}" title="${esc(T.build)}"><span class="rep-em"${p.em ? ` style="background-image:url('${BNET}${p.em}')"` : ''}></span><span><b>${esc(p.n)}</b><small>${esc([p.cls, p.l ? '✦ ' + p.l : '', fmtDur(p.t * 1000)].filter(Boolean).join(' · '))}</small></span></button><b>${p.k}</b><b>${p.d}</b><span>${p.a}</span><span>${(p.k / Math.max(1, p.d)).toFixed(1)}</span><span>${p.pr}</span><span>${p.su} / ${p.gr} / ${p.me}</span><span class="rep-w">${ws.map(([h, k]) => `<span>${wIc(h)}<small>${esc(REP.wn[h]?.n || '')} · ${k}</small></span>`).join('')}</span></div>`; }).join('')}</div>`;
+    const rows = !P ? `<p class="wait">${esc(W.loadingDefs)}</p>` : P.err ? `<p class="lb-err">${esc(W.unavailable)}</p>` : `<div class="rep-tb"><div class="rep-th"><span>${esc(T.team)}</span><span>${esc(T.k)}</span><span>${esc(T.d)}</span><span>${esc(T.a)}</span><span>${esc(T.kd)}</span><span>${esc(T.pr)}</span><span>${esc(T.ab)}</span><span>${esc(T.wp)}</span></div>${P.pl.map(p => { const ws = Object.entries(p.w).sort((a, b) => b[1] - a[1]).slice(0, 3); return `<div class="rep-tr${p.mid === member.id ? ' me' : ''}${p.ok ? '' : ' left'}"><button type="button" class="rep-p" data-mt="${p.mt}" data-mid="${esc(p.mid)}" data-name="${esc(p.full)}" title="${esc(T.build)}"><span class="rep-em"${p.em ? ` style="background-image:url('${BNET}${p.em}')"` : ''}></span><span><b>${esc(p.n)}</b><small>${esc([p.cls, p.l ? '✦ ' + p.l : '', fmtDur(p.t * 1000)].filter(Boolean).join(' · '))}</small></span></button><b data-l="${esc(T.k)}">${p.k}</b><b data-l="${esc(T.d)}">${p.d}</b><span data-l="${esc(T.a)}">${p.a}</span><span data-l="${esc(T.kd)}">${(p.k / Math.max(1, p.d)).toFixed(1)}</span><span data-l="${esc(T.pr)}">${p.pr}</span><span data-l="${esc(T.ab)}">${p.su} / ${p.gr} / ${p.me}</span><span class="rep-w">${ws.map(([h, k]) => `<span>${wIc(h)}<small>${esc(REP.wn[h]?.n || '')} · ${k}</small></span>`).join('')}</span></div>`; }).join('')}</div>`;
     main = `${head}${rows}<p class="lbd-n">${esc(T.buildN)}</p><p class="rep-ext">${esc(T.ext)} <a href="https://${kind === 'raid' ? 'raid' : 'dungeon'}.report/pgcr/${x.id}" target="_blank" rel="noopener">${kind === 'raid' ? 'raid' : 'dungeon'}.report ↗</a></p>`;
   }
   return `<article class="gd rep"><div class="gd-head"><h2>${esc(T.t)}</h2></div><p>${esc(T.note)}</p><div class="rep-cols">${side}<section class="rep-main">${main}</section></div></article>`;
@@ -3904,4 +3904,37 @@ async function openPublic(name) {
   history.replaceState(null, '', location.pathname + location.hash); // o endereço volta a ser o do site; quem abriu continua vendo a build
   try { const r = await searchPlayers(name); if (r.length === 1) showPlayer(r[0]); else { FD.results = r; renderFind(); } } catch { FD.status = 'error'; renderFind(); }
 }
+})();
+
+/* ---------- Barra compacta: quando o cabeçalho sai da tela, aparece uma barra fina no topo com os botões de utilidade ---------- */
+(function miniBar() {
+  const gh = $('gh'); if (!gh || !window.IntersectionObserver) return;
+  const bar = document.createElement('div'); bar.className = 'ghm'; bar.id = 'ghm'; bar.setAttribute('aria-hidden', 'true'); document.body.append(bar);
+  const ico = (d) => `<svg viewBox="0 0 20 20" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">${d}</svg>`;
+  const fill = () => {
+    const logged = !$('menubtn').hidden, U = u();
+    const pw = $('pwv')?.textContent || '', nm = $('title').dataset.short || $('title').textContent || 'DPI';
+    const em = getComputedStyle($('ghband')).backgroundImage;
+    const grp = GROUPS.map(g => `<button type="button" class="ghm-t" data-ghtab="${g.id}" aria-current="${groupOf(tab)?.id === g.id}">${esc(U.tabs[g.id])}</button>`).join('');
+    bar.innerHTML = `${logged ? `<button type="button" class="ghm-b" data-ghp="menubtn" aria-label="Menu">${ico('<path d="M3 5h14M3 10h14M3 15h14"/>')}</button>` : ''}
+      <button type="button" class="ghm-id" data-ghtop aria-label="Topo"><span class="ghm-em"${em && em !== 'none' ? ` style="background-image:${em.replace(/"/g, "'")}"` : ''}></span><span class="ghm-n">${esc(nm)}</span>${pw ? `<b class="ghm-pw">✦ ${esc(pw)}</b>` : ''}</button>
+      ${logged ? `<nav class="ghm-tabs">${grp}</nav>` : ''}<span class="ghm-sp"></span>
+      ${logged && !$('ldbtn').hidden ? `<button type="button" class="ghm-b ghm-ld${tab === 'ld' ? ' on' : ''}" data-ghp="ldbtn">${esc($('ldbtn').textContent)}</button>` : ''}
+      <button type="button" class="ghm-b" data-ghp="searchbtn" aria-label="${esc(U.search)}">${ico('<circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/>')}</button>
+      <button type="button" class="ghm-b" data-ghp="themebtn" aria-label="Tema">${$('themebtn').innerHTML}</button>
+      <button type="button" class="ghm-b ghm-lang" data-ghp="langbtn">${$('langbtn').innerHTML}</button>
+      <button type="button" class="ghm-b" data-ghtop aria-label="Topo">${ico('<path d="M10 16V4M5 9l5-5 5 5"/>')}</button>`;
+  };
+  let on = false;
+  new IntersectionObserver(([e]) => { on = !e.isIntersecting && e.boundingClientRect.top < 0; if (on) fill(); bar.classList.toggle('on', on); bar.setAttribute('aria-hidden', String(!on)); }, { threshold: 0 }).observe(gh);
+  bar.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.ghtop !== undefined) { scrollTo({ top: 0, behavior: 'smooth' }); return; }
+    if (b.dataset.ghtab) { document.querySelector(`#tabs [data-group="${b.dataset.ghtab}"]`)?.click(); scrollTo({ top: 0 }); return; }
+    const t = $(b.dataset.ghp); if (!t) return;
+    if (b.dataset.ghp === 'searchbtn') { scrollTo({ top: 0 }); if ($('q').hidden) t.click(); else $('q').focus(); return; }
+    if (b.dataset.ghp === 'ldbtn') scrollTo({ top: 0 });
+    t.click(); setTimeout(() => { if (on) fill(); }, 50);
+  });
+  const mo = new MutationObserver(() => { if (on) fill(); }); mo.observe($('title'), { childList: true, characterData: true, subtree: true });
 })();
