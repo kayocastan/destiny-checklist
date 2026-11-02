@@ -1383,3 +1383,5 @@ dialog.navd::backdrop{background:rgba(5,8,14,.6)}
 .nav-fz{display:flex;align-items:center;gap:10px}.nav-fz b{font:600 15px var(--mono);min-width:56px;text-align:center}
 .nav-fzb{font:700 16px var(--display);width:52px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--chip);color:var(--fg);cursor:pointer}.nav-fzb.big{font-size:21px}.nav-fzb:disabled{opacity:.35;cursor:default}
 .nav-g small{font-size:12px;color:var(--muted)}
+.gh-strip>.menubtn{flex:none;margin-right:2px}
+.nav-fzg{padding:10px 12px;border-radius:12px;background:var(--chip)}
