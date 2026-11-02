@@ -1299,3 +1299,21 @@ dialog.wr::backdrop{background:rgba(5,8,14,.8)}
 .lpa-live{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 10px;border-radius:10px;border:1px solid color-mix(in srgb,var(--exotic) 45%,transparent);background:color-mix(in srgb,var(--exotic) 7%,transparent);font-size:13px}
 .lpa-live>b{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--exotic)}
 .lpa-c{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}.lpa-c small{color:var(--muted)}
+/* montagem de build: modo manual/otimizar */
+.lbd-mode{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-left:auto}
+.lbd-mode button{font:inherit;font-size:13.5px;font-weight:600;padding:8px 14px;border:0;background:transparent;color:var(--muted);cursor:pointer}
+.lbd-mode button[aria-pressed="true"]{background:color-mix(in srgb,var(--acc) 20%,transparent);color:var(--fg)}
+.lbd-hd{align-items:center}
+.lb-two{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ld-short{display:flex;align-items:center;gap:8px;margin:0 0 10px}
+.lbd-sum-g{display:flex;gap:6px}.lbd-sum-i{width:44px;height:44px;border-radius:6px;overflow:hidden;background:#2b3542;border:1px solid var(--line)}.lbd-sum-i img{width:100%;height:100%;display:block}.lbd-sum-i.exo{border-color:var(--exotic)}
+.lb-pc.none{opacity:.5;justify-content:center;min-height:60px}
+.lbd-sti{width:12px;height:12px;vertical-align:-2px;margin-right:1px}
+.lbd-wsel small{flex-wrap:wrap}
+/* cabeçalho: a faixa do emblema ocupa toda a altura, sem a barra de botões por cima */
+.gh:not(.landing) .gh-band{--gh-h:124px;height:var(--gh-h);min-height:0;background-size:auto 100%;padding-left:calc(var(--gh-h) + 14px);--embw:calc(var(--gh-h) * 4.94)}
+.gh:not(.landing) .gh-band::before{left:var(--gh-h)}
+.gh.noemb:not(.landing) .gh-band{padding-left:16px}
+.gh.noemb:not(.landing) .gh-band::before{left:0}
+.gh:not(.landing) .gh-strip{position:relative;z-index:3}
+@media (max-width:400px){.gh:not(.landing) .gh-band{--gh-h:96px}}
