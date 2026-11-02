@@ -2258,7 +2258,7 @@ function sessHTML() {
    Favoritos, builds salvas, marcações e preferências ficam ligados à conta Bungie.
    Cada chave guarda a hora da última mudança; a mais nova vence. Na primeira vez num aparelho, listas são somadas. */
 const SY = { t: LS.get('dc-synct', {}), dirty: new Set(), timer: null, applying: false, pulled: 0 };
-const syKeys = () => member ? ['favs', 'builds', 'opts', 'hide2', 'goals', 'wish', 'focus', 'marks-' + member.id] : [];
+const syKeys = () => member ? ['favs', 'builds', 'opts', 'hide2', 'goals', 'wish', 'focus', 'tags', 'marks-' + member.id] : [];
 LS.hook = k => {
   if (SY.applying || !member || !k.startsWith('dc-')) return; const n = k.slice(3);
   if (!syKeys().includes(n)) return;
@@ -2266,6 +2266,7 @@ LS.hook = k => {
   clearTimeout(SY.timer); SY.timer = setTimeout(syncPush, 2500);
 };
 function syMerge(n, a, b) {
+  if (n === 'tags' && a && b && typeof a === 'object' && typeof b === 'object') return { ...b, ...a };
   if (!Array.isArray(a) || !Array.isArray(b)) return b;
   if (n === 'favs') return [...a, ...b.filter(x => !a.some(y => y.id === x.id))].slice(0, 30);
   if (n === 'builds') return [...a, ...b.filter(x => !a.some(y => y.k === x.k))].slice(0, 30);
@@ -2978,6 +2979,30 @@ const LCT = {
 };
 const lcw = () => LCT[lang === 'pt' ? 'pt' : 'en'];
 const LC = { off: new Set(), on: new Set(), base: null, busy: false };
+/* Etiquetas nos itens (sincronizadas com a conta): favorito e manter nunca entram na limpeza; lixo entra sempre */
+const TAGS = ['fav', 'keep', 'junk', 'inf'];
+const TAGL = { pt: { fav: '★ Favorito', keep: '✓ Manter', junk: '🗑 Lixo', inf: '⇪ Infundir', none: '＋ Etiqueta', tip: 'Toque para trocar: favorito → manter → lixo → infundir → sem etiqueta. Favorito e manter nunca entram na limpeza; lixo entra sempre.', junkT: 'Marcados como lixo', wish: (a, b) => `rolo desejado ${a}/${b}`, best: 'melhor rolo' },
+  en: { fav: '★ Favorite', keep: '✓ Keep', junk: '🗑 Junk', inf: '⇪ Infuse', none: '＋ Tag', tip: 'Tap to change: favorite → keep → junk → infuse → no tag. Favorite and keep never go into cleanup; junk always does.', junkT: 'Tagged as junk', wish: (a, b) => `wished roll ${a}/${b}`, best: 'best roll' } };
+const tagl = () => TAGL[lang === 'pt' ? 'pt' : 'en'];
+const tagOf = id => LS.get('dc-tags', {})[id] || '';
+const tagSafe = id => /^(fav|keep)$/.test(tagOf(id));
+const tagBtn = id => { const t = tagOf(id), L = tagl(); return `<button type="button" class="tag-b${t ? ' t-' + t : ''}" data-tag="${esc(id)}" title="${esc(L.tip)}">${esc(t ? L[t] : L.none)}</button>`; };
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-tag]'); if (!b) return; e.preventDefault(); e.stopPropagation();
+  const m = LS.get('dc-tags', {}), id = b.dataset.tag, n = TAGS[TAGS.indexOf(m[id] || '') + 1];
+  if (n) m[id] = n; else delete m[id];
+  const ks = Object.keys(m); if (ks.length > 1500) for (const k of ks.slice(0, ks.length - 1500)) delete m[k];
+  LS.set('dc-tags', m); LC.on.delete(id); LC.off.delete(id);
+  if ($('lcdlg')?.open) lcDraw(); else document.querySelectorAll(`[data-tag="${CSS.escape(id)}"]`).forEach(x => { x.outerHTML = tagBtn(id); });
+}, true);
+// quão perto do rolo desejado (lista de desejos) está esta cópia: colunas atendidas / colunas escolhidas
+function wishScore(w) {
+  const x = wishList().find(y => y.h === w.h || (y.n && wishKey(y.n) === wishKey(w.n))); if (!x) return null;
+  const cols = x.r ? x.r.filter(c => c?.length) : (x.p || []).map(p => [p]); if (!cols.length) return null;
+  const pk = lcPerks(w).map(h => LB.en[h]).filter(Boolean);
+  const m = cols.filter(c => c.some(o => pk.some(d => (o.ic && d.ic === o.ic) || (o.n && wishKey(d.n || '') === wishKey(o.n))))).length;
+  return { m, t: cols.length };
+}
 const MODST = LS.get('dc-modst', {});
 // atributos de base de cada peça: tira o que os mods encaixados (enhancements.*) somam
 async function lcBase() {
@@ -3014,17 +3039,20 @@ function lcArmor() {
 function lcWeapons() {
   const by = {}; let locked = 0;
   for (const w of LB.wpns) (by[w.h] = by[w.h] || []).push(w);
-  const groups = Object.values(by).filter(g => g.length > 1).map(g => g.sort((a, b) => b.pw - a.pw)).sort((a, b) => a[0].n.localeCompare(b[0].n));
+  const rank = w => (tagSafe(w.id) ? 1e6 : 0) + ((wishScore(w)?.m || 0) * 1e4) + w.pw;
+  const groups = Object.values(by).filter(g => g.length > 1).map(g => g.sort((a, b) => rank(b) - rank(a))).sort((a, b) => a[0].n.localeCompare(b[0].n));
   for (const g of groups) for (const w of g) if (w.lk) locked++;
   return { groups, locked };
 }
 const LC_PERK = /^(barrels|magazines|magazines_gl|frames|scopes|guards|blades|tubes|arrows|batteries|bowstrings|grips|hafts|stocks|origins)$/;
 function lcPerks(w) { return (LB.sk[w.id]?.sockets || []).map(s => s.plugHash).filter(h => h && LC_PERK.test(LB.en[h]?.pc || '')); }
+const lcJunk = () => [...(LB.pieces || []), ...(LB.wpns || [])].filter(x => tagOf(x.id) === 'junk' && !x.eqc && !lcEq(x.id) && !x.lk);
 function lcSelected() {
   const sel = [];
-  if (LC.base) for (const { p } of lcArmor().list) if (!LC.off.has(p.id)) sel.push(p.id);
-  for (const g of lcWeapons().groups) g.forEach((w, i) => { if (!w.lk && !lcEq(w.id) && (LC.on.has(w.id) || (i > 0 && !LC.off.has(w.id)))) sel.push(w.id); });
-  return sel;
+  if (LC.base) for (const { p } of lcArmor().list) if (!LC.off.has(p.id) && (!tagSafe(p.id) || LC.on.has(p.id))) sel.push(p.id);
+  for (const g of lcWeapons().groups) g.forEach((w, i) => { if (!w.lk && !lcEq(w.id) && (LC.on.has(w.id) || (i > 0 && !LC.off.has(w.id) && !tagSafe(w.id)))) sel.push(w.id); });
+  for (const x of lcJunk()) if (!LC.off.has(x.id) && !sel.includes(x.id)) sel.push(x.id);
+  return [...new Set(sel)];
 }
 // link para o Organizador do DIM já filtrado (categoria: 1 armas; 22 Titã, 23 Caçador, 21 Arcano)
 const LC_CAT = [22, 23, 21];
@@ -3047,14 +3075,15 @@ function lcDraw() {
   const stl = (st, ref) => `<span class="lcd-st">${STAT_ORDER.map((h, k) => `<span title="${esc(D[h]?.n || '')}"${ref && st[k] < ref[k] ? ' class="dn"' : ''}>${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}${st[k]}</span>`).join('')}<b>${st.reduce((t, v) => t + v, 0)} <small>${esc(T.tot)}</small></b></span>`;
   const piece = (p, ref) => `<span class="lcd-pc${p.exo ? ' exo' : ''}">${p.ic ? `<img src="${BNET}${p.ic}" alt="" loading="lazy">` : ''}<span><b>${esc(p.n)}</b><small>${esc(where(p))}</small>${stl(LC.base[p.id], ref)}</span></span>`;
   const A = lcArmor(), WP = lcWeapons(), sel = new Set(lcSelected());
-  const byCls = [0, 1, 2].map(c => A.list.filter(x => x.p.k === c)).map((l, c) => l.length ? `<h3 class="lcd-h3">${esc(u().classes[c])} · ${l.length}${lcLink(l.map(x => x.p.id).filter(id => sel.has(id)), LC_CAT[c])}</h3>` + l.map(({ p, q }) => `<label class="lcd-row"><input type="checkbox" data-lcid="${p.id}"${sel.has(p.id) ? ' checked' : ''}>${piece(p, LC.base[q.id])}<em>${esc(T.worse)}</em>${piece(q)}</label>`).join('') : '').join('');
-  const wrows = WP.groups.map(g => `<div class="lcd-wg"><h3 class="lcd-h3">${g[0].ic ? `<img src="${BNET}${g[0].ic}" alt="">` : ''}${esc(g[0].n)} · ${g.length}</h3>${g.map(w => { const dis = w.lk || lcEq(w.id), pk = lcPerks(w); return `<label class="lcd-row lcd-w${dis ? ' dis' : ''}"><input type="checkbox" data-lcid="${w.id}"${sel.has(w.id) ? ' checked' : ''}${dis ? ' disabled' : ''}><span class="lcd-pw">${w.pw || ''}${IDEF[w.h]?.a ? ammoSVG(IDEF[w.h].a) : ''}</span><span class="lcd-perks">${pk.map(h => `<span title="${esc(LB.en[h]?.n || '')}">${LB.en[h]?.ic ? `<img src="${BNET}${LB.en[h].ic}" alt="">` : ''}<small>${esc(LB.en[h]?.n || '')}</small></span>`).join('')}</span><small class="lcd-where">${esc(w.eqc ? W.lbEquipped : w.lk ? '🔒' : '')}</small></label>`; }).join('')}</div>`).join('');
+  const byCls = [0, 1, 2].map(c => A.list.filter(x => x.p.k === c)).map((l, c) => l.length ? `<h3 class="lcd-h3">${esc(u().classes[c])} · ${l.length}${lcLink(l.map(x => x.p.id).filter(id => sel.has(id)), LC_CAT[c])}</h3>` + l.map(({ p, q }) => `<label class="lcd-row"><input type="checkbox" data-lcid="${p.id}"${sel.has(p.id) ? ' checked' : ''}>${piece(p, LC.base[q.id])}<em>${esc(T.worse)}</em>${piece(q)}${tagBtn(p.id)}</label>`).join('') : '').join('');
+  const wrows = WP.groups.map(g => `<div class="lcd-wg"><h3 class="lcd-h3">${g[0].ic ? `<img src="${BNET}${g[0].ic}" alt="">` : ''}${esc(g[0].n)} · ${g.length}</h3>${g.map(w => { const dis = w.lk || lcEq(w.id), pk = lcPerks(w); return `<label class="lcd-row lcd-w${dis ? ' dis' : ''}"><input type="checkbox" data-lcid="${w.id}"${sel.has(w.id) ? ' checked' : ''}${dis ? ' disabled' : ''}><span class="lcd-pw">${w.pw || ''}${IDEF[w.h]?.a ? ammoSVG(IDEF[w.h].a) : ''}</span><span class="lcd-perks">${pk.map(h => `<span title="${esc(LB.en[h]?.n || '')}">${LB.en[h]?.ic ? `<img src="${BNET}${LB.en[h].ic}" alt="">` : ''}<small>${esc(LB.en[h]?.n || '')}</small></span>`).join('')}</span><small class="lcd-where">${esc(w.eqc ? W.lbEquipped : w.lk ? '🔒' : '')}</small>${(() => { const ws = wishScore(w); return ws ? `<span class="wish-m${ws.m === ws.t ? ' full' : ''}">☆ ${esc(tagl().wish(ws.m, ws.t))}</span>` : ''; })()}${tagBtn(w.id)}</label>`; }).join('')}</div>`).join('');
   lbNames(WP.groups.flat().flatMap(w => (LB.sk[w.id]?.sockets || []).map(s => s.plugHash)));
   const wIds = WP.groups.flat().map(w => w.id).filter(id => sel.has(id));
   const bar = `<div class="lcd-bar"><span>${esc(T.sel(sel.size))}</span><button type="button" class="lbd-btn" data-lcall="1">${esc(T.all)}</button><button type="button" class="lbd-btn" data-lcall="0">${esc(T.noneB)}</button><button type="button" class="lbd-btn" data-lccopy${sel.size ? '' : ' disabled'}>${esc(T.copy)}</button>${sel.size ? wBtn('data-lcmove', T.move(sel.size)) : ''}</div>${wOk() ? `<p class="lbd-n">${esc(T.moveN)}</p>` : ''}`;
   d.innerHTML = `<div class="pf-box lbd-box lcd-box">${close}${head}${bar}<div class="lcd-scroll"><p class="lbd-n">${esc(T.how)}</p>
     <div class="lcd-cols"><section class="lbd-s"><h2>${esc(T.arm)} <small>${A.list.length}</small></h2><p class="lbd-n">${esc(T.armN)}</p>${byCls || `<p class="lbd-idle">${esc(T.none)}</p>`}${A.locked ? `<p class="lbd-n">${esc(T.locked(A.locked))}</p>` : ''}</section>
     <section class="lbd-s"><div class="lcd-sh"><h2>${esc(T.wp)} <small>${WP.groups.length}</small></h2>${lcLink(wIds, 1)}</div><p class="lbd-n">${esc(T.wpN)}</p>${wrows || `<p class="lbd-idle">${esc(T.none)}</p>`}</section></div>
+    ${(() => { const J = lcJunk(); return J.length ? `<section class="lbd-s"><h2>${esc(tagl().junkT)} <small>${J.length}</small></h2>${J.map(x => `<label class="lcd-row"><input type="checkbox" data-lcid="${x.id}"${sel.has(x.id) ? ' checked' : ''}><span class="lcd-pc${x.exo ? ' exo' : ''}">${x.ic ? `<img src="${BNET}${x.ic}" alt="" loading="lazy">` : ''}<span><b>${esc(x.n)}</b><small>${esc(x.pw ? '✦ ' + x.pw : x.where ? where(x) : '')}</small></span></span>${tagBtn(x.id)}</label>`).join('')}</section>` : ''; })()}
     <p class="lbd-n lb-clan">${esc(lw().clan)}</p></div></div>`;
   const nb = d.querySelector('.lcd-scroll'); if (nb) nb.scrollTop = y;
 }
@@ -3729,6 +3758,22 @@ function grObjHTML() {
 }
 /* ---------- Correios (beta): o que está parado no Postmaster de cada personagem; usa o inventário já carregado ---------- */
 const POST_BUCKET = 215593132, POSTN = {};
+/* Correios: puxar tudo de um personagem (beta, escrita na conta). Sem espaço no inventário, a Bungie recusa aquele item e seguimos com os outros. */
+const PPT = { pt: { pull: 'Puxar tudo', going: (a, b) => `Puxando ${a}/${b}…`, ok: n => `${n} ${n === 1 ? 'item puxado' : 'itens puxados'}.`, some: (n, f) => `${n} puxados · ${f} ficaram (inventário cheio ou item que só sai na Torre).`, err: 'Não deu para puxar agora. Se estiver numa atividade, tente na órbita.' },
+  en: { pull: 'Pull all', going: (a, b) => `Pulling ${a}/${b}…`, ok: n => `${n} ${n === 1 ? 'item pulled' : 'items pulled'}.`, some: (n, f) => `${n} pulled · ${f} stayed (inventory full or item that only comes out in the Tower).`, err: "Couldn't pull right now. If you're in an activity, try from orbit." } };
+const ppt = () => PPT[lang === 'pt' ? 'pt' : 'en'], PP = { busy: null, n: 0, msg: null };
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-ppull]'); if (!b || PP.busy) return; e.stopPropagation();
+  const cid = b.dataset.ppull, items = (profile.characterInventories.data[cid]?.items || []).filter(i => i.bucketHash === POST_BUCKET);
+  PP.busy = cid; PP.n = 0; PP.msg = null; openSecs.add('post'); render(); let ok = 0, fail = 0, fatal = false;
+  for (const i of items) {
+    try { await wPost('/Destiny2/Actions/Items/PullFromPostmaster/', { itemReferenceHash: i.itemHash, stackSize: i.quantity || 1, itemId: i.itemInstanceId || '0', characterId: cid }); ok++; }
+    catch (er) { fail++; if (er.code === 1671 || er.code === 2108 || er.code === 'http') { fatal = true; break; } }
+    PP.n = ok + fail; render();
+  }
+  PP.busy = null; PP.msg = { cid, bad: fatal || !ok, t: fatal && !ok ? ppt().err : fail ? ppt().some(ok, fail) : ppt().ok(ok) };
+  if (ok) $('refresh').click(); else render();
+}, true);
 function postHTML() {
   if (!have.c || !profile?.characterInventories?.data) return '';
   const W = u(), chars = Object.entries(profile.characters.data), per = chars.map(([cid, ch]) => ({ cid, ch, items: (profile.characterInventories.data[cid]?.items || []).filter(i => i.bucketHash === POST_BUCKET) }));
@@ -3739,7 +3784,7 @@ function postHTML() {
   const open = openSecs.has('post'), full = per.some(x => x.items.length >= 15);
   return `<section data-sec="post" class="keep post coll${open ? '' : ' collapsed'}${full ? ' warn' : ''}"><div class="sec-head" data-coll="post" role="button" tabindex="0" aria-expanded="${open}"><div class="sec-title"><div class="sec-name"><h2>✉ ${esc(W.postT)}</h2></div><span class="count">${total}</span><span class="chev" aria-hidden="true"></span></div>
     <p class="post-sum">${per.map(x => `<span class="${x.items.length >= 15 ? 'hot' : ''}">${esc(W.classes[x.ch.classType] || '')} <b>${x.items.length}/21</b></span>`).join('')}</p>${full ? `<p class="post-warn">${esc(W.postFull)}</p>` : ''}</div>
-    <div class="post-body">${per.filter(x => x.items.length).map(x => `<div class="post-c"><div class="post-k">${esc(W.classes[x.ch.classType] || '')} · ${x.items.length}/21</div><div class="post-l">${x.items.map(i => { const d = POSTN[i.itemHash] || {}; return `<div class="post-i${d.tt === 6 ? ' exo' : ''}" title="${esc(d.n || '')}">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy">` : '<span class="post-noic"></span>'}<span><b>${esc(d.n || '…')}</b>${i.quantity > 1 ? `<small>×${i.quantity}</small>` : d.tl ? `<small>${esc(d.tl)}</small>` : ''}</span></div>`; }).join('')}</div></div>`).join('')}<p class="post-note">${esc(W.postNote)}</p></div></section>`;
+    <div class="post-body">${per.filter(x => x.items.length).map(x => `<div class="post-c"><div class="post-k">${esc(W.classes[x.ch.classType] || '')} · ${x.items.length}/21${wOk() ? `<button type="button" class="wr-btn post-pull" data-ppull="${x.cid}"${PP.busy ? ' disabled' : ''}>${esc(PP.busy === x.cid ? ppt().going(PP.n, x.items.length) : ppt().pull)} <small>beta</small></button>` : ''}</div>${PP.msg && PP.msg.cid === x.cid ? `<p class="post-msg${PP.msg.bad ? ' bad' : ''}">${esc(PP.msg.t)}</p>` : ''}<div class="post-l">${x.items.map(i => { const d = POSTN[i.itemHash] || {}; return `<div class="post-i${d.tt === 6 ? ' exo' : ''}" title="${esc(d.n || '')}">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy">` : '<span class="post-noic"></span>'}<span><b>${esc(d.n || '…')}</b>${i.quantity > 1 ? `<small>×${i.quantity}</small>` : d.tl ? `<small>${esc(d.tl)}</small>` : ''}</span></div>`; }).join('')}</div></div>`).join('')}<p class="post-note">${esc(W.postNote)}</p></div></section>`;
 }
 /* ---------- Novidades da Bungie (beta): notas de atualização do Destiny 2 dos últimos dias; uma consulta a cada 3 h ---------- */
 let NEWS = LS.get('dc-news', null);

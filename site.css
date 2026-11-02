@@ -1502,3 +1502,15 @@ dialog.navd::backdrop{background:rgba(5,8,14,.6)}
 @media (max-width:420px){.ghm-lang{display:none!important}.ghm-n{max-width:130px}}
 .ghm-lang{display:inline-flex;align-items:center;gap:3px}.ghm-lang .sep{opacity:.4}.ghm-lang span:not(.sep){opacity:.6}
 .ghm-ld{display:inline-flex;align-items:center}
+/* correios: puxar tudo */
+.post-k{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.post-pull{margin-left:auto;padding:4px 10px!important;font-size:12.5px!important}
+.post-msg{margin:4px 0 8px;font-size:12.5px;color:var(--done)}.post-msg.bad{color:var(--hard)}
+/* etiquetas e rolo desejado */
+.tag-b{font:600 11.5px var(--sans,inherit);white-space:nowrap;border-radius:999px;padding:3px 9px;border:1px dashed var(--line);background:transparent;color:var(--muted);cursor:pointer;flex:none}
+.tag-b:hover{border-color:var(--acc);color:var(--fg)}
+.tag-b.t-fav{border:1px solid #f2d36b;color:#f2d36b;background:rgba(242,211,107,.1)}
+.tag-b.t-keep{border:1px solid var(--done);color:var(--done);background:color-mix(in srgb,var(--done) 10%,transparent)}
+.tag-b.t-junk{border:1px solid var(--hard);color:var(--hard);background:color-mix(in srgb,var(--hard) 10%,transparent)}
+.tag-b.t-inf{border:1px solid var(--acc);color:var(--acc);background:color-mix(in srgb,var(--acc) 10%,transparent)}
+.wish-m{font:600 11.5px var(--mono);white-space:nowrap;color:var(--muted);border-radius:6px;padding:2px 6px;background:rgba(255,255,255,.05)}.wish-m.full{color:#f2d36b;background:rgba(242,211,107,.12)}
+.lcd-row{flex-wrap:wrap}
