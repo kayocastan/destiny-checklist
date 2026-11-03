@@ -1831,3 +1831,10 @@ dialog.ivdlg{width:min(1000px,calc(100vw - 24px))}
 .ivd-rl small{font-size:12px;color:var(--muted)}.ivd-rl.rl-g{border-color:rgba(127,224,143,.5)}.ivd-rl.rl-g span{color:#7fe08f}.ivd-rl.rl-p span{color:#f2d36b}.ivd-rl.rl-n span{color:#ff8a7a}
 @media (max-width:760px){.rl-k{margin-left:0}.td-hd .lbd-chips{margin-left:0}}
 .td-w{background:none!important;padding:0!important;border:0!important}
+/* O que fazer hoje: identidade própria (azul), para não confundir com Última sessão (dourado) */
+.td{border-color:color-mix(in srgb,var(--acc) 45%,transparent)!important;background:linear-gradient(180deg,color-mix(in srgb,var(--acc) 12%,var(--surface,var(--chip))) 0,var(--surface,var(--chip)) 140px)!important}
+.td-ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:var(--acc);background:color-mix(in srgb,var(--acc) 16%,transparent);flex:none}
+.td-c.hot{border-color:color-mix(in srgb,var(--acc) 55%,transparent)}
+.td-acts .lbd-btn.pri{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 14%,transparent)}
+.td-gr{font:600 12.5px var(--sans,inherit);color:var(--fg);border:1px solid color-mix(in srgb,var(--acc) 40%,transparent);background:color-mix(in srgb,var(--acc) 8%,transparent);border-radius:999px;padding:5px 11px;cursor:pointer}
+.td-gr:hover{border-color:var(--acc)}
