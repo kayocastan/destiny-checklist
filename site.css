@@ -1761,3 +1761,6 @@ dialog.ivdlg{width:min(1000px,calc(100vw - 24px))}
 /* limpeza do cofre na lateral do Cofre */
 .vl-lc{display:grid;gap:6px;padding:10px 12px;border-radius:12px;border:1px solid color-mix(in srgb,var(--acc) 40%,transparent);background:color-mix(in srgb,var(--acc) 6%,transparent)}
 .vl-lc b{font-size:14px}.vl-lc small{font-size:12px;color:var(--muted)}.vl-lc .lb-run{justify-self:start}
+.iv-grid{grid-template-columns:84px repeat(var(--ivc),minmax(0,1fr)) repeat(var(--ivv),minmax(0,2fr))}
+.iv-vg{max-height:250px;overflow:auto;scrollbar-width:thin;padding-right:2px;grid-template-columns:repeat(auto-fill,minmax(36px,1fr))}
+@media (max-width:760px){.iv-vg{max-height:none}}

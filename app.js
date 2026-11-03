@@ -4052,7 +4052,7 @@ const INVD = {}, ivReq = new Set();
 const slotB = s => s < 3 ? WEAPON_BUCKETS[s] : ARMOR_BUCKETS[s - 3];
 const ivChars = () => Object.values(profile?.characters?.data || {}).sort((a, b) => new Date(b.dateLastPlayed) - new Date(a.dateLastPlayed));
 function invAll() {
-  const p = profile, inst = instanceMap(), out = [];
+  const p = profile, inst = p.itemComponents?.instances?.data || {}, out = [];
   const add = (items, where, eq) => { for (const it of items || []) { if (!it.itemInstanceId) continue; const code = ITEMS[it.itemHash]; if (code == null) continue; const slot = Math.floor(code / 100); if (slot > 7) continue; if (where === 'v' ? it.bucketHash !== VAULT_BUCKET : !eq && it.bucketHash !== slotB(slot)) continue; const ii = inst[it.itemInstanceId] || {}; out.push({ it, iid: it.itemInstanceId, h: it.itemHash, slot, cls: Math.floor(code / 10) % 10, ex: code % 2 === 1, where, eq, pw: ii.primaryStat?.value || 0, el: ii.damageType || 0, lk: !!(it.state & 1) }); } };
   add(p.profileInventory?.data?.items, 'v', false);
   for (const [cid, v] of Object.entries(p.characterInventories?.data || {})) add(v.items, cid, false);
