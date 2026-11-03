@@ -4472,7 +4472,10 @@ async function rlLoad() {
       }
       c = { at: Date.now(), m }; idbSet('rl1', c);
     }
-    RL.m = c.m; RL.at = c.at; RL.st = 'ok';
+    RL.m = c.m; RL.at = c.at;
+    // vantagens encaixadas de todas as armas (o perfil comum só traz as dos itens equipados)
+    if (member) { const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=102,201,305`).catch(() => null); RL.so = r?.itemComponents?.sockets?.data || {}; }
+    RL.st = 'ok';
   } catch (e) { console.warn('rolos', e); RL.st = 'err'; }
   if (tab === 'inv' || tab === 'vlt' || $('ivdlg')?.open || $('lcdlg')?.open) { render(); if ($('ivdlg')?.open) ivDraw(); if ($('lcdlg')?.open) lcDraw(); }
 }
@@ -4480,7 +4483,7 @@ async function rlLoad() {
 function rlGrade(iid, h, extra) {
   if (RL.st !== 'ok') return ''; const L0 = RL.m[h]; if (!L0) return '';
   const L1 = L0.filter(e => RL.mode === 'both' || !e[1] || e[1] === (RL.mode === 'pve' ? 'e' : 'v')); if (!L1.length) return '';
-  const so = profile?.itemComponents?.sockets?.data?.[iid]?.sockets; if (!so && !extra) return '';
+  const so = RL.so?.[iid]?.sockets || profile?.itemComponents?.sockets?.data?.[iid]?.sockets; if (!so && !extra) return '';
   const have = new Set([...(so || []).map(s => s.plugHash), ...(extra || [])]);
   let best = 0; for (const [p] of L1) { const n = p.filter(x => have.has(x)).length / p.length; if (n > best) best = n; if (best === 1) break; }
   return best === 1 ? 'g' : best >= 0.5 ? 'p' : 'n';
