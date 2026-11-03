@@ -3101,7 +3101,7 @@ function lbDraw() {
     const sc = r.ps.filter(p => p.set).reduce((m, p) => (m[p.set] = (m[p.set] || 0) + 1, m), {}), setTxt = Object.entries(sc).filter(([, c]) => c >= 2).map(([h, c]) => `${SETDEF[h + ':' + lc]?.n || ''} ${c}/5`).join(' · ');
     const perks = Object.entries(sc).filter(([, c]) => c >= 2).flatMap(([h, c]) => (SETDEF[h + ':' + lc]?.perks || []).map(pk => ({ ...pk, on: c >= pk.c })));
     const saved = LB.saved?.[i];
-    return `<article class="lb-r"><div class="lb-rh"><b>#${i + 1}</b><span>${esc(setTxt || W.lbNoSet)}</span><span class="lbd-acts">${lbNameForm(String(i), r) || `<button type="button" class="lbd-btn" data-lbname="${i}"${saved ? ' disabled' : ''}>${esc(saved ? T.saved : T.save)}</button>`}<button type="button" class="lbd-btn" data-lbuse="${i}">${esc(T.use)}</button>${wBtn(`data-lbapply="${i}"`)}</span></div>
+    return `<article class="lb-r"><div class="lb-rh"><b>#${i + 1}</b><span>${esc(setTxt || W.lbNoSet)}</span><span class="lbd-acts">${lbNameForm(String(i), r) || `<button type="button" class="lbd-btn" data-lbname="${i}"${saved ? ' disabled' : ''}>${esc(saved ? T.saved : T.save)}</button>`}<button type="button" class="lbd-btn" data-lbuse="${i}">${esc(T.use)}</button>${wBtn(`data-lbapply="${i}"`)}${wBtn(`data-lbgame="${i}"`, lw().toGame)}</span></div>
       ${perks.length ? `<ul class="lbd-perks">${perks.map(pk => `<li class="${pk.on ? 'on' : ''}">${pk.ic ? `<img src="${BNET}${pk.ic}" alt="">` : ''}<span><b>${esc(pk.n)}</b> <small>${esc(pk.c + '/5 · ' + (pk.on ? T.setOn : T.setOff(pk.c)))}</small>${pk.d ? `<em>${esc(pk.d)}</em>` : ''}</span></li>`).join('')}</ul>` : ''}
       <div class="lb-ps">${r.ps.map(p => `<div class="lb-pc${p.exo ? ' exo' : ''}${p.eqc === LB.cid ? ' eq' : ''}">${p.ic ? `<img src="${BNET}${p.ic}" alt="" loading="lazy">` : ''}<b>${esc(p.n)}</b><small>${esc(where(p))}</small></div>`).join('')}</div>
       <div class="lb-st">${STAT_ORDER.map((h, k) => { const v = r.tot[k], dd = v - cur[k]; return `<span${v >= 100 ? ' class="hi"' : ''} title="${esc(stN(h))}">${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}<b>${v}</b><small class="${dd > 0 ? 'up' : dd < 0 ? 'dn' : ''}">${dd ? (dd > 0 ? '+' : '') + dd : '='}</small></span>`; }).join('')}</div></article>`;
@@ -3122,7 +3122,7 @@ function lbDraw() {
     const sc = selP.filter(p => p.set).reduce((m, p) => (m[p.set] = (m[p.set] || 0) + 1, m), {});
     const perks = Object.entries(sc).filter(([, c]) => c >= 2).flatMap(([h, c]) => (SETDEF[h + ':' + lc]?.perks || []).map(pk => ({ ...pk, on: c >= pk.c })));
     const wsel = [0, 1, 2].map(x => LB.wpns.find(w => w.id === LB.w[x])).filter(Boolean);
-    const summary = `<article class="lb-r lbd-msum"><div class="lb-rh"><b>${esc(T.sumT)}</b><span>${esc(Object.entries(sc).filter(([, c]) => c >= 2).map(([h, c]) => `${SETDEF[h + ':' + lc]?.n || ''} ${c}/5`).join(' · ') || W.lbNoSet)}</span><span class="lbd-acts">${lbNameForm('m', mr) || `<button type="button" class="lbd-btn" data-lbname="m"${LB.msaved ? ' disabled' : ''}>${esc(LB.msaved ? T.saved : T.save)}</button>`}${wBtn('data-lbmapply')}</span></div>
+    const summary = `<article class="lb-r lbd-msum"><div class="lb-rh"><b>${esc(T.sumT)}</b><span>${esc(Object.entries(sc).filter(([, c]) => c >= 2).map(([h, c]) => `${SETDEF[h + ':' + lc]?.n || ''} ${c}/5`).join(' · ') || W.lbNoSet)}</span><span class="lbd-acts">${lbNameForm('m', mr) || `<button type="button" class="lbd-btn" data-lbname="m"${LB.msaved ? ' disabled' : ''}>${esc(LB.msaved ? T.saved : T.save)}</button>`}${wBtn('data-lbmapply')}${wBtn('data-lbmgame', lw().toGame)}</span></div>
       <div class="lbd-sum-g">${si ? `<span class="lbd-sum-i sub" title="${esc(subN(si))}">${lbIc(si.itemHash)}</span>` : ''}${wsel.map(w => `<span class="lbd-sum-i${w.exo ? ' exo' : ''}" title="${esc(w.n)}">${w.ic ? `<img src="${BNET}${w.ic}" alt="">` : ''}</span>`).join('')}</div>
       <div class="lb-ps">${[0, 1, 2, 3, 4].map(sl => { const p = ps.find(x => x.id === LB.a[sl]); return p ? `<div class="lb-pc${p.exo ? ' exo' : ''}${p.eqc === LB.cid ? ' eq' : ''}">${p.ic ? `<img src="${BNET}${p.ic}" alt="" loading="lazy">` : ''}<b>${esc(p.n)}</b><small>${esc(where(p))}</small></div>` : `<div class="lb-pc none"><b>${esc(T.aSlot[sl])}</b><small>∅</small></div>`; }).join('')}</div>
       ${selP.filter(p => p.exo).length > 1 ? `<p class="lb-err">${esc(T.exo2)}</p>` : ''}${pickExo ? `<p class="lb-err">${esc(T.wpExo)}</p>` : ''}
@@ -3171,6 +3171,8 @@ $('lbdlg').addEventListener('click', e => {
   const at = q('[data-lbat]'); if (at) { const [sl, id] = at.dataset.lbat.split(':'); LB.a[+sl] = id; LB.msaved = false; lbDraw(); return; }
   const us = q('[data-lbuse]'); if (us) { const r = LB.res?.[+us.dataset.lbuse]; if (r) { for (const p of r.ps) LB.a[p.slot] = p.id; LB.mode = 'man'; LB.msaved = false; lbDraw(); } return; }
   if (q('[data-lbmapply]')) { if (LB.mres) wOpen(lbPlan(LB.mres)); return; }
+  if (q('[data-lbmgame]')) { const r = LB.mres; if (r) { const pl = lbPlan(r); wSlotPick(0, { title: pl.name, t: pl.name, cid: LB.cid, mk: () => lbPlan(r) }); } return; }
+  const lg = q('[data-lbgame]'); if (lg) { const r = LB.res?.[+lg.dataset.lbgame]; if (r) { const pl = lbPlan(r); wSlotPick(0, { title: pl.name, t: pl.name, cid: LB.cid, mk: () => lbPlan(r) }); } return; }
   const nm = q('[data-lbname]'); if (nm) { LB.nm = nm.dataset.lbname; lbDraw(); const f = $('lbnm'); if (f) { f.focus(); f.select(); } return; }
   if (q('[data-lbnameok]')) { lbSaveNamed(); return; }
   if (q('[data-lbnamex]')) { LB.nm = null; lbDraw(); return; }
@@ -3341,7 +3343,7 @@ const wt = () => WRT_[lang === 'pt' ? 'pt' : 'en'];
 const WR = { plan: null, steps: [], st: 'idle', err: '', pending: null, fresh: null };
 const wSleep = ms => new Promise(r => setTimeout(r, ms));
 const wErr = (code, msg) => Object.assign(new Error(msg || String(code)), { code });
-const wMsg = e => wt().e[e?.code] || wt().e[e?.why] || (e?.message && !/^\d+$/.test(e.message) ? e.message : wt().e.other);
+const wMsg = e => wt().e[e?.code] || wt().e[e?.why] || ((e?.message && !/^\d+$/.test(e.message) ? e.message : wt().e.other) + (e?.code && e.code !== 'http' ? ` (${lang === 'pt' ? 'código' : 'code'} ${e.code})` : ''));
 const wExo = h => { const c = ITEMS?.[h]; return c != null ? c % 2 === 1 : LB.en?.[h]?.tt === 6; };
 // POST de ação com espera quando a Bungie pede calma
 async function wPost(path, body) {
@@ -3447,7 +3449,7 @@ async function wRun() {
       for (const [id, k, h] of mods) { try { await wPost('/Destiny2/Actions/Items/InsertSocketPlugFree/', { plug: { socketIndex: k, socketArrayType: 0, plugItemHash: h }, itemId: id, characterId: cid }); ok++; s.t = T.mods(mods.length) + ` · ${ok}/${mods.length}`; wDraw(); } catch (e) { er = wMsg(e); if (e.code === 1671) { inAct = true; break; } } }
       s.st = er ? (ok ? 'part' : 'fail') : 'ok'; s.m = er; wDraw(); }
     // 5. gravar no loadout do jogo (o que está equipado agora vira aquele loadout)
-    if (plan.slot != null && !inAct) { const s = wStep(wt().snap(plan.slot + 1)); s.st = 'run'; wDraw(); try { await wPost('/Destiny2/Actions/Loadouts/SnapshotLoadout/', { loadoutIndex: plan.slot, characterId: cid }); s.st = 'ok'; } catch (e) { s.st = 'fail'; s.m = wMsg(e); if (e.code === 1671) inAct = true; } wDraw(); }
+    if (plan.slot != null && !inAct) { const s = wStep(wt().snap(plan.slot + 1)); s.st = 'run'; wDraw(); try { const LL = profile.characterLoadouts?.data?.[cid]?.loadouts || [], cur = LL[plan.slot] || {}, any = LL.find(l => l.colorHash && l.iconHash && l.nameHash) || {}; await wPost('/Destiny2/Actions/Loadouts/SnapshotLoadout/', { loadoutIndex: plan.slot, characterId: cid, colorHash: cur.colorHash || any.colorHash, iconHash: cur.iconHash || any.iconHash, nameHash: cur.nameHash || any.nameHash }); s.st = 'ok'; } catch (e) { s.st = 'fail'; s.m = wMsg(e); if (e.code === 1671) inAct = true; } wDraw(); }
     return wEnd(inAct);
   } catch (e) { WR.st = 'err'; WR.err = wMsg(e); wDraw(); }
 }
@@ -3477,7 +3479,7 @@ document.addEventListener('click', async e => {
     l.splice(+dl.dataset.svdel, 1); try { LS.set('dc-builds', l); } catch {} SVDEL = null;
     const n = LPA.list.length; LPA.list = LPA.list.filter(a => a.src !== 's:' + x.k); if (LPA.list.length !== n) lpaSave(); render(); return; }
   const sg = e.target.closest('[data-svgame]'); if (sg) { e.stopPropagation(); wSlotPick(+sg.dataset.svgame); return; }
-  const sk = e.target.closest('[data-wrslot]'); if (sk) { e.stopPropagation(); const x = savedList()[+sk.dataset.wrslotb]; if (!x) return; const B = await fetchBuild(x.p, x.cid); const pl = wPlanFromCtx({ p: x.p, cid: x.cid, B }, x.title || x.t); pl.slot = +sk.dataset.wrslot; wOpen(pl); return; }
+  const sk = e.target.closest('[data-wrslot]'); if (sk) { e.stopPropagation(); if (sk.dataset.wrslotb === 'lb') { if (!WR.mk) return; const pl = WR.mk(); pl.slot = +sk.dataset.wrslot; wOpen(pl); return; } const x = savedList()[+sk.dataset.wrslotb]; if (!x) return; const B = await fetchBuild(x.p, x.cid); const pl = wPlanFromCtx({ p: x.p, cid: x.cid, B }, x.title || x.t); pl.slot = +sk.dataset.wrslot; wOpen(pl); return; }
   const sa = e.target.closest('[data-svap]'); if (sa) { e.stopPropagation(); const x = savedList()[+sa.dataset.svap]; if (!x) return; const B = await fetchBuild(x.p, x.cid); wOpen(wPlanFromCtx({ p: x.p, cid: x.cid, B }, x.title || x.t)); }
 }, true);
 document.addEventListener('click', e => {
@@ -3540,12 +3542,12 @@ document.addEventListener('click', async e => {
   const a = e.target.closest('[data-cpapply]'); if (a && CP_LAST) { e.stopPropagation(); const B = await fetchBuild(CP_LAST.p, CP_LAST.cid); wOpen(wPlanFromCtx({ p: CP_LAST.p, cid: CP_LAST.cid, B }, CP_LAST.title)); }
 }, true);
 // escolher o espaço de loadout do jogo onde gravar uma build salva
-function wSlotPick(i) {
-  const x = savedList()[i]; if (!x) return; const T = lw(), W = u(), d = $('wrdlg');
+function wSlotPick(i, alt) {
+  const x = alt || savedList()[i]; if (!x) return; WR.mk = alt?.mk || null; const T = lw(), W = u(), d = $('wrdlg');
   const ls = profile.characterLoadouts?.data?.[x.cid]?.loadouts || [];
   const nm = (l, k) => (l.items || []).some(y => y.itemInstanceId && y.itemInstanceId !== '0') ? (loadoutNames[l.nameHash]?.n || `Loadout ${k + 1}`) : T.slotE(k + 1);
   WR.st = 'pick'; WR.plan = null;
-  d.innerHTML = `<div class="pf-box wr-box"><button type="button" class="pf-x" aria-label="${esc(W.giClose)}">✕</button><header class="wr-hd"><small>${esc(wt().t)} · beta</small><h1>${esc(x.title || x.t)}</h1></header><b class="wr-k">${esc(T.slotT)}</b><div class="wr-slots">${ls.map((l, k) => `<button type="button" class="lbd-btn" data-wrslot="${k}" data-wrslotb="${i}"><b>${k + 1}</b> ${esc(nm(l, k))}</button>`).join('')}</div><p class="lbd-n">${esc(T.slotNote)}</p><p class="lbd-n lb-clan">${esc(T.clan)}</p></div>`;
+  d.innerHTML = `<div class="pf-box wr-box"><button type="button" class="pf-x" aria-label="${esc(W.giClose)}">✕</button><header class="wr-hd"><small>${esc(wt().t)} · beta</small><h1>${esc(x.title || x.t)}</h1></header><b class="wr-k">${esc(T.slotT)}</b><div class="wr-slots">${ls.map((l, k) => `<button type="button" class="lbd-btn" data-wrslot="${k}" data-wrslotb="${alt ? 'lb' : i}"><b>${k + 1}</b> ${esc(nm(l, k))}</button>`).join('')}</div><p class="lbd-n">${esc(T.slotNote)}</p><p class="lbd-n lb-clan">${esc(T.clan)}</p></div>`;
   if (!d.open) d.showModal();
 }
 // aplicação pendente: roda sozinha quando o Ao vivo vê que você saiu da atividade (órbita, Torre ou jogo fechado)
