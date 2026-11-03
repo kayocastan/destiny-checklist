@@ -2263,7 +2263,7 @@ function weekHTML(sec) {
     const op = WKO.has(i.id);
     return `<div class="wk-c${ok ? ' ok' : ''}${w.claim ? ' claim' : ''}${im ? ' wk-img' : ''}${op ? ' open' : ''}" data-wko="${esc(i.id)}" role="button" tabindex="0" aria-expanded="${op}"${im ? ` style="--wk-img:url('${BNET}${im}')"` : ''}>${ic ? `<img class="wk-ic" src="${BNET}${ic}" alt="">` : ''}<small>${esc(u().wkKind[w.k] || '')}</small><b>${esc(w.act || i.t)}</b>${w.b ? `<span class="wk-p"><i><u style="width:${p}%"></u></i><span>${w.a}/${w.b}</span></span>` : `<span class="wk-p"><span>${esc(i.c[0] || '')}</span></span>`}${w.claim ? `<span class="wk-claim">${esc(i.d)}</span>` : ''}${ok ? '<span class="wk-ok">✓</span>' : ''}${op ? wkMore(i) : ''}</div>`; };
   return `<section data-sec="${sec.id}" class="keep wk-sec coll${open ? '' : ' collapsed'}"><div class="sec-head" data-coll="${sec.id}" role="button" tabindex="0" aria-expanded="${open}"><div class="sec-title"><div class="sec-name"><h2>${esc(sec.title)}</h2></div><span class="count">${done}/${sec.items.length}</span><span class="chev" aria-hidden="true"></span></div>${sec.nr ? `<p>${esc(sec.nr)}</p>${(sec.feat || []).length ? `<ul class="wk-nl">${sec.feat.map(f => `<li><span>★ ${esc(u().wkFeatT)}</span> ${esc(f.title)}</li>`).join('')}</ul>` : ''}` : `<p>${esc(sec.note)}</p>`}<div class="sec-bar"><i style="width:${sec.items.length ? done / sec.items.length * 100 : 0}%"></i></div></div>
-    <div class="wk-body">${feat && !BETA ? `<div class="wk-fs">${feat}</div>` : ''}<div class="wk-g">${sec.items.map(card).join('')}</div></div></section>`;
+    <div class="wk-body">${feat && !FX ? `<div class="wk-fs">${feat}</div>` : ''}<div class="wk-g">${sec.items.map(card).join('')}</div></div></section>`;
 }
 function sessHTML() {
   // jogando agora (a Bungie mostra o grupo): a sessão ainda não terminou; aparece quando o jogo é fechado
@@ -4686,7 +4686,7 @@ document.addEventListener('click', e => {
   const f = e.target.closest('[data-tdfirst]'); if (f) { FIRST.k = f.dataset.tdfirst; LS.set('dc-first', FIRST.k); go('gclg'); scrollTo({ top: 0 }); }
 });
 function todoHTML() {
-  if (BETA) return todoHTML2();
+  if (FX) return todoHTML2(); // painel único (passou pelo /beta)
   const T = tdt(); if (!profile || !have.a) return '';
   const hid = LS.get('dc-todo-hide', {}), now = Date.now(); for (const k of Object.keys(hid)) if (hid[k] < now) delete hid[k];
   const all = todoCards(), filt = { all: () => true, q: c => c.min <= 30, solo: c => c.grp === 'solo', clan: c => c.grp === 'clan' }[TD.f];
