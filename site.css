@@ -1927,3 +1927,12 @@ dialog.ivdlg{width:min(1000px,calc(100vw - 24px))}
 .lbd2 .lbd-main,.ad-p .ad-s{background:var(--surface)!important}
 .lbd2 .lbd-hl{background:rgba(242,211,107,.05)!important}
 #list section.cn{background:linear-gradient(90deg,rgba(242,211,107,.12),rgba(242,211,107,.03))!important;box-shadow:none!important}
+.ad-g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+.ad-s .lbd-n{line-height:1.4}
+.ad-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:5px;max-height:420px;overflow:auto;padding-right:2px}
+.ad-list .ad-q{flex-wrap:nowrap;padding:6px 10px}.ad-list .ad-q>small{text-align:right;flex:none;max-width:48%}
+.ad-cp{flex-direction:column;align-items:stretch}.ad-cp h2{flex-basis:auto}
+.ad-cpb{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.ad-cpb .lbd-btn{text-align:left;padding:8px 10px}
+.ad-p .lbd-act{padding:0}
+@media (max-width:1100px){.ad-g3{grid-template-columns:1fr 1fr}.ad-g3>.ad-cp{grid-column:1/-1}}
+@media (max-width:760px){.ad-g3,.ad-g2{grid-template-columns:1fr}.ad-list{grid-template-columns:1fr}}
