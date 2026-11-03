@@ -187,11 +187,32 @@ async function clanRoute(req, env, path, url) {
   if (!role) return json(req, { error: 'forbidden' }, 403);
   const n = Math.max(0, Math.min(100, Math.round(Number(body.n) || 0))), hr = Math.floor(Date.now() / 3600e3), d = new Date();
   const v = cur || { s: Array(168).fill(0), c: Array(168).fill(0), h: 0 };
-  if (v.h === hr) return json(req, { ok: true, dup: true }); // já tem leitura desta hora
+  const ua = !v.ua || Date.now() - v.ua > 3600e3; v.ua = Date.now();
+  const key = req.headers.get('X-API-Key'); if (key && /^[a-f0-9]{32}$/i.test(key)) await env.DB.prepare("INSERT OR REPLACE INTO meta (k, v) VALUES ('bkey', ?)").bind(key).run().catch(() => {});
+  if (v.h === hr) { if (ua) await put(v); return json(req, { ok: true, dup: true }); } // já tem leitura desta hora
   const i = d.getUTCDay() * 24 + d.getUTCHours(); v.s[i] += n; v.c[i] += 1; v.h = hr;
   await put(v); return json(req, { ok: true });
 }
 
+
+// leitura automática de hora em hora: quantos de cada clã estão online no jogo (lista pública da Bungie).
+// Só para clãs com alguém usando o site nos últimos 30 dias; até 40 clãs por rodada.
+async function clanHoursCron(env) {
+  const key = (await env.DB.prepare("SELECT v FROM meta WHERE k = 'bkey'").first().catch(() => null))?.v; if (!key) return;
+  const rows = (await env.DB.prepare("SELECT uid, v FROM kv WHERE k = 'hours' AND uid LIKE 'clan:%' LIMIT 200").all().catch(() => ({ results: [] }))).results || [];
+  const now = Date.now(), hr = Math.floor(now / 3600e3), d = new Date(), i = d.getUTCDay() * 24 + d.getUTCHours(), fake = { headers: new Headers({ 'X-API-Key': key }) };
+  let n = 0;
+  for (const r of rows) {
+    let v; try { v = JSON.parse(r.v); } catch { continue; }
+    if (v.h === hr || !v.ua || now - v.ua > 30 * 864e5) continue;
+    if (++n > 40) break;
+    const g = r.uid.slice(5); if (!/^\d{1,20}$/.test(g)) continue;
+    const m = await bungie(fake, `/GroupV2/${g}/Members/?currentpage=1`).catch(() => null); if (!m) continue;
+    const on = (m.results || []).filter(x => x.isOnline).length;
+    v.s[i] += on; v.c[i] += 1; v.h = hr;
+    await env.DB.prepare('UPDATE kv SET v = ?, t = ? WHERE uid = ? AND k = ?').bind(JSON.stringify(v), now, r.uid, 'hours').run().catch(() => {});
+  }
+}
 async function sync(req, env) {
   const uid = await who(req, env);
   if (!uid) return json(req, { error: 'auth' }, 401);
@@ -313,6 +334,7 @@ export default {
   async scheduled(ev, env) {
     const m = await monthUsage(env); if (m.error) return;
     await env.DB.prepare("INSERT OR REPLACE INTO meta (k, v) VALUES ('brake', ?)").bind(JSON.stringify(m)).run().catch(() => {});
+    if (!(await brake(env))) await clanHoursCron(env).catch(() => {});
     if (new Date().getUTCHours() === 6) await env.DB.prepare('DELETE FROM visit WHERE d < ?').bind(spDay(Date.now() - 400 * 864e5)).run().catch(() => {}); // guarda ~13 meses
   },
   async fetch(req, env) {
