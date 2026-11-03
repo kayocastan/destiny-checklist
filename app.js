@@ -3358,6 +3358,7 @@ async function wPost(path, body) {
     if (!j) throw wErr('http', `HTTP ${r.status}`);
     if (j.ErrorCode === 1) { await wSleep(120); return j.Response; }
     if ([31, 35, 36, 37, 1672].includes(j.ErrorCode)) { await wSleep(Math.max(1000, (j.ThrottleSeconds || 1) * 1000)); continue; }
+    if (j.ErrorCode === 1618 && t < 2) { await wSleep(1500 * (t + 1)); continue; } // erro passageiro nos servidores da Bungie: tenta de novo com calma
     if (j.ErrorCode === 2108) { WR.needPerm = true; }
     throw wErr(j.ErrorCode, j.Message);
   }
