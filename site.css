@@ -1788,3 +1788,4 @@ dialog.ivdlg{width:min(1000px,calc(100vw - 24px))}
 .rc-a{grid-column:2/4;grid-row:2}
 .rc-c{grid-row:1;grid-column:3;align-self:start;font:600 11px var(--sans,inherit);color:var(--kc,var(--acc));border-color:color-mix(in srgb,var(--kc,#6fd3ff) 45%,transparent)}
 .sq .cl-p.sq-p{display:grid;grid-template-columns:4px minmax(0,1fr);gap:0 10px;align-items:center;width:100%;border-radius:10px;padding:9px 12px}
+.rc-c{grid-row:2;grid-column:3;align-self:end}.rc-a{grid-column:2}.rc-n{min-width:0}.rc-n b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
