@@ -3455,30 +3455,41 @@ async function wRun() {
       s.st = bad ? (bad === ids.length ? 'fail' : 'part') : 'ok'; s.m = er; eqOk = !bad; wDraw();
     }
     if (inAct) return wEnd(true);
-    // 3. subclasse: aspectos antes dos fragmentos (os fragmentos dependem dos aspectos)
-    if (plan.sub && Object.keys(plan.sub.so || {}).length) {
-      const cur = F.sk[plan.sub.id]?.sockets || []; await loadPlugs(); const rp = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/Item/${plan.sub.id}/?components=310`).then(r => r.reusablePlugs?.data?.plugs || {}).catch(() => ({}));
-      // aspectos/fragmentos: a ordem não importa; mantém os que já estão em outro encaixe do mesmo grupo e só coloca os que faltam nos encaixes livres (evita "encaixe não pode ser trocado" por repetido)
+    // 3 e 4: "do zero" — primeiro esvazia os encaixes que vão mudar (fragmentos antes dos aspectos; mods da peça), depois coloca os novos.
+    // Evita repetido (mesmo fragmento em dois lugares), falta de energia na peça e briga de ordem.
+    const ins = (itemId, k, h) => wPost('/Destiny2/Actions/Items/InsertSocketPlugFree/', { plug: { socketIndex: +k, socketArrayType: 0, plugItemHash: h }, itemId, characterId: cid });
+    const defOf = async h => SDEF[h] || (SDEF[h] = await bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${h}/`, false).catch(() => ({})));
+    const emptyOf = async (itemHash, k) => (await defOf(itemHash))?.sockets?.socketEntries?.[k]?.singleInitialItemHash || 0;
+    const fill = async (s, list, label) => { let ok = 0, er = ''; let pend = list; for (let pass = 0; pass < 3 && pend.length && !inAct; pass++) { const next = []; er = '';
+      for (const x of pend) { try { await ins(x[0], x[1], x[2]); ok++; if (label) s.t = label + ` · ${ok}/${list.length}`; wDraw(); } catch (e) { er = wMsg(e); if (e.code === 1671) { inAct = true; break; } next.push(x); } }
+      pend = next; } return { ok, er }; };
+    await loadPlugs();
+    if (plan.sub && Object.keys(plan.sub.so || {}).length && !inAct) {
+      const cur = F.sk[plan.sub.id]?.sockets || [], rp = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/Item/${plan.sub.id}/?components=310`).then(r => r.reusablePlugs?.data?.plugs || {}).catch(() => ({}));
+      // aspectos/fragmentos: a ordem não importa; mantém os que já estão no grupo e só coloca os que faltam
       const pcs = await entities('DestinyInventoryItemDefinition', [...new Set([...Object.values(plan.sub.so), ...cur.map(x => x?.plugHash)].filter(Boolean))], 'en', true).catch(() => ({})), grp = {};
       for (const [k, h] of Object.entries(plan.sub.so)) (grp[pcs[h]?.pc || 'k' + k] = grp[pcs[h]?.pc || 'k' + k] || []).push([+k, h]);
-      const want = []; for (const g of Object.values(grp)) { const tg = g.map(x => x[1]), left = [...tg], free = []; for (const [k] of g) { const c = cur[k]?.plugHash, at = left.indexOf(c); if (at >= 0) left.splice(at, 1); else free.push(k); } left.forEach((h, n) => { if (free[n] != null) want.push([free[n], h]); }); }
-      const want0 = want, own = ([k, h]) => (rp[k] || []).some(p => p.plugItemHash === h) || iOwnPlug(h) !== false, ch = want.filter(own), lackS = want.filter(x => !own(x)).map(([, h]) => h);
-      if (want.length) { const s = wStep(T.sub(want.length)); s.st = 'run'; wDraw(); let ok = 0, er = '';
-        let pend = ch; for (let pass = 0; pass < 3 && pend.length && !inAct; pass++) { const next = []; er = '';
-          for (const [k, h] of pend) { try { await wPost('/Destiny2/Actions/Items/InsertSocketPlugFree/', { plug: { socketIndex: +k, socketArrayType: 0, plugItemHash: h }, itemId: plan.sub.id, characterId: cid }); ok++; if (cur[k]?.plugHash) undo.push([plan.sub.id, +k, cur[k].plugHash]); } catch (e) { er = wMsg(e); if (e.code === 1671) { inAct = true; break; } next.push([k, h]); } }
-          pend = next; }
-        if (lackS.length) { const en = await entities('DestinyInventoryItemDefinition', lackS, lang).catch(() => ({})); er = lw().lack(lackS.map(h => en[h]?.n).filter(Boolean)); }
-        s.st = er ? (ok ? 'part' : 'fail') : 'ok'; s.m = er; wDraw(); }
+      const want = []; for (const g of Object.values(grp)) { const left = g.map(x => x[1]), free = []; for (const [k] of g) { const c = cur[k]?.plugHash, at = left.indexOf(c); if (at >= 0) left.splice(at, 1); else free.push(k); } left.forEach((h, n) => { if (free[n] != null) want.push([free[n], h]); }); }
+      const own = ([k, h]) => (rp[k] || []).some(p => p.plugItemHash === h) || iOwnPlug(h) !== false, ch = want.filter(own), lackS = want.filter(x => !own(x)).map(([, h]) => h);
+      if (want.length) { const s = wStep(T.sub(want.length)); s.st = 'run'; wDraw();
+        const isFrag = h => /fragment/i.test(pcs[h]?.pc || ''), subH = F.loc[plan.sub.id]?.it?.itemHash;
+        for (const [k] of ch) if (cur[k]?.plugHash) undo.push([plan.sub.id, +k, cur[k].plugHash]);
+        // esvazia: fragmentos primeiro (dependem dos aspectos)
+        const clr = []; for (const [k] of ch) { const e = await emptyOf(subH, k); if (e && cur[k]?.plugHash !== e && !(cur[k]?.plugHash && !isFrag(cur[k].plugHash) && !/aspect/i.test(pcs[cur[k].plugHash]?.pc || ''))) clr.push([k, e, isFrag(cur[k]?.plugHash)]); }
+        for (const [k, e] of clr.sort((a, b) => b[2] - a[2])) { if (inAct) break; try { await ins(plan.sub.id, k, e); } catch (er2) { if (er2.code === 1671) inAct = true; } }
+        // coloca: aspectos antes dos fragmentos
+        const r = await fill(s, ch.slice().sort((a, b) => isFrag(a[1]) - isFrag(b[1])).map(([k, h]) => [plan.sub.id, k, h]));
+        let er = r.er; if (lackS.length) { const en = await entities('DestinyInventoryItemDefinition', lackS, lang).catch(() => ({})); er = lw().lack(lackS.map(h => en[h]?.n).filter(Boolean)); }
+        s.st = er ? (r.ok ? 'part' : 'fail') : 'ok'; s.m = er; wDraw(); }
     }
-    // 4. mods de cada peça
-    await loadPlugs(); const mods0 = Object.entries(plan.mods || {}).flatMap(([id, m]) => Object.entries(m).map(([k, h]) => [id, +k, h])).filter(([id, k, h]) => F.sk[id]?.sockets?.[k]?.plugHash !== h), mods = mods0.filter(([, , h]) => iOwnPlug(h) !== false), lackM = [...new Set(mods0.filter(([, , h]) => iOwnPlug(h) === false).map(x => x[2]))];
-    if (mods0.length && !inAct) { const s = wStep(T.mods(mods0.length)); s.st = 'run'; wDraw(); let ok = 0, er = '';
-      // primeiro esvazia o que vai trocar? não: tenta tudo e repete o que faltou (a energia da peça libera conforme os outros mods saem)
-      let pend = mods; for (let pass = 0; pass < 3 && pend.length && !inAct; pass++) { const next = []; er = '';
-        for (const [id, k, h] of pend) { try { const was = F.sk[id]?.sockets?.[k]?.plugHash; await wPost('/Destiny2/Actions/Items/InsertSocketPlugFree/', { plug: { socketIndex: k, socketArrayType: 0, plugItemHash: h }, itemId: id, characterId: cid }); ok++; if (was && prevEq.includes(id)) undo.push([id, k, was]); s.t = T.mods(mods.length) + ` · ${ok}/${mods.length}`; wDraw(); } catch (e) { er = wMsg(e); if (e.code === 1671) { inAct = true; break; } next.push([id, k, h]); } }
-        pend = next; }
-      if (lackM.length) { const en = await entities('DestinyInventoryItemDefinition', lackM, lang).catch(() => ({})); er = lw().lack(lackM.map(h => en[h]?.n).filter(Boolean)); }
-      s.st = er || lackM.length ? (ok ? 'part' : 'fail') : 'ok'; s.m = er; wDraw(); }
+    const mods0 = Object.entries(plan.mods || {}).flatMap(([id, m]) => Object.entries(m).map(([k, h]) => [id, +k, h])).filter(([id, k, h]) => F.sk[id]?.sockets?.[k]?.plugHash !== h), mods = mods0.filter(([, , h]) => iOwnPlug(h) !== false), lackM = [...new Set(mods0.filter(([, , h]) => iOwnPlug(h) === false).map(x => x[2]))];
+    if (mods0.length && !inAct) { const s = wStep(T.mods(mods0.length)); s.st = 'run'; wDraw();
+      for (const [id, k] of mods) { const was = F.sk[id]?.sockets?.[k]?.plugHash; if (was && prevEq.includes(id)) undo.push([id, k, was]); }
+      // esvazia os encaixes que vão mudar (libera a energia da peça)
+      for (const [id, k] of mods) { if (inAct) break; const e = await emptyOf(F.loc[id]?.it?.itemHash, k); if (e && F.sk[id]?.sockets?.[k]?.plugHash !== e) { try { await ins(id, k, e); } catch (er2) { if (er2.code === 1671) inAct = true; } } }
+      const r = await fill(s, mods, T.mods(mods0.length));
+      let er = r.er; if (lackM.length) { const en = await entities('DestinyInventoryItemDefinition', lackM, lang).catch(() => ({})); er = lw().lack(lackM.map(h => en[h]?.n).filter(Boolean)); }
+      s.st = er ? (r.ok ? 'part' : 'fail') : 'ok'; s.m = er; wDraw(); }
     // 5. gravar no loadout do jogo (o que está equipado agora vira aquele loadout)
     if (plan.slot != null && !inAct && !eqOk) { const s = wStep(wt().snap(plan.slot + 1)); s.st = 'fail'; s.m = lw().notSaved; wDraw(); }
     else if (plan.slot != null && !inAct) { const s = wStep(wt().snap(plan.slot + 1)); s.st = 'run'; wDraw(); try { const LL = profile.characterLoadouts?.data?.[cid]?.loadouts || [], cur = LL[plan.slot] || {}, any = LL.find(l => l.colorHash && l.iconHash && l.nameHash) || {}; await wPost('/Destiny2/Actions/Loadouts/SnapshotLoadout/', { loadoutIndex: plan.slot, characterId: cid, colorHash: plan.ident?.c || cur.colorHash || any.colorHash, iconHash: plan.ident?.i || cur.iconHash || any.iconHash, nameHash: plan.ident?.n || cur.nameHash || any.nameHash }); s.st = 'ok'; } catch (e) { s.st = 'fail'; s.m = wMsg(e); if (e.code === 1671) inAct = true; } wDraw(); }
