@@ -173,7 +173,7 @@ function status(msg) { $('status').textContent = msg || ''; }
 /* telas largas: duas colunas independentes (abrir uma ilha não empurra a outra coluna) */
 const WIDE = matchMedia('(min-width:1100px)');
 function layoutCols() {
-  const P = $('list').firstElementChild; if (!WIDE.matches || !P || !P.classList.contains('panel') || P.matches('.iv-wrap,.tr-wrap') || P.querySelector(':scope>.pcols')) return;
+  const P = $('list').firstElementChild; if (!WIDE.matches || !P || !P.classList.contains('panel') || P.matches('.iv-wrap,.tr-wrap,.ad-p') || P.querySelector(':scope>.pcols')) return;
   const kids = [...P.children], full = el => getComputedStyle(el).gridColumnEnd === '-1', box = kids.filter(el => !full(el) && !el.hidden);
   if (box.length < 2) return;
   const wrap = document.createElement('div'), cols = [document.createElement('div'), document.createElement('div')], h = [0, 0];
