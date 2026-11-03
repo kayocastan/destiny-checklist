@@ -4334,7 +4334,7 @@ async function mpOpen(x) {
   try {
     const def = SDEF[x.h] || (SDEF[x.h] = await bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${x.h}/`, false));
     await loadPlugs(); const se = def.sockets?.socketEntries?.[i] || {}, ps = se.reusablePlugSetHash || se.randomizedPlugSetHash;
-    const fromSet = ps ? [...(PLUGS?.p?.[ps] || []), ...(x.where !== 'v' ? PLUGS?.c?.[x.where]?.plugs?.[ps] || [] : [])].filter(p => p.canInsert !== false && p.enabled !== false).map(p => p.plugItemHash) : [];
+    const fromSet = ps ? [...(PLUGS?.p?.[ps] || []), ...(x.where !== 'v' ? PLUGS?.c?.[x.where]?.plugs?.[ps] || [] : Object.values(PLUGS?.c || {}).flatMap(c => c.plugs?.[ps] || []))].filter(p => p.canInsert !== false && p.enabled !== false).map(p => p.plugItemHash) : [];
     const list = [...new Set([se.singleInitialItemHash, ...fromSet, ...(se.reusablePlugItems || []).map(p => p.plugItemHash), det.so[i]?.plugHash].filter(Boolean))];
     const L = lang === 'pt' ? 'pt' : 'en', en = await entities('DestinyInventoryItemDefinition', list, L, true); Object.assign(det.en, en);
     INV.mp = { i, list: list.filter(h => det.en[h]), empty: se.singleInitialItemHash || 0, sel: null };
