@@ -3479,7 +3479,7 @@ document.addEventListener('click', async e => {
     l.splice(+dl.dataset.svdel, 1); try { LS.set('dc-builds', l); } catch {} SVDEL = null;
     const n = LPA.list.length; LPA.list = LPA.list.filter(a => a.src !== 's:' + x.k); if (LPA.list.length !== n) lpaSave(); render(); return; }
   const sg = e.target.closest('[data-svgame]'); if (sg) { e.stopPropagation(); wSlotPick(+sg.dataset.svgame); return; }
-  const sk0 = e.target.closest('[data-wrslot]'); if (sk0) { e.stopPropagation(); const k = +sk0.dataset.wrslot, b = sk0.dataset.wrslotb, x = b === 'lb' ? WR.pi?.alt : savedList()[+b]; if (!x) return; const LS0 = profile.characterLoadouts?.data?.[x.cid]?.loadouts || [], l = LS0[k] || {}, any = LS0.find(y => y.colorHash && y.iconHash) || {}; WR.pk = { slot: k, b, title: x.title || x.t, c: l.colorHash || any.colorHash, i: l.iconHash || any.iconHash, n: l.nameHash && l.nameHash !== 2166136261 ? l.nameHash : any.nameHash }; wSlotIdent(); return; }
+  const sk0 = e.target.closest('[data-wrslot]'); if (sk0) { e.stopPropagation(); const k = +sk0.dataset.wrslot, b = sk0.dataset.wrslotb, x = b === 'lb' ? WR.pi?.alt : savedList()[+b]; if (!x) return; const LS0 = profile.characterLoadouts?.data?.[x.cid]?.loadouts || [], l = LS0[k] || {}, any = LS0.find(y => y.colorHash && y.iconHash) || {}; WR.pk = { slot: k, b, title: x.title || x.t, c: l.colorHash || 0, i: l.iconHash || 0, n: l.nameHash && l.nameHash !== 2166136261 ? l.nameHash : 0 }; wSlotIdent(); return; }
   if (e.target.closest('[data-wrback]')) { e.stopPropagation(); const P = WR.pi; if (P) wSlotPick(P.i, P.alt); return; }
   const wc = e.target.closest('[data-wrc]'); if (wc && WR.pk) { e.stopPropagation(); WR.pk.c = +wc.dataset.wrc; wSlotIdent(); return; }
   const wi = e.target.closest('[data-wri]'); if (wi && WR.pk) { e.stopPropagation(); WR.pk.i = +wi.dataset.wri; wSlotIdent(); return; }
@@ -3552,12 +3552,12 @@ function ldcLoad() {
   if (LDC.d || LDC.p) return LDC.p; const lc = lang === 'pt' ? 'pt-br' : 'en';
   LDC.p = (async () => {
     try {
-      const m = await bungie('/Destiny2/Manifest/', false), ver = m.version + ':' + lc; let c = await idbGet('ldc1');
+      const m = await bungie('/Destiny2/Manifest/', false), ver = m.version + ':' + lc; let c = await idbGet('ldc2');
       if (!c || c.v !== ver) {
         const P = m.jsonWorldComponentContentPaths[lc], get = t => fetch(BNET + P[t]).then(r => r.json());
         const [K, C, I, N] = await Promise.all(['DestinyLoadoutConstantsDefinition', 'DestinyLoadoutColorDefinition', 'DestinyLoadoutIconDefinition', 'DestinyLoadoutNameDefinition'].map(get)), k = Object.values(K)[0] || {};
-        c = { v: ver, c: (k.loadoutColorHashes || []).map(h => [h, C[h]?.colorImagePath || '']), i: (k.loadoutIconHashes || []).map(h => [h, I[h]?.iconImagePath || '']), n: (k.loadoutNameHashes || []).map(h => [h, N[h]?.name || '']).filter(x => x[1]) };
-        idbSet('ldc1', c);
+        c = { v: ver, c: (k.loadoutColorHashes || []).map(h => [h, C[h]?.colorImagePath || '']), i: (k.loadoutIconHashes || []).map(h => [h, I[h]?.iconImagePath || '']), n: (k.loadoutNameHashes || []).map(h => [h, N[h]?.name || '']).filter(x => x[1]), cm: Object.fromEntries(Object.entries(C).map(([h, d]) => [h, d.colorImagePath || ''])), im: Object.fromEntries(Object.entries(I).map(([h, d]) => [h, d.iconImagePath || ''])) };
+        idbSet('ldc2', c);
       }
       LDC.d = c;
     } catch { LDC.d = { c: [], i: [], n: [] }; }
@@ -3568,10 +3568,14 @@ function ldcLoad() {
 function wSlotIdent() {
   const d = $('wrdlg'), K = WR.pk, T = lw(), W = u(), D = LDC.d; if (!K || !d) return;
   if (D && !D.n.some(y => y[0] === K.n)) K.n = D.n[0]?.[0];
-  const cp = D?.c.find(x => x[0] === K.c)?.[1];
+  // cor/ícone especiais que o espaço já usa (fora da lista padrão) continuam como opção; espaço vazio começa na primeira da lista
+  const has = (L, h, m) => L.some(y => y[0] === h) || (h && m?.[h] != null);
+  if (D && !has(D.c, K.c, D.cm)) K.c = D.c[0]?.[0]; if (D && !has(D.i, K.i, D.im)) K.i = D.i[0]?.[0];
+  const CL = D ? (D.c.some(y => y[0] === K.c) ? D.c : [[K.c, D.cm[K.c] || ''], ...D.c]) : [], IL = D ? (D.i.some(y => y[0] === K.i) ? D.i : [[K.i, D.im[K.i] || ''], ...D.i]) : [];
+  const cp = CL.find(x => x[0] === K.c)?.[1];
   const body = !D ? `<p class="wait">…</p>` : `<label class="wid-n"><span>${esc(T.idN)}</span><select id="wrnm">${D.n.map(([h, n]) => `<option value="${h}"${h === K.n ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select></label>
-    <span class="wr-k">${esc(T.idC)}</span><div class="wid-g c">${D.c.map(([h, p]) => `<button type="button" class="wid${h === K.c ? ' on' : ''}" data-wrc="${h}">${p ? `<img src="${BNET}${p}" alt="">` : ''}</button>`).join('')}</div>
-    <span class="wr-k">${esc(T.idI)}</span><div class="wid-g">${D.i.map(([h, p]) => `<button type="button" class="wid${h === K.i ? ' on' : ''}" data-wri="${h}"${cp ? ` style="background-image:url(${BNET}${cp})"` : ''}>${p ? `<img src="${BNET}${p}" alt="">` : ''}</button>`).join('')}</div>
+    <span class="wr-k">${esc(T.idC)}</span><div class="wid-g c">${CL.map(([h, p]) => `<button type="button" class="wid${h === K.c ? ' on' : ''}" data-wrc="${h}">${p ? `<img src="${BNET}${p}" alt="">` : ''}</button>`).join('')}</div>
+    <span class="wr-k">${esc(T.idI)}</span><div class="wid-g">${IL.map(([h, p]) => `<button type="button" class="wid${h === K.i ? ' on' : ''}" data-wri="${h}"${cp ? ` style="background-image:url(${BNET}${cp})"` : ''}>${p ? `<img src="${BNET}${p}" alt="">` : ''}</button>`).join('')}</div>
     <p class="lbd-n">${esc(T.idNote)}</p><div class="wid-a"><button type="button" class="lb-run" data-wrgo>${esc(T.idGo(K.slot + 1))}</button><button type="button" class="linkb" data-wrback>${esc(T.idBack)}</button></div>`;
   d.innerHTML = `<div class="pf-box wr-box"><button type="button" class="pf-x" aria-label="${esc(W.giClose)}">✕</button><header class="wr-hd"><small>${esc(wt().t)} · beta</small><h1>${esc(K.title)}</h1></header><b class="wr-k">${esc(T.idT(K.slot + 1))}</b>${body}<p class="lbd-n lb-clan">${esc(T.clan)}</p></div>`;
 }
