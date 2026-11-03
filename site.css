@@ -1723,3 +1723,4 @@ dialog.ivdlg{width:min(1000px,calc(100vw - 24px))}
 .tabs .tab{position:relative}
 .tabs .tab+.tab::before{content:"";position:absolute;left:-1px;top:22%;bottom:22%;width:1px;background:color-mix(in srgb,var(--fg) 18%,transparent)}
 .tabs .tab[aria-current="true"]::before,.tabs .tab[aria-current="true"]+.tab::before{display:none}
+.col-num{font:500 11px var(--mono);color:var(--muted);margin-left:4px}

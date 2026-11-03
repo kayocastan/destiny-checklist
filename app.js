@@ -4256,18 +4256,19 @@ document.addEventListener('click', e => { const b = e.target.closest('[data-clju
 const COLT = { pt: { load: 'Baixando as listas de coleta da Bungie (só na primeira vez de cada atualização do jogo)…', err: 'Não deu para carregar as listas agora.', retry: 'Tentar de novo', q: 'Buscar', byD: 'Por destino', byT: 'Por tipo', dests: 'Destinos', types: 'Tipos', hide: 'Esconder os que já tenho', left: n => `Faltam ${n}`, done: 'Tudo coletado aqui!', where: 'Ver onde ↗', other: 'Outros lugares', of: (a, b) => `${a} de ${b}`, note: 'Nomes e o que você já pegou vêm da sua conta na Bungie. “Ver onde” abre uma busca com guias e mapas, porque a Bungie não informa a posição no mapa.', wait: 'Carregando seu progresso…' },
   en: { load: 'Downloading the Bungie checklists (only the first time after each game update)…', err: "Couldn't load the checklists right now.", retry: 'Try again', q: 'Search', byD: 'By destination', byT: 'By type', dests: 'Destinations', types: 'Types', hide: 'Hide what I have', left: n => `${n} left`, done: 'All collected here!', where: 'Where ↗', other: 'Other places', of: (a, b) => `${a} of ${b}`, note: 'Names and what you have come from your Bungie account. “Where” opens a search with guides and maps, since Bungie does not give map positions.', wait: 'Loading your progress…' } };
 const colt = () => COLT[lang === 'pt' ? 'pt' : 'en'];
+const COLA = {}, colAReq = new Set();
 const COL = { st: null, lc: '', cl: [], dn: {}, pp: null, by: LS.get('dc-col-by', 'd'), sel: LS.get('dc-col-sel', ''), t: '', q: '', hide: LS.get('dc-col-hide', true) };
 async function colLoad() {
   const lc = lang === 'pt' ? 'pt-br' : 'en'; if (COL.st === 'load' || (COL.st === 'ok' && COL.lc === lc)) return;
   COL.st = 'load'; COL.lc = lc;
   try {
-    const m = await bungie('/Destiny2/Manifest/', false), ver = m.version + ':' + lc; let c = await idbGet('chk1');
+    const m = await bungie('/Destiny2/Manifest/', false), ver = m.version + ':' + lc; let c = await idbGet('chk2');
     if (!c || c.v !== ver) {
       const p = m.jsonWorldComponentContentPaths[lc];
       const [CD, DD] = await Promise.all([fetch(BNET + p.DestinyChecklistDefinition).then(r => r.json()), fetch(BNET + p.DestinyDestinationDefinition).then(r => r.json())]);
       const dn = {}; for (const [h, d] of Object.entries(DD)) { const n = d.displayProperties?.name; if (n) dn[h] = { n, b: Object.fromEntries((d.bubbles || []).map(b => [b.hash, b.displayProperties?.name || '']).filter(x => x[1])) }; }
-      const cl = Object.entries(CD).map(([h, d]) => ({ h, n: d.displayProperties?.name || '', s: d.scope || 0, e: (d.entries || []).map(e => ({ h: e.hash, n: e.displayProperties?.name || e.displayProperties?.description || '', d: e.destinationHash || 0, b: e.bubbleHash || 0 })) })).filter(x => x.n && x.e.length);
-      c = { v: ver, cl, dn }; idbSet('chk1', c);
+      const cl = Object.entries(CD).map(([h, d]) => ({ h, n: d.displayProperties?.name || '', s: d.scope || 0, e: (d.entries || []).map(e => ({ h: e.hash, n: e.displayProperties?.name || e.displayProperties?.description || '', d: e.destinationHash || 0, b: e.bubbleHash || 0, a: e.activityHash || 0 })) })).filter(x => x.n && x.e.length);
+      c = { v: ver, cl, dn }; idbSet('chk2', c);
     }
     COL.cl = c.cl; COL.dn = c.dn;
     const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=104`).catch(() => null); COL.pp = r?.profileProgression?.data?.checklists || {};
@@ -4298,7 +4299,12 @@ function colHTML() {
   const cards = q.length >= 2 ? '' : `<div class="col-cards">${Object.entries(subs).sort((a, b) => b[1].length - a[1].length).map(([k, l]) => `<button type="button" class="col-card" data-colt="${esc(k)}" aria-pressed="${COL.t === k}"><small>${esc(subName(k))}</small><b>${l.filter(x => x.ok).length}/${l.length}</b><i class="sea-bar"><u style="width:${pc(l)}%"></u></i></button>`).join('')}</div>`;
   const shown = list.filter(x => (!COL.t || sub(x) === COL.t) && (!COL.hide || !x.ok)), miss = list.filter(x => !x.ok).length;
   const reg = x => COL.dn[x.e.d]?.b?.[x.e.b] || COL.dn[x.e.d]?.n || '';
-  const rows = shown.length ? `<ul class="col-l">${shown.map(x => `<li class="${x.ok ? 'ok' : ''}"><span class="col-ck" aria-label="${x.ok ? '✓' : '○'}">${x.ok ? '✓' : ''}</span><span class="col-ty">${esc(x.c.n)}</span><b>${esc(x.e.n || '—')}</b><small>${esc(reg(x))}</small><a href="https://www.google.com/search?q=${encodeURIComponent('Destiny 2 ' + x.c.n + ' ' + x.e.n + ' ' + (COL.dn[x.e.d]?.n || ''))}" target="_blank" rel="noopener">${esc(T.where)}</a></li>`).join('')}</ul>` : `<p class="empty-msg">${esc(T.done)}</p>`;
+  const needA = [...new Set(shown.map(x => x.e.a).filter(h => h && !COLA[h] && !colAReq.has(h)))];
+  if (needA.length) { needA.forEach(h => colAReq.add(h)); entities('DestinyActivityDefinition', needA, lang).then(m => { Object.assign(COLA, m); if (tab === 'colx') render(); }).catch(() => {}); }
+  const ttl = x => { const m = (x.e.n || '').match(/^\s*(\d+)\.\s*(.*)$/), num = m ? m[1] : '', rest = (m ? m[2] : x.e.n || '').trim(), dn = COL.dn[x.e.d]?.n || '';
+    const an = x.e.a && COLA[x.e.a]?.n, bn = COL.dn[x.e.d]?.b?.[x.e.b];
+    const main = rest && rest !== dn ? rest : an || bn || `${x.c.n}${num ? ' nº ' + num : ''}`; return { main, num }; };
+  const rows = shown.length ? `<ul class="col-l">${shown.map(x => `<li class="${x.ok ? 'ok' : ''}"><span class="col-ck" aria-label="${x.ok ? '✓' : '○'}">${x.ok ? '✓' : ''}</span><span class="col-ty">${esc(x.c.n)}</span>${(() => { const t = ttl(x); return `<b>${esc(t.main)}${t.num && !t.main.includes('nº') ? ` <small class="col-num">#${t.num}</small>` : ''}</b>`; })()}<small>${esc(reg(x))}</small><a href="https://www.google.com/search?q=${encodeURIComponent('Destiny 2 ' + x.c.n + ' ' + x.e.n + ' ' + (COL.dn[x.e.d]?.n || ''))}" target="_blank" rel="noopener">${esc(T.where)}</a></li>`).join('')}</ul>` : `<p class="empty-msg">${esc(T.done)}</p>`;
   const head = q.length >= 2 ? `<h2>“${esc(COL.q.trim())}”</h2>` : `<h2>${esc(nameOf(COL.sel))}</h2><small>${esc(T.of(list.filter(x => x.ok).length, list.length))} · ${pc(list)}%</small>`;
   return `<div class="panel tr-wrap">${side}<section class="tr-main"><div class="tr-box col-hero"><div class="tr-hd">${head}<label class="tr-hide"><input type="checkbox" id="colhide"${COL.hide ? ' checked' : ''}> ${esc(T.hide)}</label></div>${cards}</div><div class="tr-box"><div class="tr-hd"><b>${esc(T.left(miss))}</b></div>${rows}<small class="lbd-n">${esc(T.note)}</small></div></section></div>`;
 }
