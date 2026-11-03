@@ -1936,3 +1936,9 @@ dialog.ivdlg{width:min(1000px,calc(100vw - 24px))}
 .ad-p .lbd-act{padding:0}
 @media (max-width:1100px){.ad-g3{grid-template-columns:1fr 1fr}.ad-g3>.ad-cp{grid-column:1/-1}}
 @media (max-width:760px){.ad-g3,.ad-g2{grid-template-columns:1fr}.ad-list{grid-template-columns:1fr}}
+.ivd-pds{display:grid;gap:6px;margin-top:10px}
+.ivd-pds .ivd-pd{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:start;cursor:pointer;border:1px solid transparent}
+.ivd-pds .ivd-pd.on{border-color:var(--acc)}
+.ivd-pd img,.ivd-pd>i{width:34px;height:34px;border-radius:50%;background:#2a3542}
+.ivd-pd>div{display:grid;gap:2px;min-width:0}.ivd-pd span{white-space:pre-line;line-height:1.45;color:#c9d3dd}
+.ivd-pd small{font-size:11.5px;color:var(--muted)}.ivd-pd .ivd-en{color:#6fd3ff;font:600 11.5px var(--mono)}

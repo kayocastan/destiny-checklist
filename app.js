@@ -4305,6 +4305,25 @@ async function ivLoadDet(iid) {
   } catch { INV.det[iid] = { err: true }; }
   if ($('ivdlg')?.open) ivDraw();
 }
+/* descrição das vantagens e mods: muitos vêm sem texto no item e o texto real fica nos "perks" da Bungie; busca só o que falta e guarda no aparelho */
+const PDESC = { m: LS.get('dc-pdesc-' + (lang === 'pt' ? 'pt' : 'en'), {}), busy: new Set() };
+async function pdescLoad(hashes) {
+  const lc = lang === 'pt' ? 'pt-br' : 'en', need = hashes.filter(h => !(h in PDESC.m) && !PDESC.busy.has(h)).slice(0, 30); if (!need.length) return;
+  need.forEach(h => PDESC.busy.add(h));
+  await Promise.all(need.map(async h => {
+    try {
+      const d = await bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${h}/?lc=${lc}`, false);
+      const pk = (d.perks || []).filter(p => p.perkVisibility === 0 || p.perkVisibility == null).map(p => p.perkHash);
+      const txt = (await Promise.all(pk.slice(0, 4).map(ph => bungie(`/Destiny2/Manifest/DestinySandboxPerkDefinition/${ph}/?lc=${lc}`, false).then(sp => sp.isDisplayable === false ? '' : sp.displayProperties?.description || '').catch(() => '')))).filter(Boolean);
+      const own = d.displayProperties?.description || '', tip = (d.tooltipNotifications || []).map(t => t.displayString).filter(Boolean);
+      PDESC.m[h] = { d: [...new Set([own, ...txt, ...tip].map(t => t.trim()).filter(Boolean))].join('\n'), e: d.plug?.energyCost?.energyCost || 0, t: d.itemTypeDisplayName || '' };
+    } catch { PDESC.m[h] = { d: '', e: 0, t: '' }; }
+    PDESC.busy.delete(h);
+  }));
+  try { LS.set('dc-pdesc-' + (lang === 'pt' ? 'pt' : 'en'), PDESC.m); } catch {}
+  if ($('ivdlg')?.open) ivDraw();
+}
+const pdText = (h, pd) => PDESC.m[h]?.d || pd?.d || '';
 const STAT_NOBAR = new Set([4284893193, 3871231066, 2961396640, 1931675084, 2715839340, 447667954, 925767036, 2837207746]);
 function ivDraw() {
   const d = $('ivdlg'), T = ivt(), W = u(); if (!d) return; const x = ivFind(INV.sel); if (!x) { d.close(); return; }
@@ -4319,7 +4338,7 @@ function ivDraw() {
     const rlL = RL.st === 'ok' ? (RL.m[x.h] || []).filter(e => RL.mode === 'both' || !e[1] || e[1] === (RL.mode === 'pve' ? 'e' : 'v')) : [], rec = new Set(rlL.flatMap(e => e[0]));
     const isWish = pd => wcols.some(c => c.some(o => (o.ic && pd?.ic === o.ic) || (o.n && wishKey(pd?.n || '') === wishKey(o.n))));
     if (wcols.length) { const m = wcols.filter(c => cols.some(o => c.some(w => (w.ic && o.d.ic === w.ic) || (w.n && wishKey(o.d.n) === wishKey(w.n))))).length; wishC = `<span class="wish-m${m === wcols.length ? ' full' : ''}">☆ ${esc(T.wish(m, wcols.length))}</span>`; }
-    perks = cols.length ? `<span class="sea-k">${esc(T.perks)} · ${esc(T.perksN)}</span><div class="ivd-perks">${cols.map(o => { const opts = [...new Set([o.s.plugHash, ...(det.rp[o.i] || []).map(p => p.plugItemHash)])].filter(h => det.en[h]); return `<div class="ivd-pc">${opts.map(h => { const pd = det.en[h], on = h === o.s.plugHash; return `<button type="button" class="ivd-p${on ? ' on' : ''}${isWish(pd) ? ' w' : ''}" data-ivperk="${h}" title="${esc(pd.n)}" aria-label="${esc(pd.n)}">${pd.ic ? `<img src="${BNET}${pd.ic}" alt="">` : ''}${rec.has(h) ? '<i class="ivd-r" aria-hidden="true">✓</i>' : ''}</button>`; }).join('')}</div>`; }).join('')}</div>${INV.perk && det.en[INV.perk] ? `<div class="ivd-pd"><b>${esc(det.en[INV.perk].n)}</b><span>${esc(det.en[INV.perk].d)}</span>${isWish(det.en[INV.perk]) ? `<span class="w">☆ ${esc(wl ? T.wish(1, 1).replace(/ 1\/1$/, '') : '')}</span>` : ''}</div>` : ''}` : '';
+    perks = cols.length ? `<span class="sea-k">${esc(T.perks)} · ${esc(T.perksN)}</span><div class="ivd-perks">${cols.map(o => { const opts = [...new Set([o.s.plugHash, ...(det.rp[o.i] || []).map(p => p.plugItemHash)])].filter(h => det.en[h]); return `<div class="ivd-pc">${opts.map(h => { const pd = det.en[h], on = h === o.s.plugHash; return `<button type="button" class="ivd-p${on ? ' on' : ''}${isWish(pd) ? ' w' : ''}" data-ivperk="${h}" title="${esc(pd.n)}" aria-label="${esc(pd.n)}">${pd.ic ? `<img src="${BNET}${pd.ic}" alt="">` : ''}${rec.has(h) ? '<i class="ivd-r" aria-hidden="true">✓</i>' : ''}</button>`; }).join('')}</div>`; }).join('')}</div>${(() => { const sel = INV.perk && det.en[INV.perk] ? [INV.perk] : cols.map(o => o.s.plugHash), miss = sel.filter(h => !(h in PDESC.m)); if (miss.length) setTimeout(() => pdescLoad(miss)); return `<div class="ivd-pds">${sel.map(h => { const pd = det.en[h], P = PDESC.m[h], tx = pdText(h, pd); return `<div class="ivd-pd${INV.perk ? ' on' : ''}" data-ivperk="${h}">${pd.ic ? `<img src="${BNET}${pd.ic}" alt="">` : '<i></i>'}<div><b>${esc(pd.n)}${P?.e ? ` <small class="ivd-en">${P.e}⚡</small>` : ''}</b>${P?.t ? `<small>${esc(P.t)}</small>` : ''}<span>${tx ? esc(tx) : !(h in PDESC.m) ? '…' : ''}</span>${isWish(pd) ? `<span class="w">☆ ${esc(wl ? T.wish(1, 1).replace(/ 1\/1$/, '') : '')}</span>` : ''}</div></div>`; }).join('')}</div>`; })()}` : '';
     if (isW) { const RT = rlt(), g = rlGrade(x.iid, x.h), md = RT.mode[RL.mode === 'both' ? 'pve' : RL.mode], bestN = rlL.map(e => [e, e[0].filter(p => det.so.some(s => s.plugHash === p)).length / e[0].length]).sort((a, b) => b[1] - a[1])[0]?.[0]?.[2];
       perks += RL.st === 'ok' ? `<div class="ivd-rl rl-${g || 'x'}"><b>${esc(RT.det)}</b><span>${esc(!rlL.length ? RT.detNo : g === 'g' ? RT.detG(RL.mode === 'both' ? 'PvE/PvP' : md) : g === 'p' ? RT.detP : RT.detN)}</span>${rlL.length ? `<small>${esc(RT.legend)}</small><ul class="rl-leg">${RT.leg.map(([k, a, b]) => `<li class="${k === g ? 'on' : ''}"><i class="rl-b rl-${k}">${{ g: '✓', p: '½', n: '✕' }[k]}</i><b>${esc(a.slice(2))}</b> <span>${esc(b)}</span></li>`).join('')}</ul>` : ''}${bestN ? `<small><b>${esc(RT.note)}:</b> ${esc(bestN)}</small>` : ''}</div>` : ''; }
     const sk = Object.entries(det.st).map(([h, v]) => ({ h: +h, v: v.value, n: det.sd[h]?.n || '' })).filter(s => s.n);
@@ -4341,7 +4360,7 @@ function ivDraw() {
 }
 function ivOpen(iid) {
   let d = $('ivdlg'); if (!d) { d = document.createElement('dialog'); d.id = 'ivdlg'; d.className = 'pf ivdlg'; document.body.append(d);
-    d.addEventListener('click', e => { if (e.target === d || e.target.closest('.pf-x')) { d.close(); return; } const b = e.target.closest('[data-ivdo]'); if (b) { ivDo(INV.sel, b.dataset.ivdo, !!b.dataset.iveq); return; } const t = e.target.closest('[data-ivtag]'); if (t) { const m = LS.get('dc-tags', {}); if (m[INV.sel] === t.dataset.ivtag) delete m[INV.sel]; else m[INV.sel] = t.dataset.ivtag; LS.set('dc-tags', m); ivRefresh(); return; } const p = e.target.closest('[data-ivperk]'); if (p) { INV.perk = +p.dataset.ivperk; ivDraw(); } });
+    d.addEventListener('click', e => { if (e.target === d || e.target.closest('.pf-x')) { d.close(); return; } const b = e.target.closest('[data-ivdo]'); if (b) { ivDo(INV.sel, b.dataset.ivdo, !!b.dataset.iveq); return; } const t = e.target.closest('[data-ivtag]'); if (t) { const m = LS.get('dc-tags', {}); if (m[INV.sel] === t.dataset.ivtag) delete m[INV.sel]; else m[INV.sel] = t.dataset.ivtag; LS.set('dc-tags', m); ivRefresh(); return; } const p = e.target.closest('[data-ivperk]'); if (p) { INV.perk = INV.perk === +p.dataset.ivperk ? null : +p.dataset.ivperk; ivDraw(); } });
     d.addEventListener('change', e => { if (e.target.id !== 'ivnote') return; const m = LS.get('dc-notes', {}); const v = e.target.value.trim(); if (v) m[INV.sel] = v; else delete m[INV.sel]; const ks = Object.keys(m); if (ks.length > 500) delete m[ks[0]]; LS.set('dc-notes', m); }); }
   INV.sel = iid; INV.perk = null; INV.msg = null; ivDraw(); if (!d.open) d.showModal();
 }
