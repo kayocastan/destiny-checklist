@@ -3213,7 +3213,7 @@ document.addEventListener('click', e => {
   const m = LS.get('dc-tags', {}), id = b.dataset.tag, n = TAGS[TAGS.indexOf(m[id] || '') + 1];
   if (n) m[id] = n; else delete m[id];
   const ks = Object.keys(m); if (ks.length > 1500) for (const k of ks.slice(0, ks.length - 1500)) delete m[k];
-  LS.set('dc-tags', m); LC.on.delete(id); LC.off.delete(id);
+  LS.set('dc-tags', m); LC.on.delete(id); LC.off.delete(id); if (m[id] === 'keep' && typeof keepLock === 'function') keepLock(id);
   if ($('lcdlg')?.open) lcDraw(); else document.querySelectorAll(`[data-tag="${CSS.escape(id)}"]`).forEach(x => { x.outerHTML = tagBtn(id); });
 }, true);
 // quão perto do rolo desejado (lista de desejos) está esta cópia: colunas atendidas / colunas escolhidas
@@ -4254,7 +4254,7 @@ const ivMatch = x => {
   const hay = palNorm([d.n, d.tl, x.ex ? 'exotico exotic' : '', x.dup ? 'repetidas repetida dupe dupes' : '', t === 'junk' ? 'lixo junk' : t === 'fav' ? 'favorito favorite' : t === 'keep' ? 'manter keep' : t === 'inf' ? 'infundir infuse' : '', ivt().slots[x.slot], ELEMENTS[x.el] || '', LS.get('dc-notes', {})[x.iid] || ''].join(' '));
   return q.split(/\s+/).every(w => hay.includes(w));
 };
-const ivTile = (x, big) => { const d = INVD[x.h] || {}, t = tagOf(x.iid), m = ivMatch(x); return `<button type="button" class="iv-t${big ? ' big' : ''}${x.ex ? ' ex' : ''}${m ? '' : ' dim'}${INV.picked.has(x.iid) ? ' pk' : ''}" data-iv="${x.iid}" draggable="true" title="${esc([d.n, x.pw ? '✦ ' + x.pw : '', d.tl].filter(Boolean).join(' · '))}" aria-label="${esc(d.n || '')}">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy" draggable="false">` : ''}${x.pw ? `<b>${x.pw}</b>` : ''}${t ? `<i class="iv-tg t-${t}">${{ fav: '★', keep: '✓', junk: '✕', inf: '⇪' }[t]}</i>` : ''}${x.el && ELEMENTS[x.el] && x.slot < 3 ? `<s class="el-${ELEMENTS[x.el]}"></s>` : ''}${x.slot < 3 ? rlBadge(rlGrade(x.iid, x.h)) : ''}</button>`; };
+const ivTile = (x, big) => { const d = INVD[x.h] || {}, t = tagOf(x.iid), m = ivMatch(x); return `<button type="button" class="iv-t${big ? ' big' : ''}${x.ex ? ' ex' : ''}${m ? '' : ' dim'}${INV.picked.has(x.iid) ? ' pk' : ''}" data-iv="${x.iid}" draggable="true" title="${esc([d.n, x.pw ? '✦ ' + x.pw : '', d.tl].filter(Boolean).join(' · '))}" aria-label="${esc(d.n || '')}">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy" draggable="false">` : ''}${x.pw ? `<b>${x.pw}</b>` : ''}${t ? `<i class="iv-tg t-${t}">${{ fav: '★', keep: '✓', junk: '✕', inf: '⇪' }[t]}</i>` : ''}${x.el && ELEMENTS[x.el] && x.slot < 3 ? `<s class="el-${ELEMENTS[x.el]}"></s>` : ''}${x.slot < 3 ? rlBadge(rlGrade(x.iid, x.h)) : ''}${x.lk ? '<u class="iv-lk" aria-hidden="true"><svg viewBox="0 0 12 12" width="10" height="10" fill="currentColor"><path d="M3.5 5V3.6a2.5 2.5 0 0 1 5 0V5h.7c.4 0 .8.4.8.8v4.4c0 .4-.4.8-.8.8H2.8a.8.8 0 0 1-.8-.8V5.8c0-.4.4-.8.8-.8zm1.2 0h2.6V3.6a1.3 1.3 0 0 0-2.6 0z"/></svg></u>' : ''}</button>`; };
 function ivBar() {
   const T = ivt(), chip = (k, t) => `<button type="button" class="lbd-chip${INV.f === k ? ' on' : ''}" data-ivf="${k}">${esc(t)}</button>`;
   return `<div class="iv-bar"><label class="iv-q"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/></svg><input type="search" id="ivq" value="${esc(INV.q)}" placeholder="${esc(T.q)}" aria-label="${esc(T.q)}" autocomplete="off"></label><div class="lbd-chips">${chip('all', T.all)}${chip('w', T.w)}${chip('a', T.a)}${chip('dup', T.dup)}${chip('fav', T.fav)}${chip('junk', T.junk)}${RL.st === 'ok' ? chip('rg', '✓ ' + rlt().fG) + chip('rn', '✕ ' + rlt().fN) : ''}</div><small class="iv-tip">${esc(T.tip)}</small></div>${INV.msg ? `<p class="iv-msg${INV.msg.bad ? ' bad' : ''}">${esc(INV.msg.t)}</p>` : ''}`;
@@ -4438,6 +4438,7 @@ function ivDraw() {
     <aside class="ivd-side"><span class="sea-k">${esc(T.equip)} <small class="lb-beta">${esc(T.beta)}</small></span><div class="ivd-row">${chars.map(c => btn(c.characterId, true, W.classes[c.classType], !canCls(c) || (x.eq && x.where === c.characterId))).join('')}</div>
       <span class="sea-k">${esc(T.move)}</span><div class="ivd-row">${x.where !== 'v' ? btn('v', false, T.vaultTo) : ''}${chars.filter(c => c.characterId !== x.where).map(c => btn(c.characterId, false, W.classes[c.classType])).join('')}</div>
       ${INV.msg ? `<p class="iv-msg${INV.msg.bad ? ' bad' : ''}">${esc(INV.msg.t)}</p>` : ''}
+      <span class="sea-k">${esc(lkt().lockT)}</span><div class="ivd-row"><button type="button" class="lbd-btn ivd-lk${x.lk ? ' on' : ''}" data-ivlock="${x.lk ? 0 : 1}" title="${esc(x.lk ? lkt().tipU : lkt().tipL)}"${INV.busy ? ' disabled' : ''}>${esc(x.lk ? lkt().unlock : lkt().lock)}</button></div><label class="ivd-kl"><input type="checkbox" id="keeplock"${LS.get('dc-keeplock', true) ? ' checked' : ''}> ${esc(lkt().keepAuto)}</label>
       <span class="sea-k">${esc(T.tag)}</span><div class="ivd-row">${TAGS.map(t => `<button type="button" class="tag-b${tg === t ? ' t-' + t : ''}" data-ivtag="${t}">${esc(tagl()[t])}</button>`).join('')}</div>
       <label class="tr-q">${esc(T.note)}<input type="text" id="ivnote" maxlength="120" value="${esc(notes[x.iid] || '')}" placeholder="${esc(T.notePh)}"></label>
       <span class="sea-k">${esc(T.more)}</span><a href="https://www.light.gg/db/items/${x.h}/" target="_blank" rel="noopener">${esc(T.lgg)} ↗</a></aside></div></div>`;
@@ -4445,7 +4446,7 @@ function ivDraw() {
 }
 function ivOpen(iid) {
   let d = $('ivdlg'); if (!d) { d = document.createElement('dialog'); d.id = 'ivdlg'; d.className = 'pf ivdlg'; document.body.append(d);
-    d.addEventListener('click', e => { if (e.target === d || e.target.closest('.pf-x')) { d.close(); return; } const b = e.target.closest('[data-ivdo]'); if (b) { ivDo(INV.sel, b.dataset.ivdo, !!b.dataset.iveq); return; } const t = e.target.closest('[data-ivtag]'); if (t) { const m = LS.get('dc-tags', {}); if (m[INV.sel] === t.dataset.ivtag) delete m[INV.sel]; else m[INV.sel] = t.dataset.ivtag; LS.set('dc-tags', m); ivRefresh(); return; } const p = e.target.closest('[data-ivperk]'); if (p) { const same = INV.perk === +p.dataset.ivperk; INV.perk = same ? null : +p.dataset.ivperk; INV.sock = !same && p.dataset.ivsock ? +p.dataset.ivsock : null; INV.mp = null; ivDraw(); } });
+    d.addEventListener('click', e => { if (e.target === d || e.target.closest('.pf-x')) { d.close(); return; } const b = e.target.closest('[data-ivdo]'); if (b) { ivDo(INV.sel, b.dataset.ivdo, !!b.dataset.iveq); return; } const t = e.target.closest('[data-ivtag]'); if (t) { const m = LS.get('dc-tags', {}); if (m[INV.sel] === t.dataset.ivtag) delete m[INV.sel]; else m[INV.sel] = t.dataset.ivtag; LS.set('dc-tags', m); ivRefresh(); if (m[INV.sel] === 'keep') keepLock(INV.sel); return; } const p = e.target.closest('[data-ivperk]'); if (p) { const same = INV.perk === +p.dataset.ivperk; INV.perk = same ? null : +p.dataset.ivperk; INV.sock = !same && p.dataset.ivsock ? +p.dataset.ivsock : null; INV.mp = null; ivDraw(); } });
     d.addEventListener('change', e => { if (e.target.id !== 'ivnote') return; const m = LS.get('dc-notes', {}); const v = e.target.value.trim(); if (v) m[INV.sel] = v; else delete m[INV.sel]; const ks = Object.keys(m); if (ks.length > 500) delete m[ks[0]]; LS.set('dc-notes', m); }); }
   INV.sel = iid; INV.perk = null; INV.sock = null; INV.mp = null; INV.msg = null; ivDraw(); if (!d.open) d.showModal();
 }
@@ -4731,10 +4732,41 @@ function rlGrade(iid, h, extra) {
   return best === 1 ? 'g' : best >= 0.5 ? 'p' : 'n';
 }
 const rlBadge = g => g ? `<i class="rl-b rl-${g}" aria-label="${esc(rlt()[g])}">${{ g: '✓', p: '½', n: '✕' }[g]}</i>` : '';
+/* cadeado do jogo: travar impede reciclar por engano (a Bungie deixa travar/destravar pela API, inclusive dentro de atividade) */
+const LKT = { pt: { lock: '🔓 Travar no jogo', unlock: '🔒 Travado no jogo', lockT: 'Cadeado', tipL: 'Trava o item no jogo: ele não pode ser reciclado até destravar.', tipU: 'Toque para destravar no jogo.', going: 'Mudando o cadeado…', okL: 'Travado no jogo.', okU: 'Destravado no jogo.', keepAuto: '“Manter” também trava no jogo', bulk: n => `🔒 Travar rolos bons (${n})`, bulkT: n => `Travar ${n} armas com rolo bom?`, bulkN: 'Só trava, nada é movido ou reciclado. Dá para destravar depois, aqui ou no jogo.', bulkGo: n => `Confirmar e travar ${n}`, bulkX: 'Cancelar', bulkRun: (a, b) => `Travando ${a}/${b}…`, bulkDone: (a, f) => `${a} travadas${f ? ` · ${f} falharam` : ''}.`, bulkNone: 'Todas as armas com rolo bom já estão travadas.' },
+  en: { lock: '🔓 Lock in game', unlock: '🔒 Locked in game', lockT: 'Lock', tipL: 'Locks the item in game: it cannot be dismantled until unlocked.', tipU: 'Tap to unlock in game.', going: 'Changing lock…', okL: 'Locked in game.', okU: 'Unlocked in game.', keepAuto: '“Keep” also locks in game', bulk: n => `🔒 Lock god rolls (${n})`, bulkT: n => `Lock ${n} god-roll weapons?`, bulkN: 'It only locks; nothing is moved or dismantled. You can unlock later, here or in game.', bulkGo: n => `Confirm and lock ${n}`, bulkX: 'Cancel', bulkRun: (a, b) => `Locking ${a}/${b}…`, bulkDone: (a, f) => `${a} locked${f ? ` · ${f} failed` : ''}.`, bulkNone: 'All god-roll weapons are already locked.' } };
+const lkt = () => LKT[lang === 'pt' ? 'pt' : 'en'];
+async function ivLock(x, state) {
+  const ch = x.where !== 'v' ? x.where : Object.keys(profile.characters?.data || {})[0];
+  await wPost('/Destiny2/Actions/Items/SetLockState/', { state: !!state, itemId: x.iid, characterId: ch });
+  if (x.it) x.it.state = state ? (x.it.state | 1) : (x.it.state & ~1); x.lk = !!state;
+}
+async function ivLockUI(iid, state) {
+  const T = lkt(), x = ivFind(iid); if (!x || INV.busy) return; INV.busy = true; INV.msg = { t: T.going }; ivRefresh();
+  try { await ivLock(x, state); INV.msg = { t: state ? T.okL : T.okU }; } catch (e) { INV.msg = { bad: true, t: wMsg(e) }; }
+  INV.busy = false; ivRefresh();
+}
+// "Manter" trava no jogo junto (só trava; tirar a etiqueta não destrava)
+const keepLock = id => { const x = ivFind(id); if (x && !x.lk && LS.get('dc-keeplock', true)) ivLockUI(id, true); };
+const LKB = { st: '', ids: [], n: 0, f: 0 };
+const lkbList = () => invAll().filter(x => x.slot < 3 && !x.lk && rlGrade(x.iid, x.h) === 'g');
+function lkbHTML() {
+  const T = lkt(); if (LKB.st === 'ask') return `<div class="lkb"><b>${esc(T.bulkT(LKB.ids.length))}</b><small>${esc(T.bulkN)}</small><div class="lkb-l">${LKB.ids.map(id => ivFind(id)).filter(Boolean).map(x => `<span>${esc(ivName(x))}${x.pw ? ` <small>✦ ${x.pw}</small>` : ''}</span>`).join('')}</div><div class="lkb-a"><button type="button" class="lb-run" data-lkbgo>${esc(T.bulkGo(LKB.ids.length))}</button><button type="button" class="linkb" data-lkbx>${esc(T.bulkX)}</button></div></div>`;
+  if (LKB.st === 'run') return `<div class="lkb"><b class="wait">${esc(T.bulkRun(LKB.n + LKB.f, LKB.ids.length))}</b></div>`;
+  if (LKB.st === 'done') return `<div class="lkb"><b>${esc(T.bulkDone(LKB.n, LKB.f))}</b><button type="button" class="linkb" data-lkbx>OK</button></div>`;
+  return '';
+}
+document.addEventListener('click', async e => {
+  if (e.target.closest('[data-lkb]')) { LKB.ids = lkbList().map(x => x.iid); LKB.st = LKB.ids.length ? 'ask' : 'none'; if (LKB.st === 'none') { LKB.st = 'done'; LKB.n = 0; LKB.f = 0; } render(); return; }
+  if (e.target.closest('[data-lkbx]')) { LKB.st = ''; render(); return; }
+  if (e.target.closest('[data-lkbgo]') && LKB.st === 'ask') { LKB.st = 'run'; LKB.n = 0; LKB.f = 0; render(); for (const id of LKB.ids) { const x = ivFind(id); try { if (x && !x.lk) await ivLock(x, true); LKB.n++; } catch { LKB.f++; } render(); } LKB.st = 'done'; render(); return; }
+  const l = e.target.closest('[data-ivlock]'); if (l) { ivLockUI(INV.sel, l.dataset.ivlock === '1'); }
+});
+document.addEventListener('change', e => { if (e.target.id === 'keeplock') LS.set('dc-keeplock', e.target.checked); });
 function rlBar(list) {
   const T = rlt(); if (RL.st !== 'ok') { if (!RL.st) setTimeout(rlLoad); return RL.st === 'err' ? `<div class="rl-bar"><small>${esc(T.err)}</small></div>` : `<div class="rl-bar"><small class="wait">${esc(T.load)}</small></div>`; }
   const w = list.filter(x => x.slot < 3), gs = w.map(x => rlGrade(x.iid, x.h)), c = k => gs.filter(g => g === k).length;
-  return `<div class="rl-bar"><span><b>${esc(T.t)}</b><small>${esc(T.src)} · ${esc(T.upd(new Date(RL.at).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR')))}</small></span><div class="vl-seg rl-mode">${Object.entries(T.mode).map(([k, t]) => `<button type="button" data-rlmode="${k}" aria-pressed="${RL.mode === k}">${esc(t)}</button>`).join('')}</div><div class="rl-k" title="${esc(T.leg.map(x => x[1] + ': ' + x[2]).join(' · '))}"><div class="g"><small>${esc(T.g)}</small><b>${c('g')}</b></div><div class="p"><small>${esc(T.p)}</small><b>${c('p')}</b></div><div class="n"><small>${esc(T.n)}</small><b>${c('n')}</b></div></div></div>`;
+  return `<div class="rl-bar"><span><b>${esc(T.t)}</b><small>${esc(T.src)} · ${esc(T.upd(new Date(RL.at).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR')))}</small></span><div class="vl-seg rl-mode">${Object.entries(T.mode).map(([k, t]) => `<button type="button" data-rlmode="${k}" aria-pressed="${RL.mode === k}">${esc(t)}</button>`).join('')}</div><div class="rl-k" title="${esc(T.leg.map(x => x[1] + ': ' + x[2]).join(' · '))}"><div class="g"><small>${esc(T.g)}</small><b>${c('g')}</b></div><div class="p"><small>${esc(T.p)}</small><b>${c('p')}</b></div><div class="n"><small>${esc(T.n)}</small><b>${c('n')}</b></div></div>${(() => { const n = lkbList().length; return n && !LKB.st ? `<button type="button" class="lbd-btn rl-lk" data-lkb>${esc(lkt().bulk(n))}</button>` : ''; })()}</div>${lkbHTML()}`;
 }
 document.addEventListener('click', e => { const b = e.target.closest('[data-rlmode]'); if (!b) return; RL.mode = b.dataset.rlmode; LS.set('dc-rlmode', RL.mode); render(); if ($('ivdlg')?.open) ivDraw(); });
 
