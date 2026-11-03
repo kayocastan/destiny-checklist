@@ -1260,7 +1260,7 @@ function gdHTML() {
   const sv = savedList();
   const saved = `<article class="gd"><div class="gd-head"><h2>${esc(W.savedT)}</h2></div>${sv.length ? `<ul class="sq">${sv.map((x, i) => `<li><button type="button" class="cl-p sq-p sv-p" data-sv="${i}" title="${esc(W.seeBuild)}"><span class="sq-n">${esc(x.title || x.t)}</span></button>${profile?.characters?.data?.[x.cid] ? wBtn(`data-svap="${i}"`) : member ? `<button type="button" class="lbd-btn sv-cp" data-svcp="${i}">${esc(cpt().short)}</button>` : ''}</li>`).join('')}</ul>` : `<p>${esc(W.savedNone)}</p>`}</article>`;
   if (tab === 'grep') return `<div class="panel">${repHTML()}</div>`;
-  return tab === 'gst' ? `<div class="panel">${seasonHTML()}${grHTML()}${statsA}${clears}${wp}${comm}</div>` : tab === 'gcl' ? `<div class="panel">${clvHTML()}${rosterHTML() || clan}</div>` : tab === 'gclb' ? `<div class="panel">${clanBoardHTML() || clan}</div>` : tab === 'gclg' ? `<div class="panel">${firstHTML()}${clanCkHTML()}${cmpGHTML()}</div>` : `<div class="panel">${lbHTML()}${lpaHTML()}${saved}${fav}${FX ? wishHTML() : ''}${rec}${opts}</div>`;
+  return tab === 'gst' ? `<div class="panel">${seasonHTML()}${evoHTML()}${grHTML()}${statsA}${clears}${wp}${comm}</div>` : tab === 'gcl' ? `<div class="panel">${clvHTML()}${rosterHTML() || clan}</div>` : tab === 'gclb' ? `<div class="panel">${clanBoardHTML() || clan}</div>` : tab === 'gclg' ? `<div class="panel">${firstHTML()}${clanCkHTML()}${cmpGHTML()}</div>` : `<div class="panel">${lbHTML()}${lpaHTML()}${saved}${fav}${FX ? wishHTML() : ''}${rec}${opts}</div>`;
 }
 
 /* Título do cabeçalho: subclasse + classe ("Titã Combatente" / "Striker Titan"); se o nome da subclasse já traz a classe ("Titã Prismático"), usa só ele */
@@ -1451,7 +1451,7 @@ function render() {
   if (tab === 'obj' && have.a && member && LIVE.checked && !LIVE.on) loadSession();
   if ((tab === 'raid' || tab === 'dg' || tab === 'xm') && have.a && member) loadActHist();
   if (tab === 'xm') loadXmRec();
-  $('list').innerHTML = `<div class="panel">${tab === 'obj' ? newsHTML() : ''}${tab === 'prog' ? chalHTML() : ''}${tab === 'obj' ? sessHTML() : ''}${wkBar}${tsBar}${secs.map(sec => {
+  $('list').innerHTML = `<div class="panel">${tab === 'obj' ? newsHTML() + todoHTML() : ''}${tab === 'prog' ? chalHTML() : ''}${tab === 'obj' ? sessHTML() : ''}${wkBar}${tsBar}${secs.map(sec => {
     if (sec.html) return sec.id === 'vendors' ? vendorsHTML() : sec.id === 'xmissions' ? xmHTML() : sec.id === 'goals' ? goalsHTML() : sec.id === 'post' ? postHTML() : sec.id === 'wishobj' ? wishObjHTML() : sec.id === 'focus' ? focusHTML() : sec.id === 'grank' ? grObjHTML() : '';
     if (FX && sec.id === 'week' && sec.items.length) return weekHTML(sec);
     if (sec.empty) return `<p class="empty-msg${/…$/.test(sec.note || '') ? ' wait' : ''}">${esc(sec.note)}</p>`;
@@ -2280,7 +2280,7 @@ function sessHTML() {
    Favoritos, builds salvas, marcações e preferências ficam ligados à conta Bungie.
    Cada chave guarda a hora da última mudança; a mais nova vence. Na primeira vez num aparelho, listas são somadas. */
 const SY = { t: LS.get('dc-synct', {}), dirty: new Set(), timer: null, applying: false, pulled: 0 };
-const syKeys = () => member ? ['favs', 'builds', 'opts', 'hide2', 'goals', 'wish', 'focus', 'tags', 'notes', 'marks-' + member.id] : [];
+const syKeys = () => member ? ['favs', 'builds', 'opts', 'hide2', 'goals', 'wish', 'focus', 'tags', 'notes', 'evo', 'marks-' + member.id] : [];
 LS.hook = k => {
   if (SY.applying || !member || !k.startsWith('dc-')) return; const n = k.slice(3);
   if (!syKeys().includes(n)) return;
@@ -2288,6 +2288,7 @@ LS.hook = k => {
   clearTimeout(SY.timer); SY.timer = setTimeout(syncPush, 2500);
 };
 function syMerge(n, a, b) {
+  if (n === 'evo' && Array.isArray(a) && Array.isArray(b)) { const m = new Map([...b, ...a].map(x => [x.d, x])); return [...m.values()].sort((x, y) => x.d < y.d ? -1 : 1).slice(-500); }
   if ((n === 'tags' || n === 'notes') && a && b && typeof a === 'object' && typeof b === 'object') return { ...b, ...a };
   if (!Array.isArray(a) || !Array.isArray(b)) return b;
   if (n === 'favs') return [...a, ...b.filter(x => !a.some(y => y.id === x.id))].slice(0, 30);
@@ -3127,11 +3128,13 @@ function lcWeapons() {
 const LC_PERK = /^(barrels|magazines|magazines_gl|frames|scopes|guards|blades|tubes|arrows|batteries|bowstrings|grips|hafts|stocks|origins)$/;
 function lcPerks(w) { return (LB.sk[w.id]?.sockets || []).map(s => s.plugHash).filter(h => h && LC_PERK.test(LB.en[h]?.pc || '')); }
 const lcJunk = () => [...(LB.pieces || []), ...(LB.wpns || [])].filter(x => tagOf(x.id) === 'junk' && !x.eqc && !lcEq(x.id) && !x.lk);
+const lcRlNone = () => RL.st === 'ok' ? (LB.wpns || []).filter(w => !w.eqc && !lcEq(w.id) && !w.lk && !w.exo && !tagSafe(w.id) && tagOf(w.id) !== 'junk' && rlGrade(w.id, w.h, (LB.sk[w.id]?.sockets || []).map(s => s.plugHash)) === 'n') : [];
 function lcSelected() {
   const sel = [];
   if (LC.base) for (const { p } of lcArmor().list) if (!LC.off.has(p.id) && (!tagSafe(p.id) || LC.on.has(p.id))) sel.push(p.id);
   for (const g of lcWeapons().groups) g.forEach((w, i) => { if (!w.lk && !lcEq(w.id) && (LC.on.has(w.id) || (i > 0 && !LC.off.has(w.id) && !tagSafe(w.id)))) sel.push(w.id); });
   for (const x of lcJunk()) if (!LC.off.has(x.id) && !sel.includes(x.id)) sel.push(x.id);
+  for (const w of lcRlNone()) if (LC.on.has(w.id) && !sel.includes(w.id)) sel.push(w.id);
   return [...new Set(sel)];
 }
 // link para o Organizador do DIM já filtrado (categoria: 1 armas; 22 Titã, 23 Caçador, 21 Arcano)
@@ -3163,6 +3166,7 @@ function lcDraw() {
   d.innerHTML = `<div class="pf-box lbd-box lcd-box">${close}${head}${bar}<div class="lcd-scroll"><p class="lbd-n">${esc(T.how)}</p>
     <div class="lcd-cols"><section class="lbd-s"><h2>${esc(T.arm)} <small>${A.list.length}</small></h2><p class="lbd-n">${esc(T.armN)}</p>${byCls || `<p class="lbd-idle">${esc(T.none)}</p>`}${A.locked ? `<p class="lbd-n">${esc(T.locked(A.locked))}</p>` : ''}</section>
     <section class="lbd-s"><div class="lcd-sh"><h2>${esc(T.wp)} <small>${WP.groups.length}</small></h2>${lcLink(wIds, 1)}</div><p class="lbd-n">${esc(T.wpN)}</p>${wrows || `<p class="lbd-idle">${esc(T.none)}</p>`}</section></div>
+    ${(() => { if (!RL.st) setTimeout(rlLoad); const N = lcRlNone(); return N.length ? `<section class="lbd-s"><h2>${esc(rlt().lcT)} <small>${N.length}</small></h2><p class="lbd-n">${esc(rlt().lcN)}</p>${N.map(x => `<label class="lcd-row"><input type="checkbox" data-lcid="${x.id}"${sel.has(x.id) ? ' checked' : ''}><span class="lcd-pc"><img src="${BNET}${x.ic}" alt="" loading="lazy"><span><b>${esc(x.n)}</b><small>${x.pw ? '✦ ' + x.pw : ''}</small></span></span>${tagBtn(x.id)}</label>`).join('')}</section>` : ''; })()}
     ${(() => { const J = lcJunk(); return J.length ? `<section class="lbd-s"><h2>${esc(tagl().junkT)} <small>${J.length}</small></h2>${J.map(x => `<label class="lcd-row"><input type="checkbox" data-lcid="${x.id}"${sel.has(x.id) ? ' checked' : ''}><span class="lcd-pc${x.exo ? ' exo' : ''}">${x.ic ? `<img src="${BNET}${x.ic}" alt="" loading="lazy">` : ''}<span><b>${esc(x.n)}</b><small>${esc(x.pw ? '✦ ' + x.pw : x.where ? where(x) : '')}</small></span></span>${tagBtn(x.id)}</label>`).join('')}</section>` : ''; })()}
     <p class="lbd-n lb-clan">${esc(lw().clan)}</p></div></div>`;
   const nb = d.querySelector('.lcd-scroll'); if (nb) nb.scrollTop = y;
@@ -4067,15 +4071,15 @@ function invAll() {
 const ivName = x => INVD[x.h]?.n || '';
 const ivMatch = x => {
   const f = INV.f, q = palNorm(INV.q.trim()), d = INVD[x.h] || {}, t = tagOf(x.iid);
-  if (f === 'w' && x.slot > 2 || f === 'a' && x.slot < 3 || f === 'dup' && !x.dup || f === 'fav' && t !== 'fav' || f === 'junk' && t !== 'junk') return false;
+  if ((f === 'rg' || f === 'rn') && (x.slot > 2 || rlGrade(x.iid, x.h) !== (f === 'rg' ? 'g' : 'n')) || f === 'w' && x.slot > 2 || f === 'a' && x.slot < 3 || f === 'dup' && !x.dup || f === 'fav' && t !== 'fav' || f === 'junk' && t !== 'junk') return false;
   if (!q) return true;
   const hay = palNorm([d.n, d.tl, x.ex ? 'exotico exotic' : '', x.dup ? 'repetidas repetida dupe dupes' : '', t === 'junk' ? 'lixo junk' : t === 'fav' ? 'favorito favorite' : t === 'keep' ? 'manter keep' : t === 'inf' ? 'infundir infuse' : '', ivt().slots[x.slot], ELEMENTS[x.el] || '', LS.get('dc-notes', {})[x.iid] || ''].join(' '));
   return q.split(/\s+/).every(w => hay.includes(w));
 };
-const ivTile = (x, big) => { const d = INVD[x.h] || {}, t = tagOf(x.iid), m = ivMatch(x); return `<button type="button" class="iv-t${big ? ' big' : ''}${x.ex ? ' ex' : ''}${m ? '' : ' dim'}${INV.picked.has(x.iid) ? ' pk' : ''}" data-iv="${x.iid}" draggable="true" title="${esc([d.n, x.pw ? '✦ ' + x.pw : '', d.tl].filter(Boolean).join(' · '))}" aria-label="${esc(d.n || '')}">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy" draggable="false">` : ''}${x.pw ? `<b>${x.pw}</b>` : ''}${t ? `<i class="iv-tg t-${t}">${{ fav: '★', keep: '✓', junk: '✕', inf: '⇪' }[t]}</i>` : ''}${x.el && ELEMENTS[x.el] && x.slot < 3 ? `<s class="el-${ELEMENTS[x.el]}"></s>` : ''}</button>`; };
+const ivTile = (x, big) => { const d = INVD[x.h] || {}, t = tagOf(x.iid), m = ivMatch(x); return `<button type="button" class="iv-t${big ? ' big' : ''}${x.ex ? ' ex' : ''}${m ? '' : ' dim'}${INV.picked.has(x.iid) ? ' pk' : ''}" data-iv="${x.iid}" draggable="true" title="${esc([d.n, x.pw ? '✦ ' + x.pw : '', d.tl].filter(Boolean).join(' · '))}" aria-label="${esc(d.n || '')}">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy" draggable="false">` : ''}${x.pw ? `<b>${x.pw}</b>` : ''}${t ? `<i class="iv-tg t-${t}">${{ fav: '★', keep: '✓', junk: '✕', inf: '⇪' }[t]}</i>` : ''}${x.el && ELEMENTS[x.el] && x.slot < 3 ? `<s class="el-${ELEMENTS[x.el]}"></s>` : ''}${x.slot < 3 ? rlBadge(rlGrade(x.iid, x.h)) : ''}</button>`; };
 function ivBar() {
   const T = ivt(), chip = (k, t) => `<button type="button" class="lbd-chip${INV.f === k ? ' on' : ''}" data-ivf="${k}">${esc(t)}</button>`;
-  return `<div class="iv-bar"><label class="iv-q"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/></svg><input type="search" id="ivq" value="${esc(INV.q)}" placeholder="${esc(T.q)}" aria-label="${esc(T.q)}" autocomplete="off"></label><div class="lbd-chips">${chip('all', T.all)}${chip('w', T.w)}${chip('a', T.a)}${chip('dup', T.dup)}${chip('fav', T.fav)}${chip('junk', T.junk)}</div><small class="iv-tip">${esc(T.tip)}</small></div>${INV.msg ? `<p class="iv-msg${INV.msg.bad ? ' bad' : ''}">${esc(INV.msg.t)}</p>` : ''}`;
+  return `<div class="iv-bar"><label class="iv-q"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/></svg><input type="search" id="ivq" value="${esc(INV.q)}" placeholder="${esc(T.q)}" aria-label="${esc(T.q)}" autocomplete="off"></label><div class="lbd-chips">${chip('all', T.all)}${chip('w', T.w)}${chip('a', T.a)}${chip('dup', T.dup)}${chip('fav', T.fav)}${chip('junk', T.junk)}${RL.st === 'ok' ? chip('rg', '✓ ' + rlt().fG) + chip('rn', '✕ ' + rlt().fN) : ''}</div><small class="iv-tip">${esc(T.tip)}</small></div>${INV.msg ? `<p class="iv-msg${INV.msg.bad ? ' bad' : ''}">${esc(INV.msg.t)}</p>` : ''}`;
 }
 function invHTML() {
   const T = ivt(), W = u(); if (!have.c) return `<div class="panel"><p class="empty-msg wait">${esc(T.wait)}</p></div>`;
@@ -4092,7 +4096,7 @@ function invHTML() {
     return `<div class="iv-l">${esc(T.slots[s])}</div>${cells}${showV ? `<div class="iv-c iv-v" data-ivdrop="v" data-ivslot="${s}"><small class="iv-vn">${esc(T.inVault(vs.length))}${dn ? ` · <b>${esc(T.dups(dn))}</b>` : ''}</small><div class="iv-vg">${vs.map(x => ivTile(x)).join('')}</div></div>` : ''}`;
   }).join('');
   const nc = cols.length + (showV ? 1 : 0);
-  return `<div class="panel iv-wrap">${ivBar()}${mob}<div class="iv-grid" style="--ivc:${cols.length};--ivv:${showV ? 1 : 0}"><span></span>${cols.map(head).join('')}${showV ? vHead : ''}${rows}</div></div>`;
+  return `<div class="panel iv-wrap">${rlBar(all)}${ivBar()}${mob}<div class="iv-grid" style="--ivc:${cols.length};--ivv:${showV ? 1 : 0}"><span></span>${cols.map(head).join('')}${showV ? vHead : ''}${rows}</div></div>`;
 }
 // Cofre organizado: categorias, agrupar e ordenar, vários de uma vez
 function vltHTML() {
@@ -4113,7 +4117,7 @@ function vltHTML() {
   const gHTML = Object.entries(groups).sort((a, b) => b[1].length - a[1].length).map(([n, xs]) => { const dn = new Set(xs.filter(x => x.dup).map(x => x.h)).size; return `<div class="vl-g"><span class="vl-gh"><b>${esc(n)}</b><small>${xs.length}</small>${dn ? `<small class="vl-d">${esc(T.dups(dn))}</small>` : ''}</span><div class="vl-tiles">${xs.map(x => ivTile(x)).join('')}</div></div>`; }).join('');
   const chars = ivChars(), pk = [...INV.picked].filter(id => V.some(x => x.iid === id) || all.some(x => x.iid === id));
   const bulk = INV.multi ? `<div class="vl-bulk"><b>${esc(T.sel(pk.length))}</b>${pk.length ? chars.map(c => `<button type="button" class="lbd-btn" data-ivbulk="${c.characterId}">${esc(T.take(W.classes[c.classType]))}</button>`).join('') + `<span class="vl-bt">${esc(T.tagAll)} ${TAGS.map(t => `<button type="button" class="tag-b t-${t}" data-ivbtag="${t}">${esc(tagl()[t])}</button>`).join('')}<button type="button" class="tag-b" data-ivbtag="">${esc(T.clear)}</button></span>` : ''}<small>${esc(T.noDel)}</small></div>` : '';
-  return `<div class="panel tr-wrap vl-wrap">${side}<section class="tr-main"><div class="tr-box"><div class="tr-hd"><h2>${esc(cur[1])}</h2><small>${esc(T.items(list.length))}</small><label class="vl-sort">${esc(T.sort)} <select id="vlsort">${[['pw', T.sP], ['wish', T.sW], ['tt', T.sR], ['name', T.sN]].map(([k, t]) => `<option value="${k}"${INV.vs === k ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select></label><button type="button" class="lbd-btn${INV.multi ? ' on' : ''}" data-ivmulti>${esc(INV.multi ? T.multiOff : T.multi)}</button></div>${INV.msg ? `<p class="iv-msg${INV.msg.bad ? ' bad' : ''}">${esc(INV.msg.t)}</p>` : ''}${bulk}${gHTML || `<p class="empty-msg">${esc(T.none)}</p>`}</div></section></div>`;
+  return `<div class="panel tr-wrap vl-wrap">${side}<section class="tr-main">${rlBar(V)}${RL.st === 'ok' ? `<div class="kids-row vl-rf">${[['all', u().w?.all || (lang === 'pt' ? 'Tudo' : 'All')], ['rg', '✓ ' + rlt().fG], ['rn', '✕ ' + rlt().fN]].map(([k, t]) => `<button type="button" class="kid" data-ivf="${k}" aria-pressed="${INV.f === k || (k === 'all' && !['rg', 'rn'].includes(INV.f))}">${esc(k === 'all' ? (lang === 'pt' ? 'Tudo' : 'All') : t)}</button>`).join('')}</div>` : ''}<div class="tr-box"><div class="tr-hd"><h2>${esc(cur[1])}</h2><small>${esc(T.items(list.length))}</small><label class="vl-sort">${esc(T.sort)} <select id="vlsort">${[['pw', T.sP], ['wish', T.sW], ['tt', T.sR], ['name', T.sN]].map(([k, t]) => `<option value="${k}"${INV.vs === k ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select></label><button type="button" class="lbd-btn${INV.multi ? ' on' : ''}" data-ivmulti>${esc(INV.multi ? T.multiOff : T.multi)}</button></div>${INV.msg ? `<p class="iv-msg${INV.msg.bad ? ' bad' : ''}">${esc(INV.msg.t)}</p>` : ''}${bulk}${gHTML || `<p class="empty-msg">${esc(T.none)}</p>`}</div></section></div>`;
 }
 /* mover e equipar (escrita na conta), com a cópia local do perfil atualizada na hora */
 function ivFind(iid) { return invAll().find(x => x.iid === iid); }
@@ -4174,9 +4178,12 @@ function ivDraw() {
   else {
     const isW = x.slot < 3, cols = det.so.map((s, i) => ({ s, i, d: det.en[s.plugHash] })).filter(o => o.d && (isW ? LC_PERK.test(o.d.pc || '') : /^enhancements\.(?!ghosts)|intrinsics/.test(o.d.pc || '') && o.s.plugHash));
     const wl = wishList().find(y => y.h === x.h || (y.n && wishKey(y.n) === wishKey(D.n))), wcols = wl ? (wl.r ? wl.r.filter(c => c?.length) : (wl.p || []).map(p => [p])) : [];
+    const rlL = RL.st === 'ok' ? (RL.m[x.h] || []).filter(e => RL.mode === 'both' || !e[1] || e[1] === (RL.mode === 'pve' ? 'e' : 'v')) : [], rec = new Set(rlL.flatMap(e => e[0]));
     const isWish = pd => wcols.some(c => c.some(o => (o.ic && pd?.ic === o.ic) || (o.n && wishKey(pd?.n || '') === wishKey(o.n))));
     if (wcols.length) { const m = wcols.filter(c => cols.some(o => c.some(w => (w.ic && o.d.ic === w.ic) || (w.n && wishKey(o.d.n) === wishKey(w.n))))).length; wishC = `<span class="wish-m${m === wcols.length ? ' full' : ''}">☆ ${esc(T.wish(m, wcols.length))}</span>`; }
-    perks = cols.length ? `<span class="sea-k">${esc(T.perks)} · ${esc(T.perksN)}</span><div class="ivd-perks">${cols.map(o => { const opts = [...new Set([o.s.plugHash, ...(det.rp[o.i] || []).map(p => p.plugItemHash)])].filter(h => det.en[h]); return `<div class="ivd-pc">${opts.map(h => { const pd = det.en[h], on = h === o.s.plugHash; return `<button type="button" class="ivd-p${on ? ' on' : ''}${isWish(pd) ? ' w' : ''}" data-ivperk="${h}" title="${esc(pd.n)}" aria-label="${esc(pd.n)}">${pd.ic ? `<img src="${BNET}${pd.ic}" alt="">` : ''}</button>`; }).join('')}</div>`; }).join('')}</div>${INV.perk && det.en[INV.perk] ? `<div class="ivd-pd"><b>${esc(det.en[INV.perk].n)}</b><span>${esc(det.en[INV.perk].d)}</span>${isWish(det.en[INV.perk]) ? `<span class="w">☆ ${esc(wl ? T.wish(1, 1).replace(/ 1\/1$/, '') : '')}</span>` : ''}</div>` : ''}` : '';
+    perks = cols.length ? `<span class="sea-k">${esc(T.perks)} · ${esc(T.perksN)}</span><div class="ivd-perks">${cols.map(o => { const opts = [...new Set([o.s.plugHash, ...(det.rp[o.i] || []).map(p => p.plugItemHash)])].filter(h => det.en[h]); return `<div class="ivd-pc">${opts.map(h => { const pd = det.en[h], on = h === o.s.plugHash; return `<button type="button" class="ivd-p${on ? ' on' : ''}${isWish(pd) ? ' w' : ''}" data-ivperk="${h}" title="${esc(pd.n)}" aria-label="${esc(pd.n)}">${pd.ic ? `<img src="${BNET}${pd.ic}" alt="">` : ''}${rec.has(h) ? '<i class="ivd-r" aria-hidden="true">✓</i>' : ''}</button>`; }).join('')}</div>`; }).join('')}</div>${INV.perk && det.en[INV.perk] ? `<div class="ivd-pd"><b>${esc(det.en[INV.perk].n)}</b><span>${esc(det.en[INV.perk].d)}</span>${isWish(det.en[INV.perk]) ? `<span class="w">☆ ${esc(wl ? T.wish(1, 1).replace(/ 1\/1$/, '') : '')}</span>` : ''}</div>` : ''}` : '';
+    if (isW) { const RT = rlt(), g = rlGrade(x.iid, x.h), md = RT.mode[RL.mode === 'both' ? 'pve' : RL.mode], bestN = rlL.map(e => [e, e[0].filter(p => det.so.some(s => s.plugHash === p)).length / e[0].length]).sort((a, b) => b[1] - a[1])[0]?.[0]?.[2];
+      perks += RL.st === 'ok' ? `<div class="ivd-rl rl-${g || 'x'}"><b>${esc(RT.det)}</b><span>${esc(!rlL.length ? RT.detNo : g === 'g' ? RT.detG(RL.mode === 'both' ? 'PvE/PvP' : md) : g === 'p' ? RT.detP : RT.detN)}</span>${rlL.length ? `<small>${esc(RT.legend)}</small>` : ''}${bestN ? `<small><b>${esc(RT.note)}:</b> ${esc(bestN)}</small>` : ''}</div>` : ''; }
     const sk = Object.entries(det.st).map(([h, v]) => ({ h: +h, v: v.value, n: det.sd[h]?.n || '' })).filter(s => s.n);
     if (!isW) sk.sort((a, b) => STAT_ORDER.indexOf(a.h) - STAT_ORDER.indexOf(b.h));
     stats = sk.length ? `<span class="sea-k">${esc(T.stats)}</span>${sk.map(s => `<div class="ivd-st"><span>${esc(s.n)}</span>${STAT_NOBAR.has(s.h) ? '<i></i>' : `<i class="sea-bar"><u style="width:${Math.min(100, s.v)}%"></u></i>`}<b>${s.v}</b></div>`).join('')}${!isW ? `<small class="lbd-n">${esc(T.mw)}</small>` : ''}` : '';
@@ -4192,7 +4199,7 @@ function ivDraw() {
       <span class="sea-k">${esc(T.tag)}</span><div class="ivd-row">${TAGS.map(t => `<button type="button" class="tag-b${tg === t ? ' t-' + t : ''}" data-ivtag="${t}">${esc(tagl()[t])}</button>`).join('')}</div>
       <label class="tr-q">${esc(T.note)}<input type="text" id="ivnote" maxlength="120" value="${esc(notes[x.iid] || '')}" placeholder="${esc(T.notePh)}"></label>
       <span class="sea-k">${esc(T.more)}</span><a href="https://www.light.gg/db/items/${x.h}/" target="_blank" rel="noopener">${esc(T.lgg)} ↗</a></aside></div></div>`;
-  if (!det) ivLoadDet(x.iid);
+  if (!det) ivLoadDet(x.iid); if (!RL.st && x.slot < 3) rlLoad();
 }
 function ivOpen(iid) {
   let d = $('ivdlg'); if (!d) { d = document.createElement('dialog'); d.id = 'ivdlg'; d.className = 'pf ivdlg'; document.body.append(d);
@@ -4366,6 +4373,125 @@ document.addEventListener('click', e => {
   const f = e.target.closest('[data-chf]'); if (f) { CHL.f = f.dataset.chf; if (CHL.f !== 'all') CHL.w = null; render(); return; }
   const w = e.target.closest('[data-chw]'); if (w) { const i = +w.dataset.chw; CHL.w = CHL.w === i ? null : i; render(); }
 });
+
+/* ---------- Hoje › O que fazer hoje: cruza o que falta para você com o que está em rotação ---------- */
+const TDT = { pt: { t: 'O que fazer hoje', sub: t => `o que falta para você × o que está em rotação · reset semanal em ${t}`, f: { all: 'Tudo', q: 'Até 30 min', solo: 'Solo', clan: 'Com o clã' }, tag: { rot: 'ROTAÇÃO DA SEMANA', tit: 'TÍTULO', cat: 'CATALISADOR', xur: 'XÛR', claim: 'PARA RESGATAR' }, until: 'até terça', hide: 'Já fiz · esconder', foc: '☆ Foco', see: 'Ver', guide: 'Ver guia', prep: '⚙ Preparar', none: 'Nada urgente agora: tudo em dia com a rotação.', hidden: n => `${n} escondido${n === 1 ? '' : 's'} até o reset · mostrar`, why: 'A ordem considera o que acaba antes (rotação, Xûr), o que está mais perto de completar e o que rende mais.',
+  rotEx: (a, x) => `${a} está em destaque e você ainda não tem ${x}.`, rotFirst: a => `${a} está em destaque e você nunca concluiu: boa semana para a primeira vez.`, rotTri: (a, n) => `${a} está em destaque: faltam ${n} triunfos dela.`, rotT: a => `${a} está em destaque`,
+  titT: (n, t) => `Faltam ${n} para o título “${t}”`, titW: (c) => c ? `Você já tem ${c} pronto${c === 1 ? '' : 's'} para resgatar no jogo.` : 'Está entre os títulos mais perto de completar.',
+  catT: (n, p) => `Catalisador da ${n} em ${p}%`, catW: 'É o catalisador mais perto de pronto. Use a arma nas próximas atividades.',
+  xurT: n => `Xûr vende ${n}`, xurW: (w) => w === 'col' ? 'É um exótico que você nunca pegou.' : 'Você não tem esse exótico em nenhum personagem nem no cofre.', xurSee: 'Ver no Xûr',
+  claimT: n => `${n} triunfos prontos para resgatar`, claimW: 'Já concluídos: falta só resgatar no jogo para ganhar as recompensas.', min: m => m >= 60 ? `~${Math.round(m / 60)} h` : `~${m} min`, grp: { raid: 'grupo de 6', dg: 'grupo de 3', solo: 'solo' } },
+  en: { t: 'What to do today', sub: t => `what you are missing × what is in rotation · weekly reset in ${t}`, f: { all: 'All', q: 'Up to 30 min', solo: 'Solo', clan: 'With the clan' }, tag: { rot: 'WEEKLY ROTATION', tit: 'TITLE', cat: 'CATALYST', xur: 'XÛR', claim: 'TO CLAIM' }, until: 'until Tuesday', hide: 'Done · hide', foc: '☆ Focus', see: 'Open', guide: 'Guide', prep: '⚙ Prepare', none: 'Nothing urgent: you are up to date with the rotation.', hidden: n => `${n} hidden until reset · show`, why: 'Order considers what ends first (rotation, Xûr), what is closest to done and what rewards most.',
+  rotEx: (a, x) => `${a} is featured and you still don't have ${x}.`, rotFirst: a => `${a} is featured and you have never cleared it: good week for a first clear.`, rotTri: (a, n) => `${a} is featured: ${n} of its triumphs left.`, rotT: a => `${a} is featured`,
+  titT: (n, t) => `${n} left for the “${t}” title`, titW: c => c ? `You already have ${c} ready to claim in game.` : 'It is among the titles closest to done.',
+  catT: (n, p) => `${n} catalyst at ${p}%`, catW: 'It is the catalyst closest to done. Use the weapon in your next activities.',
+  xurT: n => `Xûr sells ${n}`, xurW: w => w === 'col' ? 'An exotic you have never collected.' : 'You do not have this exotic on any character or in the vault.', xurSee: 'See at Xûr',
+  claimT: n => `${n} triumphs ready to claim`, claimW: 'Already done: claim them in game to get the rewards.', min: m => m >= 60 ? `~${Math.round(m / 60)} h` : `~${m} min`, grp: { raid: 'fireteam of 6', dg: 'fireteam of 3', solo: 'solo' } } };
+const tdt = () => TDT[lang === 'pt' ? 'pt' : 'en'];
+const TD = { f: 'all', show: false };
+function todoCards() {
+  const T = tdt(), out = []; if (!profile || !have.a) return out;
+  const F = featured(), secs = SECTIONS;
+  for (const kind of ['raid', 'dg']) for (const k of F[kind]) {
+    const a = (kind === 'raid' ? defs.raids : defs.dungeons).find(x => x.k === k), sec = secs.find(s => s.id === `${kind}-${k}`); if (!a || !sec) continue;
+    const clear = sec.items[0], ex = sec.items.find(i => i.isEx && !isDone(i)), tri = sec.items.find(i => i.tl), triLeft = tri ? tri.tl.filter(x => !x.ok).length : 0, n = L(a.n);
+    const why = ex ? T.rotEx(n, ex.exName || ex.t) : clear && !isDone(clear) ? T.rotFirst(n) : triLeft ? T.rotTri(n, triLeft) : ''; if (!why) continue;
+    out.push({ id: 'rot-' + kind + k, kind: 'rot', score: 90 + (ex ? 8 : 0), t: T.rotT(n), why, min: kind === 'raid' ? 90 : 50, grp: kind === 'raid' ? 'clan' : 'clan', gl: T.grp[kind], until: T.until, img: actImg(a.ah?.[0], kind, a.k), act: [{ t: T.guide, jump: `${kind}:${sec.id}` }, { t: T.prep, prep: `${kind}-${a.k}` }], foc: 'sec:' + sec.id, bar: tri ? { a: tri.tl.length - triLeft, b: tri.tl.length } : null });
+  }
+  const xm = xurMissing(); if (xm.length && XUR?.until && Date.parse(XUR.until) > Date.now()) { const x = xm[0]; out.push({ id: 'xur-' + x.h, kind: 'xur', score: 85, t: T.xurT(x.n), why: T.xurW(x.why), min: 5, grp: 'solo', gl: T.grp.solo, until: T.until, act: [{ t: T.xurSee, jump: 'vend:vendors' }] }); }
+  if (have.b) {
+    const st = defs.seals.map(se => { const rs = se.r.map(r => recState(r[0])).filter(r => r && !(r.state & 16)), done = rs.filter(recDone).length, claim = rs.filter(r => recDone(r) && !(r.state & 1)).length; return { se, done, tot: rs.length, claim }; }).filter(x => x.tot && x.done < x.tot && x.done / x.tot >= 0.6).sort((a, b) => (b.done / b.tot) - (a.done / a.tot));
+    for (const x of st.slice(0, 1)) out.push({ id: 'tit-' + x.se.cr, kind: 'tit', score: 60 + x.done / x.tot * 30, t: T.titT(x.tot - x.done, L(x.se.t)), why: T.titW(x.claim), min: 40, grp: 'solo', gl: T.grp.solo, act: [{ t: T.see, jump: `tit:seal-${x.se.cr}` }], foc: 'sec:seal-' + x.se.cr, bar: { a: x.done, b: x.tot } });
+    const cat = defs.cats.map(c => ({ c, r: recState(c.h) })).filter(x => x.r && !(x.r.state & 16) && !recDone(x.r) && pct(x.r) >= 0.5).sort((a, b) => pct(b.r) - pct(a.r))[0];
+    if (cat) { const p = Math.floor(pct(cat.r) * 100); out.push({ id: 'cat-' + cat.c.h, kind: 'cat', score: 50 + p / 5, t: T.catT(L(cat.c.n).replace(/^Catalisador (da|do|de) |^| Catalyst$/g, ''), p), why: T.catW, min: 20, grp: 'solo', gl: T.grp.solo, act: [{ t: T.see, jump: 'cat:cat-prog' }], bar: { a: p, b: 100, pct: true } }); }
+  }
+  return out.sort((a, b) => b.score - a.score);
+}
+function todoHTML() {
+  const T = tdt(); if (!profile || !have.a) return '';
+  const hid = LS.get('dc-todo-hide', {}), now = Date.now(); for (const k of Object.keys(hid)) if (hid[k] < now) delete hid[k];
+  const all = todoCards(), filt = { all: () => true, q: c => c.min <= 30, solo: c => c.grp === 'solo', clan: c => c.grp === 'clan' }[TD.f];
+  const vis = all.filter(filt).filter(c => TD.show || !hid[c.id]), nh = all.filter(c => hid[c.id]).length;
+  const left = t => { const m = Math.max(0, Math.round((t - now) / 60000)), d = Math.floor(m / 1440), h = Math.floor(m % 1440 / 60); return d ? `${d}d ${h}h` : `${h}h ${m % 60}min`; };
+  const TC = { rot: '#f2d36b', tit: '#c6a8ff', cat: '#6fd3ff', xur: '#f2d36b', claim: '#7fe08f' };
+  const card = c => `<article class="td-c${c.kind === 'rot' || c.kind === 'xur' ? ' hot' : ''}${hid[c.id] ? ' off' : ''}"${c.img ? ` style="--td-img:url('${BNET}${c.img}')"` : ''}><div class="td-top"><span class="td-tag" style="--tc:${TC[c.kind]}">${esc(T.tag[c.kind])}</span><span class="td-time">${esc(T.min(c.min) + ' · ' + c.gl)}</span>${c.until ? `<span class="td-until">${esc(c.until)}</span>` : ''}</div><b class="td-t">${esc(c.t)}</b><span class="td-w">${esc(c.why)}</span>${c.bar ? `<span class="td-bar"><i class="sea-bar"><u style="width:${Math.round(c.bar.a / c.bar.b * 100)}%"></u></i><small>${c.bar.pct ? c.bar.a + '%' : c.bar.a + '/' + c.bar.b}</small></span>` : ''}<div class="td-acts">${c.act.map((a, i) => a.jump ? `<button type="button" class="lbd-btn${i ? '' : ' pri'}" data-jump="${esc(a.jump)}">${esc(a.t)}</button>` : a.prep && typeof wOk === 'function' && wOk() ? `<button type="button" class="lbd-btn" data-prep="${esc(a.prep)}">${esc(a.t)}</button>` : '').join('')}${c.foc ? focBtn(c.foc) : ''}<button type="button" class="td-hide" data-tdhide="${esc(c.id)}">${esc(T.hide)}</button></div></article>`;
+  const fb = Object.entries(T.f).map(([k, t]) => `<button type="button" class="lbd-chip${TD.f === k ? ' on' : ''}" data-tdf="${k}">${esc(t)}</button>`).join('');
+  return `<section class="td keep" data-sec="todo"><div class="td-hd"><h2>${esc(T.t)}</h2><span>${esc(T.sub(left(nextReset())))}</span><div class="lbd-chips">${fb}</div></div>${vis.length ? `<div class="td-g">${vis.slice(0, 4).map(card).join('')}</div>` : `<p class="lbd-n">${esc(T.none)}</p>`}<p class="lbd-n">${esc(T.why)}${nh && !TD.show ? ` <button type="button" class="linkb" data-tdshow>${esc(T.hidden(nh))}</button>` : ''}</p></section>`;
+}
+document.addEventListener('click', e => {
+  const f = e.target.closest('[data-tdf]'); if (f) { TD.f = f.dataset.tdf; render(); return; }
+  const h = e.target.closest('[data-tdhide]'); if (h) { const m = LS.get('dc-todo-hide', {}); m[h.dataset.tdhide] = nextReset(); LS.set('dc-todo-hide', m); render(); return; }
+  if (e.target.closest('[data-tdshow]')) { TD.show = true; render(); }
+});
+/* ---------- Guardião › Estatísticas › Sua evolução: uma leitura por dia, guardada na conta ---------- */
+const EVT = { pt: { t: 'Sua evolução', sub: 'uma leitura por dia, guardada na sua conta', warn: 'Este histórico é do DPI, não da Bungie: a Bungie não guarda o passado desses números. Ele começa no primeiro dia em que você abriu o site com esta função e ganha um ponto a cada dia em que você entra.', per: { m1: '4 semanas', m3: '3 meses', all: 'Tudo' }, pw: 'Poder', gr: 'Patente de Guardião', tri: 'Pontuação de triunfos', hrs: 'Horas jogadas por semana', marks: 'Marcos', few: 'Ainda há poucos dias de histórico. Volte nos próximos dias para ver as linhas.', mGr: n => `Patente de Guardião ${n}`, mSe: n => `Título completo (${n} no total)`, mFirst: n => `Primeira conclusão: ${n}`, avg: n => `média ${n} h`, wk: 'esta semana' },
+  en: { t: 'Your progress', sub: 'one reading a day, saved to your account', warn: 'This history is DPI\'s, not Bungie\'s: Bungie does not keep the past of these numbers. It starts on the first day you opened the site with this feature and gains a point each day you sign in.', per: { m1: '4 weeks', m3: '3 months', all: 'All' }, pw: 'Power', gr: 'Guardian Rank', tri: 'Triumph score', hrs: 'Hours played per week', marks: 'Milestones', few: 'Only a few days of history so far. Come back over the next days to see the lines.', mGr: n => `Guardian Rank ${n}`, mSe: n => `Title completed (${n} total)`, mFirst: n => `First clear: ${n}`, avg: n => `avg ${n} h`, wk: 'this week' } };
+const EV = { per: LS.get('dc-evper', 'm3') };
+const dayKey = (t = Date.now()) => new Date(t).toISOString().slice(0, 10);
+function evoSnap() {
+  if (!profile || !have.a || !member) return;
+  const l = LS.get('dc-evo', []), k = dayKey(); if (l.length && l[l.length - 1].d === k && l[l.length - 1].v === 2) return;
+  const mt = profile.metrics?.data?.metrics || {}, g = h => mt[h]?.objectiveProgress?.progress || 0, ch = Object.values(profile.characters?.data || {});
+  const s = { d: k, v: 2, pw: Math.max(0, ...ch.map(c => c.light || 0)), gr: profile.profile?.data?.currentGuardianRank || 0, tri: g(MET_TRI), se: g(MET_SEALS), hrs: Math.round(ch.reduce((t, c) => t + (+c.minutesPlayedTotal || 0), 0) / 60), m: Object.fromEntries(ACT_METRICS().map(([, a]) => [a.k, g(a.m)]).filter(([, n]) => n > 0)) };
+  if (l.length && l[l.length - 1].d === k) l.pop(); l.push(s); LS.set('dc-evo', l.slice(-500));
+}
+function evoHTML() {
+  const T = EVT[lang === 'pt' ? 'pt' : 'en']; evoSnap(); const all = LS.get('dc-evo', []); if (!all.length) return '';
+  const days = { m1: 28, m3: 92, all: 1e5 }[EV.per], from = dayKey(Date.now() - days * 864e5), L2 = all.filter(x => x.d >= from);
+  const chart = (key, name, col, fmt) => { const v = L2.map(x => x[key] || 0), cur = v[v.length - 1], first = v[0], wk = all.filter(x => x.d >= dayKey(Date.now() - 7 * 864e5)), dw = cur - (wk[0]?.[key] ?? cur);
+    const mn = Math.min(...v), mx = Math.max(...v), n = Math.max(1, v.length - 1), pts = v.map((y, i) => `${(v.length === 1 ? 300 : i / n * 596 + 2).toFixed(1)},${(112 - (mx === mn ? .5 : (y - mn) / (mx - mn)) * 100).toFixed(1)}`).join(' ');
+    return `<div class="ev-c"><div class="ev-h"><span>${esc(name)}</span><b>${fmt(cur)}</b>${dw ? `<em>${dw > 0 ? '+' : ''}${fmt(dw)} ${esc(T.wk)}</em>` : ''}</div><svg viewBox="0 0 600 120" preserveAspectRatio="none" role="img" aria-label="${esc(name)}"><polyline points="2,118 ${pts} 598,118" fill="${col}22" stroke="none"/><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg><div class="ev-x"><span>${esc(L2[0]?.d.slice(5).split('-').reverse().join('/') || '')}</span><span>${esc(L2[L2.length - 1]?.d.slice(5).split('-').reverse().join('/') || '')}</span></div></div>`; };
+  // horas por semana: diferença entre leituras de semanas seguidas
+  const wkH = []; for (let i = 0; i < L2.length; i++) { const w = Math.floor(Date.parse(L2[i].d) / (7 * 864e5)); const last = wkH[wkH.length - 1]; if (last && last.w === w) last.e = L2[i].hrs; else wkH.push({ w, s: (L2[i - 1] || L2[i]).hrs, e: L2[i].hrs }); }
+  const hrsV = wkH.map(x => Math.max(0, x.e - x.s)); const hrsData = hrsV.map((h, i) => ({ hw: h }));
+  const L3 = L2; const hw = () => { const v = hrsV.length ? hrsV : [0], cur = v[v.length - 1], avg = Math.round(v.reduce((a, b) => a + b, 0) / v.length), mx = Math.max(1, ...v); return `<div class="ev-c"><div class="ev-h"><span>${esc(T.hrs)}</span><b>${cur} h</b><em class="n">${esc(T.avg(avg))}</em></div><div class="ev-bars">${v.map(h => `<i style="height:${Math.max(3, h / mx * 100)}%"></i>`).join('')}</div><div class="ev-x"><span></span><span></span></div></div>`; };
+  const marks = []; for (let i = 1; i < all.length; i++) { const a = all[i - 1], b = all[i]; if (b.gr > a.gr) marks.push({ d: b.d, t: T.mGr(b.gr), c: '#6fd3ff' }); if (b.se > a.se) marks.push({ d: b.d, t: T.mSe(b.se), c: '#c6a8ff' }); for (const [k, n] of Object.entries(b.m || {})) if (n > 0 && !(a.m || {})[k]) { const ac = [...defs.raids, ...defs.dungeons].find(x => x.k === k); if (ac) marks.push({ d: b.d, t: T.mFirst(L(ac.n)), c: '#7fe08f' }); } }
+  const per = Object.entries(T.per).map(([k, t]) => `<button type="button" data-evper="${k}" aria-pressed="${EV.per === k}">${esc(t)}</button>`).join('');
+  return `<article class="gd ev"><div class="gd-head ev-hd"><h2>${esc(T.t)}</h2><span class="ev-sub">${esc(T.sub)}</span><div class="vl-seg ev-per">${per}</div></div><p class="ev-warn">ⓘ ${esc(T.warn)}</p>${all.length < 3 ? `<p class="lbd-n">${esc(T.few)}</p>` : ''}<div class="ev-g">${chart('pw', T.pw, '#f2d36b', fmtN)}${chart('gr', T.gr, '#6fd3ff', fmtN)}${chart('tri', T.tri, '#c6a8ff', fmtN)}${hw()}</div>${marks.length ? `<span class="sea-k">${esc(T.marks)}</span><div class="ev-m">${marks.slice(-8).reverse().map(m => `<div><small style="color:${m.c}">${esc(m.d.slice(5).split('-').reverse().join('/'))}</small><b>${esc(m.t)}</b></div>`).join('')}</div>` : ''}</article>`;
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-evper]'); if (!b) return; EV.per = b.dataset.evper; LS.set('dc-evper', EV.per); render(); });
+/* ---------- Rolos bons da comunidade: a lista pública que o DIM usa (voltron), baixada do GitHub e guardada no aparelho ---------- */
+const RLT = { pt: { t: 'Rolos bons da comunidade', src: 'Lista pública que o DIM usa (voltron)', upd: d => `atualizada em ${d}`, load: 'Baixando a lista da comunidade…', err: 'Não deu para baixar a lista agora.', mode: { pve: 'PvE', pvp: 'PvP', both: 'Os dois' }, g: 'Com rolo bom', p: 'Parcial', n: 'Nada de bom', fG: 'Rolo bom', fN: 'Nada de bom', det: 'Rolo da comunidade', detG: m => `Rolo bom para ${m}`, detP: 'Rolo parcial', detN: 'Nenhum rolo recomendado bate', detNo: 'A lista não tem recomendação para esta arma.', legend: 'Selo verde nas vantagens recomendadas pela lista.', note: 'Nota da lista', lcT: 'Sem nada de bom (lista da comunidade)', lcN: 'Sugestões: confirme uma a uma. Favoritas e “manter” nunca entram.' },
+  en: { t: 'Community god rolls', src: 'Public list used by DIM (voltron)', upd: d => `updated ${d}`, load: 'Downloading the community list…', err: "Couldn't download the list right now.", mode: { pve: 'PvE', pvp: 'PvP', both: 'Both' }, g: 'God roll', p: 'Partial', n: 'Nothing good', fG: 'God roll', fN: 'Nothing good', det: 'Community roll', detG: m => `God roll for ${m}`, detP: 'Partial roll', detN: 'No recommended roll matches', detNo: 'The list has no recommendation for this weapon.', legend: 'Green mark on perks recommended by the list.', note: 'List note', lcT: 'Nothing good (community list)', lcN: 'Suggestions: confirm one by one. Favorites and “keep” never go in.' } };
+const rlt = () => RLT[lang === 'pt' ? 'pt' : 'en'];
+const RL = { st: null, m: null, at: 0, mode: LS.get('dc-rlmode', 'both') };
+const RL_URL = 'https://raw.githubusercontent.com/48klocs/dim-wish-list-sources/master/voltron.txt';
+async function rlLoad() {
+  if (RL.st) return; RL.st = 'load';
+  try {
+    let c = await idbGet('rl1');
+    if (!c || Date.now() - c.at > 5 * 864e5) {
+      const txt = await fetch(RL_URL).then(r => { if (!r.ok) throw 0; return r.text(); }); const m = {}; let note = '';
+      for (const line of txt.split('\n')) {
+        if (line.startsWith('//notes:')) { note = line.slice(8).trim(); continue; }
+        if (!line.startsWith('dimwishlist:')) { if (!line.trim()) note = ''; continue; }
+        const q = line.slice(12), hi = q.indexOf('#notes:'), body = hi >= 0 ? q.slice(0, hi) : q, nt = hi >= 0 ? q.slice(hi + 7) : note;
+        const pr = new URLSearchParams(body), it = pr.get('item'), perks = (pr.get('perks') || '').split(',').map(Number).filter(Boolean); if (!it || it.startsWith('-') || !perks.length) continue;
+        const low = nt.toLowerCase(), tg = /pvp|crucible|trials/.test(low) && !/pve/.test(low) ? 'v' : /pve/.test(low) && !/pvp/.test(low) ? 'e' : '';
+        const arr = m[it] = m[it] || []; if (arr.length < 40) arr.push([perks, tg, nt.slice(0, 220)]);
+      }
+      c = { at: Date.now(), m }; idbSet('rl1', c);
+    }
+    RL.m = c.m; RL.at = c.at; RL.st = 'ok';
+  } catch (e) { console.warn('rolos', e); RL.st = 'err'; }
+  if (tab === 'inv' || tab === 'vlt' || $('ivdlg')?.open || $('lcdlg')?.open) { render(); if ($('ivdlg')?.open) ivDraw(); if ($('lcdlg')?.open) lcDraw(); }
+}
+// nota do item: 'g' bom, 'p' parcial, 'n' nada de bom, '' sem recomendação; usa as vantagens encaixadas (ou as opções, quando o detalhe foi aberto)
+function rlGrade(iid, h, extra) {
+  if (RL.st !== 'ok') return ''; const L0 = RL.m[h]; if (!L0) return '';
+  const L1 = L0.filter(e => RL.mode === 'both' || !e[1] || e[1] === (RL.mode === 'pve' ? 'e' : 'v')); if (!L1.length) return '';
+  const so = profile?.itemComponents?.sockets?.data?.[iid]?.sockets; if (!so && !extra) return '';
+  const have = new Set([...(so || []).map(s => s.plugHash), ...(extra || [])]);
+  let best = 0; for (const [p] of L1) { const n = p.filter(x => have.has(x)).length / p.length; if (n > best) best = n; if (best === 1) break; }
+  return best === 1 ? 'g' : best >= 0.5 ? 'p' : 'n';
+}
+const rlBadge = g => g ? `<i class="rl-b rl-${g}" aria-label="${esc(rlt()[g])}">${{ g: '✓', p: '½', n: '✕' }[g]}</i>` : '';
+function rlBar(list) {
+  const T = rlt(); if (RL.st !== 'ok') { if (!RL.st) setTimeout(rlLoad); return RL.st === 'err' ? `<div class="rl-bar"><small>${esc(T.err)}</small></div>` : `<div class="rl-bar"><small class="wait">${esc(T.load)}</small></div>`; }
+  const w = list.filter(x => x.slot < 3), gs = w.map(x => rlGrade(x.iid, x.h)), c = k => gs.filter(g => g === k).length;
+  return `<div class="rl-bar"><span><b>${esc(T.t)}</b><small>${esc(T.src)} · ${esc(T.upd(new Date(RL.at).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR')))}</small></span><div class="vl-seg rl-mode">${Object.entries(T.mode).map(([k, t]) => `<button type="button" data-rlmode="${k}" aria-pressed="${RL.mode === k}">${esc(t)}</button>`).join('')}</div><div class="rl-k"><div class="g"><small>${esc(T.g)}</small><b>${c('g')}</b></div><div class="p"><small>${esc(T.p)}</small><b>${c('p')}</b></div><div class="n"><small>${esc(T.n)}</small><b>${c('n')}</b></div></div></div>`;
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-rlmode]'); if (!b) return; RL.mode = b.dataset.rlmode; LS.set('dc-rlmode', RL.mode); render(); if ($('ivdlg')?.open) ivDraw(); });
 
 /* ---------- Celular: as 5 abas numa barra fixa embaixo ---------- */
 const BOT_IC = { obj: '<circle cx="10" cy="10" r="3.2"/><path d="M10 2.5v2M10 15.5v2M2.5 10h2M15.5 10h2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M4.7 15.3l1.4-1.4M13.9 6.1l1.4-1.4"/>', act: '<path d="M4 16V10M10 16V4M16 16v-6"/>', drops: '<rect x="3" y="7" width="14" height="9" rx="1.5"/><path d="M7.5 7V4.5h5V7"/>', gd: '<path d="M10 2.8l6 2.6v4.2c0 3.6-2.6 6.2-6 7.4-3.4-1.2-6-3.8-6-7.4V5.4z"/>', clan: '<circle cx="7" cy="7" r="2.6"/><circle cx="14" cy="8" r="2"/><path d="M2.5 16.5c.6-2.7 2.3-4.2 4.5-4.2s3.9 1.5 4.5 4.2M12.2 12.6c2.4-.5 4.4.8 5.3 3.4"/>' };
