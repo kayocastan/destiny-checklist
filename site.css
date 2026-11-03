@@ -1990,3 +1990,4 @@ dialog.ivdlg{width:min(1000px,calc(100vw - 24px))}
 .t2-a{display:flex;gap:10px;font-size:12.5px;white-space:nowrap}
 .t2-see{justify-self:start;font-size:12.5px}
 @media (max-width:900px){.t2-cols{grid-template-columns:1fr}.t2-how{margin-left:0;width:100%;justify-content:space-between}.t2-seg{grid-template-columns:repeat(3,minmax(0,1fr))}.t2-seg button{padding:8px 6px;font-size:12.5px}}
+.t2-nodg{margin:0;padding:0 4px;font-size:12px}
