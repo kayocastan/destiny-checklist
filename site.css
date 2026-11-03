@@ -1996,3 +1996,5 @@ dialog.ivdlg{width:min(1000px,calc(100vw - 24px))}
 .rs-more{justify-self:center;margin-top:8px}
 .rs-more{justify-self:center;margin-top:8px}
 .wid-how{color:#f2d36b}
+.wid-g{grid-auto-rows:max-content;align-content:start;max-height:none;overflow:visible}
+.wid{aspect-ratio:auto;height:44px}
