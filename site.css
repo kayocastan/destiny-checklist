@@ -1764,3 +1764,5 @@ dialog.ivdlg{width:min(1000px,calc(100vw - 24px))}
 .iv-grid{grid-template-columns:84px repeat(var(--ivc),minmax(0,1fr)) repeat(var(--ivv),minmax(0,2fr))}
 .iv-vg{max-height:250px;overflow:auto;scrollbar-width:thin;padding-right:2px;grid-template-columns:repeat(auto-fill,minmax(36px,1fr))}
 @media (max-width:760px){.iv-vg{max-height:none}}
+.iv-vg,.iv-inv{align-content:start;grid-auto-rows:max-content}
+.iv-vg .iv-t,.iv-inv .iv-t{min-height:0;height:auto}
