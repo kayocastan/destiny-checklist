@@ -2679,7 +2679,7 @@ document.addEventListener('click', e => {
   const k = e.target.closest('[data-lbdk]'); if (k) { LBD.k = k.dataset.lbdk; LS.set('dc-lbd-k', LBD.k); if (LBD.k !== 'cl') LBD.per = 'all'; mdefLoad().then(() => render()); render(); return; }
   const p = e.target.closest('[data-lbdper]'); if (p && !p.disabled) { LBD.per = p.dataset.lbdper; render(); return; }
   if (e.target.closest('[data-lbdall]')) { LBD.all = !LBD.all; render(); return; }
-  const n = e.target.closest('.lbd-nm'); if (n) { FD.q = ''; FD.results = null; openFind({ name: n.dataset.name, type: +n.dataset.mt, id: n.dataset.mid }); }
+  const n = e.target.closest('.lbd2 .lbd-nm[data-mid]'); if (n) { FD.q = ''; FD.results = null; openFind({ name: n.dataset.name, type: +n.dataset.mt, id: n.dataset.mid }); }
 });
 document.addEventListener('change', e => {
   if (e.target.id === 'lbda30') { LBD.a30 = e.target.checked; LS.set('dc-lbd-a30', LBD.a30); render(); }
