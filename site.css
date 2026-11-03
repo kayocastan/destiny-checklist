@@ -1838,3 +1838,9 @@ dialog.ivdlg{width:min(1000px,calc(100vw - 24px))}
 .td-acts .lbd-btn.pri{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 14%,transparent)}
 .td-gr{font:600 12.5px var(--sans,inherit);color:var(--fg);border:1px solid color-mix(in srgb,var(--acc) 40%,transparent);background:color-mix(in srgb,var(--acc) 8%,transparent);border-radius:999px;padding:5px 11px;cursor:pointer}
 .td-gr:hover{border-color:var(--acc)}
+.ivd-main>div{min-width:0}
+.ivd-rl{min-width:0;overflow-wrap:anywhere;word-break:break-word}
+.rl-leg{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:4px}
+.rl-leg li{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);opacity:.75}
+.rl-leg li.on{opacity:1;color:var(--fg)}.rl-leg li b{color:var(--fg);white-space:nowrap}
+.rl-leg .rl-b{position:static;flex:none}
