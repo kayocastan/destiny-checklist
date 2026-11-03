@@ -3457,7 +3457,11 @@ async function wRun() {
     // 3. subclasse: aspectos antes dos fragmentos (os fragmentos dependem dos aspectos)
     if (plan.sub && Object.keys(plan.sub.so || {}).length) {
       const cur = F.sk[plan.sub.id]?.sockets || []; await loadPlugs(); const rp = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/Item/${plan.sub.id}/?components=310`).then(r => r.reusablePlugs?.data?.plugs || {}).catch(() => ({}));
-      const want = Object.entries(plan.sub.so).filter(([k, h]) => cur[k]?.plugHash !== h), own = ([k, h]) => (rp[k] || []).some(p => p.plugItemHash === h) || iOwnPlug(h) !== false, ch = want.filter(own), lackS = want.filter(x => !own(x)).map(([, h]) => h);
+      // aspectos/fragmentos: a ordem não importa; mantém os que já estão em outro encaixe do mesmo grupo e só coloca os que faltam nos encaixes livres (evita "encaixe não pode ser trocado" por repetido)
+      const pcs = await entities('DestinyInventoryItemDefinition', [...new Set([...Object.values(plan.sub.so), ...cur.map(x => x?.plugHash)].filter(Boolean))], 'en', true).catch(() => ({})), grp = {};
+      for (const [k, h] of Object.entries(plan.sub.so)) (grp[pcs[h]?.pc || 'k' + k] = grp[pcs[h]?.pc || 'k' + k] || []).push([+k, h]);
+      const want = []; for (const g of Object.values(grp)) { const tg = g.map(x => x[1]), left = [...tg], free = []; for (const [k] of g) { const c = cur[k]?.plugHash, at = left.indexOf(c); if (at >= 0) left.splice(at, 1); else free.push(k); } left.forEach((h, n) => { if (free[n] != null) want.push([free[n], h]); }); }
+      const want0 = want, own = ([k, h]) => (rp[k] || []).some(p => p.plugItemHash === h) || iOwnPlug(h) !== false, ch = want.filter(own), lackS = want.filter(x => !own(x)).map(([, h]) => h);
       if (want.length) { const s = wStep(T.sub(want.length)); s.st = 'run'; wDraw(); let ok = 0, er = '';
         let pend = ch; for (let pass = 0; pass < 3 && pend.length && !inAct; pass++) { const next = []; er = '';
           for (const [k, h] of pend) { try { await wPost('/Destiny2/Actions/Items/InsertSocketPlugFree/', { plug: { socketIndex: +k, socketArrayType: 0, plugItemHash: h }, itemId: plan.sub.id, characterId: cid }); ok++; if (cur[k]?.plugHash) undo.push([plan.sub.id, +k, cur[k].plugHash]); } catch (e) { er = wMsg(e); if (e.code === 1671) { inAct = true; break; } next.push([k, h]); } }
