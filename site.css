@@ -1724,3 +1724,16 @@ dialog.ivdlg{width:min(1000px,calc(100vw - 24px))}
 .tabs .tab+.tab::before{content:"";position:absolute;left:-1px;top:22%;bottom:22%;width:1px;background:color-mix(in srgb,var(--fg) 18%,transparent)}
 .tabs .tab[aria-current="true"]::before,.tabs .tab[aria-current="true"]+.tab::before{display:none}
 .col-num{font:500 11px var(--mono);color:var(--muted);margin-left:4px}
+/* correções de layout */
+#list>.panel.iv-wrap{display:flex;flex-direction:column}
+#list>.panel.tr-wrap{display:grid;grid-template-columns:270px minmax(0,1fr)}
+@media (max-width:760px){#list>.panel.tr-wrap{grid-template-columns:minmax(0,1fr)}}
+.tr-side>*{flex-shrink:0}
+.col-l.nt li{grid-template-columns:22px minmax(0,1fr) minmax(0,.8fr) auto}
+@media (max-width:760px){.col-l.nt li{grid-template-columns:22px minmax(0,1fr) auto}.col-l.nt b,.col-l.nt small{grid-column:2}}
+.rs-main,.ch-a,.rs-side>section{box-shadow:none!important}
+.rs-main{border:0!important;background:none!important;padding:0!important}
+.ch-a{border:0!important;background:none!important;padding:0!important}
+.rs-kpi{display:flex;flex-wrap:wrap}.rs-kpi div{min-width:92px;flex:1}
+.rs-q{flex:0 1 auto}
+.sr-wrap>.panel>section[hidden]{display:none!important}
