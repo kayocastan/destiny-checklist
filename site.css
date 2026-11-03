@@ -1737,3 +1737,27 @@ dialog.ivdlg{width:min(1000px,calc(100vw - 24px))}
 .rs-kpi{display:flex;flex-wrap:wrap}.rs-kpi div{min-width:92px;flex:1}
 .rs-q{flex:0 1 auto}
 .sr-wrap>.panel>section[hidden]{display:none!important}
+/* listas da página de Builds: cada uma com seu formato */
+.sq .cl-p{all:unset;box-sizing:border-box;cursor:pointer;color:var(--fg);background:var(--chip);border:1px solid transparent}
+.sq .cl-p:hover,.sq .cl-p:focus-visible{border-color:var(--acc)}
+.sq .cl-p.sq-p::before{content:"";width:4px;height:100%;min-height:28px;border-radius:3px;background:var(--acc)}
+.sq .sq-n{font-weight:600;font-size:14px}.sq .sq-s{font-size:12px;color:var(--muted)}
+.sq .sv-p{grid-template-columns:4px minmax(0,1fr)!important}.sq .sv-p::before{background:var(--arc)}
+.fv-g{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.fv-c{all:unset;box-sizing:border-box;width:100%;cursor:pointer;display:grid;gap:2px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);color:#fff;min-height:84px;background:linear-gradient(90deg,rgba(13,18,25,.45),rgba(13,18,25,.85)),var(--fv,linear-gradient(135deg,#2b3a4f,#18222e)) left center/cover}
+.fv-c:hover,.fv-c:focus-visible{border-color:#d9b84a}
+.fv-n b{font:700 18px var(--display)}.fv-n small{font:500 11px var(--mono);color:#c9d3dd;margin-left:3px}.fv-s{font-size:12.5px;color:#d5dde8}
+.fv-f{display:flex;justify-content:space-between;align-items:baseline;margin-top:auto}.fv-f b{font:700 15px var(--display);color:#f2d36b}.fv-f small{font-size:11px;color:#c9d3dd}
+.rc-l{list-style:none;margin:0;padding:0;display:grid;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.rc-l li+li{border-top:1px solid var(--line)}
+.rc-p{all:unset;box-sizing:border-box;width:100%;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) auto;gap:12px;align-items:center;padding:9px 12px;color:var(--fg)}
+.rc-p:hover{background:color-mix(in srgb,var(--acc) 8%,transparent)}
+.rc-n{display:grid}.rc-n b{font-size:14px}.rc-n small,.rc-a small{font-size:11.5px;color:var(--muted)}
+.rc-a{display:grid;min-width:0}.rc-a span{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc-c{font:700 13px var(--mono);color:var(--acc);border:1px solid color-mix(in srgb,var(--acc) 45%,transparent);border-radius:999px;padding:2px 8px}
+/* placar: largura toda, lista em 2 colunas */
+.lbd-a{grid-column:1/-1}
+@media (min-width:900px){.lbd-ol{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:14px;grid-auto-flow:column;grid-template-rows:repeat(var(--rows,5),auto)}}
+/* limpeza do cofre na lateral do Cofre */
+.vl-lc{display:grid;gap:6px;padding:10px 12px;border-radius:12px;border:1px solid color-mix(in srgb,var(--acc) 40%,transparent);background:color-mix(in srgb,var(--acc) 6%,transparent)}
+.vl-lc b{font-size:14px}.vl-lc small{font-size:12px;color:var(--muted)}.vl-lc .lb-run{justify-self:start}
