@@ -153,6 +153,45 @@ async function sugRead(req, env) {
   const b = await req.json().catch(() => ({})); if (b?.del) await env.DB.prepare('DELETE FROM sug WHERE id = ?').bind(+b.del).run(); else await env.DB.prepare('UPDATE sug SET rd = 1 WHERE rd = 0').run();
   return json(req, { ok: true });
 }
+
+/* ---------- Clã: aviso dos admins e mapa de horários ----------
+   GET /clan/notice?g=  (público)  ·  PUT /clan/notice?g=  (dono do site ou fundador/admin do clã)
+   GET /clan/hours?g=   (público)  ·  POST /clan/hours?g= (logado e membro do clã; uma leitura por hora) */
+async function clanRole(req, env, g) {
+  const uid = await who(req, env); if (!uid) return { uid: null, role: 0 };
+  if (uid === String(env.OWNER)) return { uid, role: 9 };
+  const auth = (req.headers.get('Authorization') || '').slice(7);
+  const r = await bungie(req, `/GroupV2/User/254/${uid}/0/1/`, auth).catch(() => null);
+  const m = (r?.results || []).find(x => String(x.group?.groupId) === g);
+  return { uid, role: m ? m.member?.memberType || 1 : 0 };
+}
+async function clanRoute(req, env, path, url) {
+  const g = url.searchParams.get('g') || ''; if (!/^\d{1,20}$/.test(g)) return json(req, { error: 'bad request' }, 400);
+  const k = path === '/clan/notice' ? 'notice' : 'hours', uidk = 'clan:' + g;
+  const row = await env.DB.prepare('SELECT v FROM kv WHERE uid = ? AND k = ?').bind(uidk, k).first().catch(() => null);
+  const cur = row ? JSON.parse(row.v) : null;
+  if (req.method === 'GET') return json(req, { d: k === 'hours' && cur ? { s: cur.s, c: cur.c } : cur });
+  if (await brake(env)) return json(req, { error: 'brake' }, 503);
+  const body = await req.json().catch(() => ({})), { uid, role } = await clanRole(req, env, g);
+  if (!uid) return json(req, { error: 'login' }, 401);
+  const put = v => env.DB.prepare('INSERT INTO kv (uid, k, v, t) VALUES (?, ?, ?, ?) ON CONFLICT(uid, k) DO UPDATE SET v = excluded.v, t = excluded.t').bind(uidk, k, JSON.stringify(v), Date.now()).run();
+  if (k === 'notice') {
+    if (req.method !== 'PUT') return json(req, { error: 'method' }, 405);
+    if (role < 3) return json(req, { error: 'forbidden' }, 403);
+    const text = String(body.text || '').trim().slice(0, 280);
+    if (!text) { await env.DB.prepare('DELETE FROM kv WHERE uid = ? AND k = ?').bind(uidk, k).run(); return json(req, { ok: true }); }
+    const until = Number(body.until) > Date.now() ? Math.min(Number(body.until), Date.now() + 90 * 864e5) : null;
+    await put({ text, until, by: String(body.by || '').slice(0, 40), at: Date.now() }); return json(req, { ok: true });
+  }
+  if (req.method !== 'POST') return json(req, { error: 'method' }, 405);
+  if (!role) return json(req, { error: 'forbidden' }, 403);
+  const n = Math.max(0, Math.min(100, Math.round(Number(body.n) || 0))), hr = Math.floor(Date.now() / 3600e3), d = new Date();
+  const v = cur || { s: Array(168).fill(0), c: Array(168).fill(0), h: 0 };
+  if (v.h === hr) return json(req, { ok: true, dup: true }); // já tem leitura desta hora
+  const i = d.getUTCDay() * 24 + d.getUTCHours(); v.s[i] += n; v.c[i] += 1; v.h = hr;
+  await put(v); return json(req, { ok: true });
+}
+
 async function sync(req, env) {
   const uid = await who(req, env);
   if (!uid) return json(req, { error: 'auth' }, 401);
@@ -283,6 +322,7 @@ export default {
       if (path !== '/stats' && path !== '/whoami' && !path.startsWith('/page/') && !path.startsWith('/gpage/') && !(path.startsWith('/pubimg/') && req.method === 'GET') && (await brake(env)) >= 2) return json(req, { error: 'brake' }, 503);
       if (path === '/defs' && req.method === 'POST') return await defs(req, env);
       if (path === '/sync' && (req.method === 'GET' || req.method === 'PUT')) return await sync(req, env);
+      if (path === '/clan/notice' || path === '/clan/hours') return await clanRoute(req, env, path, new URL(req.url));
       if (path === '/hit' && req.method === 'POST') return await hit(req, env);
       if (path === '/pub' && req.method === 'POST') return await pubPost(req, env);
       if (path === '/sug' && req.method === 'POST') return await sugPost(req, env);
