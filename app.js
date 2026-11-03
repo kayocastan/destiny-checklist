@@ -208,7 +208,7 @@ function login() {
   try { sessionStorage.setItem('dc-state', st); } catch {}
   location.href = `https://www.bungie.net/${lang === 'pt' ? 'pt-br' : 'en'}/OAuth/Authorize?client_id=${encodeURIComponent(cfg.clientId)}&response_type=code&state=${st}`;
 }
-function logout() { resetChar(); PLUGS = null; plugsP = null; buildOpen = false; if (member) idbDel('profile-' + member.id); LS.del('dc-auth'); LS.del('dc-member'); LS.del('dc-synct'); SY.t = {}; SY.dirty.clear(); clearInterval(LIVE.timer); LIVE.timer = null; LIVE.on = false; LIVE.mem = []; LS.del('dc-el'); auth = null; profile = null; member = null; render(); }
+function logout() { resetChar(); PLUGS = null; plugsP = null; buildOpen = false; if (member) idbDel('profile-' + member.id); LS.del('dc-auth'); LS.del('dc-member'); LS.del('dc-hdr'); LS.del('dc-synct'); SY.t = {}; SY.dirty.clear(); clearInterval(LIVE.timer); LIVE.timer = null; LIVE.on = false; LIVE.mem = []; LS.del('dc-el'); auth = null; profile = null; member = null; render(); }
 async function token() {
   if (!auth) throw new Error('auth');
   if (auth.access_expires - Date.now() > 60000) return auth.access_token;
@@ -1396,7 +1396,8 @@ function render() {
   renderWeek(); renderBuild(); renderLive();
   if (!cfg) return;
   if (!logged) {
-    delete $('title').dataset.full; $('title').style.fontSize = ''; $('title').classList.remove('two'); $('title').textContent = 'Destiny Parallel Interface'; document.title = 'DPI · Destiny Parallel Interface'; $('eyebrow').textContent = 'Destiny 2'; renderGuardian(null); landing(!auth);
+    if (!(auth && LS.get('dc-hdr', null))) { delete $('title').dataset.full; $('title').style.fontSize = ''; $('title').classList.remove('two'); $('title').textContent = 'Destiny Parallel Interface'; document.title = 'DPI · Destiny Parallel Interface'; $('eyebrow').textContent = 'Destiny 2'; renderGuardian(null); } // logado carregando: mantém o guardião da última visita
+    landing(!auth);
     $('subtabs').hidden = true;
     if (auth) return; // carregando
     const U = u();
@@ -1411,7 +1412,7 @@ function render() {
   const sub = (profile.characterEquipment?.data?.[charId]?.items || []).find(i => i.bucketHash === SUB_BUCKET), sn = sub && gearDefs[sub.itemHash]?.n;
   const ttl = charTitle(cls, sn);
   Object.assign($('title').dataset, { full: ttl, short: sn || cls, cls }); $('title').textContent = ttl; $('title').title = `${U.races[ch.raceType] || ''} ${cls}`; document.title = ttl + ' · DPI';
-  renderGuardian(ch);
+  renderGuardian(ch); try { LS.set('dc-hdr', { t: ttl, e: member.name || '', bg: ch.emblemBackgroundPath || '' }); } catch {}
   $('eyebrow').dataset.base = member.name || ''; $('eyebrow').textContent = member.name || ''; $('eyebrow').title = member.name || ''; fitTitle();
   $('ghpw').hidden = false; $('ghout').querySelector('span').textContent = U.logout; $('ghout').classList.remove('ask'); $('pwv').textContent = ch.light; $('pwmax').textContent = mx && mx > ch.light ? `${U.max} ${mx}` : U.power;
   const many = Object.keys(profile.characters.data).length > 1;
@@ -1816,6 +1817,7 @@ async function ensureLdCtx() {
   ldBusy = false;
 }
 let SVDEL = null;
+document.addEventListener('click', e => { const b = e.target.closest('[data-ldeq]'); if (!b) return; e.stopPropagation(); const l = LOADOUTS.find(x => String(x.i) === b.dataset.ldeq); if (l) wOpen({ cid: charId, name: l.name, ld: l.i }); }, true);
 function ldListHTML() {
   const W = u().w;
   const ok = member && lbAllowed(), T = lw(), mine = ok ? savedList().map((x, i) => ({ x, i })).filter(o => o.x.cid === charId) : [];
@@ -1828,8 +1830,8 @@ function ldListHTML() {
     const ws = WEAPON_B.map(b => eq.find(i => i.bucketHash === b)).filter(Boolean), xa = eq.find(i => ARMOR_B.includes(i.bucketHash) && B.en[i.itemHash]?.tt === 6);
     const ic = (i, cls = '') => { const x = d(i.itemHash); return `<span class="ldc-i ${cls}${B.en[i.itemHash]?.tt === 6 ? ' ex' : ''}" title="${esc(x.n || '')}">${x.ic ? `<img src="${BNET}${x.ic}" alt="" loading="lazy">` : ''}</span>`; };
     const same = buildSig(C) === buildSig(ownCtx());
-    return `<button type="button" class="ld ldc" data-ldo="${l.i}" style="--el:${a1}"><div class="ldc-top">${sub ? ic(sub, 'ldc-sub') : ''}<div class="ldc-t"><small><span class="ld-tag game">${esc(lw().inGame)}</span> ${esc(l.name)}${same ? ` · <b>${esc(W.ldEq)}</b>` : ''}</small><h2>${esc(charTitle(u().classes[C.p.characters.data[C.cid].classType] || '', d(sub?.itemHash).n))}</h2></div><span class="chev" aria-hidden="true"></span></div>
-      <div class="ldc-g">${ws.map(i => ic(i)).join('')}${xa ? ic(xa) : ''}<span class="ldc-n">${esc([...ws, xa].filter(Boolean).filter(i => B.en[i.itemHash]?.tt === 6).map(i => d(i.itemHash).n).join(' · '))}</span></div></button>`;
+    return `<div class="ldc-w">${wOk() && !same ? `<button type="button" class="ldc-eq" data-ldeq="${l.i}" title="${esc(lang === 'pt' ? 'Equipar este loadout no personagem' : 'Equip this loadout on the character')}">${esc(lang === 'pt' ? 'Equipar' : 'Equip')}</button>` : ''}<button type="button" class="ld ldc" data-ldo="${l.i}" style="--el:${a1}"><div class="ldc-top">${sub ? ic(sub, 'ldc-sub') : ''}<div class="ldc-t"><small><span class="ld-tag game">${esc(lw().inGame)}</span> ${esc(l.name)}${same ? ` · <b>${esc(W.ldEq)}</b>` : ''}</small><h2>${esc(charTitle(u().classes[C.p.characters.data[C.cid].classType] || '', d(sub?.itemHash).n))}</h2></div><span class="chev" aria-hidden="true"></span></div>
+      <div class="ldc-g">${ws.map(i => ic(i)).join('')}${xa ? ic(xa) : ''}<span class="ldc-n">${esc([...ws, xa].filter(Boolean).filter(i => B.en[i.itemHash]?.tt === 6).map(i => d(i.itemHash).n).join(' · '))}</span></div></button></div>`;
   }).join('') + '</div>' + site + '</div>';
 }
 /* builds salvas: uma cópia do equipamento daquele momento, guardada neste navegador */
