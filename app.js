@@ -4301,14 +4301,14 @@ async function ivLoadDet(iid) {
     const so = r.sockets?.data?.sockets || [], rp = r.reusablePlugs?.data?.plugs || {}, st = r.stats?.data?.stats || {};
     const plugs = [...new Set([...so.map(s => s.plugHash), ...Object.values(rp).flat().map(p => p.plugItemHash)].filter(Boolean))];
     const L = lang === 'pt' ? 'pt' : 'en', en = await entities('DestinyInventoryItemDefinition', plugs, L, true), sd = await entities('DestinyStatDefinition', Object.keys(st).map(Number), lang).catch(() => ({}));
-    INV.det[iid] = { so, rp, st, en, sd };
+    INV.det[iid] = { so, rp, st, en, sd, inst: r.instance?.data || null };
   } catch { INV.det[iid] = { err: true }; }
   if ($('ivdlg')?.open) ivDraw();
 }
 /* descrição das vantagens e mods: muitos vêm sem texto no item e o texto real fica nos "perks" da Bungie; busca só o que falta e guarda no aparelho */
 const PDESC = { m: LS.get('dc-pdesc-' + (lang === 'pt' ? 'pt' : 'en'), {}), busy: new Set() };
-async function pdescLoad(hashes) {
-  const lc = lang === 'pt' ? 'pt-br' : 'en', need = hashes.filter(h => !(h in PDESC.m) && !PDESC.busy.has(h)).slice(0, 30); if (!need.length) return;
+async function pdescLoad(hashes, max = 30) {
+  const lc = lang === 'pt' ? 'pt-br' : 'en', need = hashes.filter(h => !(h in PDESC.m) && !PDESC.busy.has(h)).slice(0, max); if (!need.length) return;
   need.forEach(h => PDESC.busy.add(h));
   await Promise.all(need.map(async h => {
     try {
@@ -4324,6 +4324,51 @@ async function pdescLoad(hashes) {
   if ($('ivdlg')?.open) ivDraw();
 }
 const pdText = (h, pd) => PDESC.m[h]?.d || pd?.d || '';
+/* trocar mods da armadura (a Bungie só deixa o que é grátis: mods sim, obra-prima e infusão não) */
+const MPT = { pt: { swap: 'Trocar mod', title: 'Escolha o mod', loading: 'Buscando os seus mods…', none: 'Este encaixe não tem outros mods disponíveis.', energy: (u, c) => `Energia: ${u}/${c} usada`, need: n => `Falta ${n} de energia para este mod.`, apply: 'Aplicar', remove: 'Esvaziar encaixe', cur: 'equipado', going: 'Aplicando…', ok: 'Mod aplicado!', cancel: 'Cancelar', act: 'Dentro de algumas atividades o jogo não deixa trocar mods. Volte para a órbita ou a Torre e tente de novo.' },
+  en: { swap: 'Change mod', title: 'Pick a mod', loading: 'Fetching your mods…', none: 'No other mods available for this socket.', energy: (u, c) => `Energy: ${u}/${c} used`, need: n => `Needs ${n} more energy.`, apply: 'Apply', remove: 'Empty socket', cur: 'equipped', going: 'Applying…', ok: 'Mod applied!', cancel: 'Cancel', act: 'Some activities do not allow changing mods. Go to orbit or the Tower and try again.' } };
+const mpt = () => MPT[lang === 'pt' ? 'pt' : 'en'];
+const SDEF = {};
+async function mpOpen(x) {
+  const det = INV.det[x.iid], i = INV.sock; INV.mp = { i, busy: true }; ivDraw();
+  try {
+    const def = SDEF[x.h] || (SDEF[x.h] = await bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${x.h}/`, false));
+    await loadPlugs(); const se = def.sockets?.socketEntries?.[i] || {}, ps = se.reusablePlugSetHash || se.randomizedPlugSetHash;
+    const fromSet = ps ? [...(PLUGS?.p?.[ps] || []), ...(x.where !== 'v' ? PLUGS?.c?.[x.where]?.plugs?.[ps] || [] : [])].filter(p => p.canInsert !== false && p.enabled !== false).map(p => p.plugItemHash) : [];
+    const list = [...new Set([se.singleInitialItemHash, ...fromSet, ...(se.reusablePlugItems || []).map(p => p.plugItemHash), det.so[i]?.plugHash].filter(Boolean))];
+    const L = lang === 'pt' ? 'pt' : 'en', en = await entities('DestinyInventoryItemDefinition', list, L, true); Object.assign(det.en, en);
+    INV.mp = { i, list: list.filter(h => det.en[h]), empty: se.singleInitialItemHash || 0, sel: null };
+    pdescLoad(INV.mp.list, 120);
+  } catch { INV.mp = { i, list: [], err: true }; }
+  if (INV.mp?.i === i) ivDraw();
+}
+function mpHTML(x, det) {
+  const T = mpt(), M = INV.mp; if (M.busy) return `<p class="wait">${esc(T.loading)}</p>`;
+  const cur = det.so[M.i]?.plugHash, cost = h => PDESC.m[h]?.e || 0, E = det.inst?.energy, free = E ? E.energyCapacity - E.energyUsed + cost(cur) : 99;
+  const list = M.list.filter(h => h !== M.empty).sort((a, b) => (b === cur) - (a === cur) || det.en[a].n.localeCompare(det.en[b].n));
+  if (!list.length || list.length === 1 && list[0] === cur) return `<div class="mp"><p class="lbd-n">${esc(M.err ? u().unavailable : T.none)}</p></div>`;
+  const s = M.sel, sd = s && det.en[s], short = s ? cost(s) - free : 0;
+  return `<div class="mp"><div class="mp-h"><b>${esc(T.title)}</b>${E ? `<small>${esc(T.energy(E.energyUsed, E.energyCapacity))}</small>` : ''}<button type="button" class="linkb" data-mpx>${esc(T.cancel)}</button></div>
+    <div class="mp-g">${list.map(h => { const d = det.en[h], c = cost(h); return `<button type="button" class="mp-m${h === cur ? ' cur' : ''}${h === s ? ' on' : ''}${c > free ? ' no' : ''}" data-mp="${h}" title="${esc(d.n)}">${d.ic ? `<img src="${BNET}${d.ic}" alt="">` : ''}${c ? `<i>${c}</i>` : ''}<span>${esc(d.n)}</span></button>`; }).join('')}</div>
+    ${sd ? `<div class="ivd-pd on"><img src="${BNET}${sd.ic}" alt=""><div><b>${esc(sd.n)}${cost(s) ? ` <small class="ivd-en">${cost(s)}⚡</small>` : ''}</b><span>${esc(pdText(s, sd) || '…')}</span>${short > 0 ? `<small class="bad">${esc(T.need(short))}</small>` : ''}</div></div>` : ''}
+    <div class="mp-a">${s && s !== cur ? `<button type="button" class="lb-run" data-mpgo="${s}"${short > 0 || INV.busy ? ' disabled' : ''}>${esc(T.apply)}</button>` : ''}${M.empty && cur !== M.empty ? `<button type="button" class="lbd-btn" data-mpgo="${M.empty}"${INV.busy ? ' disabled' : ''}>${esc(T.remove)}</button>` : ''}</div></div>`;
+}
+async function mpApply(x, h) {
+  const T = mpt(), W = wt(), i = INV.mp.i, ch = x.where !== 'v' ? x.where : Object.keys(profile.characters?.data || {})[0];
+  INV.busy = true; INV.msg = { t: T.going }; ivDraw();
+  try {
+    await wPost('/Destiny2/Actions/Items/InsertSocketPlugFree/', { plug: { socketIndex: i, socketArrayType: 0, plugItemHash: h }, itemId: x.iid, characterId: ch });
+    INV.msg = { t: T.ok }; delete INV.det[x.iid]; INV.mp = null; INV.perk = h; await ivLoadDet(x.iid);
+  } catch (e) { INV.msg = { bad: true, t: e.code === 1671 || e.code === 1663 || e.code === 1678 ? T.act : W.e[e.code] || `${W.e.other} ${e.message || ''}` }; }
+  INV.busy = false; ivDraw();
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#ivdlg')) return; const x = ivFind(INV.sel); if (!x) return;
+  if (e.target.closest('[data-ivmod]')) { mpOpen(x); return; }
+  if (e.target.closest('[data-mpx]')) { INV.mp = null; ivDraw(); return; }
+  const m = e.target.closest('[data-mp]'); if (m) { INV.mp.sel = +m.dataset.mp; ivDraw(); return; }
+  const g = e.target.closest('[data-mpgo]'); if (g && !g.disabled) mpApply(x, +g.dataset.mpgo);
+});
 const STAT_NOBAR = new Set([4284893193, 3871231066, 2961396640, 1931675084, 2715839340, 447667954, 925767036, 2837207746]);
 function ivDraw() {
   const d = $('ivdlg'), T = ivt(), W = u(); if (!d) return; const x = ivFind(INV.sel); if (!x) { d.close(); return; }
@@ -4338,7 +4383,7 @@ function ivDraw() {
     const rlL = RL.st === 'ok' ? (RL.m[x.h] || []).filter(e => RL.mode === 'both' || !e[1] || e[1] === (RL.mode === 'pve' ? 'e' : 'v')) : [], rec = new Set(rlL.flatMap(e => e[0]));
     const isWish = pd => wcols.some(c => c.some(o => (o.ic && pd?.ic === o.ic) || (o.n && wishKey(pd?.n || '') === wishKey(o.n))));
     if (wcols.length) { const m = wcols.filter(c => cols.some(o => c.some(w => (w.ic && o.d.ic === w.ic) || (w.n && wishKey(o.d.n) === wishKey(w.n))))).length; wishC = `<span class="wish-m${m === wcols.length ? ' full' : ''}">☆ ${esc(T.wish(m, wcols.length))}</span>`; }
-    perks = cols.length ? `<span class="sea-k">${esc(T.perks)} · ${esc(T.perksN)}</span><div class="ivd-perks">${cols.map(o => { const opts = [...new Set([o.s.plugHash, ...(det.rp[o.i] || []).map(p => p.plugItemHash)])].filter(h => det.en[h]); return `<div class="ivd-pc">${opts.map(h => { const pd = det.en[h], on = h === o.s.plugHash; return `<button type="button" class="ivd-p${on ? ' on' : ''}${isWish(pd) ? ' w' : ''}" data-ivperk="${h}" title="${esc(pd.n)}" aria-label="${esc(pd.n)}">${pd.ic ? `<img src="${BNET}${pd.ic}" alt="">` : ''}${rec.has(h) ? '<i class="ivd-r" aria-hidden="true">✓</i>' : ''}</button>`; }).join('')}</div>`; }).join('')}</div>${(() => { const sel = INV.perk && det.en[INV.perk] ? [INV.perk] : [], miss = sel.filter(h => !(h in PDESC.m)); if (miss.length) setTimeout(() => pdescLoad(miss)); const cnt = {}; sel.forEach(h => cnt[h] = (cnt[h] || 0) + 1); return `<div class="ivd-pds">${[...new Set(sel)].map(h => { const pd = det.en[h], P = PDESC.m[h], tx = pdText(h, pd); return `<div class="ivd-pd${INV.perk ? ' on' : ''}" data-ivperk="${h}">${pd.ic ? `<img src="${BNET}${pd.ic}" alt="">` : '<i></i>'}<div><b>${esc(pd.n)}${cnt[h] > 1 ? ` ×${cnt[h]}` : ''}${P?.e ? ` <small class="ivd-en">${P.e}⚡</small>` : ''}</b>${P?.t ? `<small>${esc(P.t)}</small>` : ''}<span>${tx ? esc(tx) : !(h in PDESC.m) ? '…' : ''}</span>${isWish(pd) ? `<span class="w">☆ ${esc(wl ? T.wish(1, 1).replace(/ 1\/1$/, '') : '')}</span>` : ''}</div></div>`; }).join('')}</div>`; })()}` : '';
+    perks = cols.length ? `<span class="sea-k">${esc(T.perks)} · ${esc(T.perksN)}</span><div class="ivd-perks">${cols.map(o => { const opts = [...new Set([o.s.plugHash, ...(det.rp[o.i] || []).map(p => p.plugItemHash)])].filter(h => det.en[h]); return `<div class="ivd-pc">${opts.map(h => { const pd = det.en[h], on = h === o.s.plugHash; return `<button type="button" class="ivd-p${on ? ' on' : ''}${isWish(pd) ? ' w' : ''}${on && INV.sock === o.i ? ' sel' : ''}" data-ivperk="${h}"${on ? ` data-ivsock="${o.i}"` : ''} title="${esc(pd.n)}" aria-label="${esc(pd.n)}">${pd.ic ? `<img src="${BNET}${pd.ic}" alt="">` : ''}${rec.has(h) ? '<i class="ivd-r" aria-hidden="true">✓</i>' : ''}</button>`; }).join('')}</div>`; }).join('')}</div>${(() => { const sel = INV.perk && det.en[INV.perk] ? [INV.perk] : [], miss = sel.filter(h => !(h in PDESC.m)); if (miss.length) setTimeout(() => pdescLoad(miss)); const cnt = {}; sel.forEach(h => cnt[h] = (cnt[h] || 0) + 1); return `<div class="ivd-pds">${[...new Set(sel)].map(h => { const pd = det.en[h], P = PDESC.m[h], tx = pdText(h, pd); return `<div class="ivd-pd${INV.perk ? ' on' : ''}" data-ivperk="${h}">${pd.ic ? `<img src="${BNET}${pd.ic}" alt="">` : '<i></i>'}<div><b>${esc(pd.n)}${cnt[h] > 1 ? ` ×${cnt[h]}` : ''}${P?.e ? ` <small class="ivd-en">${P.e}⚡</small>` : ''}</b>${P?.t ? `<small>${esc(P.t)}</small>` : ''}<span>${tx ? esc(tx) : !(h in PDESC.m) ? '…' : ''}</span>${isWish(pd) ? `<span class="w">☆ ${esc(wl ? T.wish(1, 1).replace(/ 1\/1$/, '') : '')}</span>` : ''}${!isW && INV.sock != null && h === det.so[INV.sock]?.plugHash && /^enhancements\.(?!ghosts)/.test(pd.pc || '') && !INV.mp ? `<button type="button" class="lbd-btn pri ivd-mb" data-ivmod>${esc(mpt().swap)}</button>` : ''}</div></div>`; }).join('')}</div>${INV.mp ? mpHTML(x, det) : ''}`; })()}` : '';
     if (isW) { const RT = rlt(), g = rlGrade(x.iid, x.h), md = RT.mode[RL.mode === 'both' ? 'pve' : RL.mode], bestN = rlL.map(e => [e, e[0].filter(p => det.so.some(s => s.plugHash === p)).length / e[0].length]).sort((a, b) => b[1] - a[1])[0]?.[0]?.[2];
       perks += RL.st === 'ok' ? `<div class="ivd-rl rl-${g || 'x'}"><b>${esc(RT.det)}</b><span>${esc(!rlL.length ? RT.detNo : g === 'g' ? RT.detG(RL.mode === 'both' ? 'PvE/PvP' : md) : g === 'p' ? RT.detP : RT.detN)}</span>${rlL.length ? `<small>${esc(RT.legend)}</small><ul class="rl-leg">${RT.leg.map(([k, a, b]) => `<li class="${k === g ? 'on' : ''}"><i class="rl-b rl-${k}">${{ g: '✓', p: '½', n: '✕' }[k]}</i><b>${esc(a.slice(2))}</b> <span>${esc(b)}</span></li>`).join('')}</ul>` : ''}${bestN ? `<small><b>${esc(RT.note)}:</b> ${esc(bestN)}</small>` : ''}</div>` : ''; }
     const sk = Object.entries(det.st).map(([h, v]) => ({ h: +h, v: v.value, n: det.sd[h]?.n || '' })).filter(s => s.n);
@@ -4360,9 +4405,9 @@ function ivDraw() {
 }
 function ivOpen(iid) {
   let d = $('ivdlg'); if (!d) { d = document.createElement('dialog'); d.id = 'ivdlg'; d.className = 'pf ivdlg'; document.body.append(d);
-    d.addEventListener('click', e => { if (e.target === d || e.target.closest('.pf-x')) { d.close(); return; } const b = e.target.closest('[data-ivdo]'); if (b) { ivDo(INV.sel, b.dataset.ivdo, !!b.dataset.iveq); return; } const t = e.target.closest('[data-ivtag]'); if (t) { const m = LS.get('dc-tags', {}); if (m[INV.sel] === t.dataset.ivtag) delete m[INV.sel]; else m[INV.sel] = t.dataset.ivtag; LS.set('dc-tags', m); ivRefresh(); return; } const p = e.target.closest('[data-ivperk]'); if (p) { INV.perk = INV.perk === +p.dataset.ivperk ? null : +p.dataset.ivperk; ivDraw(); } });
+    d.addEventListener('click', e => { if (e.target === d || e.target.closest('.pf-x')) { d.close(); return; } const b = e.target.closest('[data-ivdo]'); if (b) { ivDo(INV.sel, b.dataset.ivdo, !!b.dataset.iveq); return; } const t = e.target.closest('[data-ivtag]'); if (t) { const m = LS.get('dc-tags', {}); if (m[INV.sel] === t.dataset.ivtag) delete m[INV.sel]; else m[INV.sel] = t.dataset.ivtag; LS.set('dc-tags', m); ivRefresh(); return; } const p = e.target.closest('[data-ivperk]'); if (p) { const same = INV.perk === +p.dataset.ivperk; INV.perk = same ? null : +p.dataset.ivperk; INV.sock = !same && p.dataset.ivsock ? +p.dataset.ivsock : null; INV.mp = null; ivDraw(); } });
     d.addEventListener('change', e => { if (e.target.id !== 'ivnote') return; const m = LS.get('dc-notes', {}); const v = e.target.value.trim(); if (v) m[INV.sel] = v; else delete m[INV.sel]; const ks = Object.keys(m); if (ks.length > 500) delete m[ks[0]]; LS.set('dc-notes', m); }); }
-  INV.sel = iid; INV.perk = null; INV.msg = null; ivDraw(); if (!d.open) d.showModal();
+  INV.sel = iid; INV.perk = null; INV.sock = null; INV.mp = null; INV.msg = null; ivDraw(); if (!d.open) d.showModal();
 }
 document.addEventListener('click', e => {
   if (tab !== 'inv' && tab !== 'vlt') return;
