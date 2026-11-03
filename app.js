@@ -1179,7 +1179,6 @@ function renderBuild() {
   const on = OPTS.build && !!profile && !!auth;
   b.hidden = !buildOpen || !on; if (!b.hidden) b.innerHTML = buildHTML();
   const g = $('gear'); g.querySelector('.g-more')?.remove();
-  const bl = $('buildlink'); if (bl) { bl.hidden = !on || !APIW; bl.title = lang === 'pt' ? 'Copiar o link da sua build atual' : 'Copy the link to your current build'; bl.setAttribute('aria-label', bl.title); }
   if (bb) { bb.hidden = !on; bb.setAttribute('aria-expanded', !b.hidden); bb.title = u().w.showBuild; bb.setAttribute('aria-label', u().w.showBuild); }
   if (on) { g.setAttribute('role', 'button'); g.tabIndex = 0; g.setAttribute('aria-expanded', !b.hidden); g.title = u().w.showBuild; }
   else { g.removeAttribute('role'); g.removeAttribute('tabindex'); g.removeAttribute('aria-expanded'); g.title = ''; }
@@ -1567,7 +1566,6 @@ $('list').addEventListener('change', e => { const k = e.target.dataset.opt; if (
 $('week').addEventListener('click', e => { const b = e.target.closest('.wk'); if (!b) return; const w = WK[+b.dataset.wk]; if (w && w.to) jumpTo(w.to[0], w.to[1]); });
 $('gear').addEventListener('click', toggleBuild);
 $('buildbtn').addEventListener('click', toggleBuild);
-$('buildlink')?.addEventListener('click', async e => { const b = e.currentTarget; if (b.disabled) return; if (!BUILD || BUILD.partial) { b.disabled = true; b.dataset.tip = u().pubWait; try { await loadBuild(gen); } catch {} b.disabled = false; } sharePub(ownCtx(), b); });
 $('build').addEventListener('click', e => { if (e.target.closest('.b-cam')) openShare(ownCtx()); if (e.target.closest('.b-save')) { toggleSaved(ownCtx()); renderBuild(); return; } const lk = e.target.closest('.b-link'); if (lk && member?.name) copyLink(member.name, lk); });
 $('gear').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleBuild(); } });
 setInterval(() => { if (document.visibilityState === 'visible' && profile && tab === 'obj') { build(); render(); } }, 60000);
