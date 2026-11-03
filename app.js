@@ -4438,7 +4438,7 @@ function evoSnap() {
 function evoHTML() {
   const T = EVT[lang === 'pt' ? 'pt' : 'en']; evoSnap(); const all = LS.get('dc-evo', []); if (!all.length) return '';
   const days = { m1: 28, m3: 92, all: 1e5 }[EV.per], from = dayKey(Date.now() - days * 864e5), L2 = all.filter(x => x.d >= from);
-  const chart = (key, name, col, fmt) => { const v = L2.map(x => x[key] || 0), cur = v[v.length - 1], first = v[0], wk = all.filter(x => x.d >= dayKey(Date.now() - 7 * 864e5)), dw = cur - (wk[0]?.[key] ?? cur);
+  const chart = (key, name, col, fmt) => { const v0 = L2.map(x => x[key] || 0), v = v0.length === 1 ? [v0[0], v0[0]] : v0, cur = v[v.length - 1], first = v[0], wk = all.filter(x => x.d >= dayKey(Date.now() - 7 * 864e5)), dw = cur - (wk[0]?.[key] ?? cur);
     const mn = Math.min(...v), mx = Math.max(...v), n = Math.max(1, v.length - 1), pts = v.map((y, i) => `${(v.length === 1 ? 300 : i / n * 596 + 2).toFixed(1)},${(112 - (mx === mn ? .5 : (y - mn) / (mx - mn)) * 100).toFixed(1)}`).join(' ');
     return `<div class="ev-c"><div class="ev-h"><span>${esc(name)}</span><b>${fmt(cur)}</b>${dw ? `<em>${dw > 0 ? '+' : ''}${fmt(dw)} ${esc(T.wk)}</em>` : ''}</div><svg viewBox="0 0 600 120" preserveAspectRatio="none" role="img" aria-label="${esc(name)}"><polyline points="2,118 ${pts} 598,118" fill="${col}22" stroke="none"/><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg><div class="ev-x"><span>${esc(L2[0]?.d.slice(5).split('-').reverse().join('/') || '')}</span><span>${esc(L2[L2.length - 1]?.d.slice(5).split('-').reverse().join('/') || '')}</span></div></div>`; };
   // horas por semana: diferença entre leituras de semanas seguidas
