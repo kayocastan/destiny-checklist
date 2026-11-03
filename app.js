@@ -2584,12 +2584,12 @@ function todayHTML() {
 const GMET = LS.get('dc-gmet', {});
 const ACT_METRICS = () => [...defs.raids.map(a => ['raid', a]), ...defs.dungeons.map(a => ['dg', a])].filter(([, a]) => a.m);
 async function guardianMetrics(mt, mid) {
-  const c = GMET[mid]; if (c && c.v === 2 && Date.now() - c.at < 864e5) return c;
+  const c = GMET[mid]; if (c && c.v === 2 && c.mv === 2 && Date.now() - c.at < 864e5) return c;
   let v;
   await mdefLoad();
   try {
     const r = await bungie(`/Destiny2/${mt}/Profile/${mid}/?components=100,200,1100`, false), m = r.metrics?.data?.metrics, g = h => m?.[h]?.objectiveProgress?.progress || 0, ch = Object.values(r.characters?.data || {});
-    v = { at: Date.now(), v: 2, priv: !m, gr: r.profile?.data?.currentGuardianRank || 0, m: m ? Object.fromEntries(ACT_METRICS().map(([, a]) => [a.m, g(a.m)])) : {},
+    v = { at: Date.now(), v: 2, mv: 2, priv: !m, gr: r.profile?.data?.currentGuardianRank || 0, m: m ? Object.fromEntries(ACT_METRICS().map(([, a]) => [a.m, g(a.m)])) : {},
       k: ch.slice().sort((a, b) => new Date(b.dateLastPlayed) - new Date(a.dateLastPlayed))[0]?.classType, lp: Math.max(0, ...ch.map(c => Date.parse(c.dateLastPlayed) || 0)), hrs: Math.round(ch.reduce((t, c) => t + (+c.minutesPlayedTotal || 0), 0) / 60), lt: Math.max(0, ...ch.map(c => c.light || 0)), se: g(MET_SEALS), tri: g(MET_TRI),
       x: m && MDEF.b ? Object.fromEntries(Object.keys(MDEF.b).map(h => [h, g(h)]).filter(([, n]) => n > 0)) : {} };
     const tot = Object.values(v.m).reduce((a, b) => a + b, 0);
@@ -2645,7 +2645,7 @@ function clanBoardHTML() {
   const T = LBDT[lang === 'pt' ? 'pt' : 'en'], list = clanAll(); if (list.length < 2) return '';
   const now = Date.now(), act30 = x => x.on || (x.t > 864e5 * 365 && now - x.t < 30 * 864e5) || x.mid === member.id;
   const pubAll = list.filter(x => GMET[x.mid] && !GMET[x.mid].priv && GMET[x.mid].v === 2), pub = LBD.a30 ? pubAll.filter(act30) : pubAll;
-  const miss = list.filter(x => !GMET[x.mid] || GMET[x.mid].v !== 2).length;
+  const miss = list.filter(x => !GMET[x.mid] || GMET[x.mid].v !== 2 || (!GMET[x.mid].priv && GMET[x.mid].mv !== 2)).length;
   const loadB = miss || CLCK.busy ? `<p class="lbd-n">${esc(T.note)} <button type="button" class="char clck-b" data-clck ${CLCK.busy ? 'disabled' : ''}>${esc(CLCK.busy ? u().clckLoading(CLCK.n, list.length) : u().clckBtn(list.length))}</button></p>` : '';
   if (!pub.length) return `<article class="gd lbd-a"><div class="gd-head"><h2>🏆 ${esc(T.t)}</h2></div>${loadB}</article>`;
   const k = LBD.k === 'act' && !LBD.act ? 'cl' : LBD.k, rank = kk => pub.map(x => ({ x, v: lbdVal(kk, GMET[x.mid]) || 0 })).filter(r => r.v > 0).sort((a, b) => b.v - a.v);
