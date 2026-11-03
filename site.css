@@ -1998,3 +1998,9 @@ dialog.ivdlg{width:min(1000px,calc(100vw - 24px))}
 .wid-how{color:#f2d36b}
 .wid-g{grid-auto-rows:46px!important;grid-template-rows:none!important;align-content:start;max-height:none;overflow:visible;flex:none}
 .wid{aspect-ratio:auto;height:44px}
+/* link da build atual no topo */
+#buildbtn{margin-right:0}
+.gh-more.gh-link{width:auto;display:inline-flex;gap:6px;padding:0 10px;font:600 13px var(--sans,inherit);margin-right:auto;position:relative}
+.gh-link.ok{border-color:#7fe08f;color:#7fe08f}
+.gh-link[data-tip]::after{content:attr(data-tip);position:absolute;top:calc(100% + 6px);left:0;white-space:nowrap;font-size:12px;padding:4px 8px;border-radius:6px;background:#0d1219;border:1px solid var(--line);color:var(--fg);z-index:5}
+@media (max-width:760px){.gh-link span{display:none}.gh-more.gh-link{padding:0;width:32px;justify-content:center}}
