@@ -3090,9 +3090,9 @@ function lbDraw() {
       + (!g ? `<p class="lbd-n wait">${esc(W.loadingDefs)}</p>` : `<p class="lbd-n">${esc(T.artTap)}</p><div class="lbd-sg"><div class="lbd-sks art">${g.map(([, ix]) => `<span class="lbd-col">${lbSockRow('art', ai, ix, ov)}</span>`).join('')}</div>${g.map(([, ix]) => lbPicker('art', ai, ix, ov, sd)).join('')}</div>`)
       + (Object.keys(ov).length ? `<button type="button" class="linkb" data-lbreset="art">${esc(T.reset)}</button>` : '');
   }
-  const s6 = lbSec('s6', tt(T.s6), LB.art && ai ? `${lbIc(ai.itemHash, ' class="lbd-si"')}${esc(subN(ai))}` : esc(T.wpNo), `${arts.length ? `<label class="lb2-ck"><input type="checkbox" data-lbartck${LB.art ? ' checked' : ''}><span>${esc(T.art)}</span></label>${artBody}` : `<p class="lbd-n">${esc(T.artNo)}</p>`}`);
+  const s6 = lbSec('s6', tt(T.s6), LB.art && ai ? `${lbIc(ai.itemHash, ' class="lbd-si"')}${esc(subN(ai))}` : esc(T.wpNo), `${arts.length ? `<label class="lbd-ck"><input type="checkbox" data-lbartck${LB.art ? ' checked' : ''}><span>${esc(T.art)}</span></label>${artBody}` : `<p class="lbd-n">${esc(T.artNo)}</p>`}`);
   const mods = lbMods();
-  const s7 = lbSec('s7', tt(T.s7), esc(LB.mods ? T.modsN(mods.length).split(':')[0] : T.wpNo), `<label class="lb2-ck"><input type="checkbox" data-lbmods${LB.mods ? ' checked' : ''}><span>${esc(T.mods)}<small>${esc(T.modsN(mods.length))}</small></span></label>`);
+  const s7 = lbSec('s7', tt(T.s7), esc(LB.mods ? T.modsN(mods.length).split(':')[0] : T.wpNo), `<label class="lbd-ck"><input type="checkbox" data-lbmods${LB.mods ? ' checked' : ''}><span>${esc(T.mods)}<small>${esc(T.modsN(mods.length))}</small></span></label>`);
   const go = `<button type="button" class="lb-run lbd-go" data-lb="run" ${LB.st === 'running' ? 'disabled' : ''}>${esc(LB.st === 'running' ? W.lbRunning : W.lbRun)}</button><button type="button" class="linkb" data-lb="load">${esc(W.lbReload)}</button>`;
   // resultados
   const where = p => p.eqc === LB.cid ? W.lbEquipped : p.where === 'v' ? W.lbVault : (u().classes[profile.characters.data[p.where]?.classType] || '');
@@ -3129,9 +3129,9 @@ function lbDraw() {
       <div class="lb-st">${STAT_ORDER.map((h, k) => { const v = mt[k], dd = v - cur[k]; return `<span${v >= 100 ? ' class="hi"' : ''} title="${esc(stN(h))}">${D[h]?.ic ? `<img src="${BNET}${D[h].ic}" alt="">` : ''}<b>${v}</b><small class="${dd > 0 ? 'up' : dd < 0 ? 'dn' : ''}">${dd ? (dd > 0 ? '+' : '') + dd : '='}</small></span>`; }).join('')}</div>
       ${perks.length ? `<ul class="lbd-perks">${perks.map(pk => `<li class="${pk.on ? 'on' : ''}">${pk.ic ? `<img src="${BNET}${pk.ic}" alt="">` : ''}<span><b>${esc(pk.n)}</b> <small>${esc(pk.c + '/5 · ' + (pk.on ? T.setOn : T.setOff(pk.c)))}</small>${pk.d ? `<em>${esc(pk.d)}</em>` : ''}</span></li>`).join('')}</ul>` : ''}</article>`;
     LB.mres = mr;
-    d.innerHTML = `<div class="pf-box lbd-box">${close}${head}<div class="lb2-cols"><aside class="lbd-ctl">${s1}${[0, 1, 2, 3, 4].map(aSec).join('')}${s5}${s6}${s7}<div class="lbd-gobar"><button type="button" class="lb-run lbd-go" data-lbmode="opt">${esc(T.toOpt)}</button><button type="button" class="linkb" data-lb="load">${esc(W.lbReload)}</button></div></aside>
+    d.innerHTML = `<div class="pf-box lbd-box">${close}${head}<div class="lbd-cols"><aside class="lbd-ctl">${s1}${[0, 1, 2, 3, 4].map(aSec).join('')}${s5}${s6}${s7}<div class="lbd-gobar"><button type="button" class="lb-run lbd-go" data-lbmode="opt">${esc(T.toOpt)}</button><button type="button" class="linkb" data-lb="load">${esc(W.lbReload)}</button></div></aside>
       <section class="lbd-res"><div class="lbd-rh"><h2>${esc(T.sumT)}</h2></div>${curRow}${summary}<p class="lbd-n">${esc(T.restNote)}</p><p class="lbd-n lb-clan">${esc(T.clan)}</p></section></div></div>`;
-  } else d.innerHTML = `<div class="pf-box lbd-box">${close}${head}<div class="lb2-cols"><aside class="lbd-ctl">${s1}${s2}${s3}${s4}${s5}${s6}${s7}<div class="lbd-gobar">${go}</div></aside>
+  } else d.innerHTML = `<div class="pf-box lbd-box">${close}${head}<div class="lbd-cols"><aside class="lbd-ctl">${s1}${s2}${s3}${s4}${s5}${s6}${s7}<div class="lbd-gobar">${go}</div></aside>
     <section class="lbd-res"><div class="lbd-rh"><h2>${esc(T.res)}</h2>${meta}</div>${curRow}${res}<p class="lbd-n">${esc(T.restNote)}</p><p class="lbd-n">${esc(T.foot)}</p><p class="lbd-n lb-clan">${esc(T.clan)}</p></section></div></div>`;
   const nb = d.querySelector('.lbd-box'); if (nb) nb.scrollTop = y1; const nr = d.querySelector('.lbd-res'); if (nr) nr.scrollTop = y2; const nc = d.querySelector('.lbd-ctl'); if (nc) nc.scrollTop = y3; lbCfgSave();
 }
@@ -3776,7 +3776,7 @@ function repHTML() {
   if (!REP.sel && vis[0]) setTimeout(() => repOpen(vis[0].id), 0);
   const chip = (v, t) => `<button type="button" class="lbd-chip${REP.f === v ? ' on' : ''}" data-repf="${v}">${esc(t)}</button>`;
   const img = x => actImg(x.h, x.kk?.kind, x.kk?.k);
-  const side = `<aside class="rep-side"><div class="lbd-chips">${chip('all', T.all)}${chip('raid', T.raid)}${chip('dg', T.dg)}</div><label class="lb2-ck"><input type="checkbox" data-repdone${REP.done ? ' checked' : ''}><span>${esc(T.onlyDone)}</span></label>
+  const side = `<aside class="rep-side"><div class="lbd-chips">${chip('all', T.all)}${chip('raid', T.raid)}${chip('dg', T.dg)}</div><label class="lbd-ck"><input type="checkbox" data-repdone${REP.done ? ' checked' : ''}><span>${esc(T.onlyDone)}</span></label>
     ${vis.length ? vis.map(x => { const im = img(x); return `<button type="button" class="rep-i${REP.sel === x.id ? ' on' : ''}" data-rep="${x.id}"><span class="rep-im"${im ? ` style="background-image:url('${BNET}${im}')"` : ''}></span><span class="rep-it"><b>${esc(REP.names[x.h]?.n || '…')}</b><small>${esc(fmt(x.at) + ' · ' + T.players(x.pc || 1))}</small></span><small class="rep-r ${x.ok ? 'ok' : 'no'}">${x.ok ? fmtDur(x.dur * 1000) : '✕'}</small></button>`; }).join('') : `<p class="lbd-n">${esc(T.none)}</p>`}</aside>`;
   const x = REP.list.find(y => y.id === REP.sel), P = x && REP.pg[x.id];
   let main = `<p class="lbd-n">${esc(T.pick)}</p>`;
