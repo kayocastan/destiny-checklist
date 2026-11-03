@@ -1766,3 +1766,24 @@ dialog.ivdlg{width:min(1000px,calc(100vw - 24px))}
 @media (max-width:760px){.iv-vg{max-height:none}}
 .iv-vg,.iv-inv{align-content:start;grid-auto-rows:max-content}
 .iv-vg .iv-t,.iv-inv .iv-t{min-height:0;height:auto}
+/* inventário: ocupa a largura toda e quadrados maiores */
+#list>.panel.iv-wrap{align-items:stretch!important}
+.iv-inv{grid-template-columns:repeat(auto-fill,minmax(46px,1fr))}
+.iv-vg{grid-template-columns:repeat(auto-fill,minmax(48px,1fr));max-height:330px}
+.iv-t.big,.iv-none{width:66px;height:66px}
+.iv-t b{font-size:10.5px}.iv-t.big b{font-size:12px}
+.vl-tiles{grid-template-columns:repeat(auto-fill,minmax(60px,1fr))}
+@media (max-width:760px){.iv-inv,.iv-vg{grid-template-columns:repeat(auto-fill,minmax(48px,1fr))}}
+/* builds salvas: contorno de volta, só o nome */
+.sq .cl-p.sq-p{border:1px solid color-mix(in srgb,var(--fg) 30%,transparent);min-height:42px}
+.sq .cl-p.sq-p:hover{border-color:var(--acc)}
+/* esquadrão recente: cartões por classe */
+.rc-l{border:0;gap:8px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.rc-l li+li{border-top:0}
+.rc-p{grid-template-columns:38px minmax(0,1fr) auto;grid-template-rows:auto auto;row-gap:6px;border-radius:12px;border:1px solid var(--line);background:linear-gradient(135deg,color-mix(in srgb,var(--kc,#6fd3ff) 14%,var(--chip)),var(--chip) 60%);padding:10px 12px}
+.rc-p:hover{border-color:var(--kc,var(--acc));background:linear-gradient(135deg,color-mix(in srgb,var(--kc,#6fd3ff) 22%,var(--chip)),var(--chip) 60%)}
+.rc-p.k0{--kc:#e0704f}.rc-p.k1{--kc:#4fa3e0}.rc-p.k2{--kc:#e0b84f}
+.rc-ic{grid-row:span 2;width:38px;height:38px;border-radius:10px;display:grid;place-items:center;color:var(--kc,var(--acc));background:color-mix(in srgb,var(--kc,#6fd3ff) 18%,transparent)}
+.rc-n b{font-size:15px}
+.rc-a{grid-column:2/4;grid-row:2}
+.rc-c{grid-row:1;grid-column:3;align-self:start;font:600 11px var(--sans,inherit);color:var(--kc,var(--acc));border-color:color-mix(in srgb,var(--kc,#6fd3ff) 45%,transparent)}
