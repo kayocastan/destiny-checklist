@@ -1844,3 +1844,4 @@ dialog.ivdlg{width:min(1000px,calc(100vw - 24px))}
 .rl-leg li{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);opacity:.75}
 .rl-leg li.on{opacity:1;color:var(--fg)}.rl-leg li b{color:var(--fg);white-space:nowrap}
 .rl-leg .rl-b{position:static;flex:none}
+.ivd-rl .rl-leg span{color:var(--muted)!important}.ivd-rl .rl-leg li.on span{color:var(--fg)!important}
