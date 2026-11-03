@@ -1968,3 +1968,5 @@ dialog.ivdlg{width:min(1000px,calc(100vw - 24px))}
 .lkb small{color:var(--muted);font-size:12.5px}
 .lkb-l{display:flex;flex-wrap:wrap;gap:5px;max-height:150px;overflow:auto}.lkb-l span{font-size:12.5px;padding:3px 8px;border-radius:999px;background:var(--chip)}.lkb-l small{font-family:var(--mono)}
 .lkb-a{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.ad-gcp{display:grid;gap:4px;margin-top:4px;padding-top:10px;border-top:1px solid var(--line)}.ad-gcp .lbd-btn{justify-self:start;text-align:left}
+.ad-cpb{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
