@@ -2044,3 +2044,15 @@ button.soc-r:hover{border-color:var(--line)}button.soc-r.on{border-color:var(--a
 .soc-pl{display:flex;flex-wrap:wrap;gap:6px}.soc-pl span{font-size:13px;padding:4px 10px;border-radius:999px;background:var(--chip)}.soc-pl b{font-weight:600}
 @media (max-width:760px){.soc-q input{width:100%}}
 .soc-h2{display:flex;gap:14px;align-items:center}.soc-h2 .soc-hs:last-child{margin-left:auto;padding-right:4px}
+/* Clã › Discord do clã (em preparação) */
+.dc-wip{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;padding:14px 18px;border-radius:14px;border:2px solid rgba(255,138,122,.55);background:rgba(255,138,122,.08);font-size:14px;line-height:1.45}.dc-wip b{color:#ff8a7a;font-size:16px}
+.dc-own{display:grid;gap:6px;padding:12px 14px;border-radius:12px;border:1px dashed rgba(242,211,107,.55);background:rgba(242,211,107,.05)}.dc-own b{color:#f2d36b;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase}.dc-own ol{margin:0;padding-left:20px;display:grid;gap:4px;font-size:13.5px;line-height:1.45}
+.dc-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.dc-st{display:grid;gap:8px;align-content:start;padding:14px 16px;border-radius:14px;background:var(--chip);font-size:13.5px;line-height:1.45}
+.dc-st>b{font-size:16px}.dc-st button{justify-self:start}.dc-st button:disabled{opacity:.5;cursor:not-allowed}
+.dc-n{width:26px;height:26px;border-radius:50%;background:#5865f2;color:#fff;display:grid;place-items:center;font-weight:700}
+.dc-part{opacity:.75}
+.dc-k{grid-template-columns:repeat(5,minmax(0,1fr))}
+.dc-r{display:grid;grid-template-columns:minmax(0,1.1fr) 100px 90px 90px 110px minmax(0,1.4fr) 100px;gap:10px;align-items:center;padding:7px 10px;border-radius:9px;background:var(--chip);font-size:13.5px}
+.dc-r .m{font-family:var(--mono);font-size:12.5px}
+@media (max-width:1000px){.dc-steps{grid-template-columns:1fr}.dc-k{grid-template-columns:1fr 1fr}.dc-r{grid-template-columns:1fr auto}.dc-r>*:nth-child(n+3){display:none}}
