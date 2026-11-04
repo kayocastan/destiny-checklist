@@ -213,6 +213,50 @@ async function clanHoursCron(env) {
     await env.DB.prepare('UPDATE kv SET v = ?, t = ? WHERE uid = ? AND k = ?').bind(JSON.stringify(v), now, r.uid, 'hours').run().catch(() => {});
   }
 }
+
+// Quem joga com quem (beta, só admins): a cada 15 min, para cada clã com uso do site nos últimos 30 dias,
+// lê quem está online (lista pública do clã) e o esquadrão de cada um (componente público 1000 da Bungie).
+// Grava por dia: leituras online / com alguém do clã (soc_on) e duplas no mesmo esquadrão (soc_pair). O último retrato fica em kv (clan:<g>, social).
+async function socialCron(env) {
+  const key = (await env.DB.prepare("SELECT v FROM meta WHERE k = 'bkey'").first().catch(() => null))?.v; if (!key) return;
+  const rows = (await env.DB.prepare("SELECT uid, v FROM kv WHERE k = 'hours' AND uid LIKE 'clan:%' LIMIT 200").all().catch(() => ({ results: [] }))).results || [];
+  const now = Date.now(), d = spDay(now), fake = { headers: new Headers({ 'X-API-Key': key }) }; let n = 0;
+  for (const r of rows) {
+    let v; try { v = JSON.parse(r.v); } catch { continue; }
+    if (!v.ua || now - v.ua > 30 * 864e5) continue; if (++n > 20) break;
+    const g = r.uid.slice(5); if (!/^\d{1,20}$/.test(g)) continue;
+    const m = await bungie(fake, `/GroupV2/${g}/Members/?currentpage=1`).catch(() => null); if (!m) continue;
+    const mem = m.results || [], idOf = {}; for (const x of mem) { const u = x.destinyUserInfo || {}; if (u.membershipId) idOf[u.membershipId] = u.membershipId; }
+    const online = mem.filter(x => x.isOnline && x.destinyUserInfo?.membershipId), seen = new Set(), parties = [], acts = {};
+    for (const x of online) {
+      const u = x.destinyUserInfo, me = u.membershipId; if (seen.has(me)) continue;
+      const p = await bungie(fake, `/Destiny2/${u.membershipType}/Profile/${me}/?components=100,204,1000`).catch(() => null); if (!p) continue;
+      const prim = p.profile?.data?.userInfo?.membershipId; if (prim) idOf[prim] = me;
+      const ca = Object.values(p.characterActivities?.data || {}).sort((a, b) => Date.parse(b.dateActivityStarted || 0) - Date.parse(a.dateActivityStarted || 0))[0];
+      const pm = (p.profileTransitoryData?.data?.partyMembers || []).map(q => idOf[q.membershipId]).filter(Boolean);
+      const grp = [...new Set([me, ...pm])];
+      grp.forEach(id => seen.add(id)); parties.push({ m: grp, a: ca?.currentActivityHash || 0, s: p.profileTransitoryData?.data?.currentActivity?.startTime || null });
+    }
+    const st = [], on = new Set();
+    for (const P of parties) { const wc = P.m.length > 1 ? 1 : 0;
+      for (const id of P.m) { if (on.has(id)) continue; on.add(id); st.push(env.DB.prepare('INSERT INTO soc_on (g, mid, d, n, wc) VALUES (?, ?, ?, 1, ?) ON CONFLICT(g, mid, d) DO UPDATE SET n = n + 1, wc = wc + excluded.wc').bind(g, id, d, wc)); }
+      const ms = [...P.m].sort(); for (let i = 0; i < ms.length; i++) for (let j = i + 1; j < ms.length; j++) st.push(env.DB.prepare('INSERT INTO soc_pair (g, a, b, d, n) VALUES (?, ?, ?, ?, 1) ON CONFLICT(g, a, b, d) DO UPDATE SET n = n + 1').bind(g, ms[i], ms[j], d)); }
+    st.push(env.DB.prepare('INSERT INTO kv (uid, k, v, t) VALUES (?, ?, ?, ?) ON CONFLICT(uid, k) DO UPDATE SET v = excluded.v, t = excluded.t').bind(r.uid, 'social', JSON.stringify({ at: now, p: parties }), now));
+    await env.DB.batch(st).catch(() => {});
+  }
+}
+// leitura para a aba Administração (só dono do site, fundador e admins do clã)
+async function socialRoute(req, env, url) {
+  const g = url.searchParams.get('g') || ''; if (!/^\d{1,20}$/.test(g)) return json(req, { error: 'bad request' }, 400);
+  const { uid, role } = await clanRole(req, env, g); if (!uid) return json(req, { error: 'login' }, 401); if (role < 3) return json(req, { error: 'forbidden' }, 403);
+  const days = Math.min(400, Math.max(1, +url.searchParams.get('days') || 7)), since = spDay(Date.now() - (days - 1) * 864e5);
+  const [on, pr, snap] = await Promise.all([
+    env.DB.prepare('SELECT mid, SUM(n) n, SUM(wc) wc FROM soc_on WHERE g = ? AND d >= ? GROUP BY mid').bind(g, since).all(),
+    env.DB.prepare('SELECT a, b, SUM(n) n FROM soc_pair WHERE g = ? AND d >= ? GROUP BY a, b').bind(g, since).all(),
+    env.DB.prepare("SELECT v FROM kv WHERE uid = ? AND k = 'social'").bind('clan:' + g).first()]);
+  const first = await env.DB.prepare('SELECT MIN(d) d FROM soc_on WHERE g = ?').bind(g).first().catch(() => null);
+  return json(req, { on: on.results || [], pairs: pr.results || [], now: snap ? JSON.parse(snap.v) : null, since: first?.d || null });
+}
 async function sync(req, env) {
   const uid = await who(req, env);
   if (!uid) return json(req, { error: 'auth' }, 401);
@@ -332,6 +376,7 @@ async function stats(req, env) {
 export default {
   // de hora em hora: confere o uso do ciclo e liga/desliga o freio
   async scheduled(ev, env) {
+    if (ev.cron === '*/15 * * * *') { if (!(await brake(env))) await socialCron(env).catch(() => {}); return; }
     const m = await monthUsage(env); if (m.error) return;
     await env.DB.prepare("INSERT OR REPLACE INTO meta (k, v) VALUES ('brake', ?)").bind(JSON.stringify(m)).run().catch(() => {});
     if (!(await brake(env))) await clanHoursCron(env).catch(() => {});
@@ -345,6 +390,7 @@ export default {
       if (path === '/defs' && req.method === 'POST') return await defs(req, env);
       if (path === '/sync' && (req.method === 'GET' || req.method === 'PUT')) return await sync(req, env);
       if (path === '/clan/notice' || path === '/clan/hours') return await clanRoute(req, env, path, new URL(req.url));
+      if (path === '/clan/social' && req.method === 'GET') return await socialRoute(req, env, new URL(req.url));
       if (path === '/hit' && req.method === 'POST') return await hit(req, env);
       if (path === '/pub' && req.method === 'POST') return await pubPost(req, env);
       if (path === '/sug' && req.method === 'POST') return await sugPost(req, env);

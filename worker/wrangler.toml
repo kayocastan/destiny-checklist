@@ -9,7 +9,7 @@ ACCOUNT_ID = "__ACCOUNT_ID__"
 BILL_DAY = "29"          # dia em que o plano pago renova (assinado em 29/10/2026)
 
 [triggers]
-crons = ["17 * * * *"]   # freio de gastos: confere o uso de hora em hora
+crons = ["17 * * * *", "*/15 * * * *"]   # freio de gastos (de hora em hora) e Quem joga com quem (a cada 15 min)
 
 [[d1_databases]]
 binding = "DB"

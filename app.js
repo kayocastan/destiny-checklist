@@ -2706,6 +2706,47 @@ async function adLoad() {
   catch (e) { AD.req = []; AD.relog = true; }
   AD.busy = false; if (tab === 'gcla') render();
 }
+/* Clã › Administração › Quem joga com quem (beta): lido pelo servidor a cada 15 min, não depende de ninguém abrir o site */
+const SOCT = { pt: { t: 'Quem joga com quem', sub: 'lido a cada 15 min pelo DPI · não depende de ninguém abrir o site', per: [[7, '7 dias'], [30, '30 dias'], [400, 'Tudo']], wait: 'Coletando: o DPI lê a cada 15 minutos. A primeira leitura aparece em até 15 min e o ranking fica útil depois de alguns dias de jogo.', since: d => `dados desde ${d}`, k: ['Online no período', 'Tempo jogado junto', 'Jogando com o clã', 'Isolados'], ks: ['membros diferentes', 'somando todas as duplas', 'do tempo online', 'online 5h+ e menos de 10% com o clã'], tabs: ['Mais enturmados', 'Mais isolados'], approx: 'tempo = leituras de 15 min (aproximado)', h: ['MEMBRO', 'ONLINE', 'COM O CLÃ', 'PARCEIROS', 'JOGA MAIS COM'], iso: 'Isolado = online bastante, mas quase sempre sem ninguém do clã no esquadrão. Bom para chamar para um grupo.', now: 'Agora', nowAt: t => `última leitura ${t}`, nowNone: 'Ninguém do clã online na última leitura.', solo: 'sozinho', lim: 'Limites: sessões com menos de 15 min podem escapar; esquadrão na Torre ou em órbita também conta; perfis privados ficam de fora. Só conta quem é do clã.', more: n => `Ver todos (${n})`, less: 'Ver menos', err: 'Não deu para carregar agora.', relog: 'Entre de novo para ver (permissão de administrar o clã).' },
+  en: { t: 'Who plays with whom', sub: 'read every 15 min by DPI · does not depend on anyone opening the site', per: [[7, '7 days'], [30, '30 days'], [400, 'All']], wait: 'Collecting: DPI reads every 15 minutes. The first reading shows up within 15 min and the ranking becomes useful after a few days of play.', since: d => `data since ${d}`, k: ['Online in period', 'Time played together', 'Playing with the clan', 'Isolated'], ks: ['different members', 'adding all pairs', 'of online time', 'online 5h+ and under 10% with the clan'], tabs: ['Most social', 'Most isolated'], approx: 'time = 15-min readings (approximate)', h: ['MEMBER', 'ONLINE', 'WITH THE CLAN', 'PARTNERS', 'PLAYS MOST WITH'], iso: 'Isolated = online a lot, but almost always without anyone from the clan in the fireteam. Good to invite to a group.', now: 'Now', nowAt: t => `last reading ${t}`, nowNone: 'Nobody from the clan online in the last reading.', solo: 'solo', lim: 'Limits: sessions under 15 min may slip; fireteams in the Tower or orbit also count; private profiles are left out. Only clan members count.', more: n => `Show all (${n})`, less: 'Show less', err: 'Could not load now.', relog: 'Sign in again to see it (clan admin permission).' } };
+const SOC = { d: null, days: 7, tab: 0, all: false, busy: false, err: '', an: {} };
+async function socLoad() {
+  const g = GD?.clan?.gid; if (!g || !APIW || SOC.busy) return; SOC.busy = true; SOC.err = '';
+  try { const r = await fetch(`${APIW}/clan/social?g=${g}&days=${SOC.days}`, { headers: { Authorization: 'Bearer ' + await token(), 'X-API-Key': cfg.apiKey } }); if (r.status === 403 || r.status === 401) { SOC.err = 'relog'; SOC.d = null; } else { SOC.d = await r.json(); }
+    const hs = [...new Set((SOC.d?.now?.p || []).map(p => p.a).filter(h => h && !SOC.an[h]))]; if (hs.length) { const en = await entities('DestinyActivityDefinition', hs, lang).catch(() => ({})); for (const h of hs) SOC.an[h] = en[h]?.n || ''; }
+  } catch { SOC.err = 'err'; }
+  SOC.busy = false; if (tab === 'gcla') render();
+}
+function socHTML() {
+  const T = SOCT[lang === 'pt' ? 'pt' : 'en'], C = GD?.clan; if (!C?.gid) return '';
+  if (!SOC.d && !SOC.busy && !SOC.err) setTimeout(socLoad);
+  const nm = id => C.list.find(x => x.mid === id)?.n || (id === member.id ? (member.name || '').replace(/#\d+$/, '') : '?');
+  const hrs = n => { const h = n * 15 / 60; return (h < 10 ? h.toLocaleString(lang === 'en' ? 'en-US' : 'pt-BR', { maximumFractionDigits: 1 }) : Math.round(h)) + ' h'; };
+  const seg = T.per.map(([d, t]) => `<button type="button" data-socd="${d}" aria-pressed="${SOC.days === d}">${esc(t)}</button>`).join('');
+  const head = `<div class="ad-h"><h2>${esc(T.t)} <span class="soc-beta">BETA</span></h2><small class="lbd-n">${esc(T.sub)}</small><div class="vl-seg soc-seg">${seg}</div></div>`;
+  if (SOC.err) return `<section class="ad-s ad-wide soc">${head}<p class="lbd-n">${esc(SOC.err === 'relog' ? T.relog : T.err)}</p></section>`;
+  const D = SOC.d; if (!D) return `<section class="ad-s ad-wide soc">${head}<p class="wait">…</p></section>`;
+  const on = D.on || [], prs = D.pairs || [];
+  if (!on.length) return `<section class="ad-s ad-wide soc">${head}<p class="lbd-n">${esc(T.wait)}</p></section>`;
+  const part = {}; for (const p of prs) { (part[p.a] = part[p.a] || []).push([p.b, p.n]); (part[p.b] = part[p.b] || []).push([p.a, p.n]); }
+  const tn = on.reduce((t, x) => t + x.n, 0), tw = on.reduce((t, x) => t + x.wc, 0), tog = prs.reduce((t, p) => t + p.n, 0), isoF = x => x.n * 15 >= 300 && x.wc / x.n < .1;
+  const kv = [String(on.length), hrs(tog), (tn ? Math.round(tw / tn * 100) : 0) + '%', String(on.filter(isoF).length)];
+  const kpi = `<div class="soc-k">${T.k.map((k, i) => `<div><small>${esc(k)}</small><b>${esc(kv[i])}</b><small>${esc(T.ks[i])}</small></div>`).join('')}</div>`;
+  const list = SOC.tab ? on.filter(x => x.n >= 4).sort((a, b) => a.wc / a.n - b.wc / b.n || b.n - a.n) : on.slice().sort((a, b) => b.wc - a.wc || b.n - a.n), show = SOC.all ? list : list.slice(0, 12);
+  const row = x => { const p = x.n ? Math.round(x.wc / x.n * 100) : 0, c = p >= 50 ? 'ok' : p >= 20 ? 'mid' : 'low', pp = (part[x.mid] || []).sort((a, b) => b[1] - a[1]);
+    return `<div class="soc-r"><b>${esc(nm(x.mid))}</b><span class="m">${esc(hrs(x.n))}</span><span class="soc-bar ${c}"><i><u style="width:${p}%"></u></i><span class="m">${esc(hrs(x.wc))} · ${p}%</span></span><span class="m soc-c">${pp.length}</span><span>${pp[0] ? `${esc(nm(pp[0][0]))} · ${esc(hrs(pp[0][1]))}` : '—'}</span></div>`; };
+  const tabs = `<div class="vl-seg soc-seg">${T.tabs.map((t, i) => `<button type="button" data-soct="${i}" aria-pressed="${SOC.tab === i}">${esc(t)}</button>`).join('')}</div>`;
+  const N = D.now, ago = N ? (() => { const m = Math.round((Date.now() - N.at) / 60000); return lang === 'pt' ? `há ${m} min` : `${m} min ago`; })() : '';
+  const nowH = `<aside class="soc-now"><div class="t2-h"><b>${esc(T.now)}</b>${N ? `<small>${esc(T.nowAt(ago))}</small>` : ''}</div>${N?.p?.length ? N.p.slice().sort((a, b) => b.m.length - a.m.length).map(p => `<div class="soc-p"><b>${esc(p.m.map(nm).join(' + '))}</b><small>${esc([SOC.an[p.a], p.m.length < 2 ? T.solo : ''].filter(Boolean).join(' · '))}</small></div>`).join('') : `<p class="lbd-n">${esc(T.nowNone)}</p>`}</aside>`;
+  return `<section class="ad-s ad-wide soc">${head}${D.since ? `<small class="lbd-n">${esc(T.since(new Date(D.since + 'T12:00').toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR')))}</small>` : ''}${kpi}
+    <div class="soc-cols"><div class="soc-main"><div class="soc-bar-top">${tabs}<small class="lbd-n">${esc(T.approx)}</small></div><div class="soc-r soc-th">${T.h.map(h => `<span>${esc(h)}</span>`).join('')}</div>${show.map(row).join('')}${list.length > 12 ? `<button type="button" class="char rs-more" data-socall>${esc(SOC.all ? T.less : T.more(list.length))}</button>` : ''}<small class="lbd-n">${esc(T.iso)}</small></div>${nowH}</div><small class="lbd-n">${esc(T.lim)}</small></section>`;
+}
+document.addEventListener('click', e => {
+  if (tab !== 'gcla') return;
+  const d = e.target.closest('[data-socd]'); if (d) { SOC.days = +d.dataset.socd; SOC.d = null; socLoad(); render(); return; }
+  const t = e.target.closest('[data-soct]'); if (t) { SOC.tab = +t.dataset.soct; SOC.all = false; render(); return; }
+  if (e.target.closest('[data-socall]')) { SOC.all = !SOC.all; render(); }
+});
 // a Bungie só conta "Guiados" em algumas atividades (todas as incursões e poucas masmorras)
 const adHasG = a => { const n = actNorm(L(a.n)); return !!MDEF.b && !!n && Object.values(MDEF.b).some(([t, mn]) => t === 'g' && mn.includes(n)); };
 function adminHTML() {
@@ -2730,7 +2771,7 @@ function adminHTML() {
   const gl = ga ? [...all, { n: (member.name || '').replace(/#\d+$/, ''), mid: member.id, on: true }].map(x => ({ x, v: GMET[x.mid]?.v === 2 ? actBadges(ga, h => GMET[x.mid].x?.[h]).g : 0 })).filter(r => r.v > 0).sort((a, b) => b.v - a.v).slice(0, 8) : [];
   const gT = `<section class="ad-s"><h2>${esc(T.gT)}</h2><small class="lbd-n">${esc(T.gN)}</small><label class="lbd-act"><span>${esc(T.act)}</span><select id="adg">${acts.map(([, a]) => `<option value="${a.k}"${ga === a ? ' selected' : ''}>${esc(L(a.n))}</option>`).join('')}</select></label>${gl.map(r => `<span class="ad-g"><span><b>${esc(r.x.n)}</b>${r.x.on ? ' <small class="ok">● online</small>' : ''}</span><b class="m acc">${esc(T.guided(r.v))}</b></span>`).join('') || `<p class="lbd-n">${esc(T.noG)}</p>`}${ga ? `<div class="ad-gcp"><button type="button" class="lbd-btn pri" data-adcp="first">📋 ${esc(T.cpFirst)}</button><small class="lbd-n">${esc(T.cpFirstN)}</small></div>` : ''}</section>`;
   const cpT = `<section class="ad-s ad-cp"><h2>${esc(T.copyT)}</h2><small class="lbd-n">${esc(T.copyN)}</small><div class="ad-cpb">${Object.entries(T.cp).map(([k, t]) => `<button type="button" class="lbd-btn" data-adcp="${k}">📋 ${esc(t)}</button>`).join('')}</div></section>`;
-  return `<div class="ad-only"><b>${esc(T.only)}</b><span>${esc(T.onlyN)}</span></div>${AD.msg ? `<p class="iv-msg${AD.msg.bad ? ' bad' : ''}">${esc(AD.msg.t)}</p>` : ''}${inT}<div class="ad-g3">${reqT}${promoT}${cpT}</div><div class="ad-g2">${newT}${gT}</div>`;
+  return `<div class="ad-only"><b>${esc(T.only)}</b><span>${esc(T.onlyN)}</span></div>${AD.msg ? `<p class="iv-msg${AD.msg.bad ? ' bad' : ''}">${esc(AD.msg.t)}</p>` : ''}${inT}${socHTML()}<div class="ad-g3">${reqT}${promoT}${cpT}</div><div class="ad-g2">${newT}${gT}</div>`;
 }
 function adCopy(k) {
   const T = adt(), C = GD.clan, now = Date.now(), all = C.list, seen = x => x.t > 864e5 * 365, d = t => Math.round((now - t) / 864e5);
