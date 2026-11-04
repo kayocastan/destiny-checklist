@@ -2025,3 +2025,10 @@ dialog.ivdlg{width:min(1000px,calc(100vw - 24px))}
 @media (max-width:1000px){.soc-cols{grid-template-columns:1fr}.soc-k{grid-template-columns:1fr 1fr}}
 @media (max-width:760px){.soc-th{display:none}.soc-r{grid-template-columns:1fr auto}.soc-r>span:nth-child(4),.soc-r>span:nth-child(5){display:none}.soc-r .soc-bar{grid-column:1/-1}}
 .soc-bf{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0}.soc-bf.ok{color:#7fe08f}.soc-bf .lbd-n{flex:1 1 300px}
+/* Administração reorganizada: painéis em largura total */
+.ad-p>*{align-self:stretch;width:100%;box-sizing:border-box}
+.ad-rec-c{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:start}
+.ad-rec .ad-s{border:0!important;background:none!important;padding:0;box-shadow:none!important}
+.ad-rec .ad-s>h2{font-size:18px}
+.ad-rec .ad-rec-c>.ad-s+.ad-s{border-left:1px solid var(--line)!important;padding-left:18px}
+@media (max-width:1000px){.ad-rec-c{grid-template-columns:1fr}.ad-rec .ad-rec-c>.ad-s+.ad-s{border-left:0!important;padding-left:0;border-top:1px solid var(--line)!important;padding-top:14px}}
