@@ -278,6 +278,54 @@ async function socialBackfill(req, env, url) {
   await env.DB.prepare('INSERT INTO kv (uid, k, v, t) VALUES (?, ?, ?, ?) ON CONFLICT(uid, k) DO UPDATE SET v = excluded.v, t = excluded.t').bind('clan:' + g, 'socbf', JSON.stringify({ by: uid, n: st.length, lo: nlo }), Date.now()).run();
   return json(req, { ok: true, n: st.length });
 }
+
+// Quem joga com quem: uma vez por dia, pelo histórico de partidas de cada membro (só atividades; Torre e órbita não contam).
+// Roda no cron de hora em hora, um clã por vez, entre 05h e 23h (Brasília); cada clã guarda até onde já foi lido (socw).
+async function socialDaily(env) {
+  const key = (await env.DB.prepare("SELECT v FROM meta WHERE k = 'bkey'").first().catch(() => null))?.v; if (!key) return;
+  const now = Date.now(), dayStart = Date.parse(spDay(now) + 'T03:00:00Z'); // 00h de hoje em Brasília
+  const rows = (await env.DB.prepare("SELECT uid, v FROM kv WHERE k = 'hours' AND uid LIKE 'clan:%' LIMIT 200").all().catch(() => ({ results: [] }))).results || [];
+  for (const r of rows) {
+    let v; try { v = JSON.parse(r.v); } catch { continue; } if (!v.ua || now - v.ua > 30 * 864e5) continue;
+    const g = r.uid.slice(5); if (!/^\d{1,20}$/.test(g)) continue;
+    const wr = await env.DB.prepare("SELECT v FROM kv WHERE uid = ? AND k = 'socw'").bind(r.uid).first().catch(() => null);
+    let w = 0; try { w = JSON.parse(wr.v).w; } catch {}
+    if (!w) { const sn = await env.DB.prepare("SELECT v FROM kv WHERE uid = ? AND k = 'social'").bind(r.uid).first().catch(() => null); try { w = JSON.parse(sn.v).at; } catch {} if (!w) w = dayStart - 864e5; }
+    if (w >= dayStart) continue; // este clã já está em dia
+    await socialHistory(env, key, g, Math.max(w, dayStart - 3 * 864e5), dayStart);
+    await env.DB.prepare('INSERT INTO kv (uid, k, v, t) VALUES (?, ?, ?, ?) ON CONFLICT(uid, k) DO UPDATE SET v = excluded.v, t = excluded.t').bind(r.uid, 'socw', JSON.stringify({ w: dayStart }), now).run();
+    return; // um clã por rodada
+  }
+}
+async function socialHistory(env, key, g, from, to) {
+  const fake = { headers: new Headers({ 'X-API-Key': key }) }, m = await bungie(fake, `/GroupV2/${g}/Members/?currentpage=1`).catch(() => null); if (!m) return;
+  const mem = (m.results || []).map(x => x.destinyUserInfo).filter(u => u?.membershipId), idMap = {}, on = {}, inst = {}, wc = {}, pr = {};
+  mem.forEach(u => idMap[u.membershipId] = u.membershipId);
+  const pool = async (list, fn, n) => { let i = 0; await Promise.all(Array.from({ length: Math.min(n, list.length) }, async () => { while (i < list.length) await fn(list[i++]); })); };
+  await pool(mem, async u => {
+    const p = await bungie(fake, `/Destiny2/${u.membershipType}/Profile/${u.membershipId}/?components=100,200`).catch(() => null); if (!p) return;
+    const prim = p.profile?.data?.userInfo?.membershipId; if (prim) idMap[prim] = u.membershipId;
+    // quem não jogou no período nem precisa do histórico
+    const chars = Object.values(p.characters?.data || {}).filter(c => Date.parse(c.dateLastPlayed) >= from);
+    for (const c of chars) {
+      const h = await bungie(fake, `/Destiny2/${u.membershipType}/Account/${u.membershipId}/Character/${c.characterId}/Stats/Activities/?count=50&mode=0`).catch(() => null);
+      for (const a of h?.activities || []) { const t = Date.parse(a.period); if (t < from || t >= to) continue; const sec = a.values?.timePlayedSeconds?.basic?.value || 0; if (!sec) continue;
+        const d = spDay(t), k = u.membershipId + '|' + d; on[k] = (on[k] || 0) + sec; const id = a.activityDetails?.instanceId; if (id) (inst[id] = inst[id] || { d, m: new Set() }).m.add(u.membershipId); }
+    }
+  }, 6);
+  const shared = Object.entries(inst).filter(([, v]) => v.m.size > 1);
+  await pool(shared, async ([id, v]) => {
+    const r = await fetch(`https://stats.bungie.net/Platform/Destiny2/Stats/PostGameCarnageReport/${id}/`, { headers: { 'X-API-Key': key } }).then(x => x.json()).then(j => j.Response).catch(() => null), ft = {};
+    for (const e of r?.entries || []) { const mid = idMap[e.player?.destinyUserInfo?.membershipId]; if (!mid) continue; const f = e.values?.fireteamId?.basic?.value ?? 't' + (e.values?.team?.basic?.value ?? ''), sec = e.values?.timePlayedSeconds?.basic?.value || 0; (ft[f] = ft[f] || {})[mid] = (ft[f][mid] || 0) + sec; }
+    for (const grp of Object.values(ft)) { const ids = Object.keys(grp).sort(); if (ids.length < 2) continue;
+      for (const x of ids) { const k = x + '|' + v.d; wc[k] = (wc[k] || 0) + grp[x]; }
+      for (let i = 0; i < ids.length; i++) for (let j = i + 1; j < ids.length; j++) { const k = ids[i] + '|' + ids[j] + '|' + v.d; pr[k] = (pr[k] || 0) + Math.min(grp[ids[i]], grp[ids[j]]); } }
+  }, 6);
+  const q = sec => Math.round(sec / 900), st = []; // segundos → unidades de 15 min (mesma escala da importação)
+  for (const [k, sec] of Object.entries(on)) { const [mid, d] = k.split('|'), n = q(sec); if (!n) continue; st.push(env.DB.prepare('INSERT INTO soc_on (g, mid, d, n, wc) VALUES (?, ?, ?, ?, ?) ON CONFLICT(g, mid, d) DO UPDATE SET n = n + excluded.n, wc = wc + excluded.wc').bind(g, mid, d, n, Math.min(n, q(wc[k] || 0)))); }
+  for (const [k, sec] of Object.entries(pr)) { const [a, b, d] = k.split('|'), n = q(sec); if (n) st.push(env.DB.prepare('INSERT INTO soc_pair (g, a, b, d, n) VALUES (?, ?, ?, ?, ?) ON CONFLICT(g, a, b, d) DO UPDATE SET n = n + excluded.n').bind(g, a, b, d, n)); }
+  for (let i = 0; i < st.length; i += 100) await env.DB.batch(st.slice(i, i + 100));
+}
 async function sync(req, env) {
   const uid = await who(req, env);
   if (!uid) return json(req, { error: 'auth' }, 401);
@@ -397,10 +445,10 @@ async function stats(req, env) {
 export default {
   // de hora em hora: confere o uso do ciclo e liga/desliga o freio
   async scheduled(ev, env) {
-    if (ev.cron === '*/15 * * * *') { if (!(await brake(env))) await socialCron(env).catch(() => {}); return; }
     const m = await monthUsage(env); if (m.error) return;
     await env.DB.prepare("INSERT OR REPLACE INTO meta (k, v) VALUES ('brake', ?)").bind(JSON.stringify(m)).run().catch(() => {});
     if (!(await brake(env))) await clanHoursCron(env).catch(() => {});
+    if (!(await brake(env)) && new Date().getUTCHours() >= 8) await socialDaily(env).catch(() => {}); // a partir das 5h (Brasília): lê o dia anterior
     if (new Date().getUTCHours() === 6) await env.DB.prepare('DELETE FROM visit WHERE d < ?').bind(spDay(Date.now() - 400 * 864e5)).run().catch(() => {}); // guarda ~13 meses
   },
   async fetch(req, env) {
