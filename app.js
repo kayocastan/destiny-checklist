@@ -2707,8 +2707,8 @@ async function adLoad() {
   AD.busy = false; if (tab === 'gcla') render();
 }
 /* Clã › Administração › Quem joga com quem (beta): lido pelo servidor a cada 15 min, não depende de ninguém abrir o site */
-const SOCT = { pt: { t: 'Quem joga com quem', sub: 'lido a cada 15 min pelo DPI · não depende de ninguém abrir o site', per: [[7, '7 dias'], [30, '30 dias'], [400, 'Tudo']], wait: 'Coletando: o DPI lê a cada 15 minutos. A primeira leitura aparece em até 15 min e o ranking fica útil depois de alguns dias de jogo.', since: d => `dados desde ${d}`, k: ['Online no período', 'Tempo jogado junto', 'Jogando com o clã', 'Isolados'], ks: ['membros diferentes', 'somando todas as duplas', 'do tempo online', 'online 5h+ e menos de 10% com o clã'], tabs: ['Mais enturmados', 'Mais isolados'], approx: 'tempo = leituras de 15 min (aproximado)', h: ['MEMBRO', 'ONLINE', 'COM O CLÃ', 'PARCEIROS', 'JOGA MAIS COM'], iso: 'Isolado = online bastante, mas quase sempre sem ninguém do clã no esquadrão. Bom para chamar para um grupo.', now: 'Agora', nowAt: t => `última leitura ${t}`, nowNone: 'Ninguém do clã online na última leitura.', solo: 'sozinho', lim: 'Limites: sessões com menos de 15 min podem escapar; esquadrão na Torre ou em órbita também conta; perfis privados ficam de fora. Só conta quem é do clã.', more: n => `Ver todos (${n})`, less: 'Ver menos', err: 'Não deu para carregar agora.', relog: 'Entre de novo para ver (permissão de administrar o clã).' },
-  en: { t: 'Who plays with whom', sub: 'read every 15 min by DPI · does not depend on anyone opening the site', per: [[7, '7 days'], [30, '30 days'], [400, 'All']], wait: 'Collecting: DPI reads every 15 minutes. The first reading shows up within 15 min and the ranking becomes useful after a few days of play.', since: d => `data since ${d}`, k: ['Online in period', 'Time played together', 'Playing with the clan', 'Isolated'], ks: ['different members', 'adding all pairs', 'of online time', 'online 5h+ and under 10% with the clan'], tabs: ['Most social', 'Most isolated'], approx: 'time = 15-min readings (approximate)', h: ['MEMBER', 'ONLINE', 'WITH THE CLAN', 'PARTNERS', 'PLAYS MOST WITH'], iso: 'Isolated = online a lot, but almost always without anyone from the clan in the fireteam. Good to invite to a group.', now: 'Now', nowAt: t => `last reading ${t}`, nowNone: 'Nobody from the clan online in the last reading.', solo: 'solo', lim: 'Limits: sessions under 15 min may slip; fireteams in the Tower or orbit also count; private profiles are left out. Only clan members count.', more: n => `Show all (${n})`, less: 'Show less', err: 'Could not load now.', relog: 'Sign in again to see it (clan admin permission).' } };
+const SOCT = { pt: { t: 'Quem joga com quem', sub: 'lido a cada 15 min pelo DPI · não depende de ninguém abrir o site', per: [[7, '7 dias'], [30, '30 dias'], [400, 'Tudo']], wait: 'Coletando: o DPI lê a cada 15 minutos. A primeira leitura aparece em até 15 min e o ranking fica útil depois de alguns dias de jogo.', since: d => `dados desde ${d}`, k: ['Online no período', 'Tempo jogado junto', 'Jogando com o clã', 'Isolados'], ks: ['membros diferentes', 'somando todas as duplas', 'do tempo online', 'online 5h+ e menos de 10% com o clã'], tabs: ['Mais enturmados', 'Mais isolados'], approx: 'tempo = leituras de 15 min (aproximado)', h: ['MEMBRO', 'ONLINE', 'COM O CLÃ', 'PARCEIROS', 'JOGA MAIS COM'], iso: 'Isolado = online bastante, mas quase sempre sem ninguém do clã no esquadrão. Bom para chamar para um grupo.', now: 'Agora', nowAt: t => `última leitura ${t}`, nowNone: 'Ninguém do clã online na última leitura.', solo: 'sozinho', lim: 'Limites: sessões com menos de 15 min podem escapar; esquadrão na Torre ou em órbita também conta; perfis privados ficam de fora. Só conta quem é do clã.', more: n => `Ver todos (${n})`, less: 'Ver menos', err: 'Não deu para carregar agora.', relog: 'Entre de novo para ver (permissão de administrar o clã).', bf: '⤓ Importar a última semana', bfN: 'Uma vez só: lê o histórico de atividades de cada membro na Bungie e conta as partidas em que jogaram no mesmo esquadrão. Leva alguns minutos; deixe esta aba aberta. Não inclui tempo na Torre ou em órbita.', bfRun: (a, b) => `Lendo o histórico dos membros… ${a}/${b}`, bfPg: (a, b) => `Conferindo partidas em comum… ${a}/${b}`, bfOk: 'Última semana importada.', bfErr: 'Não deu para importar agora. Tente de novo mais tarde.' },
+  en: { t: 'Who plays with whom', sub: 'read every 15 min by DPI · does not depend on anyone opening the site', per: [[7, '7 days'], [30, '30 days'], [400, 'All']], wait: 'Collecting: DPI reads every 15 minutes. The first reading shows up within 15 min and the ranking becomes useful after a few days of play.', since: d => `data since ${d}`, k: ['Online in period', 'Time played together', 'Playing with the clan', 'Isolated'], ks: ['different members', 'adding all pairs', 'of online time', 'online 5h+ and under 10% with the clan'], tabs: ['Most social', 'Most isolated'], approx: 'time = 15-min readings (approximate)', h: ['MEMBER', 'ONLINE', 'WITH THE CLAN', 'PARTNERS', 'PLAYS MOST WITH'], iso: 'Isolated = online a lot, but almost always without anyone from the clan in the fireteam. Good to invite to a group.', now: 'Now', nowAt: t => `last reading ${t}`, nowNone: 'Nobody from the clan online in the last reading.', solo: 'solo', lim: 'Limits: sessions under 15 min may slip; fireteams in the Tower or orbit also count; private profiles are left out. Only clan members count.', more: n => `Show all (${n})`, less: 'Show less', err: 'Could not load now.', relog: 'Sign in again to see it (clan admin permission).', bf: '⤓ Import last week', bfN: 'One time only: reads each member’s activity history at Bungie and counts the matches played in the same fireteam. Takes a few minutes; keep this tab open. Does not include time in the Tower or orbit.', bfRun: (a, b) => `Reading members’ history… ${a}/${b}`, bfPg: (a, b) => `Checking shared matches… ${a}/${b}`, bfOk: 'Last week imported.', bfErr: 'Could not import now. Try again later.' } };
 const SOC = { d: null, days: 7, tab: 0, all: false, busy: false, err: '', an: {} };
 async function socLoad() {
   const g = GD?.clan?.gid; if (!g || !APIW || SOC.busy) return; SOC.busy = true; SOC.err = '';
@@ -2717,13 +2717,47 @@ async function socLoad() {
   } catch { SOC.err = 'err'; }
   SOC.busy = false; if (tab === 'gcla') render();
 }
+// importação única: últimos 7 dias a partir do histórico de atividades de cada membro (atividades em comum no mesmo esquadrão)
+async function socBackfill() {
+  const C = GD?.clan, g = C?.gid; if (!g || SOC.bf) return; SOC.bf = { st: 'run', a: 0, b: 1 }; render();
+  const K = { 'X-API-Key': cfg.apiKey }, J = u => fetch(u, { headers: K }).then(r => r.json()).then(j => j.Response).catch(() => null);
+  const B = 'https://www.bungie.net/Platform', now = Date.now(), cut = SOC.d?.now?.f || now, from = cut - 7 * 864e5;
+  const spd = t => new Date(t - 3 * 3600e3).toISOString().slice(0, 10);
+  const mem = [...C.list.map(x => ({ mid: x.mid, mt: x.mt })), { mid: member.id, mt: member.type }].filter((x, i, l) => x.mid && l.findIndex(y => y.mid === x.mid) === i);
+  const idMap = {}, on = {}, inst = {}; mem.forEach(x => idMap[x.mid] = x.mid);
+  SOC.bf.b = mem.length; let done = 0;
+  await pool(mem, async x => {
+    const p = await J(`${B}/Destiny2/${x.mt}/Profile/${x.mid}/?components=100,200`); const prim = p?.profile?.data?.userInfo?.membershipId; if (prim) idMap[prim] = x.mid;
+    for (const c of Object.keys(p?.characters?.data || {})) {
+      const h = await J(`${B}/Destiny2/${x.mt}/Account/${x.mid}/Character/${c}/Stats/Activities/?count=250&mode=0`);
+      for (const a of h?.activities || []) { const t = Date.parse(a.period); if (t < from || t >= cut) continue; const sec = a.values?.timePlayedSeconds?.basic?.value || 0; if (!sec) continue;
+        const d = spd(t), k = x.mid + '|' + d; on[k] = (on[k] || 0) + sec; const id = a.activityDetails?.instanceId; if (id) (inst[id] = inst[id] || { d, m: new Set() }).m.add(x.mid); }
+    }
+    SOC.bf.a = ++done; if (tab === 'gcla') render();
+  }, 6);
+  // só as atividades em que 2+ membros aparecem: o relatório da partida confirma se estavam no mesmo esquadrão
+  const shared = Object.entries(inst).filter(([, v]) => v.m.size > 1), wc = {}, pr = {}; SOC.bf = { st: 'run', a: 0, b: shared.length, pg: true }; done = 0;
+  await pool(shared, async ([id, v]) => {
+    const r = await J(`https://stats.bungie.net/Platform/Destiny2/Stats/PostGameCarnageReport/${id}/`), ft = {};
+    for (const e of r?.entries || []) { const mid = idMap[e.player?.destinyUserInfo?.membershipId]; if (!mid) continue; const f = e.values?.fireteamId?.basic?.value ?? 't' + (e.values?.team?.basic?.value ?? ''), sec = e.values?.timePlayedSeconds?.basic?.value || 0; ((ft[f] = ft[f] || {})[mid] = (ft[f][mid] || 0) + sec); }
+    for (const grp of Object.values(ft)) { const ids = Object.keys(grp); if (ids.length < 2) continue;
+      for (const m of ids) { const k = m + '|' + v.d; wc[k] = (wc[k] || 0) + grp[m]; }
+      ids.sort(); for (let i = 0; i < ids.length; i++) for (let j = i + 1; j < ids.length; j++) { const k = ids[i] + '|' + ids[j] + '|' + v.d; pr[k] = (pr[k] || 0) + Math.min(grp[ids[i]], grp[ids[j]]); } }
+    SOC.bf.a = ++done; if (tab === 'gcla' && done % 5 === 0) render();
+  }, 6);
+  const q = s => Math.round(s / 900); // segundos → leituras de 15 min
+  const body = { on: Object.entries(on).map(([k, s]) => { const [m, d] = k.split('|'); return [m, d, q(s), q(Math.min(s, wc[k] || 0))]; }).filter(r => r[2] > 0), pairs: Object.entries(pr).map(([k, s]) => { const [a, b, d] = k.split('|'); return [a, b, d, q(s)]; }).filter(r => r[3] > 0) };
+  try { const r = await fetch(`${APIW}/clan/social/backfill?g=${g}`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + await token(), 'X-API-Key': cfg.apiKey }, body: JSON.stringify(body) }); SOC.bf = { st: r.ok ? 'ok' : 'err' }; } catch { SOC.bf = { st: 'err' }; }
+  SOC.d = null; socLoad(); render();
+}
 function socHTML() {
   const T = SOCT[lang === 'pt' ? 'pt' : 'en'], C = GD?.clan; if (!C?.gid) return '';
   if (!SOC.d && !SOC.busy && !SOC.err) setTimeout(socLoad);
   const nm = id => C.list.find(x => x.mid === id)?.n || (id === member.id ? (member.name || '').replace(/#\d+$/, '') : '?');
   const hrs = n => { const h = n * 15 / 60; return (h < 10 ? h.toLocaleString(lang === 'en' ? 'en-US' : 'pt-BR', { maximumFractionDigits: 1 }) : Math.round(h)) + ' h'; };
   const seg = T.per.map(([d, t]) => `<button type="button" data-socd="${d}" aria-pressed="${SOC.days === d}">${esc(t)}</button>`).join('');
-  const head = `<div class="ad-h"><h2>${esc(T.t)} <span class="soc-beta">BETA</span></h2><small class="lbd-n">${esc(T.sub)}</small><div class="vl-seg soc-seg">${seg}</div></div>`;
+  const bfB = SOC.bf?.st === 'run' ? `<p class="soc-bf wait">${esc(SOC.bf.pg ? T.bfPg(SOC.bf.a, SOC.bf.b) : T.bfRun(SOC.bf.a, SOC.bf.b))}</p>` : SOC.bf?.st === 'ok' ? `<p class="soc-bf ok">${esc(T.bfOk)}</p>` : SOC.bf?.st === 'err' ? `<p class="soc-bf">${esc(T.bfErr)}</p>` : SOC.d && !SOC.d.bf ? `<div class="soc-bf"><button type="button" class="lbd-btn pri" data-socbf>${esc(T.bf)}</button><small class="lbd-n">${esc(T.bfN)}</small></div>` : '';
+  const head = `<div class="ad-h"><h2>${esc(T.t)} <span class="soc-beta">BETA</span></h2><small class="lbd-n">${esc(T.sub)}</small><div class="vl-seg soc-seg">${seg}</div></div>${bfB}`;
   if (SOC.err) return `<section class="ad-s ad-wide soc">${head}<p class="lbd-n">${esc(SOC.err === 'relog' ? T.relog : T.err)}</p></section>`;
   const D = SOC.d; if (!D) return `<section class="ad-s ad-wide soc">${head}<p class="wait">…</p></section>`;
   const on = D.on || [], prs = D.pairs || [];
@@ -2745,7 +2779,8 @@ document.addEventListener('click', e => {
   if (tab !== 'gcla') return;
   const d = e.target.closest('[data-socd]'); if (d) { SOC.days = +d.dataset.socd; SOC.d = null; socLoad(); render(); return; }
   const t = e.target.closest('[data-soct]'); if (t) { SOC.tab = +t.dataset.soct; SOC.all = false; render(); return; }
-  if (e.target.closest('[data-socall]')) { SOC.all = !SOC.all; render(); }
+  if (e.target.closest('[data-socall]')) { SOC.all = !SOC.all; render(); return; }
+  if (e.target.closest('[data-socbf]')) socBackfill();
 });
 // a Bungie só conta "Guiados" em algumas atividades (todas as incursões e poucas masmorras)
 const adHasG = a => { const n = actNorm(L(a.n)); return !!MDEF.b && !!n && Object.values(MDEF.b).some(([t, mn]) => t === 'g' && mn.includes(n)); };

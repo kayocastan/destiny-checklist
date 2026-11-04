@@ -241,7 +241,8 @@ async function socialCron(env) {
     for (const P of parties) { const wc = P.m.length > 1 ? 1 : 0;
       for (const id of P.m) { if (on.has(id)) continue; on.add(id); st.push(env.DB.prepare('INSERT INTO soc_on (g, mid, d, n, wc) VALUES (?, ?, ?, 1, ?) ON CONFLICT(g, mid, d) DO UPDATE SET n = n + 1, wc = wc + excluded.wc').bind(g, id, d, wc)); }
       const ms = [...P.m].sort(); for (let i = 0; i < ms.length; i++) for (let j = i + 1; j < ms.length; j++) st.push(env.DB.prepare('INSERT INTO soc_pair (g, a, b, d, n) VALUES (?, ?, ?, ?, 1) ON CONFLICT(g, a, b, d) DO UPDATE SET n = n + 1').bind(g, ms[i], ms[j], d)); }
-    st.push(env.DB.prepare('INSERT INTO kv (uid, k, v, t) VALUES (?, ?, ?, ?) ON CONFLICT(uid, k) DO UPDATE SET v = excluded.v, t = excluded.t').bind(r.uid, 'social', JSON.stringify({ at: now, p: parties }), now));
+    const old = await env.DB.prepare("SELECT v FROM kv WHERE uid = ? AND k = 'social'").bind(r.uid).first().catch(() => null); let f = now; try { f = JSON.parse(old.v).f || now; } catch {}
+    st.push(env.DB.prepare('INSERT INTO kv (uid, k, v, t) VALUES (?, ?, ?, ?) ON CONFLICT(uid, k) DO UPDATE SET v = excluded.v, t = excluded.t').bind(r.uid, 'social', JSON.stringify({ at: now, f, p: parties }), now));
     await env.DB.batch(st).catch(() => {});
   }
 }
@@ -255,7 +256,23 @@ async function socialRoute(req, env, url) {
     env.DB.prepare('SELECT a, b, SUM(n) n FROM soc_pair WHERE g = ? AND d >= ? GROUP BY a, b').bind(g, since).all(),
     env.DB.prepare("SELECT v FROM kv WHERE uid = ? AND k = 'social'").bind('clan:' + g).first()]);
   const first = await env.DB.prepare('SELECT MIN(d) d FROM soc_on WHERE g = ?').bind(g).first().catch(() => null);
-  return json(req, { on: on.results || [], pairs: pr.results || [], now: snap ? JSON.parse(snap.v) : null, since: first?.d || null });
+  const bf = await env.DB.prepare("SELECT v FROM kv WHERE uid = ? AND k = 'socbf'").bind('clan:' + g).first().catch(() => null);
+  return json(req, { on: on.results || [], pairs: pr.results || [], now: snap ? JSON.parse(snap.v) : null, since: first?.d || null, bf: !!bf });
+}
+// importação única da última semana (feita no navegador de um admin a partir do histórico de atividades da Bungie)
+async function socialBackfill(req, env, url) {
+  const g = url.searchParams.get('g') || ''; if (!/^\d{1,20}$/.test(g)) return json(req, { error: 'bad request' }, 400);
+  if (await brake(env)) return json(req, { error: 'brake' }, 503);
+  const { uid, role } = await clanRole(req, env, g); if (!uid) return json(req, { error: 'login' }, 401); if (role < 3) return json(req, { error: 'forbidden' }, 403);
+  if (await env.DB.prepare("SELECT 1 FROM kv WHERE uid = ? AND k = 'socbf'").bind('clan:' + g).first().catch(() => null)) return json(req, { error: 'done' }, 409);
+  const b = await req.json().catch(() => ({})), on = Array.isArray(b.on) ? b.on.slice(0, 5000) : [], pairs = Array.isArray(b.pairs) ? b.pairs.slice(0, 5000) : [];
+  const id = x => /^\d{1,25}$/.test(String(x)), day = x => /^\d{4}-\d{2}-\d{2}$/.test(String(x)), num = x => Math.max(0, Math.min(96, Math.round(+x) || 0));
+  const st = [];
+  for (const [mid, d, n, wc] of on) if (id(mid) && day(d) && num(n)) st.push(env.DB.prepare('INSERT INTO soc_on (g, mid, d, n, wc) VALUES (?, ?, ?, ?, ?) ON CONFLICT(g, mid, d) DO UPDATE SET n = n + excluded.n, wc = wc + excluded.wc').bind(g, String(mid), d, num(n), Math.min(num(n), num(wc))));
+  for (const [a, c, d, n] of pairs) if (id(a) && id(c) && a !== c && day(d) && num(n)) { const [x, y] = [String(a), String(c)].sort(); st.push(env.DB.prepare('INSERT INTO soc_pair (g, a, b, d, n) VALUES (?, ?, ?, ?, ?) ON CONFLICT(g, a, b, d) DO UPDATE SET n = n + excluded.n').bind(g, x, y, d, num(n))); }
+  for (let i = 0; i < st.length; i += 100) await env.DB.batch(st.slice(i, i + 100));
+  await env.DB.prepare('INSERT INTO kv (uid, k, v, t) VALUES (?, ?, ?, ?)').bind('clan:' + g, 'socbf', JSON.stringify({ by: uid, n: st.length }), Date.now()).run();
+  return json(req, { ok: true, n: st.length });
 }
 async function sync(req, env) {
   const uid = await who(req, env);
@@ -391,6 +408,7 @@ export default {
       if (path === '/sync' && (req.method === 'GET' || req.method === 'PUT')) return await sync(req, env);
       if (path === '/clan/notice' || path === '/clan/hours') return await clanRoute(req, env, path, new URL(req.url));
       if (path === '/clan/social' && req.method === 'GET') return await socialRoute(req, env, new URL(req.url));
+      if (path === '/clan/social/backfill' && req.method === 'POST') return await socialBackfill(req, env, new URL(req.url));
       if (path === '/hit' && req.method === 'POST') return await hit(req, env);
       if (path === '/pub' && req.method === 'POST') return await pubPost(req, env);
       if (path === '/sug' && req.method === 'POST') return await sugPost(req, env);
