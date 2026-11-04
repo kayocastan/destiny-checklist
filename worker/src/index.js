@@ -257,21 +257,25 @@ async function socialRoute(req, env, url) {
     env.DB.prepare("SELECT v FROM kv WHERE uid = ? AND k = 'social'").bind('clan:' + g).first()]);
   const first = await env.DB.prepare('SELECT MIN(d) d FROM soc_on WHERE g = ?').bind(g).first().catch(() => null);
   const bf = await env.DB.prepare("SELECT v FROM kv WHERE uid = ? AND k = 'socbf'").bind('clan:' + g).first().catch(() => null);
-  return json(req, { on: on.results || [], pairs: pr.results || [], now: snap ? JSON.parse(snap.v) : null, since: first?.d || null, bf: !!bf });
+  let lo = null; try { lo = JSON.parse(bf.v).lo || null; } catch {} if (bf && !lo) lo = first?.d || null;
+  return json(req, { on: on.results || [], pairs: pr.results || [], now: snap ? JSON.parse(snap.v) : null, since: first?.d || null, bf: !!bf, lo });
 }
 // importação única da última semana (feita no navegador de um admin a partir do histórico de atividades da Bungie)
 async function socialBackfill(req, env, url) {
   const g = url.searchParams.get('g') || ''; if (!/^\d{1,20}$/.test(g)) return json(req, { error: 'bad request' }, 400);
   if (await brake(env)) return json(req, { error: 'brake' }, 503);
   const { uid, role } = await clanRole(req, env, g); if (!uid) return json(req, { error: 'login' }, 401); if (role < 3) return json(req, { error: 'forbidden' }, 403);
-  if (await env.DB.prepare("SELECT 1 FROM kv WHERE uid = ? AND k = 'socbf'").bind('clan:' + g).first().catch(() => null)) return json(req, { error: 'done' }, 409);
+  const prev = await env.DB.prepare("SELECT v FROM kv WHERE uid = ? AND k = 'socbf'").bind('clan:' + g).first().catch(() => null);
+  let lo = null; if (prev) { try { lo = JSON.parse(prev.v).lo || null; } catch {} if (!lo) lo = (await env.DB.prepare('SELECT MIN(d) d FROM soc_on WHERE g = ?').bind(g).first().catch(() => null))?.d || null; }
+  const minD = spDay(Date.now() - 31 * 864e5), okD = d => d >= minD && (!lo || d < lo); // só dias ainda não importados, até ~30 dias atrás
   const b = await req.json().catch(() => ({})), on = Array.isArray(b.on) ? b.on.slice(0, 5000) : [], pairs = Array.isArray(b.pairs) ? b.pairs.slice(0, 5000) : [];
   const id = x => /^\d{1,25}$/.test(String(x)), day = x => /^\d{4}-\d{2}-\d{2}$/.test(String(x)), num = x => Math.max(0, Math.min(96, Math.round(+x) || 0));
   const st = [];
-  for (const [mid, d, n, wc] of on) if (id(mid) && day(d) && num(n)) st.push(env.DB.prepare('INSERT INTO soc_on (g, mid, d, n, wc) VALUES (?, ?, ?, ?, ?) ON CONFLICT(g, mid, d) DO UPDATE SET n = n + excluded.n, wc = wc + excluded.wc').bind(g, String(mid), d, num(n), Math.min(num(n), num(wc))));
-  for (const [a, c, d, n] of pairs) if (id(a) && id(c) && a !== c && day(d) && num(n)) { const [x, y] = [String(a), String(c)].sort(); st.push(env.DB.prepare('INSERT INTO soc_pair (g, a, b, d, n) VALUES (?, ?, ?, ?, ?) ON CONFLICT(g, a, b, d) DO UPDATE SET n = n + excluded.n').bind(g, x, y, d, num(n))); }
+  for (const [mid, d, n, wc] of on) if (id(mid) && day(d) && okD(d) && num(n)) st.push(env.DB.prepare('INSERT INTO soc_on (g, mid, d, n, wc) VALUES (?, ?, ?, ?, ?) ON CONFLICT(g, mid, d) DO UPDATE SET n = n + excluded.n, wc = wc + excluded.wc').bind(g, String(mid), d, num(n), Math.min(num(n), num(wc))));
+  for (const [a, c, d, n] of pairs) if (id(a) && id(c) && a !== c && day(d) && okD(d) && num(n)) { const [x, y] = [String(a), String(c)].sort(); st.push(env.DB.prepare('INSERT INTO soc_pair (g, a, b, d, n) VALUES (?, ?, ?, ?, ?) ON CONFLICT(g, a, b, d) DO UPDATE SET n = n + excluded.n').bind(g, x, y, d, num(n))); }
   for (let i = 0; i < st.length; i += 100) await env.DB.batch(st.slice(i, i + 100));
-  await env.DB.prepare('INSERT INTO kv (uid, k, v, t) VALUES (?, ?, ?, ?)').bind('clan:' + g, 'socbf', JSON.stringify({ by: uid, n: st.length }), Date.now()).run();
+  const ds = [...on.map(r => r[1]), ...pairs.map(r => r[2])].filter(d => day(d) && okD(d)).sort(), nlo = [ds[0], lo].filter(Boolean).sort()[0] || lo;
+  await env.DB.prepare('INSERT INTO kv (uid, k, v, t) VALUES (?, ?, ?, ?) ON CONFLICT(uid, k) DO UPDATE SET v = excluded.v, t = excluded.t').bind('clan:' + g, 'socbf', JSON.stringify({ by: uid, n: st.length, lo: nlo }), Date.now()).run();
   return json(req, { ok: true, n: st.length });
 }
 async function sync(req, env) {

@@ -2032,3 +2032,14 @@ dialog.ivdlg{width:min(1000px,calc(100vw - 24px))}
 .ad-rec .ad-s>h2{font-size:18px}
 .ad-rec .ad-rec-c>.ad-s+.ad-s{border-left:1px solid var(--line)!important;padding-left:18px}
 @media (max-width:1000px){.ad-rec-c{grid-template-columns:1fr}.ad-rec .ad-rec-c>.ad-s+.ad-s{border-left:0!important;padding-left:0;border-top:1px solid var(--line)!important;padding-top:14px}}
+/* Quem joga com quem: largura toda, cabeçalho clicável, busca e detalhe */
+.soc-th{font-size:12.5px!important;letter-spacing:.05em}
+.soc-hs{font:inherit;letter-spacing:inherit;text-align:left;background:none;border:0;padding:0;color:var(--muted);cursor:pointer;text-transform:inherit}
+.soc-hs:hover,.soc-hs.on{color:var(--fg)}
+button.soc-r{font:inherit;color:var(--fg);border:1px solid transparent;width:100%;text-align:left;cursor:pointer}
+button.soc-r:hover{border-color:var(--line)}button.soc-r.on{border-color:var(--acc)}
+.soc-q input{font:inherit;font-size:13px;color:var(--fg);background:var(--bg,#0d1219);border:1px solid var(--line);border-radius:8px;padding:6px 10px;width:200px}
+.soc-src{font-size:12.5px}
+.soc-det{display:grid;gap:6px;padding:10px 12px;margin:-2px 0 4px;border-radius:0 0 10px 10px;background:color-mix(in srgb,var(--acc) 6%,var(--chip))}
+.soc-pl{display:flex;flex-wrap:wrap;gap:6px}.soc-pl span{font-size:13px;padding:4px 10px;border-radius:999px;background:var(--chip)}.soc-pl b{font-weight:600}
+@media (max-width:760px){.soc-q input{width:100%}}
