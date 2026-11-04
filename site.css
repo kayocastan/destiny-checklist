@@ -2043,3 +2043,4 @@ button.soc-r:hover{border-color:var(--line)}button.soc-r.on{border-color:var(--a
 .soc-det{display:grid;gap:6px;padding:10px 12px;margin:-2px 0 4px;border-radius:0 0 10px 10px;background:color-mix(in srgb,var(--acc) 6%,var(--chip))}
 .soc-pl{display:flex;flex-wrap:wrap;gap:6px}.soc-pl span{font-size:13px;padding:4px 10px;border-radius:999px;background:var(--chip)}.soc-pl b{font-weight:600}
 @media (max-width:760px){.soc-q input{width:100%}}
+.soc-h2{display:flex;gap:14px;align-items:center}.soc-h2 .soc-hs:last-child{margin-left:auto;padding-right:4px}

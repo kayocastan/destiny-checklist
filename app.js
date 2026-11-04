@@ -2778,7 +2778,7 @@ function socHTML() {
   const lo = D.lo ? new Date(D.lo + 'T12:00').toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR') : '', f = D.now?.f ? new Date(D.now.f).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR') : '';
   return `<section class="ad-s ad-wide soc">${head}${D.since ? `<small class="lbd-n soc-src">${esc(T.src(lo || new Date(D.since + 'T12:00').toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR'), f))}</small>` : ''}${kpi}
     <div class="soc-main"><div class="soc-bar-top">${tabs}<label class="soc-q"><input type="search" id="socq" placeholder="${esc(T.find)}" value="${esc(SOC.q || '')}"></label><small class="lbd-n">${esc(T.approx)}</small></div>
-    <div class="soc-r soc-th">${hd('', T.h[0])}${hd('n', T.h[1])}${hd('wc', T.h[2])}${hd('np', T.h[3])}${hd('', T.h[4])}</div>${show.map(row).join('') || `<p class="lbd-n">${esc(T.noOne)}</p>`}${list.length > 15 && !q ? `<button type="button" class="char rs-more" data-socall>${esc(SOC.all ? T.less : T.more(list.length))}</button>` : ''}<small class="lbd-n">${esc(T.iso)}</small></div><small class="lbd-n">${esc(T.lim)}</small></section>`;
+    <div class="soc-r soc-th">${hd('', T.h[0])}${hd('n', T.h[1])}<span class="soc-h2">${hd('wc', T.h[2] + (lang === 'pt' ? ' (h)' : ' (h)'))}${hd('p', '%')}</span>${hd('np', T.h[3])}${hd('', T.h[4])}</div>${show.map(row).join('') || `<p class="lbd-n">${esc(T.noOne)}</p>`}${list.length > 15 && !q ? `<button type="button" class="char rs-more" data-socall>${esc(SOC.all ? T.less : T.more(list.length))}</button>` : ''}<small class="lbd-n">${esc(T.iso)}</small></div><small class="lbd-n">${esc(T.lim)}</small></section>`;
 }
 document.addEventListener('click', e => {
   if (tab !== 'gcla') return;
