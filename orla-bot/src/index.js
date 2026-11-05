@@ -7,13 +7,13 @@ import { handleInteraction } from './interactions.js';
 import { verifySignature, oauthUser, deleteMessage, DiscordError } from './discord.js';
 import { BungieApiError, currentUser, upsertUser, userGroups } from './bungie.js';
 import { ActivityInputError } from './rules.js';
-import { createGrade, CATALOG_PREFIX, applySignup } from './grades.js';
+import { createGrade, CATALOG_PREFIX, applySignup, editGrade } from './grades.js';
 import { catalog, searchActivities, matchActivity } from './search.js';
 
 const ORIGINS = ['https://destinyparallel.vercel.app', 'https://destiny-checklist.vercel.app'];
 const cors = req => {
   const o = req.headers.get('Origin');
-  return { 'Access-Control-Allow-Origin': ORIGINS.includes(o) ? o : ORIGINS[0], 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization', 'Access-Control-Max-Age': '86400', Vary: 'Origin' };
+  return { 'Access-Control-Allow-Origin': ORIGINS.includes(o) ? o : ORIGINS[0], 'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization', 'Access-Control-Max-Age': '86400', Vary: 'Origin' };
 };
 const json = (req, body, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', ...cors(req) } });
 const b64 = s => btoa(String.fromCharCode(...new Uint8Array(s))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -126,13 +126,28 @@ async function api(req, env, url) {
   }
   if (path === '/grades' && req.method === 'GET') { // grades marcadas (abertas), para a ilha "Agenda" do /grade
     const mine = await registered(env, me.ids);
-    const acts = (await env.DB.prepare(`SELECT a.id, a.name, a.capacity cap, a.rookie_limit rk, a.starts_at s, a.created_by_discord_id d, a.discord_channel_id c, a.discord_message_id m, cb.eligibility_group g FROM activities a LEFT JOIN curated_bungie_activities cb ON cb.id = a.curated_bungie_activity_id ORDER BY replace(a.starts_at, ' ', 'T'), a.id LIMIT 50`).all()).results;
+    const acts = (await env.DB.prepare(`SELECT a.id, a.name, a.capacity cap, a.rookie_limit rk, a.starts_at s, a.created_by_discord_id d, a.discord_channel_id c, a.discord_message_id m, a.description ds, a.curated_bungie_activity_id ci, cb.eligibility_group g FROM activities a LEFT JOIN curated_bungie_activities cb ON cb.id = a.curated_bungie_activity_id ORDER BY replace(a.starts_at, ' ', 'T'), a.id LIMIT 50`).all()).results;
     const ids = acts.map(a => a.id);
     const ps = ids.length ? (await env.DB.prepare(`SELECT p.activity_id a, p.discord_user_id d, p.category c, p.is_rookie r, coalesce(u.bungie_name, u.discord_member_name, '?') n FROM activity_participants p LEFT JOIN users u ON u.discord_user_id = p.discord_user_id WHERE p.activity_id IN (${ids.map(() => '?').join(',')}) ORDER BY p.category, p.created_at, p.id`).bind(...ids).all()).results : [];
     const by = await env.DB.prepare(`SELECT discord_user_id d, coalesce(bungie_name, discord_member_name) n FROM users WHERE discord_user_id IN (${acts.map(() => '?').join(',') || "''"})`).bind(...acts.map(a => a.d)).all().then(r => Object.fromEntries(r.results.map(x => [x.d, x.n])));
-    return json(req, { guild: env.DISCORD_GUILD_ID || null, grades: acts.map(a => ({ id: a.id, name: a.name, g: a.g || null, cap: a.cap, rk: a.rk, s: a.s, by: by[a.d] || null, url: a.c && a.m && env.DISCORD_GUILD_ID ? `https://discord.com/channels/${env.DISCORD_GUILD_ID}/${a.c}/${a.m}` : null,
+    return json(req, { guild: env.DISCORD_GUILD_ID || null, grades: acts.map(a => ({ id: a.id, name: a.name, g: a.g || null, ci: a.ci ?? null, desc: a.ds || '', cap: a.cap, rk: a.rk, s: a.s, by: by[a.d] || null, url: a.c && a.m && env.DISCORD_GUILD_ID ? `https://discord.com/channels/${env.DISCORD_GUILD_ID}/${a.c}/${a.m}` : null,
       mine: mine ? (ps.find(p => p.a === a.id && p.d === mine.discord_user_id)?.c || null) : null, creator: !!mine && a.d === mine.discord_user_id,
       p: ps.filter(p => p.a === a.id).map(p => ({ n: String(p.n).replace(/#\d+$/, ''), c: p.c, r: p.r ? 1 : 0 })) })) });
+  }
+  const ed = path.match(/^\/grades\/(\d+)$/);
+  if (ed && req.method === 'PUT') { // edição pelo criador (site)
+    const b = await req.json().catch(() => null), row = await registered(env, me.ids);
+    if (!b) return json(req, { error: 'Dados inválidos.' }, 400);
+    if (!row) return json(req, { error: 'not_registered' }, 409);
+    try {
+      const integrantes = Number(b.integrantes), novatos = b.novatos === '' || b.novatos == null ? null : Number(b.novatos);
+      if (!Number.isInteger(integrantes) || integrantes < 1 || integrantes > 12) throw new ActivityInputError('Integrantes deve ser um número entre 1 e 12.');
+      if (novatos != null && (!Number.isInteger(novatos) || novatos < 0 || novatos > integrantes)) throw new ActivityInputError('A quantidade de novatos deve ser 0 ou um número entre 1 e a quantidade de integrantes.');
+      let atividade = String(b.atividade ?? '').trim(), curatedId = null;
+      if (b.curatedId != null) { const c = await env.DB.prepare('SELECT id, name FROM curated_bungie_activities WHERE id = ?').bind(Number(b.curatedId)).first(); if (c && c.name === atividade) curatedId = c.id; }
+      if (curatedId == null) { const m = matchActivity(await catalog(env.DB), atividade); if (m) { curatedId = m.id; atividade = m.name; } }
+      return json(req, await editGrade(env, { userId: row.discord_user_id, activityId: Number(ed[1]), atividade, integrantes, inicio: String(b.inicio ?? ''), descricao: String(b.descricao ?? ''), curatedId, rookieLimit: novatos }));
+    } catch (e) { if (e instanceof ActivityInputError) return json(req, { error: e.message }, 400); throw e; }
   }
   const sg = path.match(/^\/grades\/(\d+)\/(join|leave|reserve)$/);
   if (sg && req.method === 'POST') { // botões Entrar / Sair / Reserva do /grade (mesmo fluxo dos botões do Discord)

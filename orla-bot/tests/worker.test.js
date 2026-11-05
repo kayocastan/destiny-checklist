@@ -173,6 +173,20 @@ describe('API do DPI', () => {
     expect((await (await api('/grades')).json()).grades[0].mine).toBeNull();
     expect(calls.some(c => c.method === 'PATCH' && c.url.includes('/channels/c1/messages/m1'))).toBe(true); // mensagem do Discord atualizada
   });
+  it('PUT /grades/:id: só o criador edita; ajusta vagas e marca os confirmados no Discord', async () => {
+    await link('10');
+    const t0 = new Date(Date.now() + 36e5).toISOString();
+    const id = (await env.DB.prepare(`INSERT INTO activities (name, capacity, starts_at, description, created_by_discord_id, created_at, discord_channel_id, discord_message_id) VALUES ('Velho', 3, ?, '', '10', 'x', 'c1', 'm1')`).bind(t0).run()).meta.last_row_id;
+    await env.DB.prepare(`INSERT INTO activity_participants (activity_id, discord_user_id, category, is_rookie, created_at) VALUES (?, '10', 'titular', 0, 'a'), (?, '20', 'titular', 0, 'b'), (?, '30', 'titular', 0, 'c'), (?, '40', 'substituto', 0, 'd')`).bind(id, id, id, id).run();
+    const body = { atividade: 'Novo nome', integrantes: 2, novatos: '', inicio: new Date(Date.now() + 2 * 36e5).toISOString(), descricao: 'oi' };
+    let r = await api(`/grades/${id}`, { method: 'PUT', body: JSON.stringify(body) }); expect(r.status).toBe(200);
+    const cats = (await env.DB.prepare('SELECT discord_user_id d, category c FROM activity_participants WHERE activity_id = ? ORDER BY d').bind(id).all()).results;
+    expect(cats).toEqual([{ d: '10', c: 'titular' }, { d: '20', c: 'titular' }, { d: '30', c: 'substituto' }, { d: '40', c: 'substituto' }]);
+    const aviso = calls.find(c => c.method === 'POST' && c.url.includes('/channels/c1/messages'));
+    expect(aviso.body.content).toMatch(/editou a grade \*\*Novo nome\*\*/); expect(aviso.body.allowed_mentions.users).toEqual(expect.arrayContaining(['20', '30']));
+    await env.DB.prepare(`UPDATE activities SET created_by_discord_id = '99' WHERE id = ?`).bind(id).run();
+    r = await api(`/grades/${id}`, { method: 'PUT', body: JSON.stringify(body) }); expect(r.status).toBe(400);
+  });
   it('/clan/panel: só admin; soma grades guardadas e abertas por pessoa', async () => {
     expect((await api('/clan/panel')).status).toBe(403); // membro comum (sem memberType)
     env.OWNER = '55'; // dono do DPI (conta Bungie.net do teste) vê mesmo sem ser admin

@@ -93,3 +93,46 @@ export async function applySignup(env, userId, activityId, category) {
     return 'Não foi possível atualizar a inscrição agora. Tente novamente.';
   }
 }
+
+/* Edição pelo criador (site): atualiza a grade, ajusta titulares/substitutos às vagas novas,
+   atualiza a mensagem e avisa no #lfg-destiny marcando quem estava confirmado (titulares).
+   in: { userId, activityId, atividade, integrantes, inicio, descricao, curatedId, rookieLimit } */
+export async function editGrade(env, a) {
+  const db = env.DB, tz = env.TIMEZONE || 'America/Sao_Paulo';
+  const act = await db.prepare('SELECT * FROM activities WHERE id = ?').bind(a.activityId).first();
+  if (!act) throw new ActivityInputError('Essa grade não está mais disponível.');
+  if (act.created_by_discord_id !== String(a.userId)) throw new ActivityInputError('Só quem criou a grade pode editar.');
+  let curated = null;
+  if (a.curatedId != null) curated = await db.prepare('SELECT * FROM curated_bungie_activities WHERE id = ?').bind(a.curatedId).first();
+  const startsAt = parseActivityStart(a.inicio, tz);
+  if (startsAt.getTime() !== new Date(String(act.starts_at).replace(' ', 'T')).getTime()) validateActivityStart(startsAt);
+  const name = validateActivityInput(a.atividade, a.integrantes, a.descricao ?? '', a.rookieLimit ?? null);
+  const parts = (await db.prepare('SELECT * FROM activity_participants WHERE activity_id = ? ORDER BY created_at, id').bind(act.id).all()).results;
+  const tit = parts.filter(p => p.category === 'titular'), subs = parts.filter(p => p.category === 'substituto');
+  const confirmed = tit.map(p => p.discord_user_id);
+  const stmts = [db.prepare('UPDATE activities SET name = ?, curated_bungie_activity_id = ?, capacity = ?, rookie_limit = ?, starts_at = ?, description = ? WHERE id = ?')
+    .bind(name, curated?.id ?? null, a.integrantes, a.rookieLimit ?? null, startsAt.toISOString(), a.descricao ?? '', act.id)];
+  // menos vagas: os últimos a entrar viram substitutos (o criador fica); mais vagas: sobem os substitutos mais antigos
+  const over = tit.length - a.integrantes;
+  if (over > 0) for (const p of tit.filter(p => p.discord_user_id !== act.created_by_discord_id).slice(-over)) stmts.push(db.prepare(`UPDATE activity_participants SET category = 'substituto' WHERE id = ?`).bind(p.id));
+  else for (const p of subs.slice(0, -over)) stmts.push(db.prepare(`UPDATE activity_participants SET category = 'titular' WHERE id = ?`).bind(p.id));
+  await db.batch(stmts);
+  const ch = [], fmt = d => new Intl.DateTimeFormat('pt-BR', { timeZone: tz, weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(d);
+  if (name !== act.name) ch.push(`atividade: **${name}**`);
+  if (startsAt.toISOString() !== new Date(String(act.starts_at).replace(' ', 'T')).toISOString()) ch.push(`horário: **${fmt(startsAt)}**`);
+  if (a.integrantes !== act.capacity) ch.push(`vagas: **${a.integrantes}**`);
+  if ((a.rookieLimit ?? null) !== (act.rookie_limit ?? null)) ch.push(`novatos: **${a.rookieLimit ?? 'sem limite'}**`);
+  if ((a.descricao ?? '') !== (act.description ?? '')) ch.push('descrição');
+  let warning = '';
+  if (act.discord_message_id) {
+    try { await refreshMessage(env, act.id); } catch (e) { console.error('editar mensagem', e?.message); warning = ' Não consegui atualizar a mensagem da grade no Discord.'; }
+    const notify = confirmed.filter(id => id !== act.created_by_discord_id);
+    if (ch.length && notify.length) {
+      try {
+        await postMessage(env, act.discord_channel_id, { content: `✏️ <@${act.created_by_discord_id}> editou a grade **${name}** (${ch.join(', ')}). ${notify.map(id => `<@${id}>`).join(' ')}`,
+          allowed_mentions: { users: [...new Set([act.created_by_discord_id, ...notify])] }, message_reference: { message_id: act.discord_message_id, fail_if_not_exists: false } });
+      } catch (e) { console.error('aviso edição', e?.message); warning += ' Não consegui avisar os confirmados no Discord.'; }
+    }
+  }
+  return { ok: true, changed: ch.length, notified: confirmed.filter(id => id !== act.created_by_discord_id).length, warning: warning.trim() };
+}

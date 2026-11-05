@@ -2147,3 +2147,5 @@ html.grade .ob-opt{font-size:16px}
 .ob-calg button{height:38px;border-radius:9px;border:1px solid transparent;background:var(--chip);color:var(--fg);font:600 15px var(--mono);cursor:pointer}
 .ob-calg button:hover:not(:disabled){border-color:var(--acc)}.ob-calg button.ob-td{border-color:var(--line)}.ob-calg button[aria-pressed="true"]{background:color-mix(in srgb,var(--acc) 30%,var(--chip));border-color:var(--acc)}.ob-calg button:disabled{opacity:.3;cursor:default}
 .ob-days.open{flex-wrap:wrap;overflow:visible}
+.ob-f.ob-editing{border-color:color-mix(in srgb,#f2d36b 60%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,#f2d36b 30%,transparent)}
+.ob-edb{margin-left:auto}
