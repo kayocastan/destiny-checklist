@@ -1,10 +1,11 @@
 /* Orla Bot · Worker da Cloudflare.
    POST /discord/interactions  – comandos, botões e modais do Discord (substitui o bot em Python).
    /me, /link/start, /link/callback, /activities, /grades  – usados pela aba "Orla Bot" do DPI.
+   /clan/panel  – painel "Discord do clã" do DPI (só admins).
    Cron (1 min): apaga grades que começaram há mais de 1 hora. */
 import { handleInteraction } from './interactions.js';
 import { verifySignature, oauthUser, deleteMessage, DiscordError } from './discord.js';
-import { BungieApiError, currentUser, upsertUser, userGroupIds } from './bungie.js';
+import { BungieApiError, currentUser, upsertUser, userGroups } from './bungie.js';
 import { ActivityInputError } from './rules.js';
 import { createGrade, CATALOG_PREFIX } from './grades.js';
 
@@ -47,10 +48,36 @@ async function who(req, env) {
 const clanCache = new Map();
 async function inClan(env, me) {
   const hit = clanCache.get(me.uid + env.CLAN_ID);
-  if (hit && hit.exp > Date.now()) return hit.ok;
-  const ok = (await userGroupIds(env, me.uid, me.token)).includes(String(env.CLAN_ID));
-  clanCache.set(me.uid + env.CLAN_ID, { ok, exp: Date.now() + (ok ? 300_000 : 30_000) });
+  if (hit && hit.exp > Date.now()) { me.role = hit.role; return hit.ok; }
+  const g = (await userGroups(env, me.uid, me.token)).find(x => x.id === String(env.CLAN_ID)), ok = !!g;
+  me.role = g?.role || 0;
+  clanCache.set(me.uid + env.CLAN_ID, { ok, role: me.role, exp: Date.now() + (ok ? 300_000 : 30_000) });
   return ok;
+}
+// painel "Discord do clã" no DPI: só dono do site, admins e fundador
+const isAdmin = (env, me) => me.role >= 3 || (env.OWNER && me.uid === String(env.OWNER));
+
+/* Painel do DPI (Clã › Discord do clã): quem registrou o Discord, participação nas grades e experiência por atividade.
+   Só leitura; as grades vêm do histórico (grade_hist, guardado pela limpeza) + as que ainda estão abertas. */
+async function clanPanel(env, days) {
+  const since = new Date(Date.now() - days * 864e5).toISOString(), db = env.DB;
+  const all = sql => db.prepare(sql).bind(since).all().then(r => r.results);
+  const [users, part, made, grades, exp, first] = await Promise.all([
+    db.prepare('SELECT discord_user_id d, discord_member_name n, bungie_membership_id m, bungie_name b, linked_at at FROM users').all().then(r => r.results),
+    all(`SELECT p.discord_user_id d, p.category c, SUM(CASE WHEN p.is_rookie = 1 THEN 1 ELSE 0 END) rk, COUNT(*) n, MAX(g.starts_at) last FROM (
+           SELECT activity_id, discord_user_id, category, is_rookie FROM grade_hist_p UNION ALL SELECT activity_id, discord_user_id, category, is_rookie FROM activity_participants
+         ) p JOIN (SELECT id, starts_at FROM grade_hist UNION ALL SELECT id, starts_at FROM activities) g ON g.id = p.activity_id
+         WHERE replace(g.starts_at, ' ', 'T') >= ? GROUP BY p.discord_user_id, p.category`),
+    all(`SELECT created_by d, COUNT(*) n FROM (SELECT created_by, starts_at FROM grade_hist UNION ALL SELECT created_by_discord_id, starts_at FROM activities)
+         WHERE replace(starts_at, ' ', 'T') >= ? GROUP BY created_by`),
+    all(`SELECT g.id, g.name, g.capacity cap, g.starts_at s, g.created_by d, (SELECT COUNT(*) FROM grade_hist_p p WHERE p.activity_id = g.id AND p.category = 'titular') tit, 0 open FROM grade_hist g WHERE replace(g.starts_at, ' ', 'T') >= ?
+         UNION ALL SELECT a.id, a.name, a.capacity, a.starts_at, a.created_by_discord_id, (SELECT COUNT(*) FROM activity_participants p WHERE p.activity_id = a.id AND p.category = 'titular'), 1 FROM activities a
+         ORDER BY s DESC LIMIT 40`),
+    db.prepare(`SELECT pa.user_discord_id d, ba.eligibility_group g, MIN(ba.name) a, MIN(ba.type) t, SUM(pa.clear_count) c, MAX(pa.skill) s, MAX(pa.checked_at) at
+                FROM player_activities pa JOIN bungie_activities ba ON ba.bungie_id = pa.activity_bungie_id GROUP BY pa.user_discord_id, ba.eligibility_group`).all().then(r => r.results),
+    db.prepare('SELECT MIN(archived_at) t FROM grade_hist').first(),
+  ]);
+  return { days, users, part, made, grades, exp, histSince: first?.t || null, at: Date.now() };
 }
 const registered = (env, ids) => env.DB.prepare(`SELECT * FROM users WHERE bungie_membership_id IN (${ids.map(() => '?').join(',')}) ORDER BY linked_at DESC LIMIT 1`).bind(...ids).first();
 
@@ -80,6 +107,11 @@ async function api(req, env, url) {
     return json(req, { activities: rows });
   }
 
+  if (path === '/clan/panel' && req.method === 'GET') {
+    if (!isAdmin(env, me)) return json(req, { error: 'forbidden' }, 403);
+    const d = [30, 90, 365].includes(Number(url.searchParams.get('days'))) ? Number(url.searchParams.get('days')) : 30;
+    return json(req, await clanPanel(env, d));
+  }
   if (path === '/me' && req.method === 'GET') {
     const row = await registered(env, me.ids);
     return json(req, { bungieName: me.membership.bungieName, linked: !!row, discord: row ? { id: row.discord_user_id, name: row.discord_member_name } : null });
@@ -123,7 +155,14 @@ async function cleanup(env) {
   for (const r of rows) {
     try { if (r.m) await deleteMessage(env, r.c, r.m); }
     catch (e) { if (!(e instanceof DiscordError && e.status === 404)) { console.error('limpeza', r.id, e.message); continue; } }
-    await env.DB.prepare('DELETE FROM activities WHERE id = ?').bind(r.id).run();
+    // guarda um resumo (sem descrição nem mensagem) para o painel de participação do DPI, antes de apagar
+    await env.DB.batch([
+      env.DB.prepare(`INSERT OR IGNORE INTO grade_hist (id, name, curated_id, capacity, rookie_limit, starts_at, created_by, archived_at)
+        SELECT id, name, curated_bungie_activity_id, capacity, rookie_limit, starts_at, created_by_discord_id, ? FROM activities WHERE id = ?`).bind(new Date().toISOString(), r.id),
+      env.DB.prepare(`INSERT OR IGNORE INTO grade_hist_p (activity_id, discord_user_id, category, is_rookie)
+        SELECT activity_id, discord_user_id, category, is_rookie FROM activity_participants WHERE activity_id = ?`).bind(r.id),
+      env.DB.prepare('DELETE FROM activities WHERE id = ?').bind(r.id),
+    ]);
   }
   await env.DB.prepare('DELETE FROM pending_grades WHERE created_at < ?').bind(new Date(Date.now() - 3600_000).toISOString()).run();
 }

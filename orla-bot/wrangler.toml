@@ -8,6 +8,7 @@ DISCORD_GUILD_ID = "1474588542410686716"
 LFG_CHANNEL_ID = "1474590008114679919"     # #lfg-destiny: todas as grades são publicadas aqui
 TIMEZONE = "America/Sao_Paulo"
 CLAN_ID = "5280120"                         # clã Orla Emaranhada: único com acesso à interface do site
+OWNER = "9967831"                           # dono do DPI (conta Bungie.net): vê o painel "Discord do clã" mesmo sem ser admin
 SITE_URL = "https://destinyparallel.vercel.app"
 HERO_URL = "https://destinyparallel.vercel.app/orla-bot/assets/orla-bot-hero.png"
 SELF_URL = "https://orla-bot.__SUB__.workers.dev"   # workflow troca __SUB__ pelo subdomínio workers.dev

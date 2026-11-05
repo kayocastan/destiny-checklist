@@ -152,5 +152,25 @@ describe('API do DPI', () => {
     vi.stubGlobal('fetch', vi.fn(async () => new Response(null, { status: 204 })));
     await worker.scheduled({}, env, ctx); await flush();
     expect((await env.DB.prepare('SELECT name FROM activities').all()).results.map(r => r.name)).toEqual(['Nova']);
+    expect((await env.DB.prepare('SELECT name FROM grade_hist').all()).results.map(r => r.name)).toEqual(['Velha']);
+  });
+  it('/clan/panel: só admin; soma grades guardadas e abertas por pessoa', async () => {
+    expect((await api('/clan/panel')).status).toBe(403); // membro comum (sem memberType)
+    env.OWNER = '55'; // dono do DPI (conta Bungie.net do teste) vê mesmo sem ser admin
+    await link('10');
+    const old = new Date(Date.now() - 2 * 36e5).toISOString(), soon = new Date(Date.now() + 36e5).toISOString();
+    const a1 = (await env.DB.prepare(`INSERT INTO activities (name, capacity, starts_at, description, created_by_discord_id, created_at) VALUES ('Velha', 3, ?, '', '10', 'x')`).bind(old).run()).meta.last_row_id;
+    await env.DB.prepare(`INSERT INTO activity_participants (activity_id, discord_user_id, category, is_rookie, created_at) VALUES (?, '10', 'titular', 1, 'x'), (?, '20', 'reserva', 0, 'x')`).bind(a1, a1).run();
+    await worker.scheduled({}, env, ctx); await flush();
+    const a2 = (await env.DB.prepare(`INSERT INTO activities (name, capacity, starts_at, description, created_by_discord_id, created_at) VALUES ('Nova', 3, ?, '', '20', 'x')`).bind(soon).run()).meta.last_row_id;
+    await env.DB.prepare(`INSERT INTO activity_participants (activity_id, discord_user_id, category, is_rookie, created_at) VALUES (?, '10', 'titular', 0, 'x')`).bind(a2).run();
+    const r = await api('/clan/panel?days=30'); expect(r.status).toBe(200);
+    const j = await r.json();
+    expect(j.users.map(u => u.b)).toEqual(['Guardian#0042']);
+    expect(j.part.find(p => p.d === '10' && p.c === 'titular')).toMatchObject({ n: 2, rk: 1 });
+    expect(j.part.find(p => p.d === '20' && p.c === 'reserva')).toMatchObject({ n: 1 });
+    expect(j.made.map(m => [m.d, m.n]).sort()).toEqual([['10', 1], ['20', 1]]);
+    expect(j.grades.map(g => [g.name, g.open, g.tit])).toEqual([['Nova', 1, 1], ['Velha', 0, 1]]);
+    expect(j.histSince).toBeTruthy();
   });
 });

@@ -66,8 +66,12 @@ export async function currentUser(env, token) {
 
 // ids dos clãs da conta (GroupV2); usado para liberar a interface só para o clã Orla Emaranhada
 export async function userGroupIds(env, uid, token) {
+  return (await userGroups(env, uid, token)).map(g => g.id);
+}
+// clãs da conta com o cargo (memberType: 1 iniciante, 2 membro, 3 admin, 4 fundador interino, 5 fundador)
+export async function userGroups(env, uid, token) {
   const r = await request(env, 'GET', `/GroupV2/User/254/${uid}/0/1/`, { token });
-  return (r.results || []).map(x => String(x.group?.groupId)).filter(Boolean);
+  return (r.results || []).map(x => ({ id: String(x.group?.groupId || ''), role: Number(x.member?.memberType) || 0 })).filter(g => g.id);
 }
 
 export async function getClearCounts(env, membership, hashes, mode) {
