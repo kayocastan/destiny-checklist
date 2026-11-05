@@ -170,7 +170,7 @@ if (GRADE) document.documentElement.classList.add('grade');
 const groupOf = t => GROUPS.find(g => g.subs.includes(parentOf(t)));
 // aba salva que não existe mais (ex.: Padrões, que foi retirada) volta para Objetivos
 if (!groupOf(tab)) { tab = 'obj'; LS.set('dc-tab', 'obj'); }
-if (GRADE) tab = 'gclo'; // /grade abre direto no Clã › Orla Bot, com o cabeçalho e o rodapé do DPI
+if (GRADE) tab = 'gclo'; // /grade: página própria (botão Grade do topo), com o cabeçalho e o rodapé do DPI; sem subaba
 for (const [k, v] of Object.entries(lastSub)) if (groupOf(v)?.id !== k) delete lastSub[k];
 
 /* ---------- status ---------- */
@@ -1429,8 +1429,8 @@ function render() {
   // atalho do Orla Bot no topo (só membros da Orla): confere o clã uma vez por dia, mesmo sem abrir a aba Clã
   { const gb = $('gradebtn'); if (gb) { if (GD?.clan?.gid) LS.set('dc-orla', { ok: GD.clan.gid === ORLA_CLAN, at: Date.now() }); const o = LS.get('dc-orla', null);
     if (member && (!o || Date.now() - o.at > 864e5) && !orlaChk) { orlaChk = true; bungie(`/GroupV2/User/${member.type}/${member.id}/0/1/`).then(r => { LS.set('dc-orla', { ok: (r.results || []).some(x => String(x.group?.groupId) === ORLA_CLAN), at: Date.now() }); render(); }).catch(() => {}); }
-    gb.hidden = !member || !(o?.ok || orlaOK()); gb.title = lang === 'pt' ? 'Orla Bot: criar ou ver grades do clã' : 'Orla Bot: create or see clan rosters'; } }
-  GROUPS[4].subs = [...(clanAdminOK() ? ['gcl', 'gclb', 'gclg', 'gcla', 'gcld'] : ['gcl', 'gclb', 'gclg']), ...(orlaOK() || GRADE ? ['gclo'] : [])]; if ((tab === 'gcla' || tab === 'gcld') && !clanAdminOK() && GD?.clan) { tab = 'gcl'; }
+    gb.hidden = !member || !(o?.ok || orlaOK() || GRADE); gb.classList.toggle('on', GRADE); gb.title = lang === 'pt' ? 'Orla Bot: criar ou ver grades do clã' : 'Orla Bot: create or see clan rosters'; } }
+  GROUPS[4].subs = [...(clanAdminOK() ? ['gcl', 'gclb', 'gclg', 'gcla', 'gcld'] : ['gcl', 'gclb', 'gclg'])]; if ((tab === 'gcla' || tab === 'gcld') && !clanAdminOK() && GD?.clan) { tab = 'gcl'; }
   const g = groupOf(tab), st = $('subtabs'), pa = parentOf(tab), kids = KIDS[pa];
   if (g && (g.subs.length > 1 || kids)) { st.hidden = false; st.innerHTML = `${g.subs.length > 1 ? `<div class="subs-row">${g.subs.map(id => `<button class="sub" type="button" data-sub="${id}" aria-pressed="${id === pa}">${esc(U.subs[id])}</button>`).join('')}</div>` : ''}${kids ? `<div class="kids-row" role="group" aria-label="${esc(U.subs[pa])}"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 5h14M6 10h8M8.5 15h3"/></svg>${kids.map(k => `<button type="button" class="kid" data-kid="${k}" aria-pressed="${k === tab}">${esc(U.subs[k])}</button>`).join('')}</div>` : ''}`; }
   else { st.hidden = true; st.innerHTML = ''; }
@@ -2870,17 +2870,17 @@ document.addEventListener('click', e => {
 document.addEventListener('change', e => { if (e.target.id === 'dpg') { DPN.g = e.target.value; LS.set('dc-dp-g', DPN.g); render(); } });
 /* ---------- Orla Bot: registrar o Discord e criar grades de atividade (publicadas no #lfg-destiny) ---------- */
 const OBT = {
-  pt: { t: 'Orla Bot', sub: 'Monte grades de atividade do clã aqui no site: a grade aparece no #lfg-destiny do Discord, igualzinha à criada pelo comando /orla grade.', login: 'Entre com sua conta Bungie para usar o Orla Bot.', loading: 'Carregando…', down: 'O Orla Bot não respondeu agora. Tente de novo em instantes.',
+  pt: { t: 'Grades do clã', sub: 'Monte grades de atividade do clã aqui no site: o Orla Bot publica a grade no #lfg-destiny do Discord, igualzinha à criada pelo comando /orla grade.', login: 'Entre com sua conta Bungie para usar o Orla Bot.', loading: 'Carregando…', down: 'O Orla Bot não respondeu agora. Tente de novo em instantes.',
     linked: n => `Vinculado ao Discord: ${n || 'conta confirmada'}`, notLinked: 'Seu usuário do DPI ainda não está ligado a um usuário do Discord.', register: 'Registrar', relink: 'Trocar usuário do Discord',
     regT: 'Registrar no Orla Bot', regN: 'Informe seu usuário do Discord (o nome de usuário, sem o @). Você vai confirmar entrando no Discord, e então seu usuário do DPI fica ligado a ele no Orla Bot.', tag: 'Usuário do Discord', regGo: 'Continuar com o Discord', cancel: 'Cancelar', eTag: 'Informe seu usuário do Discord.',
-    create: 'Criar grade', act: 'Atividade', actPh: 'Escolha uma sugestão ou digite um título livre', cap: 'Titulares', rk: 'Novatos', start: 'Início', desc: 'Descrição', descPh: 'Informações adicionais (opcional)', send: 'Criar grade', sending: 'Criando…', where: 'A grade é publicada no canal #lfg-destiny.',
+    create: 'Criar grade', act: 'Atividade', actPh: 'Escolha uma sugestão ou digite um título livre', cap: 'Titulares', rk: 'Novatos', start: 'Início', day: 'Dia', hour: 'Horário', today: 'Hoje', tomorrow: 'Amanhã', tz: 'no seu horário', desc: 'Descrição', descPh: 'Informações adicionais (opcional)', send: 'Criar grade', sending: 'Criando…', where: 'A grade é publicada no canal #lfg-destiny.',
     eAct: 'Informe a atividade.', eCap: 'Titulares deve ser um número de 1 a 12.', eRk: 'Novatos deve ser de 0 até o número de integrantes.', eStart: 'Escolha uma data e hora futuras.', eReg: 'Registre seu Discord antes de criar uma grade.', eGen: 'Não consegui criar a grade agora. Tente novamente.',
     done: 'Grade publicada no #lfg-destiny.', doneNoMsg: 'A grade foi salva, mas não consegui publicar a mensagem no Discord. Avise um administrador.',
     res: { ok: 'Discord vinculado com sucesso.', mismatch: 'O usuário do Discord em que você entrou não é o que foi informado. Tente de novo.', cancel: 'Vínculo cancelado.', expired: 'O pedido expirou. Tente registrar de novo.', fail: 'Não consegui concluir o vínculo com o Discord.' } },
-  en: { t: 'Orla Bot', sub: 'Build clan activity rosters here on the site: the roster shows up on Discord in #lfg-destiny, just like one made with /orla grade.', login: 'Sign in with your Bungie account to use Orla Bot.', loading: 'Loading…', down: 'Orla Bot did not respond. Try again shortly.',
+  en: { t: 'Clan rosters', sub: 'Build clan activity rosters here on the site: Orla Bot posts the roster on Discord in #lfg-destiny, just like one made with /orla grade.', login: 'Sign in with your Bungie account to use Orla Bot.', loading: 'Loading…', down: 'Orla Bot did not respond. Try again shortly.',
     linked: n => `Linked to Discord: ${n || 'account confirmed'}`, notLinked: 'Your DPI user is not linked to a Discord user yet.', register: 'Register', relink: 'Change Discord user',
     regT: 'Register with Orla Bot', regN: 'Enter your Discord username (without the @). You will confirm by signing in to Discord, and then your DPI user is linked to it in Orla Bot.', tag: 'Discord username', regGo: 'Continue with Discord', cancel: 'Cancel', eTag: 'Enter your Discord username.',
-    create: 'Create roster', act: 'Activity', actPh: 'Pick a suggestion or type a custom title', cap: 'Members', rk: 'Rookies', start: 'Start', desc: 'Description', descPh: 'Extra information (optional)', send: 'Create roster', sending: 'Creating…', where: 'The roster is posted in the #lfg-destiny channel.',
+    create: 'Create roster', act: 'Activity', actPh: 'Pick a suggestion or type a custom title', cap: 'Members', rk: 'Rookies', start: 'Start', day: 'Day', hour: 'Time', today: 'Today', tomorrow: 'Tomorrow', tz: 'your local time', desc: 'Description', descPh: 'Extra information (optional)', send: 'Create roster', sending: 'Creating…', where: 'The roster is posted in the #lfg-destiny channel.',
     eAct: 'Enter the activity.', eCap: 'Members must be a number from 1 to 12.', eRk: 'Rookies must be from 0 up to the number of members.', eStart: 'Pick a future date and time.', eReg: 'Register your Discord before creating a roster.', eGen: 'Could not create the roster right now. Try again.',
     done: 'Roster posted in #lfg-destiny.', doneNoMsg: 'The roster was saved, but the Discord message could not be posted. Tell an admin.',
     res: { ok: 'Discord linked successfully.', mismatch: 'The Discord user you signed in with is not the one you entered. Try again.', cancel: 'Linking cancelled.', expired: 'The request expired. Try registering again.', fail: 'Could not finish linking with Discord.' } } };
@@ -2888,6 +2888,19 @@ const obt = () => OBT[lang === 'pt' ? 'pt' : 'en'];
 let ORLA = null;
 const OB = { me: undefined, deny: false, loading: false, f: null, msg: null, busy: false, res: null, sug: [], t: 0 };
 const obNow = () => { const d = new Date(); d.setSeconds(0, 0); return new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 16); };
+const obLoc = d => new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
+const obNext = () => { const d = new Date(Date.now() + 15 * 6e4); d.setMinutes(Math.ceil(d.getMinutes() / 15) * 15, 0, 0); return obLoc(d); }; // próximo quarto de hora (com folga)
+function obWhenHTML(f, T) { // dia em botões + hora/minuto em listas, no visual do site (sem o calendário do navegador)
+  const day = f.start.slice(0, 10), hh = +f.start.slice(11, 13), mm = +f.start.slice(14, 16), loc = lang === 'en' ? 'en-US' : 'pt-BR', now = obNow(), p = n => String(n).padStart(2, '0');
+  const days = Array.from({ length: 14 }, (_, i) => { const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + i); return d; });
+  const chip = (d, i) => { const k = obLoc(d).slice(0, 10), wd = d.toLocaleDateString(loc, { weekday: 'short' }).replace('.', ''), dm = d.toLocaleDateString(loc, { day: '2-digit', month: '2-digit' });
+    return `<button type="button" class="ob-day" data-obday="${k}" aria-pressed="${k === day}"><b>${esc(i === 0 ? T.today : i === 1 ? T.tomorrow : wd)}</b><small>${esc(dm)}</small></button>`; };
+  const hours = Array.from({ length: 24 }, (_, h) => `<option value="${h}"${h === hh ? ' selected' : ''}${`${day}T${p(h)}:59` < now ? ' disabled' : ''}>${p(h)}h</option>`).join('');
+  const mins = [0, 15, 30, 45].map(m => `<option value="${m}"${m === mm ? ' selected' : ''}${`${day}T${p(hh)}:${p(m)}` < now ? ' disabled' : ''}>${p(m)}</option>`).join('');
+  return `<div class="ob-l ob-when"><span>${esc(T.day)}</span><div class="ob-days" role="group" aria-label="${esc(T.day)}">${days.map(chip).join('')}</div></div>
+    <div class="ob-l ob-time"><span>${esc(T.hour)}</span><div class="ob-tm"><select id="obh" class="search" aria-label="${esc(T.hour)}">${hours}</select><b>:</b><select id="obm" class="search" aria-label="min">${mins}</select><small class="lbd-n">${esc(T.tz)}</small></div></div>`;
+}
+const obSet = (day, h, m) => { const p = n => String(n).padStart(2, '0'), v = `${day}T${p(h)}:${p(m)}`; OB.f.start = v < obNow() ? obNext() : v; }; // só hoje pode cair no passado
 async function obApi(path, opts = {}) {
   if (!ORLA) ORLA = await fetch('/data/orla.json', { cache: 'no-cache' }).then(r => r.json()).then(j => j.api || null).catch(() => null);
   if (!ORLA) throw new Error('down');
@@ -2901,7 +2914,7 @@ async function obLoad() {
   OB.loading = false; render();
 }
 function gradeRender() { // /grade: página em branco até confirmar que a conta é do clã Orla Emaranhada
-  const root = document.documentElement, list = $('list'); document.title = 'Orla Bot · DPI';
+  const root = document.documentElement, list = $('list'); document.title = (lang === 'pt' ? 'Grades do clã' : 'Clan rosters') + ' · DPI';
   if (!auth) { root.classList.add('grade-ok'); list.innerHTML = `<div class="panel ob-p"><section class="ad-s ad-wide"><button type="button" class="lb-run" data-obin>${lang === 'pt' ? 'Entrar com Bungie' : 'Sign in with Bungie'}</button></section></div>`; return; }
   if (!member) return;
   if (OB.me === undefined) { obLoad(); return; }
@@ -2912,7 +2925,7 @@ function orlaHTML() {
   const T = obt(); if (!member) return `<p class="empty-msg">${esc(T.login)}</p>`;
   if (OB.me === undefined) { setTimeout(obLoad); return `<p class="empty-msg wait">${esc(T.loading)}</p>`; }
   if (!OB.me) return `<p class="iv-msg bad">${esc(T.down)}</p>`;
-  const me = OB.me, f = OB.f ??= { act: '', cur: null, cap: 6, rk: 0, start: obNow(), desc: '' }; if (f.start < obNow()) f.start = obNow();
+  const me = OB.me, f = OB.f ??= { act: '', cur: null, cap: 6, rk: 0, start: obNext(), desc: '' }; if (f.start < obNow()) f.start = obNext();
   const note = (OB.res ? `<p class="iv-msg${OB.res === 'ok' ? '' : ' bad'}">${esc(T.res[OB.res] || T.res.fail)}</p>` : '') + (OB.msg ? `<p class="iv-msg${OB.msg.bad ? ' bad' : ''}">${esc(OB.msg.t)}</p>` : '');
   return `<section class="ad-s ad-wide ob-h"><div class="ad-h"><h2>${esc(T.t)}</h2></div><small class="lbd-n">${esc(T.sub)}</small>
     <div class="ob-st"><span class="${me.linked ? 'ok' : 'warn'}">${esc(me.linked ? T.linked(me.discord?.name) : T.notLinked)}</span><button type="button" class="lbd-btn${me.linked ? '' : ' pri'}" data-obreg>${esc(me.linked ? T.relink : T.register)}</button></div></section>${note}
@@ -2921,7 +2934,8 @@ function orlaHTML() {
       <div class="ob-row">
         <label class="ob-l"><span>${esc(T.cap)}</span><input id="obcap" class="search" type="number" min="1" max="12" step="1" inputmode="numeric" value="${esc(f.cap)}"></label>
         <label class="ob-l"><span>${esc(T.rk)}</span><input id="obrk" class="search" type="number" min="0" max="${esc(Number(f.cap) || 12)}" step="1" inputmode="numeric" value="${esc(f.rk)}"></label>
-        <label class="ob-l ob-w"><span>${esc(T.start)}</span><input id="obstart" class="search" type="datetime-local" min="${obNow()}" value="${esc(f.start)}"></label></div>
+      </div>
+      <div class="ob-start"><h3>${esc(T.start)}</h3>${obWhenHTML(f, T)}</div>
       <label class="ob-l"><span>${esc(T.desc)}</span><textarea id="obdesc" class="search" rows="3" maxlength="250" placeholder="${esc(T.descPh)}">${esc(f.desc)}</textarea></label>
       <div class="ob-act"><button type="button" class="lb-run" data-obsend${OB.busy ? ' disabled' : ''}>${esc(OB.busy ? T.sending : T.send)}</button><small class="lbd-n">${esc(T.where)}</small></div></section>`;
 }
@@ -2962,10 +2976,12 @@ document.addEventListener('click', e => {
   if (e.target.closest('[data-obx]')) { $('obdlg')?.close(); return; }
   if (e.target.closest('[data-obgo]')) { obGo(); return; }
   if (e.target.closest('[data-obsend]')) { obSend(); return; }
+  const dy = e.target.closest('[data-obday]'); if (dy && OB.f) { obSet(dy.dataset.obday, +OB.f.start.slice(11, 13), +OB.f.start.slice(14, 16)); render(); return; }
   const p = e.target.closest('[data-obpick]'); if (p && OB.f) { const a = OB.sug.find(x => String(x.id) === p.dataset.obpick); if (a) { OB.f.act = a.name; OB.f.cur = a.id; $('obact').value = a.name; } $('obsug').hidden = true; $('obact').setAttribute('aria-expanded', 'false'); return; }
   if (!e.target.closest('.ob-ac') && $('obsug')) $('obsug').hidden = true;
 });
 document.addEventListener('focusin', e => { if (e.target.id === 'obact') obSug(e.target.value); });
+document.addEventListener('change', e => { const f = OB.f; if (!f || (e.target.id !== 'obh' && e.target.id !== 'obm')) return; obSet(f.start.slice(0, 10), e.target.id === 'obh' ? +e.target.value : +f.start.slice(11, 13), e.target.id === 'obm' ? +e.target.value : +f.start.slice(14, 16)); render(); });
 document.addEventListener('keydown', e => {
   if (e.target.id === 'obtag' && e.key === 'Enter') { e.preventDefault(); obGo(); return; }
   if (e.target.id === 'obact' && e.key === 'ArrowDown') { const b = $('obsug')?.querySelector('button'); if (b) { e.preventDefault(); b.focus(); } }
@@ -2977,7 +2993,7 @@ document.addEventListener('input', e => {
   if (id === 'obact') { f.act = e.target.value; f.cur = null; obSug(f.act); }
   else if (id === 'obcap') { f.cap = e.target.value; const r = $('obrk'), c = Number(f.cap); if (r && Number.isInteger(c) && c >= 1) { r.max = Math.min(c, 12); if (Number(r.value) > c) { r.value = c; f.rk = String(c); } } }
   else if (id === 'obrk') f.rk = e.target.value;
-  else if (id === 'obstart') f.start = e.target.value;
+
   else if (id === 'obdesc') f.desc = e.target.value;
 });
 // a Bungie só conta "Guiados" em algumas atividades (todas as incursões e poucas masmorras)

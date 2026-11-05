@@ -8,6 +8,7 @@ import { verifySignature, oauthUser, deleteMessage, DiscordError } from './disco
 import { BungieApiError, currentUser, upsertUser, userGroups } from './bungie.js';
 import { ActivityInputError } from './rules.js';
 import { createGrade, CATALOG_PREFIX } from './grades.js';
+import { catalog, searchActivities, matchActivity } from './search.js';
 
 const ORIGINS = ['https://destinyparallel.vercel.app', 'https://destiny-checklist.vercel.app'];
 const cors = req => {
@@ -102,9 +103,8 @@ async function api(req, env, url) {
   try { if (!(await inClan(env, me))) return json(req, { error: 'clan' }, 403); }
   catch (e) { if (e instanceof BungieApiError) return json(req, { error: 'clan' }, 403); throw e; }
   if (path === '/activities' && req.method === 'GET') {
-    const q = (url.searchParams.get('q') || '').slice(0, 80).replace(/[%_\\]/g, m => '\\' + m);
-    const rows = (await env.DB.prepare(`SELECT id, name, type FROM curated_bungie_activities WHERE name LIKE ? ESCAPE '\\' AND length(name) <= 80 ORDER BY name, id LIMIT 25`).bind(`%${q}%`).all()).results;
-    return json(req, { activities: rows });
+    const rows = searchActivities(await catalog(env.DB), (url.searchParams.get('q') || '').slice(0, 80));
+    return json(req, { activities: rows.map(({ id, name, type }) => ({ id, name, type })) });
   }
 
   if (path === '/clan/panel' && req.method === 'GET') {
@@ -139,6 +139,7 @@ async function api(req, env, url) {
         if (c && c.name === atividade) curatedId = c.id; // texto editado = título livre
       }
       if (atividade.startsWith(CATALOG_PREFIX)) atividade = atividade.slice(CATALOG_PREFIX.length);
+      if (curatedId == null) { const m = matchActivity(await catalog(env.DB), atividade); if (m) { curatedId = m.id; atividade = m.name; } } // "o fim de crota" → Fim de Crota: Normal
       const r = await createGrade(env, { userId: row.discord_user_id, atividade, integrantes, inicio: String(b.inicio ?? ''), descricao: String(b.descricao ?? ''), curatedId, rookieLimit: novatos });
       return json(req, { ok: true, activityId: r.activityId, published: r.published, warning: r.warning.trim() });
     } catch (e) {

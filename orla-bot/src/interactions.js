@@ -3,6 +3,7 @@ import { ActivityInputError } from './rules.js';
 import { BungieApiError, findMembership, syncPlayerActivities, upsertUser } from './bungie.js';
 import { SignupError, enroll, removeSignup } from './signups.js';
 import { CATALOG_PREFIX, createGrade, refreshMessage } from './grades.js';
+import { catalog, searchActivities, matchActivity } from './search.js';
 import { DiscordError, deleteMessage, editOriginal, ephemeral, followup } from './discord.js';
 import { escapeMarkdown } from './embed.js';
 import { skillForClears } from './rules.js';
@@ -67,6 +68,7 @@ async function commandGrade(env, ctx, i, opts) {
     if (!c) return ephemeral('Essa opção não está mais no catálogo. Pesquise novamente e escolha outra.');
     curatedId = id; atividade = c.name;
   }
+  else if (atividade) { const m = matchActivity(await catalog(env.DB), atividade); if (m) { curatedId = m.id; atividade = m.name; } }
   const complete = integrantes != null && inicio != null;
   if (!(await linkedUser(env, u.id))) {
     if (!complete) return json(bungieNameModal('orla:bn:g0'));
@@ -85,7 +87,9 @@ async function submitGrade(env, ctx, i) {
   const curatedId = Number(i.data.custom_id.split(':')[2]) || null;
   let linked = null;
   if (curatedId) { const c = await env.DB.prepare('SELECT name FROM curated_bungie_activities WHERE id = ?').bind(curatedId).first(); if (c && typed.trim() === c.name) linked = curatedId; }
-  safe(ctx, runSave(env, i.token, u, { atividade: typed, integrantes: Number(f.integrantes?.[0]), inicio: String(f.inicio ?? ''), descricao: String(f.descricao ?? ''), curatedId: linked, rookieLimit: Number(f.novatos?.[0]) }));
+  let nome = typed;
+  if (!linked) { const m = matchActivity(await catalog(env.DB), typed); if (m) { linked = m.id; nome = m.name; } }
+  safe(ctx, runSave(env, i.token, u, { atividade: nome, integrantes: Number(f.integrantes?.[0]), inicio: String(f.inicio ?? ''), descricao: String(f.descricao ?? ''), curatedId: linked, rookieLimit: Number(f.novatos?.[0]) }));
   return json(deferEphemeral());
 }
 
@@ -175,8 +179,7 @@ async function buttonPress(env, ctx, i) {
 // ---------- autocomplete ----------
 async function autocomplete(env, i, sub) {
   const focused = sub.options?.find(o => o.focused);
-  const q = String(focused?.value ?? '').replace(/[%_\\]/g, m => '\\' + m);
-  const rows = (await env.DB.prepare(`SELECT id, name FROM curated_bungie_activities WHERE name LIKE ? ESCAPE '\\' AND length(name) <= 80 ORDER BY name, id LIMIT 25`).bind(`%${q}%`).all()).results;
+  const rows = searchActivities(await catalog(env.DB), String(focused?.value ?? '').slice(0, 80));
   return json({ type: 8, data: { choices: rows.map(r => ({ name: r.name.slice(0, 100), value: `${CATALOG_PREFIX}${r.id}` })) } });
 }
 
