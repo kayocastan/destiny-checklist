@@ -170,6 +170,17 @@ describe('API do DPI', () => {
     const j = await (await api('/grades')).json();
     expect(j.grades).toEqual([expect.objectContaining({ name: 'Crota', cap: 6, by: 'Guardian#0042', url: 'https://discord.com/channels/g1/c1/m1', p: [{ n: 'Guardian', c: 'titular', r: 1 }] })]);
   });
+  it('/grades/:id/join|reserve|leave no site, com mine na agenda', async () => {
+    await link('10');
+    const id = (await env.DB.prepare(`INSERT INTO activities (name, capacity, starts_at, description, created_by_discord_id, created_at, discord_channel_id, discord_message_id) VALUES ('Livre', 2, ?, '', '99', 'x', 'c1', 'm1')`).bind(new Date(Date.now() + 36e5).toISOString()).run()).meta.last_row_id;
+    let j = await (await api(`/grades/${id}/join`, { method: 'POST' })).json(); expect(j.ok).toBe(true);
+    expect((await (await api('/grades')).json()).grades[0].mine).toBe('titular');
+    j = await (await api(`/grades/${id}/reserve`, { method: 'POST' })).json(); expect(j.message).toMatch(/reserva/);
+    expect((await (await api('/grades')).json()).grades[0].mine).toBe('reserva');
+    j = await (await api(`/grades/${id}/leave`, { method: 'POST' })).json(); expect(j.message).toMatch(/removida/);
+    expect((await (await api('/grades')).json()).grades[0].mine).toBeNull();
+    expect(calls.some(c => c.method === 'PATCH' && c.url.includes('/channels/c1/messages/m1'))).toBe(true); // mensagem do Discord atualizada
+  });
   it('/clan/panel: só admin; soma grades guardadas e abertas por pessoa', async () => {
     expect((await api('/clan/panel')).status).toBe(403); // membro comum (sem memberType)
     env.OWNER = '55'; // dono do DPI (conta Bungie.net do teste) vê mesmo sem ser admin

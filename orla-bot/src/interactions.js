@@ -2,7 +2,7 @@
 import { ActivityInputError } from './rules.js';
 import { BungieApiError, findMembership, syncPlayerActivities, upsertUser } from './bungie.js';
 import { SignupError, enroll, removeSignup } from './signups.js';
-import { CATALOG_PREFIX, createGrade, refreshMessage } from './grades.js';
+import { CATALOG_PREFIX, createGrade, refreshMessage, applySignup } from './grades.js';
 import { catalog, searchActivities, matchActivity } from './search.js';
 import { DiscordError, deleteMessage, editOriginal, ephemeral, followup } from './discord.js';
 import { escapeMarkdown } from './embed.js';
@@ -131,39 +131,8 @@ async function submitBungieName(env, ctx, i) {
 
 // ---------- botões ----------
 async function applyEnrollment(env, token, u, activityId, category) {
-  const send = c => followup(env, token, c);
-  try {
-    const act = await env.DB.prepare('SELECT * FROM activities WHERE id = ?').bind(activityId).first();
-    if (!act) return send('Essa atividade não está mais disponível.');
-    let warning = '', isRookie = null, requiresBungie = false;
-    const curatedId = act.curated_bungie_activity_id, rookieLimit = act.rookie_limit;
-    if (category !== null) {
-      const c = curatedId != null ? await env.DB.prepare('SELECT eligibility_group g FROM curated_bungie_activities WHERE id = ?').bind(curatedId).first() : null;
-      requiresBungie = curatedId != null && (!c || c.g !== 'orla:0');
-      if (rookieLimit == null && requiresBungie && !env.BUNGIE_API_KEY) warning = 'A integração Bungie não está configurada; sua inscrição seguirá sem atualizar o histórico.';
-      if (curatedId != null && requiresBungie && env.BUNGIE_API_KEY) {
-        try { const counts = await syncPlayerActivities(env, u.id, curatedId); isRookie = skillForClears(Object.values(counts).reduce((s, n) => s + n, 0)) === 'rookie'; }
-        catch (e) { if (!(e instanceof BungieApiError)) throw e; if (rookieLimit == null) warning = 'A consulta Bungie falhou; sua inscrição foi mantida sem atualizar o histórico.'; }
-      }
-    }
-    let result;
-    if (category === null) result = await removeSignup(env.DB, activityId, String(u.id));
-    else result = await enroll(env.DB, activityId, String(u.id), category, { isRookie, rookieLimitApplicable: curatedId != null && requiresBungie });
-    if (category === null && result.activityDeleted) {
-      try { if (result.messageId) await deleteMessage(env, result.channelId, result.messageId); }
-      catch (e) { if (e instanceof DiscordError && e.status !== 404) return send('A grade foi excluída do banco, mas não consegui apagar a mensagem do Discord.'); }
-      return send(result.message);
-    }
-    try { await refreshMessage(env, activityId); }
-    catch (e) { console.error('editar mensagem', e?.message); return send('Sua inscrição foi processada, mas não consegui atualizar a mensagem da grade. Grades publicadas no layout anterior precisam ser recriadas para usar o embed.'); }
-    const text = category === null ? result.message : result;
-    if (category === null || text !== 'Inscrição atualizada como titular.') return send(warning ? `${text}\n${warning}` : text);
-    if (warning) return send(warning);
-  } catch (e) {
-    if (e instanceof SignupError) return send(e.message);
-    console.error('inscrição', e?.stack || e);
-    return send('Não foi possível atualizar a inscrição agora. Tente novamente.');
-  }
+  const text = await applySignup(env, String(u.id), activityId, category);
+  if (text) return followup(env, token, text);
 }
 
 async function buttonPress(env, ctx, i) {

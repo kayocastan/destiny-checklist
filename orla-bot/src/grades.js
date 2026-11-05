@@ -2,9 +2,9 @@
 import { maxPlayers, kindOf } from './search.js';
 import { ActivityInputError, parseActivityStart, validateActivityInput, validateActivityStart, skillForClears } from './rules.js';
 import { BungieApiError, syncPlayerActivities } from './bungie.js';
-import { getRoster } from './signups.js';
+import { getRoster, enroll, removeSignup, SignupError } from './signups.js';
 import { renderActivity, BUTTONS } from './embed.js';
-import { postMessage, editMessage } from './discord.js';
+import { postMessage, editMessage, deleteMessage, DiscordError } from './discord.js';
 
 export const CATALOG_PREFIX = 'curated:';
 
@@ -61,5 +61,42 @@ export async function createGrade(env, a) {
   } catch (e) {
     console.error('publicar grade', e.message);
     return { activityId, name, warning, published: false };
+  }
+}
+
+/* Entrar (titular), reserva ou sair (category null) — mesmo fluxo para os botões do Discord e para o /grade do DPI.
+   Devolve o texto para quem clicou (ou null quando não há o que avisar). */
+export async function applySignup(env, userId, activityId, category) {
+  try {
+    const act = await env.DB.prepare('SELECT * FROM activities WHERE id = ?').bind(activityId).first();
+    if (!act) return 'Essa atividade não está mais disponível.';
+    let warning = '', isRookie = null, requiresBungie = false;
+    const curatedId = act.curated_bungie_activity_id, rookieLimit = act.rookie_limit;
+    if (category !== null) {
+      const c = curatedId != null ? await env.DB.prepare('SELECT eligibility_group g FROM curated_bungie_activities WHERE id = ?').bind(curatedId).first() : null;
+      requiresBungie = curatedId != null && (!c || c.g !== 'orla:0');
+      if (rookieLimit == null && requiresBungie && !env.BUNGIE_API_KEY) warning = 'A integração Bungie não está configurada; sua inscrição seguirá sem atualizar o histórico.';
+      if (curatedId != null && requiresBungie && env.BUNGIE_API_KEY) {
+        try { const counts = await syncPlayerActivities(env, userId, curatedId); isRookie = skillForClears(Object.values(counts).reduce((s, n) => s + n, 0)) === 'rookie'; }
+        catch (e) { if (!(e instanceof BungieApiError)) throw e; if (rookieLimit == null) warning = 'A consulta Bungie falhou; sua inscrição foi mantida sem atualizar o histórico.'; }
+      }
+    }
+    let result;
+    if (category === null) result = await removeSignup(env.DB, activityId, userId);
+    else result = await enroll(env.DB, activityId, userId, category, { isRookie, rookieLimitApplicable: curatedId != null && requiresBungie });
+    if (category === null && result.activityDeleted) {
+      try { if (result.messageId) await deleteMessage(env, result.channelId, result.messageId); }
+      catch (e) { if (e instanceof DiscordError && e.status !== 404) return 'A grade foi excluída do banco, mas não consegui apagar a mensagem do Discord.'; }
+      return result.message;
+    }
+    try { await refreshMessage(env, activityId); }
+    catch (e) { console.error('editar mensagem', e?.message); return 'Sua inscrição foi processada, mas não consegui atualizar a mensagem da grade. Grades publicadas no layout anterior precisam ser recriadas para usar o embed.'; }
+    const text = category === null ? result.message : result;
+    if (category === null || text !== 'Inscrição atualizada como titular.') return warning ? `${text}\n${warning}` : text;
+    return warning || null;
+  } catch (e) {
+    if (e instanceof SignupError) return e.message;
+    console.error('inscrição', e?.stack || e);
+    return 'Não foi possível atualizar a inscrição agora. Tente novamente.';
   }
 }

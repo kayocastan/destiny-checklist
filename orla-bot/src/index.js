@@ -7,7 +7,7 @@ import { handleInteraction } from './interactions.js';
 import { verifySignature, oauthUser, deleteMessage, DiscordError } from './discord.js';
 import { BungieApiError, currentUser, upsertUser, userGroups } from './bungie.js';
 import { ActivityInputError } from './rules.js';
-import { createGrade, CATALOG_PREFIX } from './grades.js';
+import { createGrade, CATALOG_PREFIX, applySignup } from './grades.js';
 import { catalog, searchActivities, matchActivity, maxPlayers } from './search.js';
 
 const ORIGINS = ['https://destinyparallel.vercel.app', 'https://destiny-checklist.vercel.app'];
@@ -125,12 +125,22 @@ async function api(req, env, url) {
     return json(req, { url: u.toString() });
   }
   if (path === '/grades' && req.method === 'GET') { // grades marcadas (abertas), para a ilha "Agenda" do /grade
+    const mine = await registered(env, me.ids);
     const acts = (await env.DB.prepare(`SELECT id, name, capacity cap, rookie_limit rk, starts_at s, created_by_discord_id d, discord_channel_id c, discord_message_id m FROM activities ORDER BY replace(starts_at, ' ', 'T'), id LIMIT 50`).all()).results;
     const ids = acts.map(a => a.id);
-    const ps = ids.length ? (await env.DB.prepare(`SELECT p.activity_id a, p.category c, p.is_rookie r, coalesce(u.bungie_name, u.discord_member_name, '?') n FROM activity_participants p LEFT JOIN users u ON u.discord_user_id = p.discord_user_id WHERE p.activity_id IN (${ids.map(() => '?').join(',')}) ORDER BY p.category, p.created_at, p.id`).bind(...ids).all()).results : [];
+    const ps = ids.length ? (await env.DB.prepare(`SELECT p.activity_id a, p.discord_user_id d, p.category c, p.is_rookie r, coalesce(u.bungie_name, u.discord_member_name, '?') n FROM activity_participants p LEFT JOIN users u ON u.discord_user_id = p.discord_user_id WHERE p.activity_id IN (${ids.map(() => '?').join(',')}) ORDER BY p.category, p.created_at, p.id`).bind(...ids).all()).results : [];
     const by = await env.DB.prepare(`SELECT discord_user_id d, coalesce(bungie_name, discord_member_name) n FROM users WHERE discord_user_id IN (${acts.map(() => '?').join(',') || "''"})`).bind(...acts.map(a => a.d)).all().then(r => Object.fromEntries(r.results.map(x => [x.d, x.n])));
     return json(req, { guild: env.DISCORD_GUILD_ID || null, grades: acts.map(a => ({ id: a.id, name: a.name, cap: a.cap, rk: a.rk, s: a.s, by: by[a.d] || null, url: a.c && a.m && env.DISCORD_GUILD_ID ? `https://discord.com/channels/${env.DISCORD_GUILD_ID}/${a.c}/${a.m}` : null,
+      mine: mine ? (ps.find(p => p.a === a.id && p.d === mine.discord_user_id)?.c || null) : null, creator: !!mine && a.d === mine.discord_user_id,
       p: ps.filter(p => p.a === a.id).map(p => ({ n: String(p.n).replace(/#\d+$/, ''), c: p.c, r: p.r ? 1 : 0 })) })) });
+  }
+  const sg = path.match(/^\/grades\/(\d+)\/(join|leave|reserve)$/);
+  if (sg && req.method === 'POST') { // botões Entrar / Sair / Reserva do /grade (mesmo fluxo dos botões do Discord)
+    const row = await registered(env, me.ids);
+    if (!row) return json(req, { error: 'not_registered' }, 409);
+    const text = await applySignup(env, String(row.discord_user_id), Number(sg[1]), sg[2] === 'join' ? 'titular' : sg[2] === 'reserve' ? 'reserva' : null);
+    const names = {}; for (const id of new Set([...(text || '').matchAll(/<@(\d+)>/g)].map(m => m[1]))) { const u = await env.DB.prepare('SELECT bungie_name n FROM users WHERE discord_user_id = ?').bind(id).first(); names[id] = String(u?.n || 'alguém').replace(/#\d+$/, ''); }
+    return json(req, { ok: true, message: (text || 'Inscrição atualizada como titular.').replace(/<@(\d+)>/g, (_, id) => names[id]) });
   }
   if (path === '/grades' && req.method === 'POST') {
     const b = await req.json().catch(() => null);
