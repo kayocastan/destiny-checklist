@@ -8,7 +8,7 @@ import { verifySignature, oauthUser, deleteMessage, DiscordError } from './disco
 import { BungieApiError, currentUser, upsertUser, userGroups } from './bungie.js';
 import { ActivityInputError } from './rules.js';
 import { createGrade, CATALOG_PREFIX } from './grades.js';
-import { catalog, searchActivities, matchActivity } from './search.js';
+import { catalog, searchActivities, matchActivity, maxPlayers } from './search.js';
 
 const ORIGINS = ['https://destinyparallel.vercel.app', 'https://destiny-checklist.vercel.app'];
 const cors = req => {
@@ -104,7 +104,7 @@ async function api(req, env, url) {
   catch (e) { if (e instanceof BungieApiError) return json(req, { error: 'clan' }, 403); throw e; }
   if (path === '/activities' && req.method === 'GET') {
     const rows = searchActivities(await catalog(env.DB), (url.searchParams.get('q') || '').slice(0, 80));
-    return json(req, { activities: rows.map(({ id, name, type }) => ({ id, name, type })) });
+    return json(req, { activities: rows.map(a => ({ id: a.id, name: a.name, type: a.type, max: maxPlayers(a) })) });
   }
 
   if (path === '/clan/panel' && req.method === 'GET') {

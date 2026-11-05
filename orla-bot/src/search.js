@@ -83,3 +83,7 @@ export async function catalog(db) {
   CAT = { list, exp: Date.now() + 600_000 };
   return list;
 }
+
+// limite de jogadores por tipo (grupo "raid:…" / "dungeon:…"): incursão 6, masmorra 3
+export const kindOf = a => String(a?.eligibility_group || '').split(':')[0].toLowerCase();
+export const maxPlayers = a => ({ raid: 6, dungeon: 3 })[kindOf(a)] || null;
