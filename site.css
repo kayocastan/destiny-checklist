@@ -2110,3 +2110,22 @@ html.grade:not(.grade-ok) .wrap{visibility:hidden}
 .ob-day:hover{border-color:var(--acc)}.ob-day[aria-pressed="true"]{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 16%,var(--chip))}.ob-day[aria-pressed="true"] small{color:var(--acc)}
 .ob-tm{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.ob-tm select.search{width:88px;height:42px;flex:none;font:600 16px var(--mono);cursor:pointer}.ob-tm>b{font:600 18px var(--mono);color:var(--muted)}
 .gradebtn.on{background:#5865f2;color:#fff}
+/* /grade: data recolhida, agenda do clã e letra maior */
+.ob-days:not(.open){overflow:visible}
+.ob-more{flex:none;align-self:stretch;padding:0 14px;border-radius:10px;border:1px dashed var(--line);background:none;color:var(--muted);font:600 14px var(--sans,inherit);cursor:pointer}.ob-more:hover{border-color:var(--acc);color:var(--fg)}
+.ob-ag{display:grid;gap:10px}.ob-agd{margin:6px 0 0;font:500 12.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc)}
+.ob-gc{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:14px;align-items:start;padding:12px 14px;border-radius:12px;background:var(--chip)}
+.ob-gt{font:600 18px var(--mono);padding-top:1px}.ob-gb{display:grid;gap:4px;min-width:0}.ob-gb>b{font-size:17px}
+.ob-gr{display:grid;gap:6px;justify-items:end}.ob-gr .m{font:600 16px var(--mono)}.ob-gr .full{color:#7fe08f}.ob-gr small{font-size:12px;color:#7fe08f}
+.ob-gc .dp-chip.rk::after{content:' 👶'}
+@media (max-width:560px){.ob-gc{grid-template-columns:52px minmax(0,1fr)}.ob-gr{grid-column:1/-1;grid-auto-flow:column;justify-content:start;align-items:center}}
+html.grade .ob-p{font-size:16px}
+html.grade .ob-p h2{font-size:24px}
+html.grade .ob-p .lbd-n,html.grade .ob-p .ob-st{font-size:14.5px}
+html.grade .ob-p .ob-l>span,html.grade .ob-start h3{font-size:12.5px}
+html.grade .ob-p .ob-l .search,html.grade .ob-f textarea.search{font-size:17px}html.grade .ob-p .ob-l .search{height:46px}
+html.grade .ob-day{min-width:72px;padding:9px 12px}html.grade .ob-day b{font-size:15px}html.grade .ob-day small{font-size:12.5px}
+html.grade .ob-tm select.search{width:96px;height:46px;font-size:18px}
+html.grade .ob-p .lb-run{font-size:16px;padding:12px 20px}html.grade .ob-p .lbd-btn{font-size:14px}
+html.grade .ob-p .dp-chip{font-size:14px}
+html.grade .ob-opt{font-size:16px}

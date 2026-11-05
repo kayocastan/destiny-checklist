@@ -154,6 +154,14 @@ describe('API do DPI', () => {
     expect((await env.DB.prepare('SELECT name FROM activities').all()).results.map(r => r.name)).toEqual(['Nova']);
     expect((await env.DB.prepare('SELECT name FROM grade_hist').all()).results.map(r => r.name)).toEqual(['Velha']);
   });
+  it('GET /grades lista a agenda com os inscritos', async () => {
+    await link('10');
+    const id = (await env.DB.prepare(`INSERT INTO activities (name, capacity, starts_at, description, created_by_discord_id, created_at, discord_channel_id, discord_message_id) VALUES ('Crota', 6, ?, '', '10', 'x', 'c1', 'm1')`).bind(new Date(Date.now() + 36e5).toISOString()).run()).meta.last_row_id;
+    await env.DB.prepare(`INSERT INTO activity_participants (activity_id, discord_user_id, category, is_rookie, created_at) VALUES (?, '10', 'titular', 1, 'x')`).bind(id).run();
+    env.DISCORD_GUILD_ID = 'g1';
+    const j = await (await api('/grades')).json();
+    expect(j.grades).toEqual([expect.objectContaining({ name: 'Crota', cap: 6, by: 'Guardian#0042', url: 'https://discord.com/channels/g1/c1/m1', p: [{ n: 'Guardian', c: 'titular', r: 1 }] })]);
+  });
   it('/clan/panel: só admin; soma grades guardadas e abertas por pessoa', async () => {
     expect((await api('/clan/panel')).status).toBe(403); // membro comum (sem memberType)
     env.OWNER = '55'; // dono do DPI (conta Bungie.net do teste) vê mesmo sem ser admin

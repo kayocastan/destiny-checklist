@@ -2873,14 +2873,14 @@ const OBT = {
   pt: { t: 'Grades do clã', sub: 'Monte grades de atividade do clã aqui no site: o Orla Bot publica a grade no #lfg-destiny do Discord, igualzinha à criada pelo comando /orla grade.', login: 'Entre com sua conta Bungie para usar o Orla Bot.', loading: 'Carregando…', down: 'O Orla Bot não respondeu agora. Tente de novo em instantes.',
     linked: n => `Vinculado ao Discord: ${n || 'conta confirmada'}`, notLinked: 'Seu usuário do DPI ainda não está ligado a um usuário do Discord.', register: 'Registrar', relink: 'Trocar usuário do Discord',
     regT: 'Registrar no Orla Bot', regN: 'Informe seu usuário do Discord (o nome de usuário, sem o @). Você vai confirmar entrando no Discord, e então seu usuário do DPI fica ligado a ele no Orla Bot.', tag: 'Usuário do Discord', regGo: 'Continuar com o Discord', cancel: 'Cancelar', eTag: 'Informe seu usuário do Discord.',
-    create: 'Criar grade', act: 'Atividade', actPh: 'Escolha uma sugestão ou digite um título livre', cap: 'Titulares', rk: 'Novatos', start: 'Início', day: 'Dia', hour: 'Horário', today: 'Hoje', tomorrow: 'Amanhã', tz: 'no seu horário', desc: 'Descrição', descPh: 'Informações adicionais (opcional)', send: 'Criar grade', sending: 'Criando…', where: 'A grade é publicada no canal #lfg-destiny.',
+    create: 'Criar grade', act: 'Atividade', actPh: 'Escolha uma sugestão ou digite um título livre', cap: 'Titulares', rk: 'Novatos', start: 'Início', day: 'Dia', hour: 'Horário', today: 'Hoje', tomorrow: 'Amanhã', tz: 'no seu horário', moreDays: 'Outra data', agT: 'Agenda do clã', agN: 'Grades já marcadas. Vários grupos podem marcar no mesmo horário.', agNone: 'Nenhuma grade marcada agora.', agOpen: 'Ver no Discord', agRes: n => `${n} na reserva`, agBy: n => `por ${n}`, agFull: 'completa', desc: 'Descrição', descPh: 'Informações adicionais (opcional)', send: 'Criar grade', sending: 'Criando…', where: 'A grade é publicada no canal #lfg-destiny.',
     eAct: 'Informe a atividade.', eCap: 'Titulares deve ser um número de 1 a 12.', eRk: 'Novatos deve ser de 0 até o número de integrantes.', eStart: 'Escolha uma data e hora futuras.', eReg: 'Registre seu Discord antes de criar uma grade.', eGen: 'Não consegui criar a grade agora. Tente novamente.',
     done: 'Grade publicada no #lfg-destiny.', doneNoMsg: 'A grade foi salva, mas não consegui publicar a mensagem no Discord. Avise um administrador.',
     res: { ok: 'Discord vinculado com sucesso.', mismatch: 'O usuário do Discord em que você entrou não é o que foi informado. Tente de novo.', cancel: 'Vínculo cancelado.', expired: 'O pedido expirou. Tente registrar de novo.', fail: 'Não consegui concluir o vínculo com o Discord.' } },
   en: { t: 'Clan rosters', sub: 'Build clan activity rosters here on the site: Orla Bot posts the roster on Discord in #lfg-destiny, just like one made with /orla grade.', login: 'Sign in with your Bungie account to use Orla Bot.', loading: 'Loading…', down: 'Orla Bot did not respond. Try again shortly.',
     linked: n => `Linked to Discord: ${n || 'account confirmed'}`, notLinked: 'Your DPI user is not linked to a Discord user yet.', register: 'Register', relink: 'Change Discord user',
     regT: 'Register with Orla Bot', regN: 'Enter your Discord username (without the @). You will confirm by signing in to Discord, and then your DPI user is linked to it in Orla Bot.', tag: 'Discord username', regGo: 'Continue with Discord', cancel: 'Cancel', eTag: 'Enter your Discord username.',
-    create: 'Create roster', act: 'Activity', actPh: 'Pick a suggestion or type a custom title', cap: 'Members', rk: 'Rookies', start: 'Start', day: 'Day', hour: 'Time', today: 'Today', tomorrow: 'Tomorrow', tz: 'your local time', desc: 'Description', descPh: 'Extra information (optional)', send: 'Create roster', sending: 'Creating…', where: 'The roster is posted in the #lfg-destiny channel.',
+    create: 'Create roster', act: 'Activity', actPh: 'Pick a suggestion or type a custom title', cap: 'Members', rk: 'Rookies', start: 'Start', day: 'Day', hour: 'Time', today: 'Today', tomorrow: 'Tomorrow', tz: 'your local time', moreDays: 'Other date', agT: 'Clan schedule', agN: 'Rosters already scheduled. Several groups can book the same time.', agNone: 'No rosters scheduled right now.', agOpen: 'Open in Discord', agRes: n => `${n} in reserve`, agBy: n => `by ${n}`, agFull: 'full', desc: 'Description', descPh: 'Extra information (optional)', send: 'Create roster', sending: 'Creating…', where: 'The roster is posted in the #lfg-destiny channel.',
     eAct: 'Enter the activity.', eCap: 'Members must be a number from 1 to 12.', eRk: 'Rookies must be from 0 up to the number of members.', eStart: 'Pick a future date and time.', eReg: 'Register your Discord before creating a roster.', eGen: 'Could not create the roster right now. Try again.',
     done: 'Roster posted in #lfg-destiny.', doneNoMsg: 'The roster was saved, but the Discord message could not be posted. Tell an admin.',
     res: { ok: 'Discord linked successfully.', mismatch: 'The Discord user you signed in with is not the one you entered. Try again.', cancel: 'Linking cancelled.', expired: 'The request expired. Try registering again.', fail: 'Could not finish linking with Discord.' } } };
@@ -2889,15 +2889,15 @@ let ORLA = null;
 const OB = { me: undefined, deny: false, loading: false, f: null, msg: null, busy: false, res: null, sug: [], t: 0 };
 const obNow = () => { const d = new Date(); d.setSeconds(0, 0); return new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 16); };
 const obLoc = d => new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
-const obNext = () => { const d = new Date(Date.now() + 15 * 6e4); d.setMinutes(Math.ceil(d.getMinutes() / 15) * 15, 0, 0); return obLoc(d); }; // próximo quarto de hora (com folga)
+const obNext = () => { const d = new Date(Date.now() + 10 * 6e4); d.setMinutes(Math.ceil(d.getMinutes() / 10) * 10, 0, 0); return obLoc(d); }; // próximos 10 min cheios (com folga)
 function obWhenHTML(f, T) { // dia em botões + hora/minuto em listas, no visual do site (sem o calendário do navegador)
   const day = f.start.slice(0, 10), hh = +f.start.slice(11, 13), mm = +f.start.slice(14, 16), loc = lang === 'en' ? 'en-US' : 'pt-BR', now = obNow(), p = n => String(n).padStart(2, '0');
-  const days = Array.from({ length: 14 }, (_, i) => { const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + i); return d; });
+  const days = Array.from({ length: 16 }, (_, i) => { const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + i); return d; }); // hoje + 15 dias
   const chip = (d, i) => { const k = obLoc(d).slice(0, 10), wd = d.toLocaleDateString(loc, { weekday: 'short' }).replace('.', ''), dm = d.toLocaleDateString(loc, { day: '2-digit', month: '2-digit' });
     return `<button type="button" class="ob-day" data-obday="${k}" aria-pressed="${k === day}"><b>${esc(i === 0 ? T.today : i === 1 ? T.tomorrow : wd)}</b><small>${esc(dm)}</small></button>`; };
   const hours = Array.from({ length: 24 }, (_, h) => `<option value="${h}"${h === hh ? ' selected' : ''}${`${day}T${p(h)}:59` < now ? ' disabled' : ''}>${p(h)}h</option>`).join('');
-  const mins = [0, 15, 30, 45].map(m => `<option value="${m}"${m === mm ? ' selected' : ''}${`${day}T${p(hh)}:${p(m)}` < now ? ' disabled' : ''}>${p(m)}</option>`).join('');
-  return `<div class="ob-l ob-when"><span>${esc(T.day)}</span><div class="ob-days" role="group" aria-label="${esc(T.day)}">${days.map(chip).join('')}</div></div>
+  const mins = [0, 10, 20, 30, 40, 50].map(m => `<option value="${m}"${m === mm ? ' selected' : ''}${`${day}T${p(hh)}:${p(m)}` < now ? ' disabled' : ''}>${p(m)}</option>`).join('');
+  return `<div class="ob-l ob-when"><span>${esc(T.day)}</span><div class="ob-days${OB.dayOpen ? ' open' : ''}" role="group" aria-label="${esc(T.day)}">${OB.dayOpen ? days.map(chip).join('') : (() => { const i = Math.max(0, days.findIndex(d => obLoc(d).slice(0, 10) === day)); return chip(days[i], i).replace('data-obday=', 'data-obdayopen data-x=') + `<button type="button" class="ob-more" data-obdayopen>${esc(T.moreDays)} ▾</button>`; })()}</div></div>
     <div class="ob-l ob-time"><span>${esc(T.hour)}</span><div class="ob-tm"><select id="obh" class="search" aria-label="${esc(T.hour)}">${hours}</select><b>:</b><select id="obm" class="search" aria-label="min">${mins}</select><small class="lbd-n">${esc(T.tz)}</small></div></div>`;
 }
 const obSet = (day, h, m) => { const p = n => String(n).padStart(2, '0'), v = `${day}T${p(h)}:${p(m)}`; OB.f.start = v < obNow() ? obNext() : v; }; // só hoje pode cair no passado
@@ -2937,7 +2937,18 @@ function orlaHTML() {
       </div>
       <div class="ob-start"><h3>${esc(T.start)}</h3>${obWhenHTML(f, T)}</div>
       <label class="ob-l"><span>${esc(T.desc)}</span><textarea id="obdesc" class="search" rows="3" maxlength="250" placeholder="${esc(T.descPh)}">${esc(f.desc)}</textarea></label>
-      <div class="ob-act"><button type="button" class="lb-run" data-obsend${OB.busy ? ' disabled' : ''}>${esc(OB.busy ? T.sending : T.send)}</button><small class="lbd-n">${esc(T.where)}</small></div></section>`;
+      <div class="ob-act"><button type="button" class="lb-run" data-obsend${OB.busy ? ' disabled' : ''}>${esc(OB.busy ? T.sending : T.send)}</button><small class="lbd-n">${esc(T.where)}</small></div></section>${obAgHTML(T)}`;
+}
+async function obAgLoad(force) { if (OB.agBusy || (!force && OB.ag !== undefined)) return; OB.agBusy = true; try { OB.ag = (await obApi('/grades')).grades || []; } catch { OB.ag = OB.ag || null; } OB.agBusy = false; if (GRADE) render(); }
+function obAgHTML(T) { // ilha "Agenda do clã": grades marcadas, por dia
+  if (OB.ag === undefined) { setTimeout(obAgLoad); return `<section class="ad-s ad-wide ob-ag"><h2>${esc(T.agT)}</h2><p class="wait">${esc(T.loading)}</p></section>`; }
+  const loc = lang === 'en' ? 'en-US' : 'pt-BR', D = s => new Date(String(s).replace(' ', 'T')), today = obLoc(new Date()).slice(0, 10), tmw = obLoc(new Date(Date.now() + 864e5)).slice(0, 10);
+  const dayLbl = d => { const k = obLoc(d).slice(0, 10); return k === today ? T.today : k === tmw ? T.tomorrow : d.toLocaleDateString(loc, { weekday: 'long', day: '2-digit', month: '2-digit' }); };
+  const groups = []; for (const g of OB.ag || []) { const d = D(g.s), k = obLoc(d).slice(0, 10); let x = groups.find(y => y.k === k); if (!x) groups.push(x = { k, l: dayLbl(d), list: [] }); x.list.push(g); }
+  const card = g => { const tit = g.p.filter(p => p.c === 'titular'), res = g.p.length - tit.length, t = D(g.s).toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' });
+    return `<div class="ob-gc"><span class="ob-gt">${esc(t)}</span><div class="ob-gb"><b>${esc(g.name)}</b><small class="lbd-n">${g.by ? esc(T.agBy(String(g.by).replace(/#\d+$/, ''))) : ''}</small><div class="dp-chips">${tit.map(p => `<span class="dp-chip${p.r ? ' rk' : ''}">${esc(p.n)}</span>`).join('')}${res ? `<small class="lbd-n">${esc(T.agRes(res))}</small>` : ''}</div></div>
+      <div class="ob-gr"><b class="m${tit.length >= g.cap ? ' full' : ''}">${tit.length}/${g.cap}</b>${tit.length >= g.cap ? `<small>${esc(T.agFull)}</small>` : ''}${g.url ? `<a class="lbd-btn" href="${esc(g.url)}" target="_blank" rel="noopener">${esc(T.agOpen)}</a>` : ''}</div></div>`; };
+  return `<section class="ad-s ad-wide ob-ag"><h2>${esc(T.agT)}</h2><small class="lbd-n">${esc(T.agN)}</small>${OB.ag === null ? `<p class="iv-msg bad">${esc(T.down)}</p>` : groups.length ? groups.map(x => `<h3 class="ob-agd">${esc(x.l)}</h3>${x.list.map(card).join('')}`).join('') : `<p class="lbd-n">${esc(T.agNone)}</p>`}</section>`;
 }
 function obRegDlg() {
   const T = obt(); let d = $('obdlg'); if (!d) { d = document.createElement('dialog'); d.id = 'obdlg'; d.className = 'fd'; document.body.appendChild(d); }
@@ -2959,7 +2970,7 @@ async function obSend() {
   OB.busy = true; OB.msg = null; render();
   try {
     const r = await obApi('/grades', { method: 'POST', body: JSON.stringify({ atividade: f.act.trim(), curatedId: f.cur, integrantes: cap, novatos: rk, inicio: new Date(f.start).toISOString(), descricao: f.desc.trim() }) });
-    OB.msg = { t: (r.published ? T.done : T.doneNoMsg) + (r.warning ? ' ' + r.warning : ''), bad: !r.published }; OB.f = null;
+    OB.msg = { t: (r.published ? T.done : T.doneNoMsg) + (r.warning ? ' ' + r.warning : ''), bad: !r.published }; OB.f = null; obAgLoad(true);
   } catch (e) { OB.msg = { bad: true, t: e.message === 'not_registered' ? T.eReg : e.status === 400 ? e.message : T.eGen }; }
   OB.busy = false; render();
 }
@@ -2976,7 +2987,8 @@ document.addEventListener('click', e => {
   if (e.target.closest('[data-obx]')) { $('obdlg')?.close(); return; }
   if (e.target.closest('[data-obgo]')) { obGo(); return; }
   if (e.target.closest('[data-obsend]')) { obSend(); return; }
-  const dy = e.target.closest('[data-obday]'); if (dy && OB.f) { obSet(dy.dataset.obday, +OB.f.start.slice(11, 13), +OB.f.start.slice(14, 16)); render(); return; }
+  if (e.target.closest('[data-obdayopen]')) { OB.dayOpen = true; render(); return; }
+  const dy = e.target.closest('[data-obday]'); if (dy && OB.f) { obSet(dy.dataset.obday, +OB.f.start.slice(11, 13), +OB.f.start.slice(14, 16)); OB.dayOpen = false; render(); return; }
   const p = e.target.closest('[data-obpick]'); if (p && OB.f) { const a = OB.sug.find(x => String(x.id) === p.dataset.obpick); if (a) { OB.f.act = a.name; OB.f.cur = a.id; $('obact').value = a.name; } $('obsug').hidden = true; $('obact').setAttribute('aria-expanded', 'false'); return; }
   if (!e.target.closest('.ob-ac') && $('obsug')) $('obsug').hidden = true;
 });

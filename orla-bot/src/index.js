@@ -124,6 +124,14 @@ async function api(req, env, url) {
     u.search = new URLSearchParams({ client_id: env.DISCORD_APP_ID, response_type: 'code', scope: 'identify', redirect_uri: `${env.SELF_URL}/link/callback`, state, prompt: 'consent' }).toString();
     return json(req, { url: u.toString() });
   }
+  if (path === '/grades' && req.method === 'GET') { // grades marcadas (abertas), para a ilha "Agenda" do /grade
+    const acts = (await env.DB.prepare(`SELECT id, name, capacity cap, rookie_limit rk, starts_at s, created_by_discord_id d, discord_channel_id c, discord_message_id m FROM activities ORDER BY replace(starts_at, ' ', 'T'), id LIMIT 50`).all()).results;
+    const ids = acts.map(a => a.id);
+    const ps = ids.length ? (await env.DB.prepare(`SELECT p.activity_id a, p.category c, p.is_rookie r, coalesce(u.bungie_name, u.discord_member_name, '?') n FROM activity_participants p LEFT JOIN users u ON u.discord_user_id = p.discord_user_id WHERE p.activity_id IN (${ids.map(() => '?').join(',')}) ORDER BY p.category, p.created_at, p.id`).bind(...ids).all()).results : [];
+    const by = await env.DB.prepare(`SELECT discord_user_id d, coalesce(bungie_name, discord_member_name) n FROM users WHERE discord_user_id IN (${acts.map(() => '?').join(',') || "''"})`).bind(...acts.map(a => a.d)).all().then(r => Object.fromEntries(r.results.map(x => [x.d, x.n])));
+    return json(req, { guild: env.DISCORD_GUILD_ID || null, grades: acts.map(a => ({ id: a.id, name: a.name, cap: a.cap, rk: a.rk, s: a.s, by: by[a.d] || null, url: a.c && a.m && env.DISCORD_GUILD_ID ? `https://discord.com/channels/${env.DISCORD_GUILD_ID}/${a.c}/${a.m}` : null,
+      p: ps.filter(p => p.a === a.id).map(p => ({ n: String(p.n).replace(/#\d+$/, ''), c: p.c, r: p.r ? 1 : 0 })) })) });
+  }
   if (path === '/grades' && req.method === 'POST') {
     const b = await req.json().catch(() => null);
     if (!b) return json(req, { error: 'Dados inválidos.' }, 400);
