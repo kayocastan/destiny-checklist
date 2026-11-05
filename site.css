@@ -2139,3 +2139,11 @@ html.grade .ob-opt{font-size:16px}
 .ob-gc.ob-img::before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(10,14,20,.94) 0%,rgba(10,14,20,.82) 45%,rgba(10,14,20,.55) 100%),var(--ob-img) center/cover no-repeat}
 .ob-gc.ob-img .ob-gt,.ob-gc.ob-img .ob-gb>b{text-shadow:0 1px 3px rgba(0,0,0,.6)}
 .ob-guide{margin:2px 0 0;gap:6px}.ob-guide .chip{font-size:13px}
+/* /grade: calendário "Outra data" */
+.ob-more.on{border-style:solid;border-color:var(--acc);color:var(--fg)}
+.ob-cal{margin-top:8px;max-width:340px;padding:12px;border-radius:14px;border:1px solid var(--line);background:var(--surface,var(--bg));box-shadow:0 18px 40px -16px rgba(0,0,0,.6)}
+.ob-calh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}.ob-calh b{font-size:16px;text-transform:capitalize}.ob-calh .lbd-btn{min-width:36px;font-size:18px}
+.ob-calg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}.ob-calg small{font:600 12px var(--mono);color:var(--muted);text-transform:uppercase;padding:2px 0}
+.ob-calg button{height:38px;border-radius:9px;border:1px solid transparent;background:var(--chip);color:var(--fg);font:600 15px var(--mono);cursor:pointer}
+.ob-calg button:hover:not(:disabled){border-color:var(--acc)}.ob-calg button.td{border-color:var(--line)}.ob-calg button[aria-pressed="true"]{background:color-mix(in srgb,var(--acc) 30%,var(--chip));border-color:var(--acc)}.ob-calg button:disabled{opacity:.3;cursor:default}
+.ob-days.open{flex-wrap:wrap;overflow:visible}

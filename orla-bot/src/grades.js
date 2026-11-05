@@ -27,7 +27,7 @@ export async function createGrade(env, a) {
     curated = await db.prepare('SELECT * FROM curated_bungie_activities WHERE id = ?').bind(a.curatedId).first();
     if (!curated) throw new ActivityInputError('Essa opção não está mais no catálogo. Pesquise novamente e escolha outra.');
   }
-  const requiresBungie = !!curated && curated.eligibility_group !== 'orla:0';
+  const requiresBungie = !!curated && /^(raid|dungeon):/i.test(curated.eligibility_group); // histórico Bungie só de incursão/masmorra
   const startsAt = parseActivityStart(a.inicio, tz);
   validateActivityStart(startsAt);
   const name = validateActivityInput(a.atividade, a.integrantes, a.descricao ?? '', a.rookieLimit ?? null);
@@ -67,7 +67,7 @@ export async function applySignup(env, userId, activityId, category) {
     const curatedId = act.curated_bungie_activity_id, rookieLimit = act.rookie_limit;
     if (category !== null) {
       const c = curatedId != null ? await env.DB.prepare('SELECT eligibility_group g FROM curated_bungie_activities WHERE id = ?').bind(curatedId).first() : null;
-      requiresBungie = curatedId != null && (!c || c.g !== 'orla:0');
+      requiresBungie = curatedId != null && (!c || /^(raid|dungeon):/i.test(c.g));
       if (rookieLimit == null && requiresBungie && !env.BUNGIE_API_KEY) warning = 'A integração Bungie não está configurada; sua inscrição seguirá sem atualizar o histórico.';
       if (curatedId != null && requiresBungie && env.BUNGIE_API_KEY) {
         try { const counts = await syncPlayerActivities(env, userId, curatedId); isRookie = skillForClears(Object.values(counts).reduce((s, n) => s + n, 0)) === 'rookie'; }

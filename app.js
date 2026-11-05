@@ -2890,6 +2890,13 @@ const OB = { me: undefined, deny: false, loading: false, f: null, msg: null, bus
 const obNow = () => { const d = new Date(); d.setSeconds(0, 0); return new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 16); };
 const obLoc = d => new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
 const obNext = () => { const d = new Date(Date.now() + 10 * 6e4); d.setMinutes(Math.ceil(d.getMinutes() / 10) * 10, 0, 0); return obLoc(d); }; // próximos 10 min cheios (com folga)
+function obCalHTML(day, loc) { // calendário do mês no visual do site (até 6 meses à frente)
+  const { y, m } = OB.cal, first = new Date(y, m, 1, 12), today = obLoc(new Date()).slice(0, 10), max = obLoc(new Date(Date.now() + 180 * 864e5)).slice(0, 10), p = n => String(n).padStart(2, '0');
+  const n = new Date(y, m + 1, 0).getDate(), lead = first.getDay(), wd = Array.from({ length: 7 }, (_, i) => new Date(2026, 10, 1 + i, 12).toLocaleDateString(loc, { weekday: 'narrow' }));
+  const prev = `${y}-${p(m + 1)}-01` > today, next = obLoc(new Date(y, m + 1, 1, 12)).slice(0, 10) <= max;
+  return `<div class="ob-cal" role="dialog"><div class="ob-calh"><button type="button" class="lbd-btn" data-obcalm="-1"${prev ? '' : ' disabled'}>‹</button><b>${esc(first.toLocaleDateString(loc, { month: 'long', year: 'numeric' }))}</b><button type="button" class="lbd-btn" data-obcalm="1"${next ? '' : ' disabled'}>›</button></div>
+    <div class="ob-calg">${wd.map(w => `<small>${esc(w)}</small>`).join('')}${'<span></span>'.repeat(lead)}${Array.from({ length: n }, (_, i) => { const k = `${y}-${p(m + 1)}-${p(i + 1)}`, off = k < today || k > max; return `<button type="button" data-obday="${k}" aria-pressed="${k === day}"${k === today ? ' class="td"' : ''}${off ? ' disabled' : ''}>${i + 1}</button>`; }).join('')}</div></div>`;
+}
 function obWhenHTML(f, T) { // dia em botões + hora/minuto em listas, no visual do site (sem o calendário do navegador)
   const day = f.start.slice(0, 10), hh = +f.start.slice(11, 13), mm = +f.start.slice(14, 16), loc = lang === 'en' ? 'en-US' : 'pt-BR', now = obNow(), p = n => String(n).padStart(2, '0');
   const days = Array.from({ length: 16 }, (_, i) => { const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + i); return d; }); // hoje + 15 dias
@@ -2897,7 +2904,8 @@ function obWhenHTML(f, T) { // dia em botões + hora/minuto em listas, no visual
     return `<button type="button" class="ob-day" data-obday="${k}" aria-pressed="${k === day}"><b>${esc(i === 0 ? T.today : i === 1 ? T.tomorrow : wd)}</b><small>${esc(dm)}</small></button>`; };
   const hours = Array.from({ length: 24 }, (_, h) => `<option value="${h}"${h === hh ? ' selected' : ''}${`${day}T${p(h)}:59` < now ? ' disabled' : ''}>${p(h)}h</option>`).join('');
   const mins = [0, 10, 20, 30, 40, 50].map(m => `<option value="${m}"${m === mm ? ' selected' : ''}${`${day}T${p(hh)}:${p(m)}` < now ? ' disabled' : ''}>${p(m)}</option>`).join('');
-  return `<div class="ob-l ob-when"><span>${esc(T.day)}</span><div class="ob-days${OB.dayOpen ? ' open' : ''}" role="group" aria-label="${esc(T.day)}">${OB.dayOpen ? days.map(chip).join('') : (() => { const i = Math.max(0, days.findIndex(d => obLoc(d).slice(0, 10) === day)); return chip(days[i], i).replace('data-obday=', 'data-obdayopen data-x=') + `<button type="button" class="ob-more" data-obdayopen>${esc(T.moreDays)} ▾</button>`; })()}</div></div>
+  const inRow = days.some(d => obLoc(d).slice(0, 10) === day), extra = inRow ? '' : (() => { const d = new Date(day + 'T12:00'); return `<button type="button" class="ob-day" data-obday="${day}" aria-pressed="true"><b>${esc(d.toLocaleDateString(loc, { weekday: 'short' }).replace('.', ''))}</b><small>${esc(d.toLocaleDateString(loc, { day: '2-digit', month: '2-digit' }))}</small></button>`; })();
+  return `<div class="ob-l ob-when"><span>${esc(T.day)}</span><div class="ob-days open" role="group" aria-label="${esc(T.day)}">${days.map(chip).join('')}${extra}<button type="button" class="ob-more${OB.cal ? ' on' : ''}" data-obcal aria-expanded="${!!OB.cal}">📅 ${esc(T.moreDays)}</button></div>${OB.cal ? obCalHTML(day, loc) : ''}</div>
     <div class="ob-l ob-time"><span>${esc(T.hour)}</span><div class="ob-tm"><select id="obh" class="search" aria-label="${esc(T.hour)}">${hours}</select><b>:</b><select id="obm" class="search" aria-label="min">${mins}</select><small class="lbd-n">${esc(T.tz)}</small></div></div>`;
 }
 const obSet = (day, h, m) => { const p = n => String(n).padStart(2, '0'), v = `${day}T${p(h)}:${p(m)}`; OB.f.start = v < obNow() ? obNext() : v; }; // só hoje pode cair no passado
@@ -2951,7 +2959,10 @@ async function obSignup(id, act) { // Entrar / Reserva / Sair numa grade da agen
 const obSlug = x => String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/'/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^(the|o|a)-/, '').replace(/^-|-$/g, '');
 function obActOf(g) {
   const all = [...(defs?.raids || []).map(a => ['raid', a]), ...(defs?.dungeons || []).map(a => ['dg', a])], names = a => (Array.isArray(a.n) ? a.n : [a.n]).map(obSlug);
-  const slug = String(g.g || '').split(':')[1]; let hit = slug && all.find(([, a]) => names(a).includes(slug.replace(/^the-/, '')));
+  const [gk, slug] = String(g.g || '').split(':');
+  if (gk === 'xm') { const a = (defs?.xmissions || []).find(x => x.k === slug); if (a) return { kind: 'xm', a }; }
+  const xm = String(g.name).match(/^miss[aã]o ex[oó]tica:\s*(.+)$/i); if (xm) { const b = obSlug(xm[1]), a = (defs?.xmissions || []).find(x => (Array.isArray(x.n) ? x.n : [x.n]).map(obSlug).includes(b)); if (a) return { kind: 'xm', a }; }
+  let hit = slug && all.find(([, a]) => names(a).includes(slug.replace(/^the-/, '')));
   if (!hit) { const base = obSlug(String(g.name).split(':')[0]); hit = base && all.find(([, a]) => names(a).includes(base)); }
   return hit ? { kind: hit[0], a: hit[1] } : null;
 }
@@ -3005,8 +3016,9 @@ document.addEventListener('click', e => {
   if (e.target.closest('[data-obgo]')) { obGo(); return; }
   if (e.target.closest('[data-obsend]')) { obSend(); return; }
   const sg = e.target.closest('[data-obsg]'); if (sg) { obSignup(...sg.dataset.obsg.split(':')); return; }
-  if (e.target.closest('[data-obdayopen]')) { OB.dayOpen = true; render(); return; }
-  const dy = e.target.closest('[data-obday]'); if (dy && OB.f) { obSet(dy.dataset.obday, +OB.f.start.slice(11, 13), +OB.f.start.slice(14, 16)); OB.dayOpen = false; render(); return; }
+  if (e.target.closest('[data-obcal]')) { const d = new Date((OB.f?.start || obNext()).slice(0, 10) + 'T12:00'); OB.cal = OB.cal ? null : { y: d.getFullYear(), m: d.getMonth() }; render(); return; }
+  const cm = e.target.closest('[data-obcalm]'); if (cm && OB.cal) { const d = new Date(OB.cal.y, OB.cal.m + +cm.dataset.obcalm, 1); OB.cal = { y: d.getFullYear(), m: d.getMonth() }; render(); return; }
+  const dy = e.target.closest('[data-obday]'); if (dy && OB.f) { obSet(dy.dataset.obday, +OB.f.start.slice(11, 13), +OB.f.start.slice(14, 16)); OB.cal = null; render(); return; }
   const p = e.target.closest('[data-obpick]'); if (p && OB.f) { const a = OB.sug.find(x => String(x.id) === p.dataset.obpick); if (a) { OB.f.act = a.name; OB.f.cur = a.id; $('obact').value = a.name; } $('obsug').hidden = true; $('obact').setAttribute('aria-expanded', 'false'); return; }
   if (!e.target.closest('.ob-ac') && $('obsug')) $('obsug').hidden = true;
 });

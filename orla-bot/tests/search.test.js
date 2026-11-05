@@ -21,3 +21,12 @@ describe('busca do catálogo', async () => {
     expect(matchActivity(c, 'Sala de treino')).toBeNull();
   });
 });
+
+describe('missões exóticas no catálogo', async () => {
+  const c = await catalog(makeDb());
+  it('acha pelo nome em português, em inglês e liga o título digitado', () => {
+    expect(searchActivities(c, 'heliostato', 2)[0].name).toBe('Missão exótica: Heliostato');
+    expect(searchActivities(c, 'zero hour', 2)[0].name).toBe('Missão exótica: Hora Zero');
+    expect(matchActivity(c, 'hora zero')?.name).toBe('Missão exótica: Hora Zero');
+  });
+});

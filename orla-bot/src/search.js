@@ -9,8 +9,11 @@ const ALIAS = {
   'last-wish': 'lw ud', 'vow-of-the-disciple': 'vow vod jd', 'root-of-nightmares': 'ron rdp', 'crotas-end': 'ce fdc', 'salvations-edge': 'se',
   'desert-perpetual': 'dp', 'crown-of-sorrow': 'cos', 'grasp-of-avarice': 'goa', 'ghosts-of-the-deep': 'gotd', 'spire-of-the-watcher': 'sotw',
   'prophecy': 'profecia', 'pit-of-heresy': 'poh', 'shattered-throne': 'st', 'warlords-ruin': 'wr', 'vespers-host': 'vh',
+  // missões exóticas (grupo "xm:<chave>"): nome em inglês
+  avalon: 'avalon node ovrd', encore: 'encore', zero: 'zero hour', whisper: 'whisper', presage: 'presage', vox: 'vox obscura', seraph: 'operation seraphs shield seraph',
+  star: 'starcrossed', kell: 'kells fall', fire: 'fire ice', helio: 'heliostat', dereal: 'derealize', oblation: 'oblation bloodline', dual: 'dual destiny',
 };
-const DIFF = new Set(['normal', 'mestre', 'master', 'padrao', 'standard']);
+const DIFF = new Set(['normal', 'mestre', 'master', 'padrao', 'standard', 'missao', 'exotica', 'operacao']); // palavras que o título digitado pode omitir
 
 export const norm = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 export const words = s => norm(s).split(' ').filter(t => t && !STOP.has(t));

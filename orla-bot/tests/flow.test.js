@@ -21,7 +21,7 @@ beforeEach(() => { db = makeDb(); });
 describe('seed', () => {
   it('traz o catálogo curado', async () => {
     const n = await db.prepare('SELECT count(*) n FROM curated_bungie_activities').first();
-    expect(n.n).toBe(45);
+    expect(n.n).toBe(59);
   });
 });
 
