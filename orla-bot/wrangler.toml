@@ -1,0 +1,25 @@
+name = "orla-bot"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+workers_dev = true
+
+[vars]
+DISCORD_GUILD_ID = "1474588542410686716"
+LFG_CHANNEL_ID = "1474590008114679919"     # #lfg-destiny: todas as grades são publicadas aqui
+TIMEZONE = "America/Sao_Paulo"
+CLAN_ID = "5280120"                         # clã Orla Emaranhada: único com acesso à interface do site
+SITE_URL = "https://destinyparallel.vercel.app"
+HERO_URL = "https://destinyparallel.vercel.app/orla-bot/assets/orla-bot-hero.png"
+DISCORD_APP_ID = "__DISCORD_APP_ID__"      # igual ao client id do aplicativo (workflow troca)
+SELF_URL = "https://orla-bot.__SUB__.workers.dev"   # workflow troca __SUB__ pelo subdomínio workers.dev
+
+[triggers]
+crons = ["* * * * *"]   # limpeza de grades que começaram há mais de 1 h
+
+[[d1_databases]]
+binding = "DB"
+database_name = "orla"
+database_id = "__DB_ID__"
+migrations_dir = "migrations"
+
+# Segredos (wrangler secret put): DISCORD_TOKEN, DISCORD_PUBLIC_KEY, DISCORD_CLIENT_SECRET, BUNGIE_API_KEY

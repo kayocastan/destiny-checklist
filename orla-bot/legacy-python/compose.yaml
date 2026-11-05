@@ -1,0 +1,42 @@
+services:
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      DATABASE_URL: sqlite+aiosqlite:////data/orla.sqlite3
+    volumes:
+      - ./data:/data
+
+  seed:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["python", "-m", "orla_bot.persistence.seed"]
+    environment:
+      DATABASE_URL: sqlite+aiosqlite:////data/orla.sqlite3
+    volumes:
+      - ./data:/data
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+      - .env.secrets
+    environment:
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      TIMEZONE: ${TIMEZONE:-America/Sao_Paulo}
+      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID}
+      DATABASE_URL: sqlite+aiosqlite:////data/orla.sqlite3
+    volumes:
+      - ./data:/data
+    depends_on:
+      seed:
+        condition: service_completed_successfully
