@@ -169,6 +169,7 @@ if (GRADE) document.documentElement.classList.add('grade');
 const groupOf = t => GROUPS.find(g => g.subs.includes(parentOf(t)));
 // aba salva que não existe mais (ex.: Padrões, que foi retirada) volta para Objetivos
 if (!groupOf(tab)) { tab = 'obj'; LS.set('dc-tab', 'obj'); }
+if (GRADE) tab = 'gclo'; // /grade abre direto no Clã › Orla Bot, com o cabeçalho e o rodapé do DPI
 for (const [k, v] of Object.entries(lastSub)) if (groupOf(v)?.id !== k) delete lastSub[k];
 
 /* ---------- status ---------- */
@@ -1394,7 +1395,7 @@ function applyUI() {
 }
 function render() {
   applyUI();
-  if (GRADE) { gradeRender(); return; }
+  if (GRADE && !(auth && profile)) { gradeRender(); return; }
   const logged = !!(auth && profile);
   for (const id of ['tabs', 'overall', 'chars', 'refresh', 'logout']) $(id).hidden = !logged; $('ldbtn').hidden = true; document.body.classList.toggle('logged', logged);
   renderWeek(); renderBuild(); renderLive();
@@ -1424,17 +1425,18 @@ function render() {
   $('chars').hidden = false;
   $('tabs').innerHTML = GROUPS.map(g => `<button class="tab" type="button" data-group="${g.id}" aria-current="${groupOf(tab)?.id === g.id}">${esc(U.tabs[g.id])}</button>`).join('');
   botNav();
-  GROUPS[4].subs = [...(clanAdminOK() ? ['gcl', 'gclb', 'gclg', 'gcla', 'gcld'] : ['gcl', 'gclb', 'gclg']), ...(orlaOK() ? ['gclo'] : [])]; if ((tab === 'gcla' || tab === 'gcld') && !clanAdminOK() && GD?.clan) { tab = 'gcl'; }
+  GROUPS[4].subs = [...(clanAdminOK() ? ['gcl', 'gclb', 'gclg', 'gcla', 'gcld'] : ['gcl', 'gclb', 'gclg']), ...(orlaOK() || GRADE ? ['gclo'] : [])]; if ((tab === 'gcla' || tab === 'gcld') && !clanAdminOK() && GD?.clan) { tab = 'gcl'; }
   const g = groupOf(tab), st = $('subtabs'), pa = parentOf(tab), kids = KIDS[pa];
   if (g && (g.subs.length > 1 || kids)) { st.hidden = false; st.innerHTML = `${g.subs.length > 1 ? `<div class="subs-row">${g.subs.map(id => `<button class="sub" type="button" data-sub="${id}" aria-pressed="${id === pa}">${esc(U.subs[id])}</button>`).join('')}</div>` : ''}${kids ? `<div class="kids-row" role="group" aria-label="${esc(U.subs[pa])}"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 5h14M6 10h8M8.5 15h3"/></svg>${kids.map(k => `<button type="button" class="kid" data-kid="${k}" aria-pressed="${k === tab}">${esc(U.subs[k])}</button>`).join('')}</div>` : ''}`; }
   else { st.hidden = true; st.innerHTML = ''; }
   $('ldbtn').setAttribute('aria-pressed', tab === 'ld'); $('ldbtn').textContent = tab === 'ld' ? U.checklist : U.loadouts;
   document.body.classList.toggle('on-ld', tab === 'ld'); document.body.classList.toggle('no-clears', !OPTS.clears);
-  $('overall').hidden = isGd() || tab === 'vend' || tab === 'tri' || tab === 'inv' || tab === 'vlt' || tab === 'colx';
+  $('overall').hidden = isGd() || tab === 'gclo' || tab === 'vend' || tab === 'tri' || tab === 'inv' || tab === 'vlt' || tab === 'colx';
   if (tab === 'tri') { $('list').innerHTML = triHTML(); return; }
   if (tab === 'colx') { $('list').innerHTML = colHTML(); return; }
   if (tab === 'inv' || tab === 'vlt') { const y = scrollY; $('list').innerHTML = tab === 'inv' ? invHTML() : vltHTML(); if (Math.abs(scrollY - y) > 2) scrollTo(0, y); return; }
   if (tab === 'vend' && !VEND && have.a && member) loadVendors(gen);
+  if (tab === 'gclo') { gradeRender(); if (!GD && have.a) loadGuardian(gen); return; }
   if (isGd()) { $('list').innerHTML = gdHTML(); if (!GD && have.a) loadGuardian(gen); if (!VAULT && have.c) loadVault(gen); return; }
   if (tab === 'ld') {
     showMessage(!have.c ? `<p class="empty-msg wait" role="status">${esc(U.loadingDefs)}</p>` : LOADOUTS.length ? ldListHTML() : `<p class="empty-msg">${esc(U.noLoadouts)}</p>`);
@@ -1539,7 +1541,7 @@ function filter() {
 }
 
 /* ---------- eventos ---------- */
-function go(t) { t = resolveTab(t); tab = t; const g = groupOf(t), pa = parentOf(t); if (pa !== t) { lastKid[pa] = t; LS.set('dc-kids', lastKid); } if (g) { lastSub[g.id] = t; LS.set('dc-subs', lastSub); } LS.set('dc-tab', t); render(); }
+function go(t) { t = resolveTab(t); if (GRADE && t !== 'gclo') { LS.set('dc-tab', t); location.href = '/'; return; } tab = t; const g = groupOf(t), pa = parentOf(t); if (pa !== t) { lastKid[pa] = t; LS.set('dc-kids', lastKid); } if (g) { lastSub[g.id] = t; LS.set('dc-subs', lastSub); } if (!GRADE) LS.set('dc-tab', t); render(); }
 $('tabs').addEventListener('click', e => { const b = e.target.closest('.tab'); if (!b) return; const g = GROUPS.find(x => x.id === b.dataset.group); go(groupOf(lastSub[g.id])?.id === g.id ? lastSub[g.id] : g.subs[0]); });
 $('subtabs').addEventListener('click', e => { const b = e.target.closest('.sub'); if (b?.dataset.sub === 'gclo') { location.href = '/grade'; return; } if (b) go(b.dataset.sub); const k = e.target.closest('[data-kid]'); if (k) go(k.dataset.kid); });
 $('chars').addEventListener('click', e => { if (e.target.closest('#findbtn')) { openFind(); return; } const b = e.target.closest('.char'); if (!b || b.dataset.char === charId) return; charId = b.dataset.char; LS.set('dc-char-' + member.id, charId); resetChar(); buildOpen && renderBuild(); hydrate(); });
@@ -2813,8 +2815,8 @@ const OBT = {
   pt: { t: 'Orla Bot', sub: 'Monte grades de atividade do clã aqui no site: a grade aparece no #lfg-destiny do Discord, igualzinha à criada pelo comando /orla grade.', login: 'Entre com sua conta Bungie para usar o Orla Bot.', loading: 'Carregando…', down: 'O Orla Bot não respondeu agora. Tente de novo em instantes.',
     linked: n => `Vinculado ao Discord: ${n || 'conta confirmada'}`, notLinked: 'Seu usuário do DPI ainda não está ligado a um usuário do Discord.', register: 'Registrar', relink: 'Trocar usuário do Discord',
     regT: 'Registrar no Orla Bot', regN: 'Informe seu usuário do Discord (o nome de usuário, sem o @). Você vai confirmar entrando no Discord, e então seu usuário do DPI fica ligado a ele no Orla Bot.', tag: 'Usuário do Discord', regGo: 'Continuar com o Discord', cancel: 'Cancelar', eTag: 'Informe seu usuário do Discord.',
-    create: 'Criar grade', act: 'Atividade', actPh: 'Escolha uma sugestão ou digite um título livre', cap: 'Integrantes', rk: 'Novatos', start: 'Início', desc: 'Descrição', descPh: 'Informações adicionais (opcional)', send: 'Criar grade', sending: 'Criando…', where: 'A grade é publicada no canal #lfg-destiny.',
-    eAct: 'Informe a atividade.', eCap: 'Integrantes deve ser um número de 1 a 12.', eRk: 'Novatos deve ser de 0 até o número de integrantes.', eStart: 'Escolha uma data e hora futuras.', eReg: 'Registre seu Discord antes de criar uma grade.', eGen: 'Não consegui criar a grade agora. Tente novamente.',
+    create: 'Criar grade', act: 'Atividade', actPh: 'Escolha uma sugestão ou digite um título livre', cap: 'Titulares', rk: 'Novatos', start: 'Início', desc: 'Descrição', descPh: 'Informações adicionais (opcional)', send: 'Criar grade', sending: 'Criando…', where: 'A grade é publicada no canal #lfg-destiny.',
+    eAct: 'Informe a atividade.', eCap: 'Titulares deve ser um número de 1 a 12.', eRk: 'Novatos deve ser de 0 até o número de integrantes.', eStart: 'Escolha uma data e hora futuras.', eReg: 'Registre seu Discord antes de criar uma grade.', eGen: 'Não consegui criar a grade agora. Tente novamente.',
     done: 'Grade publicada no #lfg-destiny.', doneNoMsg: 'A grade foi salva, mas não consegui publicar a mensagem no Discord. Avise um administrador.',
     res: { ok: 'Discord vinculado com sucesso.', mismatch: 'O usuário do Discord em que você entrou não é o que foi informado. Tente de novo.', cancel: 'Vínculo cancelado.', expired: 'O pedido expirou. Tente registrar de novo.', fail: 'Não consegui concluir o vínculo com o Discord.' } },
   en: { t: 'Orla Bot', sub: 'Build clan activity rosters here on the site: the roster shows up on Discord in #lfg-destiny, just like one made with /orla grade.', login: 'Sign in with your Bungie account to use Orla Bot.', loading: 'Loading…', down: 'Orla Bot did not respond. Try again shortly.',
