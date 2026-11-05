@@ -1,0 +1,13 @@
+{
+  "name": "orla-bot",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "register": "node scripts/register-commands.mjs"
+  },
+  "devDependencies": {
+    "vitest": "3.2.4",
+    "wrangler": "4.148.0"
+  }
+}

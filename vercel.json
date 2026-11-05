@@ -55,6 +55,10 @@
       "destination": "/status.html"
     },
     {
+      "source": "/grade",
+      "destination": "/index.html"
+    },
+    {
       "source": "/beta",
       "destination": "/index.html"
     },
