@@ -2079,3 +2079,7 @@ button.soc-r:hover{border-color:var(--line)}button.soc-r.on{border-color:var(--a
 /* /grade: em branco até a conta ser confirmada como do clã; sem cabeçalho/rodapé do DPI */
 html.grade:not(.grade-ok) .wrap{visibility:hidden}
 html.grade .wrap>header,html.grade .wrap>footer{display:none}
+/* atalho do Orla Bot no topo */
+.gradebtn{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:10px;border:1px solid color-mix(in srgb,#5865f2 70%,transparent);background:color-mix(in srgb,#5865f2 18%,transparent);color:var(--fg);font:600 13px var(--sans,inherit);text-decoration:none}
+.gradebtn:hover{background:#5865f2;color:#fff}.gradebtn[hidden]{display:none}
+@media (max-width:560px){.gradebtn span{display:none}.gradebtn{padding:0 9px}}
