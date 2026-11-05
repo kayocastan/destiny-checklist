@@ -1,5 +1,4 @@
 /* Criação de grade: mesmo fluxo para /orla grade (Discord) e para o formulário do DPI. */
-import { maxPlayers, kindOf } from './search.js';
 import { ActivityInputError, parseActivityStart, validateActivityInput, validateActivityStart, skillForClears } from './rules.js';
 import { BungieApiError, syncPlayerActivities } from './bungie.js';
 import { getRoster, enroll, removeSignup, SignupError } from './signups.js';
@@ -29,22 +28,16 @@ export async function createGrade(env, a) {
     if (!curated) throw new ActivityInputError('Essa opção não está mais no catálogo. Pesquise novamente e escolha outra.');
   }
   const requiresBungie = !!curated && curated.eligibility_group !== 'orla:0';
-  let capNote = '';
-  const max = maxPlayers(curated); // masmorra 3, incursão 6: ajusta em vez de recusar (título digitado também pode cair aqui)
-  if (max && Number.isInteger(a.integrantes) && a.integrantes > max) {
-    a = { ...a, integrantes: max, rookieLimit: a.rookieLimit != null ? Math.min(a.rookieLimit, max) : a.rookieLimit };
-    capNote = ` ${kindOf(curated) === 'dungeon' ? 'Masmorras' : 'Incursões'} aceitam até ${max} jogadores: a grade ficou com ${max} titulares.`;
-  }
   const startsAt = parseActivityStart(a.inicio, tz);
   validateActivityStart(startsAt);
   const name = validateActivityInput(a.atividade, a.integrantes, a.descricao ?? '', a.rookieLimit ?? null);
 
-  let warning = capNote, creatorIsRookie = null;
+  let warning = '', creatorIsRookie = null;
   if (curated && requiresBungie) {
     try { const c = await syncPlayerActivities(env, a.userId, curated.id); creatorIsRookie = skillForClears(Object.values(c).reduce((s, n) => s + n, 0)) === 'rookie'; }
     catch (e) {
       if (!(e instanceof BungieApiError)) throw e;
-      warning += a.rookieLimit != null ? ' Não consegui verificar seu histórico Bungie; você entrou como substituto.' : ' Não consegui verificar seu histórico Bungie; nenhum dado novo de progressão foi salvo.';
+      warning = a.rookieLimit != null ? ' Não consegui verificar seu histórico Bungie; você entrou como substituto.' : ' Não consegui verificar seu histórico Bungie; nenhum dado novo de progressão foi salvo.';
     }
   }
   const limitApplies = !!curated && requiresBungie, rl = a.rookieLimit ?? null, now = new Date().toISOString();

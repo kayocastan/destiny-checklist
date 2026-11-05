@@ -154,14 +154,6 @@ describe('API do DPI', () => {
     expect((await env.DB.prepare('SELECT name FROM activities').all()).results.map(r => r.name)).toEqual(['Nova']);
     expect((await env.DB.prepare('SELECT name FROM grade_hist').all()).results.map(r => r.name)).toEqual(['Velha']);
   });
-  it('masmorra limita a 3 titulares (ajusta e avisa); /activities informa o limite', async () => {
-    await link('10');
-    const acts = (await (await api('/activities?q=dualidade')).json()).activities;
-    expect(acts[0].max).toBe(3);
-    const r = await api('/grades', { method: 'POST', body: JSON.stringify({ atividade: acts[0].name, curatedId: acts[0].id, integrantes: 6, novatos: 5, inicio: new Date(Date.now() + 864e5).toISOString(), descricao: '' }) });
-    const j = await r.json(); expect(j.ok).toBe(true); expect(j.warning).toMatch(/até 3/);
-    expect(await env.DB.prepare('SELECT capacity, rookie_limit FROM activities WHERE id = ?').bind(j.activityId).first()).toEqual({ capacity: 3, rookie_limit: 3 });
-  });
   it('GET /grades lista a agenda com os inscritos', async () => {
     await link('10');
     const id = (await env.DB.prepare(`INSERT INTO activities (name, capacity, starts_at, description, created_by_discord_id, created_at, discord_channel_id, discord_message_id) VALUES ('Crota', 6, ?, '', '10', 'x', 'c1', 'm1')`).bind(new Date(Date.now() + 36e5).toISOString()).run()).meta.last_row_id;
