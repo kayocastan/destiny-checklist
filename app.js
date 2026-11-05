@@ -165,6 +165,7 @@ const FX = true; // recursos que passaram pelo /beta e agora valem para todos
 if (FX) GROUPS[0].subs = ['obj', 'prog'];
 const GRADE = location.pathname.replace(/\/+$/, '') === '/grade'; // interface do Orla Bot (só membros do clã Orla Emaranhada; os demais veem a página em branco)
 const ORLA_CLAN = '5280120', orlaOK = () => GD?.clan?.gid === ORLA_CLAN;
+let orlaChk = false;
 if (GRADE) document.documentElement.classList.add('grade');
 const groupOf = t => GROUPS.find(g => g.subs.includes(parentOf(t)));
 // aba salva que não existe mais (ex.: Padrões, que foi retirada) volta para Objetivos
@@ -212,7 +213,7 @@ function login() {
   try { sessionStorage.setItem('dc-state', st); } catch {}
   location.href = `https://www.bungie.net/${lang === 'pt' ? 'pt-br' : 'en'}/OAuth/Authorize?client_id=${encodeURIComponent(cfg.clientId)}&response_type=code&state=${st}`;
 }
-function logout() { resetChar(); PLUGS = null; plugsP = null; buildOpen = false; if (member) idbDel('profile-' + member.id); LS.del('dc-auth'); LS.del('dc-member'); LS.del('dc-hdr'); LS.del('dc-synct'); SY.t = {}; SY.dirty.clear(); clearInterval(LIVE.timer); LIVE.timer = null; LIVE.on = false; LIVE.mem = []; LS.del('dc-el'); auth = null; profile = null; member = null; render(); }
+function logout() { resetChar(); PLUGS = null; plugsP = null; buildOpen = false; if (member) idbDel('profile-' + member.id); LS.del('dc-auth'); LS.del('dc-member'); LS.del('dc-hdr'); LS.del('dc-orla'); LS.del('dc-synct'); SY.t = {}; SY.dirty.clear(); clearInterval(LIVE.timer); LIVE.timer = null; LIVE.on = false; LIVE.mem = []; LS.del('dc-el'); auth = null; profile = null; member = null; render(); }
 async function token() {
   if (!auth) throw new Error('auth');
   if (auth.access_expires - Date.now() > 60000) return auth.access_token;
@@ -1425,6 +1426,10 @@ function render() {
   $('chars').hidden = false;
   $('tabs').innerHTML = GROUPS.map(g => `<button class="tab" type="button" data-group="${g.id}" aria-current="${groupOf(tab)?.id === g.id}">${esc(U.tabs[g.id])}</button>`).join('');
   botNav();
+  // atalho do Orla Bot no topo (só membros da Orla): confere o clã uma vez por dia, mesmo sem abrir a aba Clã
+  { const gb = $('gradebtn'); if (gb) { if (GD?.clan?.gid) LS.set('dc-orla', { ok: GD.clan.gid === ORLA_CLAN, at: Date.now() }); const o = LS.get('dc-orla', null);
+    if (member && (!o || Date.now() - o.at > 864e5) && !orlaChk) { orlaChk = true; bungie(`/GroupV2/User/${member.type}/${member.id}/0/1/`).then(r => { LS.set('dc-orla', { ok: (r.results || []).some(x => String(x.group?.groupId) === ORLA_CLAN), at: Date.now() }); render(); }).catch(() => {}); }
+    gb.hidden = !member || !(o?.ok || orlaOK()); gb.title = lang === 'pt' ? 'Orla Bot: criar ou ver grades do clã' : 'Orla Bot: create or see clan rosters'; } }
   GROUPS[4].subs = [...(clanAdminOK() ? ['gcl', 'gclb', 'gclg', 'gcla', 'gcld'] : ['gcl', 'gclb', 'gclg']), ...(orlaOK() || GRADE ? ['gclo'] : [])]; if ((tab === 'gcla' || tab === 'gcld') && !clanAdminOK() && GD?.clan) { tab = 'gcl'; }
   const g = groupOf(tab), st = $('subtabs'), pa = parentOf(tab), kids = KIDS[pa];
   if (g && (g.subs.length > 1 || kids)) { st.hidden = false; st.innerHTML = `${g.subs.length > 1 ? `<div class="subs-row">${g.subs.map(id => `<button class="sub" type="button" data-sub="${id}" aria-pressed="${id === pa}">${esc(U.subs[id])}</button>`).join('')}</div>` : ''}${kids ? `<div class="kids-row" role="group" aria-label="${esc(U.subs[pa])}"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 5h14M6 10h8M8.5 15h3"/></svg>${kids.map(k => `<button type="button" class="kid" data-kid="${k}" aria-pressed="${k === tab}">${esc(U.subs[k])}</button>`).join('')}</div>` : ''}`; }

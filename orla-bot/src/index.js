@@ -40,7 +40,7 @@ const norm = t => String(t || '').trim().replace(/^@/, '').replace(/#0+$/, '').t
 async function who(req, env) {
   const a = req.headers.get('Authorization') || '';
   if (!a.startsWith('Bearer ')) return null;
-  try { return { ...(await currentUser(env, a.slice(7))), token: a.slice(7) }; } catch (e) { if (e instanceof BungieApiError) return null; throw e; }
+  try { return { ...(await currentUser(env, a.slice(7))), token: a.slice(7) }; } catch (e) { if (e instanceof BungieApiError) { req.authErr = { code: e.code || null, msg: e.message }; return null; } throw e; }
 }
 
 // só membros do clã Orla Emaranhada (CLAN_ID) usam o Orla Bot; confirmado na Bungie (cache curto por conta)
@@ -71,7 +71,7 @@ async function api(req, env, url) {
   }
 
   const me = await who(req, env);
-  if (!me) return json(req, { error: 'auth' }, 401);
+  if (!me) return json(req, { error: 'auth', why: req.authErr || null }, 401); // why: motivo vindo da Bungie (sem dados da conta), ajuda a diagnosticar
   try { if (!(await inClan(env, me))) return json(req, { error: 'clan' }, 403); }
   catch (e) { if (e instanceof BungieApiError) return json(req, { error: 'clan' }, 403); throw e; }
   if (path === '/activities' && req.method === 'GET') {
