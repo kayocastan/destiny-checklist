@@ -125,7 +125,7 @@ export async function syncPlayerActivities(env, discordId, curatedId) {
   const mode = type.includes('raid') ? 4 : type.includes('dungeon') ? 82 : null;
   if (!mode) throw new BungieApiError('O histórico só pode ser consultado para atividades classificadas como Raid ou Dungeon.');
   const counts = await getClearCounts(env, { membershipId: user.bungie_membership_id, membershipType: user.bungie_membership_type }, hashes, mode);
-  if (!acts.some(a => a.bungie_id in counts)) throw new BungieApiError('A Bungie não retornou dados suficientes para classificar essa atividade.');
+  // A Bungie omite atividades nunca concluídas: ausência do hash = 0 conclusões (rookie), não erro.
   const total = acts.reduce((s, a) => s + (counts[a.bungie_id] || 0), 0);
   const skill = skillForClears(total);
   let store = acts.filter(a => (counts[a.bungie_id] || 0) > 0).map(a => a.bungie_id);
