@@ -1,7 +1,7 @@
 /* Mensagem da grade: mesmo layout do bot em Python (activities/view.py). */
 import { parseDbDate } from './rules.js';
 
-const SKILL_EMOJI = { rookie: '👶', veteran: '🎖️', master: '🧙‍♂️', unknown: '⚠' };
+const SKILL_EMOJI = { rookie: '👶', veteran: '🎖️', master: '🧙‍♂️', unknown: '⚠️' };
 const SP = '​';
 
 export const escapeMarkdown = s => String(s).replace(/([\\*_~|`>])/g, '\\$1');
