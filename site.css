@@ -2134,3 +2134,8 @@ html.grade .ob-opt{font-size:16px}
 .ob-sgb b{font:700 15px var(--mono)}.ob-sgb.join:not(:disabled){border-color:color-mix(in srgb,#7fe08f 60%,transparent)}.ob-sgb.leave:not(:disabled){border-color:color-mix(in srgb,#ff8a7a 60%,transparent)}.ob-sgb:disabled{opacity:.45;cursor:default}
 .ob-you{font-size:13.5px;font-weight:600;padding:4px 10px;border-radius:999px;background:color-mix(in srgb,var(--acc) 16%,transparent);color:var(--acc)}.ob-you.reserva,.ob-you.substituto{background:rgba(242,211,107,.12);color:#f2d36b}
 .ob-sgm{font-size:13.5px;color:#7fe08f}.ob-sgm.bad{color:#ff8a7a}
+/* agenda: imagem da atividade ao fundo + vídeos e imagens do guia */
+.ob-gc.ob-img{position:relative;isolation:isolate;overflow:hidden;background:var(--chip)}
+.ob-gc.ob-img::before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(10,14,20,.94) 0%,rgba(10,14,20,.82) 45%,rgba(10,14,20,.55) 100%),var(--ob-img) center/cover no-repeat}
+.ob-gc.ob-img .ob-gt,.ob-gc.ob-img .ob-gb>b{text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.ob-guide{margin:2px 0 0;gap:6px}.ob-guide .chip{font-size:13px}

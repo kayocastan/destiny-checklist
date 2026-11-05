@@ -126,11 +126,11 @@ async function api(req, env, url) {
   }
   if (path === '/grades' && req.method === 'GET') { // grades marcadas (abertas), para a ilha "Agenda" do /grade
     const mine = await registered(env, me.ids);
-    const acts = (await env.DB.prepare(`SELECT id, name, capacity cap, rookie_limit rk, starts_at s, created_by_discord_id d, discord_channel_id c, discord_message_id m FROM activities ORDER BY replace(starts_at, ' ', 'T'), id LIMIT 50`).all()).results;
+    const acts = (await env.DB.prepare(`SELECT a.id, a.name, a.capacity cap, a.rookie_limit rk, a.starts_at s, a.created_by_discord_id d, a.discord_channel_id c, a.discord_message_id m, cb.eligibility_group g FROM activities a LEFT JOIN curated_bungie_activities cb ON cb.id = a.curated_bungie_activity_id ORDER BY replace(a.starts_at, ' ', 'T'), a.id LIMIT 50`).all()).results;
     const ids = acts.map(a => a.id);
     const ps = ids.length ? (await env.DB.prepare(`SELECT p.activity_id a, p.discord_user_id d, p.category c, p.is_rookie r, coalesce(u.bungie_name, u.discord_member_name, '?') n FROM activity_participants p LEFT JOIN users u ON u.discord_user_id = p.discord_user_id WHERE p.activity_id IN (${ids.map(() => '?').join(',')}) ORDER BY p.category, p.created_at, p.id`).bind(...ids).all()).results : [];
     const by = await env.DB.prepare(`SELECT discord_user_id d, coalesce(bungie_name, discord_member_name) n FROM users WHERE discord_user_id IN (${acts.map(() => '?').join(',') || "''"})`).bind(...acts.map(a => a.d)).all().then(r => Object.fromEntries(r.results.map(x => [x.d, x.n])));
-    return json(req, { guild: env.DISCORD_GUILD_ID || null, grades: acts.map(a => ({ id: a.id, name: a.name, cap: a.cap, rk: a.rk, s: a.s, by: by[a.d] || null, url: a.c && a.m && env.DISCORD_GUILD_ID ? `https://discord.com/channels/${env.DISCORD_GUILD_ID}/${a.c}/${a.m}` : null,
+    return json(req, { guild: env.DISCORD_GUILD_ID || null, grades: acts.map(a => ({ id: a.id, name: a.name, g: a.g || null, cap: a.cap, rk: a.rk, s: a.s, by: by[a.d] || null, url: a.c && a.m && env.DISCORD_GUILD_ID ? `https://discord.com/channels/${env.DISCORD_GUILD_ID}/${a.c}/${a.m}` : null,
       mine: mine ? (ps.find(p => p.a === a.id && p.d === mine.discord_user_id)?.c || null) : null, creator: !!mine && a.d === mine.discord_user_id,
       p: ps.filter(p => p.a === a.id).map(p => ({ n: String(p.n).replace(/#\d+$/, ''), c: p.c, r: p.r ? 1 : 0 })) })) });
   }

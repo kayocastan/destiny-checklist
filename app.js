@@ -2947,13 +2947,22 @@ async function obSignup(id, act) { // Entrar / Reserva / Sair numa grade da agen
   catch (e) { OB.sgMsg = { id: +id, bad: true, t: e.message === 'not_registered' ? T.eReg : T.eGen }; }
   OB.sgBusy = null; await obAgLoad(true); setTimeout(() => { if (OB.sgMsg?.id === +id) { OB.sgMsg = null; if (GRADE) render(); } }, 8000);
 }
+// grade → incursão/masmorra do DPI (imagem de fundo, vídeos e imagens do guia): pelo grupo do catálogo do bot ("raid:crotas-end:…") ou pelo nome
+const obSlug = x => String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/'/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^(the|o|a)-/, '').replace(/^-|-$/g, '');
+function obActOf(g) {
+  const all = [...(defs?.raids || []).map(a => ['raid', a]), ...(defs?.dungeons || []).map(a => ['dg', a])], names = a => (Array.isArray(a.n) ? a.n : [a.n]).map(obSlug);
+  const slug = String(g.g || '').split(':')[1]; let hit = slug && all.find(([, a]) => names(a).includes(slug.replace(/^the-/, '')));
+  if (!hit) { const base = obSlug(String(g.name).split(':')[0]); hit = base && all.find(([, a]) => names(a).includes(base)); }
+  return hit ? { kind: hit[0], a: hit[1] } : null;
+}
 function obAgHTML(T) { // ilha "Agenda do clã": grades marcadas, por dia
   if (OB.ag === undefined) { setTimeout(obAgLoad); return `<section class="ad-s ad-wide ob-ag"><h2>${esc(T.agT)}</h2><p class="wait">${esc(T.loading)}</p></section>`; }
   const loc = lang === 'en' ? 'en-US' : 'pt-BR', D = s => new Date(String(s).replace(' ', 'T')), today = obLoc(new Date()).slice(0, 10), tmw = obLoc(new Date(Date.now() + 864e5)).slice(0, 10);
   const dayLbl = d => { const k = obLoc(d).slice(0, 10); return k === today ? T.today : k === tmw ? T.tomorrow : d.toLocaleDateString(loc, { weekday: 'long', day: '2-digit', month: '2-digit' }); };
   const groups = []; for (const g of OB.ag || []) { const d = D(g.s), k = obLoc(d).slice(0, 10); let x = groups.find(y => y.k === k); if (!x) groups.push(x = { k, l: dayLbl(d), list: [] }); x.list.push(g); }
   const card = g => { const tit = g.p.filter(p => p.c === 'titular'), res = g.p.length - tit.length, t = D(g.s).toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' });
-    return `<div class="ob-gc"><span class="ob-gt">${esc(t)}</span><div class="ob-gb"><b>${esc(g.name)}</b><small class="lbd-n">${g.by ? esc(T.agBy(String(g.by).replace(/#\d+$/, ''))) : ''}</small><div class="dp-chips">${tit.map(p => `<span class="dp-chip${p.r ? ' rk' : ''}">${esc(p.n)}</span>`).join('')}${res ? `<small class="lbd-n">${esc(T.agRes(res))}</small>` : ''}</div></div>
+    const ac = obActOf(g), extra = ac ? actYt(ac.kind, ac.a.k) : '';
+    return `<div class="ob-gc${ac?.a.img ? ' ob-img' : ''}"${ac?.a.img ? ` style="--ob-img:url('${BNET}${esc(ac.a.img)}')"` : ''}><span class="ob-gt">${esc(t)}</span><div class="ob-gb"><b>${esc(g.name)}</b><small class="lbd-n">${g.by ? esc(T.agBy(String(g.by).replace(/#\d+$/, ''))) : ''}</small>${extra ? `<div class="sec-meta ob-guide">${extra}</div>` : ''}<div class="dp-chips">${tit.map(p => `<span class="dp-chip${p.r ? ' rk' : ''}">${esc(p.n)}</span>`).join('')}${res ? `<small class="lbd-n">${esc(T.agRes(res))}</small>` : ''}</div></div>
       <div class="ob-gr"><b class="m${tit.length >= g.cap ? ' full' : ''}">${tit.length}/${g.cap}</b>${tit.length >= g.cap ? `<small>${esc(T.agFull)}</small>` : ''}${g.url ? `<a class="lbd-btn" href="${esc(g.url)}" target="_blank" rel="noopener">${esc(T.agOpen)}</a>` : ''}</div>
       <div class="ob-sg">${g.mine ? `<span class="ob-you ${esc(g.mine)}">${esc(T.you[g.mine] || g.mine)}</span>` : ''}${OB.sgBusy === g.id ? `<small class="lbd-n wait">${esc(T.loading)}</small>` : [['join', '＋', T.sgJoin, g.mine === 'titular'], ['reserve', '?', T.sgRes, g.mine === 'reserva'], ['leave', '−', T.sgLeave, !g.mine]].map(([k, ic, l, off]) => `<button type="button" class="lbd-btn ob-sgb ${k}" data-obsg="${g.id}:${k}"${off ? ' disabled' : ''}><b>${ic}</b> ${esc(l)}</button>`).join('')}${OB.sgMsg?.id === g.id ? `<small class="ob-sgm${OB.sgMsg.bad ? ' bad' : ''}">${esc(OB.sgMsg.t)}</small>` : ''}</div></div>`; };
   return `<section class="ad-s ad-wide ob-ag"><h2>${esc(T.agT)}</h2><small class="lbd-n">${esc(T.agN)}</small>${OB.ag === null ? `<p class="iv-msg bad">${esc(T.down)}</p>` : groups.length ? groups.map(x => `<h3 class="ob-agd">${esc(x.l)}</h3>${x.list.map(card).join('')}`).join('') : `<p class="lbd-n">${esc(T.agNone)}</p>`}</section>`;
