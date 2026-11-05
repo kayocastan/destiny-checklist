@@ -10,7 +10,6 @@ TIMEZONE = "America/Sao_Paulo"
 CLAN_ID = "5280120"                         # clã Orla Emaranhada: único com acesso à interface do site
 SITE_URL = "https://destinyparallel.vercel.app"
 HERO_URL = "https://destinyparallel.vercel.app/orla-bot/assets/orla-bot-hero.png"
-DISCORD_APP_ID = "__DISCORD_APP_ID__"      # igual ao client id do aplicativo (workflow troca)
 SELF_URL = "https://orla-bot.__SUB__.workers.dev"   # workflow troca __SUB__ pelo subdomínio workers.dev
 
 [triggers]
@@ -22,4 +21,4 @@ database_name = "orla"
 database_id = "__DB_ID__"
 migrations_dir = "migrations"
 
-# Segredos (wrangler secret put): DISCORD_TOKEN, DISCORD_PUBLIC_KEY, DISCORD_CLIENT_SECRET, BUNGIE_API_KEY
+# Segredos (no painel do Cloudflare › orla-bot › Settings › Variables and Secrets, tipo Secret): DISCORD_APP_ID, DISCORD_TOKEN, DISCORD_PUBLIC_KEY, DISCORD_CLIENT_SECRET, BUNGIE_API_KEY
