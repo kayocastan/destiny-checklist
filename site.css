@@ -2145,5 +2145,5 @@ html.grade .ob-opt{font-size:16px}
 .ob-calh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}.ob-calh b{font-size:16px;text-transform:capitalize}.ob-calh .lbd-btn{min-width:36px;font-size:18px}
 .ob-calg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}.ob-calg small{font:600 12px var(--mono);color:var(--muted);text-transform:uppercase;padding:2px 0}
 .ob-calg button{height:38px;border-radius:9px;border:1px solid transparent;background:var(--chip);color:var(--fg);font:600 15px var(--mono);cursor:pointer}
-.ob-calg button:hover:not(:disabled){border-color:var(--acc)}.ob-calg button.td{border-color:var(--line)}.ob-calg button[aria-pressed="true"]{background:color-mix(in srgb,var(--acc) 30%,var(--chip));border-color:var(--acc)}.ob-calg button:disabled{opacity:.3;cursor:default}
+.ob-calg button:hover:not(:disabled){border-color:var(--acc)}.ob-calg button.ob-td{border-color:var(--line)}.ob-calg button[aria-pressed="true"]{background:color-mix(in srgb,var(--acc) 30%,var(--chip));border-color:var(--acc)}.ob-calg button:disabled{opacity:.3;cursor:default}
 .ob-days.open{flex-wrap:wrap;overflow:visible}
