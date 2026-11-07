@@ -2183,3 +2183,4 @@ html.grade .ob-opt{font-size:16px}
 .rl-k button[aria-pressed="true"] b{color:var(--fg)}
 .t3 .t2-main{min-width:0}.t3-hero,.t3-rest{grid-template-columns:minmax(0,1fr)}.t3-big,.t3-row{min-width:0}.t3-yt{flex-wrap:wrap}
 .t3 .t2-side .t2-n{min-width:0}.t3 .t2-side .t2-n small{white-space:normal}
+.t3-pin{display:grid;place-items:center;font-size:18px;background:var(--chip)}
