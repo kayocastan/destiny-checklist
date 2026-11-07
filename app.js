@@ -888,6 +888,7 @@ function gdeDraw() {
       ${e.roles?.length ? `<span class="sea-k">${P ? 'PAPÉIS' : 'ROLES'}</span><div class="gde-roles">${e.roles.map(([n, t]) => `<span><b>${esc(n)}</b> · ${esc(t)}</span>`).join('')}</div>` : ''}
       <span class="sea-k">${P ? 'PASSO A PASSO' : 'STEP BY STEP'}</span><ol class="gde-steps">${e.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>
       ${e.tip ? `<p class="gde-tip"><b>${P ? 'Dica:' : 'Tip:'}</b> ${esc(e.tip)}</p>` : ''}</article>
+    <button type="button" class="gde-full" data-gdefs="${esc(GDE.k)}">⛶ ${P ? 'Modo encontros' : 'Encounter mode'}<small>${P ? 'todos os encontros em tela cheia, texto maior' : 'all encounters full screen, larger text'}</small></button>
     <footer class="gde-ft"><span>${P ? 'Resumo de guias da comunidade' : 'Summary of community guides'}: ${(g.src || []).map(([n, u2]) => `<a href="${esc(u2)}" target="_blank" rel="noopener">${esc(n)} ↗</a>`).join(', ')}</span>${a ? actYtRaw(...GDE.k.split(':')) : ''}</footer></div>`;
 }
 function gdeOpen(k) {
@@ -895,6 +896,37 @@ function gdeOpen(k) {
     d.addEventListener('click', e => { if (e.target === d || e.target.closest('.pf-x')) { d.close(); return; } const t = e.target.closest('[data-gdei]'); if (t) { GDE.i = +t.dataset.gdei; gdeDraw(); } }); }
   GDE.k = k; GDE.i = 0; gdeDraw(); if (!d.open) d.showModal();
 }
+/* Modo encontros: tela cheia só com os encontros, um cartão por encontro (tipo por cor), faixa de etapas e texto ajustável */
+const GFS = { z: LS.get('dc-gfs-z', 0), r: LS.get('dc-gfs-r', 1) };
+function gfsOpen(k) {
+  const g = GUIDES?.[k], [kind, key] = k.split(':'), a = actDefOf(kind, key), P = lang === 'pt'; if (!g) return;
+  let d = $('gdefs'); if (!d) { d = document.createElement('dialog'); d.id = 'gdefs'; d.className = 'gfs'; document.body.append(d);
+    d.addEventListener('click', e => { const t = e.target.closest('[data-gfs]'); if (!t) return; const v = t.dataset.gfs;
+      if (v === 'x') { d.close(); return; }
+      if (v === '+' || v === '-') { GFS.z = Math.max(-1, Math.min(3, GFS.z + (v === '+' ? 1 : -1))); LS.set('dc-gfs-z', GFS.z); d.style.setProperty('--gz', 1 + GFS.z * .12); return; }
+      if (v === 'r') { GFS.r = GFS.r ? 0 : 1; LS.set('dc-gfs-r', GFS.r); d.classList.toggle('nor', !GFS.r); t.classList.toggle('on', !!GFS.r); return; }
+      if (v.startsWith('#')) d.querySelector(v)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+    d.addEventListener('scroll', () => { const cs = [...d.querySelectorAll('.gfs-cd')], y = d.scrollTop + 160; let on = 0; cs.forEach((c, i) => { if (c.offsetTop <= y) on = i; });
+      d.querySelectorAll('.gfs-rl a').forEach((x, i) => x.classList.toggle('on', i === on)); }, { passive: true }); }
+  const TL = { enc: P ? 'Encontro' : 'Encounter', pas: P ? 'Passagem' : 'Passage', boss: P ? 'Chefe' : 'Boss', final: P ? 'Chefe final' : 'Final boss' };
+  const ty = e => e.t || (/\(passagem\)/.test(e.n) ? 'pas' : 'enc'), nm = e => e.n.replace(/\s*\(passagem\)/, '');
+  const n = g.enc.length, nb = g.enc.filter(e => ty(e) !== 'pas').length; let c = 0;
+  const cards = g.enc.map((e, i) => { const t = ty(e), id = `gfs${i}`, nn = String(i + 1).padStart(2, '0');
+    if (t === 'pas') return `<section class="gfs-cd pas" id="${id}"><div class="gfs-n">${nn}</div><div><div class="gfs-tg"><span class="gfs-ty pas">${TL.pas}</span><span>${P ? 'entre' : 'between'} ${String(i).padStart(2, '0')} ${P ? 'e' : 'and'} ${String(i + 2).padStart(2, '0')}</span></div><h2>${esc(nm(e))}</h2><p>${esc([e.obj, ...e.steps].join(' '))}</p></div>${e.tip ? `<div class="gfs-pt"><span class="gfs-l">${P ? 'Dica' : 'Tip'}</span>${esc(e.tip)}</div>` : ''}</section>`;
+    c++; return `<section class="gfs-cd ${t}" id="${id}"><header><div class="gfs-n">${nn}</div><div><div class="gfs-tg"><span class="gfs-ty ${t}">${TL[t]}</span><span>${P ? 'Encontro' : 'Encounter'} ${c} ${P ? 'de' : 'of'} ${nb} · ${P ? 'etapa' : 'step'} ${nn}</span></div><h2>${esc(e.n)}</h2><p class="gfs-obj">${esc(e.obj)}</p></div></header>
+      <div class="gfs-bd"><div class="gfs-c1">${e.roles?.length ? `<div class="gfs-roles"><span class="gfs-l">${P ? 'Funções sugeridas' : 'Suggested roles'}</span><ul>${e.roles.map(([r, x]) => `<li><b>${esc(r)}</b><span>${esc(x)}</span></li>`).join('')}</ul></div>` : ''}${e.tip ? `<div class="gfs-tip"><span class="gfs-l">${P ? 'Dica' : 'Tip'}</span>${esc(e.tip)}</div>` : ''}</div>
+      <div class="gfs-c2"><span class="gfs-l">${P ? 'Passo a passo' : 'Step by step'}</span><ol>${e.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol></div></div></section>`; }).join('');
+  const meta = [`${n} ${P ? 'etapas' : 'steps'}`, `${nb} ${P ? 'encontros' : 'encounters'}`, n - nb ? `${n - nb} ${P ? (n - nb > 1 ? 'passagens' : 'passagem') : 'passages'}` : '', a?.x ? `${P ? 'Exótico' : 'Exotic'}: ${a.x}` : '', a?.master ? (P ? 'Mestre disponível' : 'Master available') : ''].filter(Boolean);
+  d.innerHTML = `<div class="gfs-top"><div class="gfs-bc"><b>DPI</b><span>/</span>${P ? 'Guia por encontro' : 'Encounter guide'}</div><div class="gfs-act"><button type="button" data-gfs="-" aria-label="${P ? 'Diminuir texto' : 'Smaller text'}">A−</button><button type="button" data-gfs="+" aria-label="${P ? 'Aumentar texto' : 'Larger text'}">A+</button><button type="button" data-gfs="r" class="${GFS.r ? 'on' : ''}">${P ? 'Funções' : 'Roles'}</button><button type="button" data-gfs="x" class="gfs-x">✕ ${P ? 'Fechar' : 'Close'} <kbd>Esc</kbd></button></div></div>
+    <div class="gfs-hero"><div><span class="gfs-k">${kind === 'raid' ? (P ? 'Incursão' : 'Raid') : kind === 'dg' ? (P ? 'Masmorra' : 'Dungeon') : ''} · ${P ? 'Modo encontros' : 'Encounter mode'}</span><h1>${esc(a ? L(a.n) : '')}</h1><div class="gfs-meta">${meta.map(x => `<span>${esc(x)}</span>`).join('')}</div></div><div class="gfs-yt">${a ? actYtRaw(kind, key) : ''}</div></div>
+    <nav class="gfs-rl" style="--rn:${n}">${g.enc.map((e, i) => `<a role="button" tabindex="0" data-gfs="#gfs${i}" class="${ty(e)}${i ? '' : ' on'}"><b>${String(i + 1).padStart(2, '0')}</b><span>${esc(nm(e))}</span><i>${TL[ty(e)]}</i></a>`).join('')}</nav>
+    <main class="gfs-m">${cards}</main>
+    <footer class="gfs-ft"><span>${P ? 'Resumo de guias da comunidade' : 'Summary of community guides'}: ${(g.src || []).map(([s2, u2]) => `<a href="${esc(u2)}" target="_blank" rel="noopener">${esc(s2)} ↗</a>`).join(', ')}${P ? ' · funções são sugestões' : ' · roles are suggestions'}</span><span>destinyparallel.vercel.app</span></footer>`;
+  d.style.setProperty('--gz', 1 + GFS.z * .12); d.classList.toggle('nor', !GFS.r);
+  $('gdedlg')?.open && $('gdedlg').close(); if (!d.open) d.showModal(); d.scrollTop = 0;
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-gdefs]'); if (!b) return; e.preventDefault(); e.stopPropagation(); gfsOpen(b.dataset.gdefs); }, true);
+document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches?.('.gfs-rl a')) { e.preventDefault(); e.target.click(); } });
 document.addEventListener('click', e => { const b = e.target.closest('[data-gde]'); if (!b) return; e.preventDefault(); e.stopPropagation(); gdeOpen(b.dataset.gde); }, true);
 const actYt = (kind, key) => { if (!GUIDES) setTimeout(gdeLoad); const g = GUIDES?.[(kind === 'dg' ? 'dg' : kind) + ':' + key]; return (g ? `<button type="button" class="chip gde" data-gde="${kind}:${esc(key)}">📖 ${esc(lang === 'pt' ? `Guia (${g.enc.length})` : `Guide (${g.enc.length})`)}</button>` : '') + actYtRaw(kind, key); };
 const actYtRaw = (kind, key) => { const a = actDefOf(kind, key); if (!a) return ''; const yl = ytList(a);

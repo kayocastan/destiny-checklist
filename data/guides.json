@@ -23,7 +23,8 @@
      "Passe o Chalice para outra pessoa, que repete o processo.",
      "Continue revezando até a ponte ficar pronta."
     ],
-    "tip": "Passe rápido: alguém precisa pegar o Chalice até 10 s depois de cheio, ou quem segura morre."
+    "tip": "Passe rápido: alguém precisa pegar o Chalice até 10 s depois de cheio, ou quem segura morre.",
+    "t": "enc"
    },
    {
     "n": "The Abyss",
@@ -41,7 +42,8 @@
      "Fique perto das lanternas acesas para baixar o Weight of Darkness.",
      "No fim, use o Enlightened na placa para começar a ponte."
     ],
-    "tip": "Acender qualquer lanterna reinicia o tempo da escuridão de todos: não parem de andar. Grapple e Eager Edge ajudam."
+    "tip": "Acender qualquer lanterna reinicia o tempo da escuridão de todos: não parem de andar. Grapple e Eager Edge ajudam.",
+    "t": "enc"
    },
    {
     "n": "The Bridge",
@@ -72,7 +74,8 @@
      "Com 3 do outro lado, eles assumem a construção; continuem passando o resto.",
      "Com os 6 atravessados, limpem as ondas e usem as espadas guardadas nos Gatekeepers."
     ],
-    "tip": "Fuzil de batedor ou de precisão ajuda cada lado a cobrir o outro de longe."
+    "tip": "Fuzil de batedor ou de precisão ajuda cada lado a cobrir o outro de longe.",
+    "t": "enc"
    },
    {
     "n": "Subida dos Servos",
@@ -89,7 +92,8 @@
      "Mate o Shrieker para tirar a próxima barreira.",
      "Repita até o topo e deposite o Chalice para abrir o buraco."
     ],
-    "tip": "Mantenha o Chalice girando para sempre ter alguém pronto para a próxima barreira."
+    "tip": "Mantenha o Chalice girando para sempre ter alguém pronto para a próxima barreira.",
+    "t": "enc"
    },
    {
     "n": "Ir Yût, the Deathsinger",
@@ -115,7 +119,8 @@
      "O vigia avisa em que salas estão os Feiticeiros.",
      "Matem os Feiticeiros quase juntos e depois juntem todos no dano (os Enlightened têm a habilidade extra do Chalice)."
     ],
-    "tip": "O Deathsong começa quando o primeiro Feiticeiro morre ou depois de 3 min: sejam rápidos."
+    "tip": "O Deathsong começa quando o primeiro Feiticeiro morre ou depois de 3 min: sejam rápidos.",
+    "t": "boss"
    },
    {
     "n": "Crota, Son of Oryx",
@@ -141,7 +146,8 @@
      "Um Enlightened destrói a Oversoul antes dos 30 s (isso encerra a fase de dano).",
      "Repitam pelo menos 3 fases; na final, Wells of Radiance no chão e munição pesada."
     ],
-    "tip": "Uma granada de cura em quem está de espada ajuda a aguentar os golpes do Crota."
+    "tip": "Uma granada de cura em quem está de espada ajuda a aguentar os golpes do Crota.",
+    "t": "final"
    }
   ]
  },
@@ -169,7 +175,8 @@
      "Matem Wyverns e Campeões rápido com Super ou pesada: Wyvern que se sacrifica derruba o time.",
      "Evitem as poças azuis/brancas (Mark of Negation); limpem no poço central."
     ],
-    "tip": "Falem o tempo todo para nenhum Vex a mais chegar ao Conflux."
+    "tip": "Falem o tempo todo para nenhum Vex a mais chegar ao Conflux.",
+    "t": "enc"
    },
    {
     "n": "Oracles",
@@ -187,7 +194,8 @@
      "Destruam na ordem: fora de ordem ou atrasado marca o time e pode derrubar todos.",
      "Cuidem dos Goblins, Minotauros e Hobgoblins atiradores."
     ],
-    "tip": "Deem nome às posições (E1–E3, D1–D4, meio) para os avisos ficarem rápidos."
+    "tip": "Deem nome às posições (E1–E3, D1–D4, meio) para os avisos ficarem rápidos.",
+    "t": "enc"
    },
    {
     "n": "The Templar",
@@ -213,7 +221,8 @@
      "Com o escudo fora, mirem no nariz (ponto fraco).",
      "Quando ele teleportar, repitam; quem tem a Relic pode bloquear o teleporte no círculo (mas nascem Praetorians)."
     ],
-    "tip": "Relic no chão precisa ser pega em 10 s, senão o time cai."
+    "tip": "Relic no chão precisa ser pega em 10 s, senão o time cai.",
+    "t": "boss"
    },
    {
     "n": "Gatekeepers",
@@ -239,7 +248,8 @@
      "A Relic só passa por portal 1 vez a cada 45 s: larguem para o próximo pegar.",
      "Depois dos Praetorians, defendam o Conflux central contra Praetorians e 3 Wyverns."
     ],
-    "tip": "Super de Blade Barrage, Thundercrash ou Nova Bomb matam as Wyverns rápido."
+    "tip": "Super de Blade Barrage, Thundercrash ou Nova Bomb matam as Wyverns rápido.",
+    "t": "enc"
    },
    {
     "n": "Gorgons' Labyrinth (passagem)",
@@ -249,7 +259,8 @@
      "Saia pelo lado esquerdo do labirinto.",
      "Pule as pedras grandes pela esquerda para fugir das Gorgons."
     ],
-    "tip": "Se uma Gorgon te ver, o time todo cai."
+    "tip": "Se uma Gorgon te ver, o time todo cai.",
+    "t": "pas"
    },
    {
     "n": "Atheon, Time's Conflux",
@@ -272,7 +283,8 @@
      "Com 9 Oracles, saiam e deem dano nos 30 s de Time's Vengeance.",
      "Repitam até ele cair."
     ],
-    "tip": "Xenophage mata Oracle com 1 tiro; fuzil de precisão é o reserva."
+    "tip": "Xenophage mata Oracle com 1 tiro; fuzil de precisão é o reserva.",
+    "t": "final"
    }
   ]
  },
@@ -293,7 +305,8 @@
      "Peguem o elevador central.",
      "Interajam com a plataforma do encontro escolhido (os 3 primeiros podem ser em qualquer ordem)."
     ],
-    "tip": "Cada plataforma diz o chefe: Iatros (Wyvern), Agraios (Hobgoblin), Epoptes (Hidra)."
+    "tip": "Cada plataforma diz o chefe: Iatros (Wyvern), Agraios (Hobgoblin), Epoptes (Hidra).",
+    "t": "pas"
    },
    {
     "n": "Iatros, Inward-Turned",
@@ -320,7 +333,8 @@
      "Lá em cima, pega os 3 cubos brancos para abrir o dano (~15–20 s).",
      "Repitam até o chefe cair."
     ],
-    "tip": "A cor do Chronos mostra onde o chefe aparece. No dano, alguém precisa depositar um Chronos de Minotauro para não cair todo mundo."
+    "tip": "A cor do Chronos mostra onde o chefe aparece. No dano, alguém precisa depositar um Chronos de Minotauro para não cair todo mundo.",
+    "t": "boss"
    },
    {
     "n": "Agraios, Inherent",
@@ -343,7 +357,8 @@
      "A passa pelos 5 anéis e ganha uma Detention Cage, que usa em B nos 2–3 s finais para bloquear o laser.",
      "Façam o dano (dá para estender 2 vezes)."
     ],
-    "tip": "Fiquem fora da linha do laser do chefe; se o tempo zerar, o raio mata na hora."
+    "tip": "Fiquem fora da linha do laser do chefe; se o tempo zerar, o raio mata na hora.",
+    "t": "boss"
    },
    {
     "n": "Epoptes, Lord of Quanta",
@@ -369,7 +384,8 @@
      "Com os 6 olhos de escudo quebrados, os de dentro ganham a Lancet e matam o chefe interno.",
      "Atirem no olho principal para abrir o dano (2–3 ciclos)."
     ],
-    "tip": "Avisos claros: atirar no olho errado começa a contagem de queda antes."
+    "tip": "Avisos claros: atirar no olho errado começa a contagem de queda antes.",
+    "t": "boss"
    },
    {
     "n": "Koregos, the Worldline",
@@ -400,7 +416,8 @@
      "No dano, quem tem o Tractor Cannon deposita os Chronons certos para estender.",
      "No fim, zerem a vida e desçam da plataforma em 30 s."
     ],
-    "tip": "Descer da plataforma a tempo é obrigatório, senão todos caem."
+    "tip": "Descer da plataforma a tempo é obrigatório, senão todos caem.",
+    "t": "final"
    }
   ]
  },
@@ -436,7 +453,8 @@
      "Com os 4 teclados atingidos, 1 dos 6 fusíveis brilha; o Scanner avisa qual.",
      "Quem está em cima destrói o fusível; repitam até os 6 caírem."
     ],
-    "tip": "Cada time fica do seu lado da sala para não perder tempo correndo entre fusíveis."
+    "tip": "Cada time fica do seu lado da sala para não perder tempo correndo entre fusíveis.",
+    "t": "enc"
    },
    {
     "n": "Atraks-1, Fallen Exo",
@@ -462,7 +480,8 @@
      "Dentro da eclusa, o Operator atira no efeito da cabeça de quem carrega.",
      "Com 8 efeitos ejetados, todos vão para o espaço; o Scanner avisa cada réplica destacada no final."
     ],
-    "tip": "Lament é a melhor arma aqui: as réplicas somem segundos depois de levar dano."
+    "tip": "Lament é a melhor arma aqui: as réplicas somem segundos depois de levar dano.",
+    "t": "boss"
    },
    {
     "n": "The Descent (passagem)",
@@ -472,7 +491,8 @@
      "Sigam por fora da estação.",
      "Voltem para dentro no fim do percurso."
     ],
-    "tip": "Tem um baú numa plataforma do lado esquerdo."
+    "tip": "Tem um baú numa plataforma do lado esquerdo.",
+    "t": "pas"
    },
    {
     "n": "Taniks, Reborn",
@@ -502,7 +522,8 @@
      "Depositem com Taniks atordoado; troquem o aprimoramento desativado no terminal.",
      "Com núcleos suficientes, desçam pela escotilha central e corram até o fim."
     ],
-    "tip": "Troquem o núcleo entre os carregadores antes de chegar a 10 de Radiation."
+    "tip": "Troquem o núcleo entre os carregadores antes de chegar a 10 de Radiation.",
+    "t": "boss"
    },
    {
     "n": "Taniks, the Abomination",
@@ -536,7 +557,8 @@
      "O Suppressor atordoa Taniks pelos 3 drones e o time deposita; repitam até 4 núcleos.",
      "No dano, pulem o anel de fora mas não o de dentro; no final ele teleporta, achem e terminem."
     ],
-    "tip": "Ward of Dawn fora dos anéis e Well of Radiance dentro mantêm o bônus de dano."
+    "tip": "Ward of Dawn fora dos anéis e Well of Radiance dentro mantêm o bônus de dano.",
+    "t": "final"
    }
   ]
  },
@@ -569,7 +591,8 @@
      "Com os 6 Cavaleiros mortos, juntem no centro e deem dano.",
      "Na explosão, entrem nas salas seguras e saiam para continuar o dano."
     ],
-    "tip": "Combinem as salas seguras antes: cada Cavaleiro certo abre 3 salas, errar deixa menos salas."
+    "tip": "Combinem as salas seguras antes: cada Cavaleiro certo abre 3 salas, errar deixa menos salas.",
+    "t": "boss"
    },
    {
     "n": "Shuro Chi, the Corrupted",
@@ -600,7 +623,8 @@
      "Na sala do quebra-cabeça, resolvam da esquerda para a direita, cada um num botão.",
      "Subam pelas esferas e repitam; terminar o quebra-cabeça reinicia o tempo."
     ],
-    "tip": "Um Arcano com Well of Radiance ajuda muito no último andar."
+    "tip": "Um Arcano com Well of Radiance ajuda muito no último andar.",
+    "t": "boss"
    },
    {
     "n": "Morgeth, the Spirekeeper",
@@ -626,7 +650,8 @@
      "O grupo de dano atira no crítico das costas.",
      "Derrubem as esferas Possuídas que ele lança e usem o Super da Essence perto de 90%."
     ],
-    "tip": "Limpar passa a Strength para quem limpou: quem limpa precisa estar com 0."
+    "tip": "Limpar passa a Strength para quem limpou: quem limpa precisa estar com 0.",
+    "t": "boss"
    },
    {
     "n": "The Vault (sem chefe)",
@@ -652,7 +677,8 @@
      "Corram pelos túneis até o mecanismo central, sem deixar os Cavaleiros travarem.",
      "Purifiquem a certa: Penumbra para duplicata à esquerda, Antumbra à direita. Repitam até 3 feixes."
     ],
-    "tip": "Essence errada explode e mata quem carrega e quem está perto: confirmem antes."
+    "tip": "Essence errada explode e mata quem carrega e quem está perto: confirmem antes.",
+    "t": "enc"
    },
    {
     "n": "Riven of a Thousand Voices",
@@ -675,7 +701,8 @@
      "Repitam no andar de cima e atirem nos pontos fracos na descida.",
      "Subam pela luz no Ascendant Plane e destruam o coração no final."
     ],
-    "tip": "Uma pessoa por olho aceso: cada um só lembra de 1 olho, não de 6."
+    "tip": "Uma pessoa por olho aceso: cada um só lembra de 1 olho, não de 6.",
+    "t": "final"
    },
    {
     "n": "Queenswalk",
@@ -701,7 +728,8 @@
      "Cada pessoa que entra depois pega no máximo 2 Strength, deixando 1 para o próximo; cada entrada reinicia o tempo do carregador.",
      "O próximo carregador pega o coração do lado de fora e continua a corrida até os Techeuns."
     ],
-    "tip": "Dá para pegar o coração a ~2 m. Na 1ª corrida parem na boca da Riven e virem à esquerda; 3 Strength matam; matem os Cavaleiros com espada."
+    "tip": "Dá para pegar o coração a ~2 m. Na 1ª corrida parem na boca da Riven e virem à esquerda; 3 Strength matam; matem os Cavaleiros com espada.",
+    "t": "enc"
    }
   ]
  },
@@ -734,7 +762,8 @@
      "Psiônicos com escudo só morrem no corpo a corpo; matar os dois traz um Tormentor.",
      "Matem o Tormentor rápido: cada um dá +30 s no tempo."
     ],
-    "tip": "Não peguem o efeito se outra pessoa já está com ele: isso bagunça as esferas."
+    "tip": "Não peguem o efeito se outra pessoa já está com ele: isso bagunça as esferas.",
+    "t": "enc"
    },
    {
     "n": "Scission",
@@ -757,7 +786,8 @@
      "Usem o efeito para matar os Centuriões com escudo.",
      "Depois do aviso de invasores, matem a última onda para liberar o impulsor do próximo andar."
     ],
-    "tip": "Cada andar tem 2 min e o tempo não estende: velocidade importa."
+    "tip": "Cada andar tem 2 min e o tempo não estende: velocidade importa.",
+    "t": "enc"
    },
    {
     "n": "Macrocosm · Zo'Aurc",
@@ -784,7 +814,8 @@
      "Com tudo certo, matem os Centuriões, leiam os planetas do centro e abram o dano.",
      "Peguem o efeito da cor do escudo do chefe (alterna Luz e Escuridão)."
     ],
-    "tip": "Só dá para fazer 2 vezes os Lieutenants antes de cair o time: planejem as trocas."
+    "tip": "Só dá para fazer 2 vezes os Lieutenants antes de cair o time: planejem as trocas.",
+    "t": "boss"
    },
    {
     "n": "Nezarec, Final God of Pain",
@@ -811,7 +842,8 @@
      "No dano (~30 s), fiquem na placa de Field of Light mais perto do centro.",
      "No final, usem tudo que sobrou."
     ],
-    "tip": "O refúgio dura 14 s depois de sair da placa: passem por ele, não fiquem parados nele."
+    "tip": "O refúgio dura 14 s depois de sair da placa: passem por ele, não fiquem parados nele.",
+    "t": "final"
    }
   ]
  },
@@ -848,7 +880,8 @@
      "Cada depósito dá ~3 s a mais no tempo, ajudando o outro lado.",
      "Com todas depositadas, limpem os inimigos do pátio para ativar o portal."
     ],
-    "tip": "Deixem 1 ou 2 no centro limpando e quebrem a porta da próxima esfera antes."
+    "tip": "Deixem 1 ou 2 no centro limpando e quebrem a porta da próxima esfera antes.",
+    "t": "enc"
    },
    {
     "n": "Salto nas naves (passagem)",
@@ -858,7 +891,8 @@
      "Pule da nave inicial para a próxima.",
      "Sigam nave a nave até o fim."
     ],
-    "tip": "É igual ao Destiny 1."
+    "tip": "É igual ao Destiny 1.",
+    "t": "pas"
    },
    {
     "n": "Totems",
@@ -881,7 +915,8 @@
      "Quem está com o Deathsinger's Power vai à placa central e descarrega.",
      "Revezem: cada Brand dura 30 s e quem segura morre se acabar. Não tem chefe."
     ],
-    "tip": "Thunderlord ajuda contra grupos e Cavaleiros das sacadas; evitem Shadowshot no centro (lenta os inimigos que dão carga)."
+    "tip": "Thunderlord ajuda contra grupos e Cavaleiros das sacadas; evitem Shadowshot no centro (lenta os inimigos que dão carga).",
+    "t": "enc"
    },
    {
     "n": "Warpriest",
@@ -905,7 +940,8 @@
      "Matem um Blightguard para pegar o Brand Claimer e passar a Brand antes do tempo acabar.",
      "No fim do dano, se escondam atrás de um monólito para fugir do Oculus."
     ],
-    "tip": "Deem dano entre o monólito do meio e o da direita; Shadowshot com Divinity e Well of Radiance com Sentinel Shield não somam."
+    "tip": "Deem dano entre o monólito do meio e o da direita; Shadowshot com Divinity e Well of Radiance com Sentinel Shield não somam.",
+    "t": "boss"
    },
    {
     "n": "Golgoroth",
@@ -928,7 +964,8 @@
      "Quem pega Unstable Light se afasta antes de explodir.",
      "A fase acaba com 6 esferas ou se o Gaze não for passado; são até 3 rodadas."
     ],
-    "tip": "Cada esfera não usada marca a Tablet of Ruin (6 marcas = time cai); Well of Radiance em cada poça."
+    "tip": "Cada esfera não usada marca a Tablet of Ruin (6 marcas = time cai); Well of Radiance em cada poça.",
+    "t": "boss"
    },
    {
     "n": "Parede de pistões (passagem)",
@@ -939,7 +976,8 @@
      "Atravessem pelos pistões.",
      "Voltem pela parede."
     ],
-    "tip": "Agora dá para agarrar nas beiradas, ficou mais fácil."
+    "tip": "Agora dá para agarrar nas beiradas, ficou mais fácil.",
+    "t": "pas"
    },
    {
     "n": "Daughters of Oryx",
@@ -966,7 +1004,8 @@
      "Juntem na aura e deem dano na Filha.",
      "Repitam com a segunda Filha."
     ],
-    "tip": "Gjallarhorn e lança-foguetes lendários resolvem rápido; limpem logo as 4 Falanges Possuídas à direita da entrada."
+    "tip": "Gjallarhorn e lança-foguetes lendários resolvem rápido; limpem logo as 4 Falanges Possuídas à direita da entrada.",
+    "t": "boss"
    },
    {
     "n": "Oryx, the Taken King",
@@ -995,7 +1034,8 @@
      "Depois sobrevivam às bombas ou matem a Shade of Oryx na cúpula; repitam até 25%.",
      "No final, matem 2 Ogros, detonem as bombas e deem dano no peito."
     ],
-    "tip": "Divinity em vez de Tether, com fuzis de fusão linear e de precisão; cuidem da munição até chegar aos 25%."
+    "tip": "Divinity em vez de Tether, com fuzis de fusão linear e de precisão; cuidem da munição até chegar aos 25%.",
+    "t": "final"
    }
   ]
  },
@@ -1028,7 +1068,8 @@
      "Repitam até a última barreira (3 fechaduras, 3 caixas Vex).",
      "No campo aberto, continuem pegando o Voltaic Overflow e passem pelos Ciclopes e Minotauros."
     ],
-    "tip": "Munição de Sobrecarga para atordoar os Minotauros; deixem alguns matando Ciclopes para pelo menos 1 chegar ao fim."
+    "tip": "Munição de Sobrecarga para atordoar os Minotauros; deixem alguns matando Ciclopes para pelo menos 1 chegar ao fim.",
+    "t": "enc"
    },
    {
     "n": "Summon the Consecrated Mind",
@@ -1055,7 +1096,8 @@
      "Cada canto recebe 3 Angelics; com os 12 mortos a barreira central cai.",
      "Todos vão ao centro, liguem o retransmissor e segurem por 3 ondas."
     ],
-    "tip": "Enlightened dura ~44 s e é necessário para quebrar escudos brancos; usem os portais Vex para chegar rápido."
+    "tip": "Enlightened dura ~44 s e é necessário para quebrar escudos brancos; usem os portais Vex para chegar rápido.",
+    "t": "enc"
    },
    {
     "n": "Consecrated Mind",
@@ -1078,7 +1120,8 @@
      "O preso atira na barbatana de cima; os outros dois na da esquerda e da direita.",
      "Com 30 partículas, o chefe vai até o banco: destruam todos os olhos vermelhos para expor o ponto fraco e atirem no centro."
     ],
-    "tip": "Quando os 3 do chefe tiverem o efeito Voltaic Overflow, troquem com alguém das partículas; o Izanagi's Burden é ótimo aqui."
+    "tip": "Quando os 3 do chefe tiverem o efeito Voltaic Overflow, troquem com alguém das partículas; o Izanagi's Burden é ótimo aqui.",
+    "t": "boss"
    },
    {
     "n": "Sanctified Mind",
@@ -1106,7 +1149,8 @@
      "Quebrado o primeiro símbolo, liguem do outro retransmissor para o segundo.",
      "Juntem e deem dano na barriga."
     ],
-    "tip": "Priorizem a segunda ligação em vez de dano; reconstruam primeiro as plataformas do meio (a água machuca)."
+    "tip": "Priorizem a segunda ligação em vez de dano; reconstruam primeiro as plataformas do meio (a água machuca).",
+    "t": "final"
    }
   ]
  },
@@ -1144,7 +1188,8 @@
      "Atirem nos 3 símbolos do obelisco quase juntos.",
      "Repitam nos outros dois obeliscos."
     ],
-    "tip": "Lança-granadas com Blinding Grenades seguram os Adherents; levem Imparável (aparecem Unstoppable Abominations)."
+    "tip": "Lança-granadas com Blinding Grenades seguram os Adherents; levem Imparável (aparecem Unstoppable Abominations).",
+    "t": "enc"
    },
    {
     "n": "The Caretaker",
@@ -1175,7 +1220,8 @@
      "Subam a escada para o próximo andar e repitam.",
      "No corredor final, avancem e fiquem o máximo em cada placa."
     ],
-    "tip": "Fuzis de fusão linear; Lunafaction Boots ajudam na recarga."
+    "tip": "Fuzis de fusão linear; Lunafaction Boots ajudam na recarga.",
+    "t": "boss"
    },
    {
     "n": "Exhibition",
@@ -1206,7 +1252,8 @@
      "Depositem e outras pessoas pegam de novo.",
      "Repitam em cada sala usando o Eye of Riven nas amarras."
     ],
-    "tip": "Alguns símbolos só aparecem para quem tem artefato; matar a Ampulheta e cada depósito dão +40 s."
+    "tip": "Alguns símbolos só aparecem para quem tem artefato; matar a Ampulheta e cada depósito dão +40 s.",
+    "t": "enc"
    },
    {
     "n": "Rhulk, Disciple of the Witness",
@@ -1238,7 +1285,8 @@
      "Depositem no canto do símbolo avisado até destruir 4 pontos fracos e abrir o dano.",
      "Deem dano, recuem quando ele ficar imune e repitam; no final, matem antes de Pervading Darkness chegar a 10."
     ],
-    "tip": "Uma pessoa de Divinity (+30% de dano) e o resto com Sleeper Simulant ou fusão linear; guardem Supers de uma vez para o final."
+    "tip": "Uma pessoa de Divinity (+30% de dano) e o resto com Sleeper Simulant ou fusão linear; guardem Supers de uma vez para o final.",
+    "t": "final"
    }
   ]
  },
@@ -1267,7 +1315,8 @@
      "Façam o sinal saltar entre as placas, peguem 3 formas, atirem no centro do Conductor e fiquem na placa dele para travar.",
      "Com os 2 Conductors travados, voltem ao centro, matem o Subjugator e depositem a Resonance; repitam até 6."
     ],
-    "tip": "Sempre fiquem na placa que recebe o sinal (senão nasce um Subjugator); 4 formas ou tempo zerado matam."
+    "tip": "Sempre fiquem na placa que recebe o sinal (senão nasce um Subjugator); 4 formas ou tempo zerado matam.",
+    "t": "enc"
    },
    {
     "n": "Dissipation · Herald of Finality",
@@ -1290,7 +1339,8 @@
      "Juntem 3 formas iguais saltando o sinal e travem o Conductor (a última forma que pegar define a pilha toda).",
      "Com os 3 travados, depositem na caixa do buraco para abrir o dano; repitam quando ele ficar imune."
     ],
-    "tip": "Só quem tem o Call to Reckoning dá dano na cabeça: protejam essas pessoas."
+    "tip": "Só quem tem o Call to Reckoning dá dano na cabeça: protejam essas pessoas.",
+    "t": "boss"
    },
    {
     "n": "Repository",
@@ -1309,7 +1359,8 @@
      "Com tudo travado, limpem e matem o Campeão para abrir a porta.",
      "Repitam nas próximas salas, onde as ligações cruzam de lado."
     ],
-    "tip": "A forma da sua placa pode não ser a que o seu Conductor pede: confiram antes de pegar."
+    "tip": "A forma da sua placa pode não ser a que o seu Conductor pede: confiram antes de pegar.",
+    "t": "enc"
    },
    {
     "n": "Verity",
@@ -1332,7 +1383,8 @@
      "Matando 2 Cavaleiros, as formas viram um objeto 3D no bolso; quando bate com a estátua de fora, atravessem a parede.",
      "Repitam 3 vezes."
     ],
-    "tip": "Dentro, juntem primeiro todas as formas iguais na mão de uma pessoa; na Catatonic Decimation, Fantasma errado na estátua mata o colega."
+    "tip": "Dentro, juntem primeiro todas as formas iguais na mão de uma pessoa; na Catatonic Decimation, Fantasma errado na estátua mata o colega.",
+    "t": "enc"
    },
    {
     "n": "Zenith · The Witness",
@@ -1356,7 +1408,8 @@
      "No teste da Witness, atirem nos nós a mais para formar a forma do último braço que atiraram (errar derruba o time).",
      "Com os 6 glifos quebrados, deem dano na plataforma central e pulem fora antes da pancada final."
     ],
-    "tip": "Anotem o último braço em que atiraram antes do teste: ele define a forma."
+    "tip": "Anotem o último braço em que atiraram antes do teste: ele define a forma.",
+    "t": "final"
    }
   ]
  },
@@ -1388,7 +1441,8 @@
      "Quando ele ficar imune, voltem a limpar as placas.",
      "Repitam até ele cair e subam todos na placa de areia do centro."
     ],
-    "tip": "Combinem uma cor de mote antes de começar para ninguém zerar a carga do outro. Well of Radiance + Falling Guillotine pode matar numa fase."
+    "tip": "Combinem uma cor de mote antes de começar para ninguém zerar a carga do outro. Well of Radiance + Falling Guillotine pode matar numa fase.",
+    "t": "boss"
    },
    {
     "n": "Wasteland",
@@ -1406,7 +1460,8 @@
      "Procurem a grande construção de pedra com uma entrada estreita.",
      "Entrem no túnel de luz rosa para chegar ao Hexahedron."
     ],
-    "tip": "O Toland é o guia mais confiável do caminho."
+    "tip": "O Toland é o guia mais confiável do caminho.",
+    "t": "pas"
    },
    {
     "n": "Hexahedron",
@@ -1429,7 +1484,8 @@
      "Peguem munição, recarreguem e subam na placa do centro para virar a sala.",
      "Repitam até 6 viradas; na última aparecem 2 Centuriões Possuídos."
     ],
-    "tip": "The Mountaintop e o Xenophage resolvem os Hobgoblins e Knight Echoes. Virou a sala errada? É só pegar as motes certas de novo."
+    "tip": "The Mountaintop e o Xenophage resolvem os Hobgoblins e Knight Echoes. Virou a sala errada? É só pegar as motes certas de novo.",
+    "t": "enc"
    },
    {
     "n": "Kell Echo",
@@ -1453,7 +1509,8 @@
      "Persigam o Kell Echo pelo corredor matando Hobgoblins; com 10 acúmulos de Dark Entropy você morre.",
      "Deem dano no começo e no fim do corredor; após ~20 s ele fica imune. Voltem pelo triângulo de areia e repitam."
     ],
-    "tip": "Na parada final, Ward of Dawn ou Well of Radiance. Se a espada estiver tomando pisão, troquem por Xenophage ou lança-granadas; o teleporte dele atravessa cobertura."
+    "tip": "Na parada final, Ward of Dawn ou Well of Radiance. Se a espada estiver tomando pisão, troquem por Xenophage ou lança-granadas; o teleporte dele atravessa cobertura.",
+    "t": "final"
    }
   ]
  },
@@ -1485,7 +1542,8 @@
      "Em cada sala: Cavaleiro com ataque leve, Feiticeira com o ataque pesado à distância, Shrieker com a guarda.",
      "Com os 3 mortos, sigam o feixe de luz verde."
     ],
-    "tip": "Só a Relic sword fere esses mini-chefes; peguem uma antes de entrar na sala."
+    "tip": "Só a Relic sword fere esses mini-chefes; peguem uma antes de entrar na sala.",
+    "t": "enc"
    },
    {
     "n": "Tunnels of Despair",
@@ -1507,7 +1565,8 @@
      "Repitam nas outras portas.",
      "Passem escondidos ou puxem os 3 Harrowing Pariah Ogres para longe."
     ],
-    "tip": "Os Ogros batem muito e não morrem: puxem para longe em vez de lutar."
+    "tip": "Os Ogros batem muito e não morrem: puxem para longe em vez de lutar.",
+    "t": "enc"
    },
    {
     "n": "Chamber of Suffering",
@@ -1530,7 +1589,8 @@
      "Usem Supers para limpar o excesso de inimigos.",
      "O 6º orbe termina o encontro."
     ],
-    "tip": "Velocidade é tudo: cada acúmulo de Curse of Suffering aumenta o dano recebido (com 5 quase tudo mata de um tiro). Well of Radiance ajuda quem está na placa."
+    "tip": "Velocidade é tudo: cada acúmulo de Curse of Suffering aumenta o dano recebido (com 5 quase tudo mata de um tiro). Well of Radiance ajuda quem está na placa.",
+    "t": "enc"
    },
    {
     "n": "The Harrow",
@@ -1547,7 +1607,8 @@
      "Matem o Malevolent Ritualist Wizard perto de cada símbolo.",
      "Quebrou as 3 travas, o caminho abre."
     ],
-    "tip": "Cuidado com as armadilhas e quedas; as Feiticeiras tiram muita vida rápido."
+    "tip": "Cuidado com as armadilhas e quedas; as Feiticeiras tiram muita vida rápido.",
+    "t": "enc"
    },
    {
     "n": "Zulmak, Instrument of Torment",
@@ -1570,7 +1631,8 @@
      "Quando Zulmak se ajoelhar para carregar o cristal, saiam do centro para fugir da explosão de fogo.",
      "Mudem de posição quando ele soltar o ataque longo que deixa fogo no chão."
     ],
-    "tip": "Combinem as posições antes de apagar o último orbe. O Izanagi's Burden funciona bem, ou 1 com Divinity e os outros com lança-granadas."
+    "tip": "Combinem as posições antes de apagar o último orbe. O Izanagi's Burden funciona bem, ou 1 com Divinity e os outros com lança-granadas.",
+    "t": "final"
    }
   ]
  },
@@ -1598,7 +1660,8 @@
      "Repitam até o símbolo do pássaro, que leva de volta ao prédio inicial.",
      "Limpem a área para liberar a descida."
     ],
-    "tip": "Zona de escuridão: cada morte soma 40 s de espera e uma derrota do time reinicia a área."
+    "tip": "Zona de escuridão: cada morte soma 40 s de espera e uma derrota do time reinicia a área.",
+    "t": "enc"
    },
    {
     "n": "Vorgeth, the Boundless Hunger",
@@ -1621,7 +1684,8 @@
      "Com o escudo caído, dano em Vorgeth; atirem ou fujam das bombas teleguiadas.",
      "Repitam até ele cair."
     ],
-    "tip": "Priorizem os Vândalos atiradores, protegidos pelos Goblins. Fiquem juntos para reviver rápido."
+    "tip": "Priorizem os Vândalos atiradores, protegidos pelos Goblins. Fiquem juntos para reviver rápido.",
+    "t": "boss"
    },
    {
     "n": "The Descent (Thrallway)",
@@ -1640,7 +1704,8 @@
      "Limpem os Shadow Thrall juntos.",
      "Pulem a borda com névoa para sair."
     ],
-    "tip": "Ficar no alto dá respiro; com Poder baixo esse trecho fica bem mais difícil."
+    "tip": "Ficar no alto dá respiro; com Poder baixo esse trecho fica bem mais difícil.",
+    "t": "pas"
    },
    {
     "n": "Dul Incaru, the Eternal Return",
@@ -1663,7 +1728,8 @@
      "Com o buff ativo, dano em Dul Incaru; limpem o buff no braseiro central antes de zerar.",
      "Os Cavaleiros voltam em ~60 s."
     ],
-    "tip": "Sem capacete, o Cavaleiro sai correndo: não tirem vida demais antes de estarem prontos. Usem a varanda de trás e os pilares como cobertura."
+    "tip": "Sem capacete, o Cavaleiro sai correndo: não tirem vida demais antes de estarem prontos. Usem a varanda de trás e os pilares como cobertura.",
+    "t": "final"
    }
   ]
  },
@@ -1691,7 +1757,8 @@
      "Entrem na caverna e fiquem perto do cristal para descarregar.",
      "Repitam até aparecer \"The remains are quieted\"."
     ],
-    "tip": "Fiquem perto da boca da caverna para depositar rápido."
+    "tip": "Fiquem perto da boca da caverna para depositar rápido.",
+    "t": "enc"
    },
    {
     "n": "Phry'zhia the Insatiable",
@@ -1714,7 +1781,8 @@
      "Repitam até o escudo cair.",
      "Dano em Phry'zhia."
     ],
-    "tip": "Barricade ou Healing Rift atrás do cristal ajudam. No Mestre aparecem Anti-Barrier Knights nas garagens."
+    "tip": "Barricade ou Healing Rift atrás do cristal ajudam. No Mestre aparecem Anti-Barrier Knights nas garagens.",
+    "t": "boss"
    },
    {
     "n": "Sunken Lair (shield)",
@@ -1737,7 +1805,8 @@
      "Em ~90 s, empurrem (ou soquem) a carcaça até o canhão.",
      "Mirem na estrutura central e disparem; 4 nós destruídos derrubam o escudo."
     ],
-    "tip": "No Mestre aparecem Overload Captains em cada ponto: matem primeiro."
+    "tip": "No Mestre aparecem Overload Captains em cada ponto: matem primeiro.",
+    "t": "enc"
    },
    {
     "n": "Captain Avarokk, the Covetous",
@@ -1760,7 +1829,8 @@
      "Começa a fase de dano de 30 s.",
      "Quando ele \"resists temptation once more\", repitam."
     ],
-    "tip": "No Mestre aparecem Anti-Barrier Servitors na coleta. Well of Radiance ou Ward of Dawn onde os adds surgem limpa rápido."
+    "tip": "No Mestre aparecem Anti-Barrier Servitors na coleta. Well of Radiance ou Ward of Dawn onde os adds surgem limpa rápido.",
+    "t": "final"
    }
   ]
  },
@@ -1794,7 +1864,8 @@
      "Matem as Visions of Gahlran para abrir as portas.",
      "Dano em Gahlran e voltem pelo sino antes de 60 s."
     ],
-    "tip": "\"Nightmare Collapsing\" mata o time ao zerar. A realidade não tem tempo: aproveitem para juntar munição pesada."
+    "tip": "\"Nightmare Collapsing\" mata o time ao zerar. A realidade não tem tempo: aproveitem para juntar munição pesada.",
+    "t": "boss"
    },
    {
     "n": "Open the Vault",
@@ -1817,7 +1888,8 @@
      "Com a segunda essência o Nightmare fica vulnerável (sem limite de tempo).",
      "Dano com Super e pesada; repitam para os 3."
     ],
-    "tip": "Peguem as duas essências de uma vez para economizar viagens."
+    "tip": "Peguem as duas essências de uma vez para economizar viagens.",
+    "t": "enc"
    },
    {
     "n": "Nightmare of Caiatl",
@@ -1840,7 +1912,8 @@
      "No pesadelo, interceptem Caiatl no sino para onde ela corre e atirem no sino: 10 s de atordoamento.",
      "Repitam nos outros 2 sinos; a fase acaba se ela chegar num sino."
     ],
-    "tip": "Perto do sino você ganha Waking Resonance (mais dano). Cada Psiônico morto dá mais tempo."
+    "tip": "Perto do sino você ganha Waking Resonance (mais dano). Cada Psiônico morto dá mais tempo.",
+    "t": "final"
    }
   ]
  },
@@ -1872,7 +1945,8 @@
      "Com todos carregados, peguem o elevador.",
      "Repitam até o topo e abram o baú."
     ],
-    "tip": "A ordem importa: nó errado ou pulado desliga em segundos."
+    "tip": "A ordem importa: nó errado ou pulado desliga em segundos.",
+    "t": "enc"
    },
    {
     "n": "Akelous, the Siren's Current",
@@ -1895,7 +1969,8 @@
      "Dano no núcleo (até 50% da vida por ciclo).",
      "Repitam até cair."
     ],
-    "tip": "No fim do dano vem uma explosão que joga longe: desçam para as passarelas ou usem habilidades."
+    "tip": "No fim do dano vem uma explosão que joga longe: desçam para as passarelas ou usem habilidades.",
+    "t": "boss"
    },
    {
     "n": "Persys, Primordial Ruin",
@@ -1918,7 +1993,8 @@
      "Ativem os nós dos pilares e o de cima da porta para trancá-lo.",
      "Com a purga concluída, ele sai vulnerável: dano e repitam."
     ],
-    "tip": "Cabo vermelho = porta, amarelo = reator. Sem Persys no reator durante a purga, o escudo não cai."
+    "tip": "Cabo vermelho = porta, amarelo = reator. Sem Persys no reator durante a purga, o escudo não cai.",
+    "t": "final"
    }
   ]
  },
@@ -1951,7 +2027,8 @@
      "Na porta, matem a Veilweaver Wizard e revelem a ilusão (Deepsight).",
      "Imbuam a estátua do símbolo certo; repitam 4 vezes."
     ],
-    "tip": "Estátua errada mata quem carrega e zera o progresso. Pardal acelera a volta."
+    "tip": "Estátua errada mata quem carrega e zera o progresso. Pardal acelera a volta.",
+    "t": "enc"
    },
    {
     "n": "Ecthar, Shield of Savathûn",
@@ -1974,7 +2051,8 @@
      "Matem o Wellkeeper Knight, entrem na poça e quebrem o escudo.",
      "Dano até ele ficar imune e repitam."
     ],
-    "tip": "Well of Radiance quase obrigatório; evitem foguete no espaço apertado. A primeira Feiticeira já surge após a primeira runa."
+    "tip": "Well of Radiance quase obrigatório; evitem foguete no espaço apertado. A primeira Feiticeira já surge após a primeira runa.",
+    "t": "boss"
    },
    {
     "n": "Simmumah ur-Nokru, Lucent Necromancer",
@@ -1997,7 +2075,8 @@
      "Na câmara d'água, matem o Lightbearer e o Fantasma (60 s de Vestige) e anotem a runa.",
      "Voltem, revelem e imbuam o ponto certo; 3 vezes e começa o dano."
     ],
-    "tip": "Quebrem o escudo na poça com a Arbalest. Mods de resistência a Arco ajudam."
+    "tip": "Quebrem o escudo na poça com a Arbalest. Mods de resistência a Arco ajudam.",
+    "t": "final"
    }
   ]
  },
@@ -2029,7 +2108,8 @@
      "Dano em Rathil (a fase dura mais quanto mais totens).",
      "Repitam e resolvam o enigma da prisão."
     ],
-    "tip": "Fiquem entre dois círculos sobrepostos para converter os dois juntos. Crítico fácil: sniper, escopeta ou espada."
+    "tip": "Fiquem entre dois círculos sobrepostos para converter os dois juntos. Crítico fácil: sniper, escopeta ou espada.",
+    "t": "boss"
    },
    {
     "n": "Locus of Wailing Grief",
@@ -2055,7 +2135,8 @@
      "Dano perto de um braseiro (dá buff).",
      "Quando acabar, passem para o próximo; após os 4, voltem e repitam."
     ],
-    "tip": "Com 10 acúmulos de Biting Cold você morre: os estandartes da parede limpam."
+    "tip": "Com 10 acúmulos de Biting Cold você morre: os estandartes da parede limpam.",
+    "t": "boss"
    },
    {
     "n": "Hefnd's Vengeance, Blighted Chimaera",
@@ -2082,7 +2163,8 @@
      "Repitam nas 3 de baixo.",
      "No topo, fiquem numa ilha, destruam Acolyte Eyes para ganhar tempo e mudem quando ele mudar."
     ],
-    "tip": "Ele fica longe: foguete e sniper, nada de escopeta. Sunshot limpa os Acolyte Eyes rápido."
+    "tip": "Ele fica longe: foguete e sniper, nada de escopeta. Sunshot limpa os Acolyte Eyes rápido.",
+    "t": "final"
    }
   ]
  },
@@ -2119,7 +2201,8 @@
      "Levem ao salão, matem o Brig e depositem.",
      "Repitam até 3; guardem Super e pesada para o Brig final."
     ],
-    "tip": "Segurar o núcleo dá Radiation; com 10 você morre. Larguem para baixar."
+    "tip": "Segurar o núcleo dá Radiation; com 10 você morre. Larguem para baixar.",
+    "t": "enc"
    },
    {
     "n": "Raneiks Unified",
@@ -2146,7 +2229,8 @@
      "Anotem os 2 servidores com luzes extras; repitam até 4 números.",
      "O Operator atira nos painéis certos e o Suppressor usa o buff: 25 s de dano."
     ],
-    "tip": "Titãs Solares com Consecration e Arcanos com Song of Flame vão bem; Parasite e Dragon's Breath também."
+    "tip": "Titãs Solares com Consecration e Arcanos com Song of Flame vão bem; Parasite e Dragon's Breath também.",
+    "t": "boss"
    },
    {
     "n": "Atraks Sovereign (The Corrupted Puppeteer)",
@@ -2173,7 +2257,8 @@
      "Destruam a Broken Puppet que fica branca no radar, peguem o núcleo e depositem; 2 vezes.",
      "No elevador, dano no centro e depois nas laterais; o núcleo extra dá mais tempo."
     ],
-    "tip": "Consecration limpa as Broken Puppets rápido; Lost Signal, Anarchy e Grand Overture ajudam no dano."
+    "tip": "Consecration limpa as Broken Puppets rápido; Lost Signal, Anarchy e Grand Overture ajudam no dano.",
+    "t": "final"
    }
   ]
  },
@@ -2206,7 +2291,8 @@
      "Girem o suporte antes de pôr a lente (quebra após 3 giros).",
      "Completem 1, 2 e 3 feixes nas três fases."
     ],
-    "tip": "Círculo errado faz surgir um Tormentor no centro."
+    "tip": "Círculo errado faz surgir um Tormentor no centro.",
+    "t": "enc"
    },
    {
     "n": "Zoetic Lockset",
@@ -2229,7 +2315,8 @@
      "A da esquerda em Kill: começa o dano.",
      "Juntos, dano em um dos 4 Shriekers; repitam."
     ],
-    "tip": "Sleeper Simulant e Grand Overture vão bem; Ammo Finder ajuda."
+    "tip": "Sleeper Simulant e Grand Overture vão bem; Ammo Finder ajuda.",
+    "t": "enc"
    },
    {
     "n": "Kerrev, the Erased",
@@ -2256,7 +2343,8 @@
      "Com tudo pronto, apertem o botão da placa do meio.",
      "Protejam-se do obelisco e deem dano; repitam."
     ],
-    "tip": "Mod de resistência a Strand muito recomendado."
+    "tip": "Mod de resistência a Strand muito recomendado.",
+    "t": "final"
    }
   ]
  },
@@ -2293,7 +2381,8 @@
      "Nos túneis de pardal, juntem Shadow até Shadow Novice.",
      "Usem a granada especial nos escudos; 6 Nameless Apprentices e os Behemoths."
     ],
-    "tip": "Sem pegar Shadow nos túneis, as Creeping Shadows matam. Cápsulas de queda matam quem estiver embaixo."
+    "tip": "Sem pegar Shadow nos túneis, as Creeping Shadows matam. Cápsulas de queda matam quem estiver embaixo.",
+    "t": "enc"
    },
    {
     "n": "Harrow, Dredgen Apprentice",
@@ -2320,7 +2409,8 @@
      "Atraiam Harrow para as portas do hangar ou para os 4 pilares.",
      "Dano em ~30 s; na divisão, persigam-no pelo corredor."
     ],
-    "tip": "Pilares e fusíveis não voltam: ~3 fases. Praxic Blade, Legend of Acrius ou Parasite."
+    "tip": "Pilares e fusíveis não voltam: ~3 fases. Praxic Blade, Legend of Acrius ou Parasite.",
+    "t": "boss"
    },
    {
     "n": "Dredgen Sere",
@@ -2347,7 +2437,8 @@
      "Voltem, destruam os últimos orbes e deem dano.",
      "Depois, nas bordas, parem os pilares de Arco com a granada."
     ],
-    "tip": "Atirem nas mãos de Sere quando ele soltar raios para atordoá-lo."
+    "tip": "Atirem nas mãos de Sere quando ele soltar raios para atordoá-lo.",
+    "t": "final"
    }
   ]
  }
