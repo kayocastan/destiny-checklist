@@ -4400,23 +4400,42 @@ function firstHTML() {
   return `<article class="gd fg-a"><div class="gd-head"><h2>${esc(W.fgT)}</h2></div><p>${esc(W.fgNote)}</p>${sel}${body}</article>`;
 }
 document.addEventListener('change', e => { if (e.target.id !== 'firstsel') return; FIRST.k = e.target.value; LS.set('dc-first', FIRST.k); render(); });
-/* ---------- Beta: comparar guardiões (conclusões de cada atividade, lado a lado) ---------- */
-const CMPG = { sel: null };
-function cmpGHTML() {
-  const W = u(), opts = [...favs().map(f => ({ n: f.name.replace(/#\d+$/, ''), mt: f.type, mid: f.id })), ...(GD?.clan?.list || []).map(x => ({ n: x.n, mt: x.mt, mid: x.mid }))].filter((x, i, l) => l.findIndex(y => y.mid === x.mid) === i).sort((a, b) => a.n.localeCompare(b.n, lang === 'en' ? 'en' : 'pt-BR', { sensitivity: 'base' }));
-  const o = CMPG.sel && GMET[CMPG.sel.mid];
-  let body = '';
-  if (CMPG.sel && !o) body = `<p class="wait">${esc(W.loadingDefs)}</p>`;
-  else if (o?.priv) body = `<p>${esc(W.cmpgPriv)}</p>`;
-  else if (o) {
-    const rows = ACT_METRICS().map(([k, a]) => ({ k, a, me: metric(a.m), him: o.m[a.m] || 0 })).filter(r => r.me || r.him);
-    const tot = (f) => rows.reduce((t, r) => t + f(r), 0);
-    body = `<table class="cmpg"><thead><tr><th></th><th>${esc(W.cmpgYou)}</th><th>${esc(CMPG.sel.n)}</th></tr></thead><tbody>${profile.profile?.data?.currentGuardianRank ? `<tr><td>${esc(W.w.gRank)}</td>${cmpCell(profile.profile.data.currentGuardianRank, o.gr)}</tr>` : ''}${rows.map(r => `<tr><td>${esc(L(r.a.n))}</td>${cmpCell(r.me, r.him)}</tr>`).join('')}<tr class="tot"><td>${esc(W.cmpgTot)}</td>${cmpCell(tot(r => r.me), tot(r => r.him))}</tr></tbody></table>`;
-  }
-  return `<article class="gd cmpg-a"><div class="gd-head"><h2>${esc(W.cmpgT)}</h2></div><p>${esc(W.cmpgNote)}</p><select class="tsort-sel cmpg-s" id="cmpgsel"><option value="">${esc(W.cmpgPick)}</option>${opts.map(x => `<option value="${esc(x.mt + ':' + x.mid)}"${CMPG.sel?.mid === x.mid ? ' selected' : ''}>${esc(x.n)}</option>`).join('')}</select>${body}</article>`;
+/* ---------- Comparar guardiões: incursões e masmorras feitas, exóticos e títulos que um tem e o outro não ---------- */
+const CMPG = { sel: null, cr: {}, open: LS.get('dc-cmpg-open', 'ex') };
+const cgAcq = (p, hs) => hs.some(h => { const st = [p.profileCollectibles?.data?.collectibles?.[h]?.state, ...Object.values(p.characterCollectibles?.data || {}).map(c => c.collectibles?.[h]?.state)].filter(x => x !== undefined); return st.some(x => !(x & 1)); });
+const cgRec = (p, h) => { const r = p.profileRecords?.data?.records?.[h] || Object.values(p.characterRecords?.data || {}).map(c => c.records?.[h]).find(Boolean); return r ? !(r.state & 4) : false; };
+function cgSets(p) { return { ex: new Set((defs.exotics || []).filter(x => cgAcq(p, x.h)).map(x => x.h[0])), tit: new Set((defs.seals || []).filter(x => cgRec(p, x.cr)).map(x => x.cr)) }; }
+async function cgLoad(mt, mid) {
+  if (CMPG.cr[mid]) return; CMPG.cr[mid] = { busy: true };
+  try { const r = await bungie(`/Destiny2/${mt}/Profile/${mid}/?components=800,900`, false); CMPG.cr[mid] = r.profileCollectibles?.data || r.profileRecords?.data ? cgSets(r) : { priv: true }; }
+  catch { CMPG.cr[mid] = { priv: true }; }
+  if (isGd()) render();
 }
+function cmpGHTML() {
+  const W = u(), P = lang === 'pt', opts = [...favs().map(f => ({ n: f.name.replace(/#\d+$/, ''), mt: f.type, mid: f.id })), ...(GD?.clan?.list || []).map(x => ({ n: x.n, mt: x.mt, mid: x.mid }))].filter((x, i, l) => l.findIndex(y => y.mid === x.mid) === i).sort((a, b) => a.n.localeCompare(b.n, lang === 'en' ? 'en' : 'pt-BR', { sensitivity: 'base' }));
+  const o = CMPG.sel && GMET[CMPG.sel.mid], c = CMPG.sel && CMPG.cr[CMPG.sel.mid], nm = CMPG.sel?.n || '';
+  let body = '';
+  if (CMPG.sel && (!o || !c || c.busy)) body = `<p class="wait">${esc(W.loadingDefs)}</p>`;
+  else if (o?.priv && c?.priv) body = `<p>${esc(W.cmpgPriv)}</p>`;
+  else if (o) {
+    const me = cgSets(profile), rows = ACT_METRICS().map(([k, a]) => ({ k, a, me: metric(a.m), him: o.m[a.m] || 0 })).filter(r => r.me || r.him);
+    const only = (A, B) => [...A].filter(x => !B.has(x));
+    const exN = h => { const x = (defs.exotics || []).find(e => e.h[0] === h); return x ? L(x.n) : ''; }, tiN = h => { const x = (defs.seals || []).find(e => e.cr === h); return x ? L(x.t) : ''; };
+    const lists = c.priv ? null : { exMe: only(me.ex, c.ex).map(exN).sort(), exHim: only(c.ex, me.ex).map(exN).sort(), tiMe: only(me.tit, c.tit).map(tiN), tiHim: only(c.tit, me.tit).map(tiN) };
+    const raidMe = rows.filter(r => r.me && !r.him), raidHim = rows.filter(r => r.him && !r.me);
+    const kpi = (t, a, b) => `<div class="cg-k"><small>${esc(t)}</small><span><b class="${a > b ? 'win' : ''}">${a}</b><i>×</i><b class="${b > a ? 'win' : ''}">${b}</b></span></div>`;
+    const chips = (l, cls) => l.length ? `<div class="dp-chips">${l.map(n => `<span class="dp-chip ${cls}">${esc(n)}</span>`).join('')}</div>` : `<small class="lbd-n">${P ? 'nada' : 'nothing'}</small>`;
+    const blk = (id, t, a, b, la, lb) => { const open = CMPG.open === id; return `<section class="cg-b${open ? ' open' : ''}"><button type="button" class="cg-bh" data-cgo="${id}" aria-expanded="${open}"><b>${esc(t)}</b><span class="cg-c"><span class="me">${P ? 'só você' : 'only you'} <b>${a}</b></span><span class="him">${P ? 'só ' : 'only '}${esc(nm)} <b>${b}</b></span></span><span class="chev" aria-hidden="true"></span></button>${open ? `<div class="cg-cols"><div><small class="cg-l me">${P ? 'Você tem e ' + nm + ' não' : 'You have, ' + nm + ' does not'}</small>${chips(la, 'me')}</div><div><small class="cg-l him">${esc(nm)} ${P ? 'tem e você não' : 'has, you do not'}</small>${chips(lb, 'him')}</div></div>` : ''}</section>`; };
+    body = `<div class="cg-kpis">${kpi(P ? 'Patente de guardião' : 'Guardian rank', profile.profile?.data?.currentGuardianRank || 0, o.gr || 0)}${kpi(P ? 'Conclusões (incursão + masmorra)' : 'Clears (raid + dungeon)', rows.reduce((t, r) => t + r.me, 0), rows.reduce((t, r) => t + r.him, 0))}${lists ? kpi(P ? 'Exóticos' : 'Exotics', me.ex.size, c.ex.size) + kpi(P ? 'Títulos' : 'Titles', me.tit.size, c.tit.size) : ''}</div>
+      ${blk('act', P ? 'Incursões e masmorras' : 'Raids and dungeons', raidMe.length, raidHim.length, raidMe.map(r => L(r.a.n)), raidHim.map(r => L(r.a.n)))}
+      ${lists ? blk('ex', P ? 'Exóticos' : 'Exotics', lists.exMe.length, lists.exHim.length, lists.exMe, lists.exHim) + blk('tit', P ? 'Títulos' : 'Titles', lists.tiMe.length, lists.tiHim.length, lists.tiMe, lists.tiHim) : `<p class="lbd-n">${P ? 'Coleções e triunfos privados: só dá para comparar as conclusões.' : 'Private collections and triumphs: only clears can be compared.'}</p>`}
+      <details class="cg-all"><summary>${P ? 'Conclusões por atividade' : 'Clears per activity'}</summary><table class="cmpg"><thead><tr><th></th><th>${esc(W.cmpgYou)}</th><th>${esc(nm)}</th></tr></thead><tbody>${rows.map(r => `<tr><td>${esc(L(r.a.n))}</td>${cmpCell(r.me, r.him)}</tr>`).join('')}</tbody></table></details>`;
+  }
+  return `<article class="gd cmpg-a"><div class="gd-head"><h2>${esc(W.cmpgT)}</h2></div><p>${esc(P ? 'O que cada um já fez e tem: incursões e masmorras, exóticos e títulos que um tem e o outro não. Ajuda a montar grade e a escolher quem guia.' : 'What each of you has done and owns: raids and dungeons, exotics and titles one has and the other does not. Helps build rosters and pick who guides.')}</p><select class="tsort-sel cmpg-s" id="cmpgsel"><option value="">${esc(W.cmpgPick)}</option>${opts.map(x => `<option value="${esc(x.mt + ':' + x.mid)}"${CMPG.sel?.mid === x.mid ? ' selected' : ''}>${esc(x.n)}</option>`).join('')}</select>${body}</article>`;
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-cgo]'); if (!b) return; CMPG.open = CMPG.open === b.dataset.cgo ? '' : b.dataset.cgo; LS.set('dc-cmpg-open', CMPG.open); render(); });
 const cmpCell = (a, b) => `<td class="${a > b ? 'win' : ''}">${fmtN(a)}</td><td class="${b > a ? 'win' : ''}">${fmtN(b)}</td>`;
-document.addEventListener('change', e => { if (e.target.id !== 'cmpgsel') return; const [mt, mid] = e.target.value.split(':'); const n = e.target.selectedOptions[0]?.textContent || ''; CMPG.sel = mid ? { mt: +mt, mid, n } : null; render(); if (mid) guardianMetrics(+mt, mid).then(() => { if (isGd()) render(); }); });
+document.addEventListener('change', e => { if (e.target.id !== 'cmpgsel') return; const [mt, mid] = e.target.value.split(':'); const n = e.target.selectedOptions[0]?.textContent || ''; CMPG.sel = mid ? { mt: +mt, mid, n } : null; render(); if (mid) { guardianMetrics(+mt, mid).then(() => { if (isGd()) render(); }); cgLoad(+mt, mid); } });
 /* ---------- Foco: títulos, incursões, masmorras, missões, exóticos e catalisadores marcados com ☆ aparecem em destaque nos Objetivos ---------- */
 const FOCUS_TABS = ['tit', 'raid', 'dg', 'xm'], FOCUS_ITEM_TABS = ['exo', 'cat'];
 const focList = () => LS.get('dc-focus', []);
