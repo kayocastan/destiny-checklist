@@ -2181,3 +2181,5 @@ html.grade .ob-opt{font-size:16px}
 .rl-k button:hover{transform:translateY(-1px)}.rl-k button[aria-pressed="true"]{box-shadow:0 0 0 2px currentColor inset}
 .rl-k button.g[aria-pressed="true"]{color:#7fe08f;background:rgba(127,224,143,.2)}.rl-k button.p[aria-pressed="true"]{color:#f2d36b;background:rgba(242,211,107,.18)}.rl-k button.n[aria-pressed="true"]{color:#ff8a7a;background:rgba(255,138,122,.18)}
 .rl-k button[aria-pressed="true"] b{color:var(--fg)}
+.t3 .t2-main{min-width:0}.t3-hero,.t3-rest{grid-template-columns:minmax(0,1fr)}.t3-big,.t3-row{min-width:0}.t3-yt{flex-wrap:wrap}
+.t3 .t2-side .t2-n{min-width:0}.t3 .t2-side .t2-n small{white-space:normal}
