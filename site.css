@@ -2226,3 +2226,16 @@ html.grade .ob-opt{font-size:16px}
 .dp-chip.me{border:1px solid color-mix(in srgb,var(--acc) 40%,transparent)}.dp-chip.him{border:1px solid rgba(242,211,107,.4)}
 .cg-all{margin-top:10px}.cg-all summary{cursor:pointer;color:var(--muted);font-size:14px}
 @media (max-width:640px){.cg-cols{grid-template-columns:1fr}}
+/* Hoje › Calendário do jogo */
+.cal{display:grid;gap:14px}.cal-hd{display:flex;align-items:baseline;gap:10px}.cal-hd h2{margin:0;font-family:var(--display,inherit);font-size:28px}.cal-hd small{color:var(--muted)}
+.cal-cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}.cal-b{display:grid;gap:8px;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--surface,var(--bg))}
+.cal-r{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border-radius:10px;background:var(--chip);color:var(--fg);font:inherit;text-align:left;border:0;width:100%}
+.cal-r>i{width:10px;height:10px;border-radius:50%}.cal-r b{display:block;font-size:15px}.cal-r small{display:block;color:var(--muted);font-size:12.5px;margin-top:1px}.cal-r .v{font:600 13px var(--mono);white-space:nowrap}
+.cal-r.on{box-shadow:inset 3px 0 0 currentColor}.cal-btn{cursor:pointer}.cal-btn:hover{outline:1px solid var(--acc)}
+.cal-sea{display:grid;gap:4px;padding:10px 12px;border-radius:10px;background:var(--chip)}.cal-sea small{color:var(--muted);font-size:12.5px}.cal-sea .sea-bar u{background:#c6a8ff}
+@media (max-width:760px){.cal-cols{grid-template-columns:1fr}}
+/* comparar: cabeçalho sem colidir com o ✕ e atributos numa linha */
+.cmp-box .pf-x{z-index:2}.cmp-hd{padding:4px 48px 12px 0}.cmp-h img{flex:none}
+.cmp-s{grid-template-columns:40px minmax(0,1fr) minmax(110px,150px) minmax(0,1fr) 40px}.cmp-s span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12.5px}
+.cmp-s>i:not(.cmp-bar){height:6px}
+.cmp-r{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}.cmp-r>small{display:none}.cmp-r span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
