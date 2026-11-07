@@ -2154,3 +2154,25 @@ html.grade .ob-opt{font-size:16px}
 .ob-calb{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.ob-calb a{text-decoration:none}
 .ob-calb.big{padding:14px 16px;border-radius:14px;border:1px solid color-mix(in srgb,var(--acc) 45%,transparent);background:linear-gradient(135deg,color-mix(in srgb,var(--acc) 14%,transparent),transparent 70%)}
 .ob-calb.big b{flex-basis:100%;font-size:16px}.ob-calb.big a{font-size:15px;padding:9px 16px;border-color:var(--acc)}
+/* Esta semana para você (beta 07/11): destaques na horizontal, faixa do topo e linhas que abrem */
+.t3 .t3-top{display:flex;align-items:stretch;gap:12px;flex-wrap:wrap;margin:-4px 0 4px}.t3 .t3-top .t2-how{margin-left:auto}
+.t3-strip{flex:1 1 320px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border-radius:12px;border:1px solid color-mix(in srgb,#5865f2 55%,var(--line));background:linear-gradient(90deg,rgba(88,101,242,.16),transparent 70%);color:var(--fg);text-decoration:none;font:inherit;cursor:pointer;text-align:left}
+.t3-strip>span:first-child{font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}.t3-strip b{font-size:16px}.t3-strip small{color:var(--muted);font-family:var(--mono);font-size:12.5px}.t3-strip .sea-bar{flex:1 1 80px;max-width:180px}.t3-go{margin-left:auto;color:var(--acc);font-size:13.5px;font-weight:600}
+.t3-hero,.t3-rest{display:grid;gap:10px}.t3-hk{font:600 11.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.t3-big{position:relative;isolation:isolate;overflow:hidden;display:grid;gap:6px;padding:16px 18px;border-radius:14px;border:1px solid var(--line);background:var(--chip)}
+.t3-big::before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(10,14,20,.95) 0%,rgba(10,14,20,.8) 50%,rgba(10,14,20,.45) 100%),var(--t3-img,none) center/cover no-repeat}
+.t3-bh{display:flex;align-items:center;gap:10px}.t3-pg{margin-left:auto;font:600 12.5px var(--mono);color:var(--muted)}
+.t3-t{font-family:var(--display,inherit);font-size:24px;line-height:1.1;text-shadow:0 1px 3px rgba(0,0,0,.6)}.t3-st{font-size:14px;color:#c9d3dd}.t3-st.w{color:#f2d36b}.t3-st.ok{color:#7fe08f}
+.t3-yt{margin:2px 0 0}.t3-acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:4px}.t3-acts a{text-decoration:none}
+.t3-grade,.t3-gr{background:rgba(88,101,242,.18)!important;border-color:rgba(88,101,242,.7)!important;color:#c8ccff!important}
+.t3-gr{font-size:12.5px;padding:3px 9px;border:1px solid;border-radius:999px;text-decoration:none;white-space:nowrap}
+.t3-ex{margin-left:auto;display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid var(--line);border-radius:8px;color:var(--fg);font:600 13px var(--sans,inherit);padding:6px 10px;cursor:pointer}.t3-ex[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.t3-items{list-style:none;margin:6px 0 0;padding:10px 0 0;border-top:1px solid var(--line);display:grid;gap:6px}.t3-items li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:8px;font-size:14px}.t3-items li.ok{color:var(--muted)}.t3-items small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.t3-items .tl-i{width:18px;height:18px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-size:11px;color:#7fe08f}
+.t3-mis{border-color:rgba(159,176,194,.4)}.t3-where,.t3-loc{font-weight:700;color:#f2d36b}.t3-where{font-size:15px}
+.t3-row{border:1px solid var(--line);border-radius:12px;background:var(--chip)}
+.t3-rh{width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;background:none;border:0;color:var(--fg);font:inherit;text-align:left;cursor:pointer}.t3-rh b{font-size:15px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t3-rh .chev{margin-left:auto}.t3-row.open .t3-rh .chev{transform:rotate(180deg)}
+.t3-mb{display:flex;align-items:center;gap:6px;flex:0 0 140px;margin-left:auto}.t3-mb .sea-bar{flex:1}.t3-mb small{font:600 12px var(--mono);color:var(--muted)}.t3-mb+.chev{margin-left:8px}
+.t3-rb{display:grid;gap:8px;padding:0 14px 12px}
+@media (max-width:640px){.t3 .t3-top .t2-how{margin-left:0}.t3-mb{display:none}}
