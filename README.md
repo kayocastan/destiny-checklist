@@ -41,3 +41,22 @@ Depois, em **Deployments**, clique em **Redeploy** para valer.
 
 ## Atualizar os nomes do jogo
 `data/defs.json` é gerado a partir do manifesto oficial da Bungie. Quando sair conteúdo novo (exóticos, títulos), ele precisa ser regerado.
+
+## Backlog (ideias aprovadas, ainda não feitas)
+
+Detalhes em `docs/sugestoes.md`.
+
+- **Lembretes do Orla Bot:** 30 minutos antes da grade, o bot marca os titulares na mensagem do #lfg-destiny (a tarefa por minuto do bot já existe; falta a coluna "lembrado" e o texto).
+- **Grade recorrente:** modelos do tipo "toda sexta às 21h, Cripta" que o bot cria sozinho com alguns dias de antecedência; o criador pausa ou apaga pelo site.
+- **Mensagem para quem não registrou o Discord:** aviso único para os membros do clã que ainda não ligaram o Discord à Bungie.
+- **Bônus de conjunto e tiers de armadura:** proposta em `docs/armaduras.md`.
+- **Separar o app.js em módulos:** medição e plano em `docs/desempenho.md`.
+
+## Páginas e serviços extras
+
+| Endereço | O que é |
+|---|---|
+| `/estado` | status público: site, servidor, Orla Bot e API da Bungie |
+| `/grade` | grades do clã (Orla Bot), só membros da Orla |
+| `/videos` | cadastro de vídeos de guia (só o dono do site) |
+| `/status` | uso do servidor (só o dono do site) |

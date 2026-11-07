@@ -1,0 +1,1849 @@
+{
+ "_source": "Planilha Armor Set Bonuses (We Chosen Few; créditos LowCo + Azra; números do Destiny Data Compendium). Notas são subjetivas.",
+ "archetypes": {
+  "Gunner": {
+   "Grenade": 25,
+   "Weapons": 30
+  },
+  "Bulwark": {
+   "Health": 30,
+   "Class": 25
+  },
+  "Specialist": {
+   "Class": 30,
+   "Weapons": 25
+  },
+  "Grenadier": {
+   "Grenade": 30,
+   "Super": 25
+  },
+  "Paragon": {
+   "Melee": 25,
+   "Super": 30
+  },
+  "Brawler": {
+   "Health": 25,
+   "Melee": 30
+  },
+  "Siegebreaker": {
+   "Health": 30,
+   "Grenade": 25
+  },
+  "Skirmisher": {
+   "Melee": 30,
+   "Weapons": 25
+  },
+  "Demolitionist": {
+   "Grenade": 30,
+   "Class": 25
+  },
+  "Colossus": {
+   "Health": 25,
+   "Super": 30
+  },
+  "Reaver": {
+   "Melee": 25,
+   "Class": 30
+  },
+  "Powerhouse": {
+   "Super": 25,
+   "Weapons": 30
+  }
+ },
+ "sets": [
+  {
+   "set": "AION Adapter",
+   "b2": {
+    "name": "Force Absorption",
+    "desc": "Final blows with any Rocket or Grenade Launcher temporarily decrease incoming area-of-effect damage.",
+    "num": "After a Micromissile, Rocket Launcher, or Grenade Launcher Kill: 20% AOE Damage Resist and 60% self-explosive Damage Resist for 15 Seconds",
+    "rating": "B"
+   },
+   "b4": {
+    "name": "Reactive Shock",
+    "desc": "When Force Absorption is active, taking melee damage causes you to emit a disorienting burst once.",
+    "num": "This disorienting burst can only be triggered ONCE per Reactive Shock activation",
+    "rating": "C"
+   },
+   "source": "Kepler",
+   "sourceType": "Destination"
+  },
+  {
+   "set": "AION Renewal",
+   "b2": {
+    "name": "Force Converter",
+    "desc": "After a final blow with any Rocket or Grenade Launcher, sprint for a short time to gain Speed Booster.",
+    "num": "After a Micromissile, Rocket Launcher, or Grenade Launcher Kill: Grants force converter, granting speed boost",
+    "rating": "E"
+   },
+   "b4": {
+    "name": "Reactive Booster",
+    "desc": "Once per activation of Force Converter, sprinting while at critical health, being suspended, or being slowed by a Stasis effect will immediately grant Speed Booster for a short duration.",
+    "num": "This benefit can only trigger ONCE per Force Converter Activation",
+    "rating": "E"
+   },
+   "source": "Kepler",
+   "sourceType": "Destination"
+  },
+  {
+   "set": "Apostate's Blade",
+   "b2": {
+    "name": "Regenerative Threshold",
+    "desc": "Performing a finisher stores power. The next time your shields are broken, consume stored power to immediately heal and start health regeneration.",
+    "num": "Grants Regenerative Threshold on Finisher. When reaching Critical Health, consumes Regenerative Threshold and grants 20 HP and begins Health Regeneration.",
+    "rating": "B"
+   },
+   "b4": {
+    "name": "Melee Conduction",
+    "desc": "While you have Radiant, Restoration, or Cure, your melee hits release a burst that will scorch the target.",
+    "num": "While Radiant, Resoration, or Cure are active: The tiggered Solar Blast deals 28 Damage and inflicts 30 (+10 ashes) scorch within 7? meters",
+    "rating": "C"
+   },
+   "source": "Pit of Heresy",
+   "sourceType": "Dungeon"
+  },
+  {
+   "set": "Atheon's Memory",
+   "b2": {
+    "name": "Radiolaria Breach",
+    "desc": "After picking up an Orb of Power, the next time your shields are broken, gain a bonus to Health stat for a short duration and release a burst of radiolaria around you.",
+    "num": "Damage is very minimal. Play for the 4 piece bonus",
+    "rating": "D"
+   },
+   "b4": {
+    "name": "Collective Power",
+    "desc": "While you have a subclass buff, dealing sustained damage creates an Orb of Power.",
+    "num": "Orb Appears at feet. Great for damage self-sustain via orbs",
+    "rating": "A"
+   },
+   "source": "Vault of Glass",
+   "sourceType": "Raid"
+  },
+  {
+   "set": "Bushido",
+   "b2": {
+    "name": "Iaido",
+    "desc": "Final blows with freshly drawn or reloaded weapons heal you.",
+    "num": "Kills Restore 35 HP. There is a 3 second Cooldown between perk activation.",
+    "rating": "B+"
+   },
+   "b4": {
+    "name": "Unfaltering Focus",
+    "desc": "Bow, Shotgun, or Sword final blows temporarily reduce incoming damage. Damaging targets with those weapons extends the effect.",
+    "num": "Resist x1 (10%) for 7 seconds. Additional damage extends buff by +2 seconds with maximum of 9 seconds.",
+    "rating": "C"
+   },
+   "source": "Vanguard Engrams + Postmaster",
+   "sourceType": "Vendor (Zavala) + Lost Sectors*"
+  },
+  {
+   "set": "Circuit",
+   "b2": {
+    "name": "Revving Up",
+    "desc": "Fast movement builds up a charge that gradually increases your health regeneration speed. Once you are Fully Revved, sprinting grants Speed Booster.",
+    "num": "Stacks accumulate at 1 per 5 seconds (45 seconds total) up to 10x stacks (+45% HP/s). Each stack grants increased Critical Health Regeneration Speed, NOT Shields. When slow, stacks deplete at 4x stacks/second",
+    "rating": "C"
+   },
+   "b4": {
+    "name": "Dielectric Drift",
+    "desc": "Sliding while Speed Booster is active jolts combatants in front of you.",
+    "num": "No internal cooldown?",
+    "rating": "B+"
+   },
+   "source": "Sparrow Racing League",
+   "sourceType": "Portal"
+  },
+  {
+   "set": "CODA",
+   "b2": {
+    "name": "Between Poles",
+    "desc": "Final blows with Light weapons grants stacks of Light Polarity, which grants Grenade stat. Final blows with Darkness or Kinetic weapons grants stacks of Dark Polarity, which grants stacks of Melee stat.",
+    "num": "Light/Dark polarity for 10 seconds a stack, 5 stacks max, 8 stat per stack up to a max of +40 stat. ALL stacks removed when polarity changes on opposite polarity weapon kill",
+    "rating": "C"
+   },
+   "b4": {
+    "name": "So Very Thin",
+    "desc": "Final blows with Light weapons grants additional grenade energy. Final blows with Dark or Kinetic weapons grants additional melee energy. Rapid final blows that alternate between Light and Darkness grant a short period of damage resistance.",
+    "num": "In addition to the stats provided by 2-piece, chunk-ability gains AND 40% DR for 5 seconds as long as you play the rotating elements mini-game is amazing",
+    "rating": "S"
+   },
+   "source": "Prophecy",
+   "sourceType": "Dungeon"
+  },
+  {
+   "set": "Collective Psyche",
+   "b2": {
+    "name": "Accretion",
+    "desc": "Picking up an ammo brick gives you a stacking bonus to weapon swap and stow speeds until you die.",
+    "num": "Stacks up to 20x. Persist through death. Special grants 1 stack, Heavy 3 stacks. Bonus to ready/stow speeds at maximum is .8x Ready/Stow Animation duration at 20 stacks.",
+    "rating": "E"
+   },
+   "b4": {
+    "name": "Doppler Effect",
+    "desc": "Suspend, unravel, and sever effects applied to targets, and radiant and restoration effects applied to you have increased duration.",
+    "num": "Duration increase is 50% longer with Ember of Solace or Thread of Continuity boosting benefit to 70%",
+    "rating": "C"
+   },
+   "source": "The Desert Perpetual",
+   "sourceType": "Raid"
+  },
+  {
+   "set": "Crota's Memory",
+   "b2": {
+    "name": "Cursed Fist",
+    "desc": "Melee final blows trigger a Cursed Thrall explosion.",
+    "num": "Radius of explosion is 4.5 meters. No? internal cooldown. Explosion is ARC damage.",
+    "rating": "B+"
+   },
+   "b4": {
+    "name": "Power of the Son",
+    "desc": "Being in combat for a duration grants progressively more flinch resistance and damage resistance versus combatants.",
+    "num": "Similar to Frenzy requirements for combat (Deal/recieve damage every 7 seconds). After 12 Seconds, gain 15% Damage Resist + Flinch Resist. After 24 Seconds, gain 25% Damage Resist + Flinch Resist.",
+    "rating": "A"
+   },
+   "source": "Crota's End",
+   "sourceType": "Raid"
+  },
+  {
+   "set": "Cruel Electrum",
+   "b2": {
+    "name": "Primary Survivor",
+    "desc": "When an ally is defeated, Primary ammo weapons gain increased handling, reload speed, target acquisition, and reduced flinch. Bonus increases when multiple allies are dead at the same time or when you are running solo.",
+    "num": "",
+    "rating": "PVP"
+   },
+   "b4": {
+    "name": "Primary Phantom",
+    "desc": "Final blows with Primary ammo weapons remove you from radar for a short time. Drawing a weapon that does not use Primary ammo will immediately end this effect.",
+    "num": "",
+    "rating": "PVP"
+   },
+   "source": "Trials of Osiris + Trials Engrams",
+   "sourceType": "Portal + Vendor (Saint-14)"
+  },
+  {
+   "set": "Crystocrene",
+   "b2": {
+    "name": "Resupply",
+    "desc": "After being out of combat for a moderate duration, your next final blow grants additional ammo progress and creates an Orb of Power.",
+    "num": "Triggers EVERY 12 seconds no matter what; seems like a bug but likely will not get patched. free ammo progress + orbs is very good and benefits increase the less you are in combat.",
+    "rating": "A"
+   },
+   "b4": {
+    "name": "From the Storm",
+    "desc": "After being out of combat for a moderate duration, slowly gain Frost Armor until you reenter combat.",
+    "num": "Does not have the same functionality of \"being out of combat\" as the 2-piece. Extremely extremley niche, borderline PVP",
+    "rating": "E"
+   },
+   "source": "Europa",
+   "sourceType": "Destination"
+  },
+  {
+   "set": "Cyberserpent Null",
+   "b2": {
+    "name": "Adrenal Rush",
+    "desc": "Sprinting for a short time grants a period of improved reload speed and handling. Final blows extend this period.",
+    "num": "Triggers after 5 seconds",
+    "rating": "D"
+   },
+   "b4": {
+    "name": "Bountiful Munitions",
+    "desc": "While Adrenal Rush is active, final blows grant Special Ammo progress. Final Blows against powerful combatants, Guardians, and Taken grants additional progress.",
+    "num": "",
+    "rating": "D"
+   },
+   "source": "Gambit + Gambit Engrams",
+   "sourceType": "Portal + Vendor (Drifter)"
+  },
+  {
+   "set": "Dark Age",
+   "b2": {
+    "name": "Taking Initiative",
+    "desc": "Hitting combatants with melee attacks or Sword strikes grants a stack of Initiative, giving bonus handling and reload. Stacks decay slowly over time.",
+    "num": "Initiative stacks up to 5x  and lasts for 8 seconds per stack, decaying 1 at a time",
+    "rating": "C"
+   },
+   "b4": {
+    "name": "Healing Initiative",
+    "desc": "While you have Initiative, using your class ability creates a stationary healing aura. The aura gains increased healing based on the number of Initiative stacks.",
+    "num": "Upon Class ability usage, deploys stationary Healling Drone that heals every 2 seconds. Health restored is +10 HP (+50 HP Max) per initiative stack and can pulse up to 5 times per Class Ability use",
+    "rating": "B+"
+   },
+   "source": "Warlord's Ruin",
+   "sourceType": "Dungeon"
+  },
+  {
+   "set": "Deep Explorer",
+   "b2": {
+    "name": "Built Bitter",
+    "desc": "Taking damage increases the reload speed of your equipped weapon until it is stowed. Taking more damage increases the effect.",
+    "num": "Stacks to 10x. Self Damage does not count. ~+50 reload speed and ~.85x -.9x Reload Duration Multiplier at MAX stacks",
+    "rating": "B"
+   },
+   "b4": {
+    "name": "Bittersweet",
+    "desc": "When you stow a weapon, restore health based on the number of Built Bitter stacks lost.",
+    "num": "~+35 HP at 1 stack (Full Heal at >8x stacks) Healing seems to be inconsistent and can provided substantially more health sometimes. ",
+    "rating": "C"
+   },
+   "source": "Duality",
+   "sourceType": "Dungeon"
+  },
+  {
+   "set": "Disaster Corps",
+   "b2": {
+    "name": "Pleas Heard",
+    "desc": "Reloading an Auto Rifle, Scout Rifle, or Sidearm after a final blow slowly restores health until you reenter combat.",
+    "num": "Healing is 20 HP/s after reloading within 3 seconds of a kill. Lasts until any \"combat\" action is taken (ability use, weapon, class, super, take damage).",
+    "rating": "B"
+   },
+   "b4": {
+    "name": "Magnificent Duty",
+    "desc": "When you reach critical health or heal an ally at critical health, Auto Rifles, Scout Rifles, and Sidearms gain a period of increased range, stability, and reload speed.",
+    "num": "Grants +20 Range, +20 Stability, +30 Reload Speed, and .9x Reload Duration Multiplier to listed weapons for 11 seconds.",
+    "rating": "D"
+   },
+   "source": "Crucible Engrams ",
+   "sourceType": "Vendor (Shaxx)"
+  },
+  {
+   "set": "Dreambane",
+   "b2": {
+    "name": "Nightmarish Power",
+    "desc": "Final blows to a challenging combatant or higher-ranked target grant Unstable Essence. When you have Unstable Essence, you receive grenade and melee stat bonuses.",
+    "num": "Buff triggers on elite+, lasts for 15 seconds, and grants +30 to melee and grenade stat.",
+    "rating": "C"
+   },
+   "b4": {
+    "name": "Nightmarish Resilience",
+    "desc": "When you have Unstable Essence, rapid weapon damage or final blows heal you and begin health regeneration.",
+    "num": "While buff is active, 8 damage instances  within 3 seconds each (only counted once per .45 seconds) Begins Critical Health Regeneration and restores 20 HP. 2 second internal cooldown.",
+    "rating": "B+"
+   },
+   "source": "Moon",
+   "sourceType": "Destination"
+  },
+  {
+   "set": "Eutechnology",
+   "b2": {
+    "name": "Gift of the Ley Lines",
+    "desc": "Rapidly defeating combatants with Void energy spawns a Void breach.",
+    "num": "Requirement is 3 Void kills within 5 seconds of each other. ",
+    "rating": "B"
+   },
+   "b4": {
+    "name": "Techeun's Foresight",
+    "desc": "After collecting a Void breach, your next final blow with a Void weapon triggers a detonation. The detonation is more powerful if it is triggered quickly after collecting a Void breach.",
+    "num": "Techeun's Foresight granted on collecting void breach: next void weapon  kill triggers a 3 meter Void detonation for 87 Damage. If Void breach collection is rapid, grants Techeun's Clairvoyance: next void weapon kill triggers a 5 meter Void detonation for 173 damage ",
+    "rating": "B"
+   },
+   "source": "Pinnacle + Vanguard Engrams",
+   "sourceType": "Portal + Vendor (Zavala)"
+  },
+  {
+   "set": "Exodus Down",
+   "b2": {
+    "name": "Emergency Electromagnet",
+    "desc": "When your shields become broken, collect all nearby Orbs of Power and ammo bricks.",
+    "num": "Radius is 10 meters. Picking up multiple orbs will grant multiple stacks of 4-piece Repurposed charge buff.",
+    "rating": "B+"
+   },
+   "b4": {
+    "name": "Repurposed Charge",
+    "desc": "Whenever you gain, lose, or spend an Armor Charge, heal and gain damage reduction for a short time. This effect scales with the amount of Armor Charge gained, lost, or spent.",
+    "num": "Grants +5 HP per Armor charge change, with duration = 3 seconds * stacks. The change scales based off SIMULTANEOUS gains/loses. Maxes out at x7 stacks. x2 = 13% DR, x3 =21% DR, x4 = 29.5% DR, x7 = 35% DR",
+    "rating": "S"
+   },
+   "source": "Nessus",
+   "sourceType": "Destination"
+  },
+  {
+   "set": "Ferropotent",
+   "b2": {
+    "name": "Rapid Repair",
+    "desc": "When your shields begin to regenerate, you gain flinch resistance and damage resistance for a short time.",
+    "num": "Grants 10% Damage Resist and ? flinch resist for 7 seconds ",
+    "rating": "B+"
+   },
+   "b4": {
+    "name": "Built from Scratch",
+    "desc": "While your reserves are low, combatant final blows with weapons provide additional ammo progress based on their ammo type. Primary ammo weapons boost Special ammo progress, and Special ammo weapons boost Heavy ammo progress.",
+    "num": "Primary's grant +3% special progess and Special's grant +2% Heavy ammo progress on Low Ammo Reserves.",
+    "rating": "C"
+   },
+   "source": "Vanguard Engrams",
+   "sourceType": "Vendor (Zavala) "
+  },
+  {
+   "set": "First Ascent",
+   "b2": {
+    "name": "Stack 'Em Up",
+    "desc": "Defeating targets with unique elemental damage grants a stacking bonus to Transcendence energy gains while Transcendence is inactive.",
+    "num": "Buff duration is 24 seconds, refreshed on unique elemental kill. CANNOT refresh once all 5 elements have been utilized. ",
+    "rating": "A"
+   },
+   "b4": {
+    "name": "Burn 'Em Down",
+    "desc": "While Transcendence is active, using your grenade ability consumes all stacks of Stack 'Em Up to grant an escalating amount of grenade energy.",
+    "num": "Grants 6% Prismatic Grenade energy per stack of Stack 'Em up used up to 30% at maximum.",
+    "rating": "B"
+   },
+   "source": "Pale Heart + Pale Heart Engrams",
+   "sourceType": "Destination + Vendor (Ghost)"
+  },
+  {
+   "set": "Flain",
+   "b2": {
+    "name": "Sinew Stitching",
+    "desc": "Taking damage from combatants sometimes spawns a Threadling.",
+    "num": "",
+    "rating": "D"
+   },
+   "b4": {
+    "name": "Knit Together",
+    "desc": "For a short time after your shields break, your next several Threadling hits restore health.",
+    "num": "",
+    "rating": "C+"
+   },
+   "source": "Sundered Doctrine",
+   "sourceType": "Dungeon"
+  },
+  {
+   "set": "Great Hunt",
+   "b2": {
+    "name": "Taken Barrier",
+    "desc": "Grenade final blows temporarily reduce incoming damage.",
+    "num": "Grants Damage Resist x1 (10%) for 7 seconds",
+    "rating": "A"
+   },
+   "b4": {
+    "name": "Taken Armaments",
+    "desc": "Grenade final blows grant additional Heavy ammo progress.",
+    "num": "",
+    "rating": "B"
+   },
+   "source": "Last Wish",
+   "sourceType": "Raid"
+  },
+  {
+   "set": "Iron Battalion",
+   "b2": {
+    "name": "Primary Honing",
+    "desc": "Increases handling and reload speed for Primary ammo weapons. Primary ammo weapons gain increased damage against non-boss combatants based on your Weapons stat.",
+    "num": "Damage bonus is around 12.5% bonus damage against non-boss combatants at 200 Weapons Stat compared to 100 Weapons Stat. Does NOT affect boss combatants.",
+    "rating": "S"
+   },
+   "b4": {
+    "name": "Supercyclical",
+    "desc": "Final blows while your Super is active refund Super energy when it ends.",
+    "num": "Returns up to 30% super based on kills in super/with super. Works with Well of Radiance, works with bubble (melee kills holding bubble ONLY), does stack with super-generating exotics, enemy tier scales super gains to maximum 30% quicker. Around 6 red bar kills for max gains",
+    "rating": "S"
+   },
+   "source": "Iron Banner",
+   "sourceType": "Portal"
+  },
+  {
+   "set": "Iron Panoply",
+   "b2": {
+    "name": "Vigilant Watch",
+    "desc": "As your health gets lower, your weapons gain increased stability and handling. Weapon final blows while your shields are depleted heal you.",
+    "num": "Grants +30 HP on weapon kills when shields broke. 5 Second internal cooldown.",
+    "rating": "D"
+   },
+   "b4": {
+    "name": "Iron Conviction",
+    "desc": "When your shields become broken, you gain increased ammo generation, flinch resistance, and damage resistance against nearby combatants for a short time. Final blows extend this effect.",
+    "num": "Grants +35 ammo Regeneration stat, 15% Damage resist against Combatants within 15 meters for 7 seconds. Additional kills refresh buff duration. Buff cant retrigger until any shield has been recovered.",
+    "rating": "B"
+   },
+   "source": "Iron Banner Engrams",
+   "sourceType": "Vendor (Saladin)"
+  },
+  {
+   "set": "Kentarch 3",
+   "b2": {
+    "name": "Network Admin",
+    "desc": "Being near allies creates a relay network that gives the wearer improved handling and reload speed. Being near other allied Network Admins additionally grants the wearer a bonus to Health stat.",
+    "num": "Radius is 15 meters",
+    "rating": "D"
+   },
+   "b4": {
+    "name": "Network Upload",
+    "desc": "Weapon final blows grant the wearer and nearby allies melee energy.",
+    "num": "",
+    "rating": "D"
+   },
+   "source": "Garden of Salvation",
+   "sourceType": "Raid"
+  },
+  {
+   "set": "Last Discipline",
+   "b2": {
+    "name": "Terminal Velocity",
+    "desc": "Final blows with primary ammo weapons grant your primary ammo weapons temporarily increased reload speed.",
+    "num": "Grants +20 reload speed and .95x Reload Duration Multiplier for Primary Weapons for 6 Seconds. Triggers on Constructs as well.",
+    "rating": "D"
+   },
+   "b4": {
+    "name": "Power Loader",
+    "desc": "Picking up an Orb of Power grants special ammo progress.",
+    "num": "Grants 6% Special Ammo Progress on Orb pickup.",
+    "rating": "D"
+   },
+   "source": "Crucible Engrams ",
+   "sourceType": "Vendor (Shaxx)"
+  },
+  {
+   "set": "Legacy's Oath",
+   "b2": {
+    "name": "Augmented Servos",
+    "desc": "Powered melees release an additional disorienting pulse when used to defeat a target.",
+    "num": "Disorient triggers .67 seconds after combatant death in a 10 meter radius that applies Disorient for 2.5 Seconds.",
+    "rating": "A"
+   },
+   "b4": {
+    "name": "God-like Judgment",
+    "desc": "When your shields are broken by a combatant, or upon casting your Super, release a swarm of heat seeking micro-missiles.",
+    "num": "Critical Health releases 2 680 Damage micromissiles while casting super releases 4 680 Damage micromissiles.",
+    "rating": "B"
+   },
+   "source": "Deep Stone Crypt",
+   "sourceType": "Raid"
+  },
+  {
+   "set": "Luminopotent",
+   "b2": {
+    "name": "Ionic Overclock",
+    "desc": "While amplified, your Fusion Rifles, Linear Fusion Rifles, and Heat weapons gain increased handling, reload, and vent speeds.",
+    "num": "",
+    "rating": "D"
+   },
+   "b4": {
+    "name": "Shock and Clear",
+    "desc": "Final blows with Jolt or against jolted combatants create Ionic Traces.",
+    "num": "NO COOLDOWN",
+    "rating": "A"
+   },
+   "source": "Fireteam + Vanguard Engrams",
+   "sourceType": "Portal + Vendor (Zavala)"
+  },
+  {
+   "set": "Lustrous",
+   "b2": {
+    "name": "Photogalvanic",
+    "desc": "Receiving healing temporarily grants your Solar weapons increased flinch resistance, handling, and reload speed.",
+    "num": "Grants +20 Handling, + 10 Reload Speed, .85x Reload Duration Multipler and Flinch resist for Solar weapons upon ANY sources of healing while not at full HP",
+    "rating": "D"
+   },
+   "b4": {
+    "name": "Cauterize",
+    "desc": "Rapid Solar final blows heal you.",
+    "num": "Grants +35 HP after 3 Solar kills within 3 seconds of each other. Small internal cooldown.",
+    "rating": "C"
+   },
+   "source": "Solstice",
+   "sourceType": "Tenet Of Bravery"
+  },
+  {
+   "set": "New Demotic",
+   "b2": {
+    "name": "Paroli",
+    "desc": "Primary ammo weapons gain a bonus to flinch resistance after sliding.",
+    "num": "",
+    "rating": "PVP"
+   },
+   "b4": {
+    "name": "Martingale",
+    "desc": "Your weapons gain a temporary increase to handling and aim-down-sights speed when an ally is defeated or you revive an ally.",
+    "num": "",
+    "rating": "PVP"
+   },
+   "source": "Trials of Osiris Engrams",
+   "sourceType": "Vendor (Saint-14)"
+  },
+  {
+   "set": "Nezarec's Nightmare",
+   "b2": {
+    "name": "Bad Dreams",
+    "desc": "Final blows versus subclass-debuffed targets have an escalating chance to spawn an Orb of Power.",
+    "num": "Requires 3 elementally debuffed kills to spawn an orb. No internal cooldown?",
+    "rating": "B"
+   },
+   "b4": {
+    "name": "Dream-Devourer",
+    "desc": "Performing a finisher versus a powerful combatant grants Devour. While you have Devour, gain damage resistance versus combatants.",
+    "num": "Grants Devour for 6 (+3) Seconds, while Devour is active, gain +20% Damage Resist against Combatants.",
+    "rating": "S"
+   },
+   "source": "Root of Nightmares",
+   "sourceType": "Raid"
+  },
+  {
+   "set": "Oryx's Memory",
+   "b2": {
+    "name": "Iron Sharpens Iron",
+    "desc": "Final blows on Guardians and powerful combatants generate additional ammo progress.",
+    "num": "12% special ammo progress and 8% power ammo progress on elite+ kill ",
+    "rating": "S"
+   },
+   "b4": {
+    "name": "Ascendant Escape",
+    "desc": "After a final blow on a powerful combatant, the next time your shields are broken, you become invisible.",
+    "num": "Duration of invisibility is ~6 seconds",
+    "rating": "B"
+   },
+   "source": "King's Fall",
+   "sourceType": "Raid"
+  },
+  {
+   "set": "Pantheos Resplendent",
+   "b2": {
+    "name": "Well Prepared",
+    "desc": "Picking up ammo grants Armor Charge. Grants a bonus to Health stat per Armor Charge you have.",
+    "num": "Grants 1x Armor Charge on ammo brick pick up. Each Armor charge stack grants +10 Health Stat, maxing out at +60 Health Stat at x6 Armor Charge",
+    "rating": "B"
+   },
+   "b4": {
+    "name": "Down the Line",
+    "desc": "Sustained damage on minibosses, Champions, and bosses increases weapon damage versus base and powerful combatants. Weapon final blows consume one stack each.",
+    "num": "Stacks up to 10x, grants 15% bonus Damage against Orange bar and lower enemies. Each kill consumes 1 stack.",
+    "rating": "C"
+   },
+   "source": "Pantheon",
+   "sourceType": "Raid"
+  },
+  {
+   "set": "Per Audacia",
+   "b2": {
+    "name": "Primary Chain",
+    "desc": "Primary ammo weapon final blows grant a stacking bonus to mobility and Primary weapon range and handling until you are defeated.",
+    "num": "",
+    "rating": "D"
+   },
+   "b4": {
+    "name": "Sublime Transit",
+    "desc": "Increases mobility and grants enhanced sprint speed and slide distance.",
+    "num": "grants +20 mobility, 6.25% sprint speed boost and 33% slide distance",
+    "rating": "D"
+   },
+   "source": "Crucible (Comp) + Crucible Engrams",
+   "sourceType": "Portal + Vendor (Shaxx)"
+  },
+  {
+   "set": "Promised",
+   "b2": {
+    "name": "Stable Resonance",
+    "desc": "Defeating a powerful combatant generates Stable Resonance, which grants damage resistance and increased weapon damage for the duration.",
+    "num": "Grants 7% increased damage and 25% Damage Resist for 12 Seconds on Orange bar+ kill",
+    "rating": "S"
+   },
+   "b4": {
+    "name": "Resonance Redirection",
+    "desc": "While you have Stable Resonance, continued weapon damage occasionally generates a resonance burst that damages and exhausts targets.",
+    "num": "Dealing ~600 Damage triggers an 8-meter radius Exhausting Blast that deals damage and inflicts exhaustion. ~2 second internal cooldown.",
+    "rating": "A"
+   },
+   "source": "Salvation's Edge",
+   "sourceType": "Raid"
+  },
+  {
+   "set": "Resonant Fury",
+   "b2": {
+    "name": "Resonant Plating",
+    "desc": "Your health begins regenerating immediately after taking melee damage from a powerful combatant.",
+    "num": "Health Regeneration Triggers on Miniboss+ melee hits",
+    "rating": "C"
+   },
+   "b4": {
+    "name": "Siphoning Touch",
+    "desc": "Gain stacks of Siphoning Touch for weapon or Glaive melee hits. Switching weapons heals you and consumes all stacks.",
+    "num": "Stacks up to 5x. Consumes all stacks on weapon stow and Heals +30 HP per stack consumed.",
+    "rating": "D"
+   },
+   "source": "Vow of the Disciple",
+   "sourceType": "Raid"
+  },
+  {
+   "set": "Reverie Dawn",
+   "b2": {
+    "name": "A Wish for Protection",
+    "desc": "Taking significant damage in a short time generates a Protective Wish that makes it harder for combatants to hit you, and grants increased reload speed and flinch resistance.",
+    "num": "Buff duration is 7 seconds and incurs a 5 second internal cooldown before it can be triggered again",
+    "rating": "B"
+   },
+   "b4": {
+    "name": "A Wish Fulfilled",
+    "desc": "When the Protective Wish expires, it cures you. Rapid final blows prematurely end the Protective Wish.",
+    "num": "Grants Cure x1",
+    "rating": "D"
+   },
+   "source": "Dreaming City",
+   "sourceType": "Destination"
+  },
+  {
+   "set": "Sage Protector",
+   "b2": {
+    "name": "Combat Meditation",
+    "desc": "Sword hits return grenade and class energy. Bonus energy is granted if Blade Focus is active.",
+    "num": "Grants 3% Grenade and Class Ability enrgy per Sword Hit. Bonus increase to 8% with Blase Focus Active.",
+    "rating": "S"
+   },
+   "b4": {
+    "name": "Blade Focus",
+    "desc": "Briefly guard with a Sword to ready Blade Focus. While Blade Focus is readied, hitting a target with your sword increases Sword damage and lunge distance for a moderate duration.",
+    "num": "After guarding for 1.35 seconds then hitting a target, grants Blade focus: +10% bonus sword damage, +100% sword lunge range, buff duration 7 seconds or on sword guard or stow.",
+    "rating": "C"
+   },
+   "source": "Equilibrium",
+   "sourceType": "Dungeon"
+  },
+  {
+   "set": "Seventh Seraph",
+   "b2": {
+    "name": "Rasputin's Wrath",
+    "desc": "Final blows with area-of-effect damage, Solar abilities, Seventh Seraph weapons, or IKELOS weapons grant Warmind Charges. Each stack of Warmind Charge increases your Weapons and Grenade stats.",
+    "num": "Stacks up to 10x with a duration of 10 seconds. All stacks disappear on expiration. Each stack grants +3 grenade stat and +3 weapon stat up to +30 maximum for each",
+    "rating": "A"
+   },
+   "b4": {
+    "name": "Rasputin's Reprisal",
+    "desc": "While you have Warmind Charges, defeating powerful combatants, destroying a construct, or destroying a Tangle releases a Solar detonation that damages combatants and heals allies. Constructs include barricades, turrets, Stasis crystals, and other objects created in the field.",
+    "num": "On Elite+ Kill: Damage is 405 Solar Damage, restoring +50HP to user and allies over 10 meters. On Construct Kill: ~half damage and health over same radius. Warmind detonations can grant warmind stacks but not chain into other warmind detonations. .3 second internal cooldown.",
+    "rating": "S"
+   },
+   "source": "Cosmodrome",
+   "sourceType": "Destination"
+  },
+  {
+   "set": "Shrewd Survivor",
+   "b2": {
+    "name": "Reflex Action",
+    "desc": "Swapping to a Heat weapon, Submachine Gun, or Hand Cannon grants a short period of increased handling and accuracy. This effect is extended by dealing damage with that weapon.",
+    "num": "Duration is 1.5 seconds. Dealing damage extends duration. Grants +50 handling, .6x Ready Duration Multiplier, and -2.5% Accuracy Cone Size for 1.5 seconds",
+    "rating": "PVP"
+   },
+   "b4": {
+    "name": "Hotshot",
+    "desc": "Dealing final blows while Reflex Action is active grants a bonus to weapon stat and increases stability, reload, and aim assist for Heat weapons, Submachine Guns, and Hand Cannons for a moderate duration.",
+    "num": "Scoring a kill grants Hotshot for 10 seconds: +15 Stability, +20 Reload Speed, Bonus Aim Assist, and +30 Weapons stat",
+    "rating": "E"
+   },
+   "source": "Lawless Frontier",
+   "sourceType": "Destination"
+  },
+  {
+   "set": "Smoke Jumper",
+   "b2": {
+    "name": "Ride Together, Die Together",
+    "desc": "When you pick up an Orb of Power, gain a brief period of rapidly decaying damage reduction.",
+    "num": "Buff duration is 3 seconds. Initially grants 40% DR, scales down to 30% within 1.5 seconds and is further reduces to 24% with 1 second left, decreasing to 0% at no time remaining.",
+    "rating": "A"
+   },
+   "b4": {
+    "name": "Too Old for This",
+    "desc": "Defeating a powerful combatant with a finisher grants you Special ammo progress and replenishes a small amount of health.",
+    "num": "Grants 16% Special Ammo Progress and restores +35 HP on elite+ finisher ",
+    "rating": "D"
+   },
+   "source": "Vanguard Engrams",
+   "sourceType": "Vendor (Zavala)"
+  },
+  {
+   "set": "Spacewalk",
+   "b2": {
+    "name": "Augmented Armaments",
+    "desc": "Primary ammo weapons deal increased damage to disoriented combatants.",
+    "num": "The damage bonus is +15% against disoriented combatants, but does NOT work with Arc Blind.",
+    "rating": "B"
+   },
+   "b4": {
+    "name": "Augmented Explosives",
+    "desc": "Your grenade abilities release an additional disorienting pulse shortly after detonating.",
+    "num": "",
+    "rating": "C"
+   },
+   "source": "Vespers Host",
+   "sourceType": "Dungeon"
+  },
+  {
+   "set": "Swordmaster",
+   "b2": {
+    "name": "Balestra",
+    "desc": "Damaging a target with a Sword, Glaive, or any melee attack exhausts them. Exhausted targets deal reduced outgoing damage.",
+    "num": "No internal cooldown",
+    "rating": "B"
+   },
+   "b4": {
+    "name": "Stesso Tempo",
+    "desc": "Blocking attacks with a Sword or Glaive grants a short period of damage resistance against targets when you next drop your guard.",
+    "num": "Upon Blocking, grants 50% Damage Resist for 3 seconds after Guard is dropped. No internal Cooldown.",
+    "rating": "B"
+   },
+   "source": "Vanguard Engrams + Postmaster",
+   "sourceType": "Vendor (Zavala) + Lost Sectors*"
+  },
+  {
+   "set": "Taken King",
+   "b2": {
+    "name": "The Ceremony",
+    "desc": "Finishing combatants or reviving allies initiates a Lucent Hive ritual. While the ritual is active, gain increased Super stat.",
+    "num": "Duration of Ceremony is 30 Seconds. Buff can be refreshed up to a max of 30 seconds. Grants + 30 Super Stat while active.",
+    "rating": "C"
+   },
+   "b4": {
+    "name": "Lucent Swarm",
+    "desc": "Collecting Orbs of Power extends the Ceremony. While it is active, ability final blows occasionally spawn allied Arc moths.",
+    "num": "Scoring 2 ability kills spawns a Loyal Arc moth with 8 second duration. The moth chases enemies within 60+ meters and deal 180 damage, inflcting blind for 8 seconds over ~6 meters. All means of Bolt Charge discharge trigger can spawn the moth (except praxic blade).",
+    "rating": "C"
+   },
+   "source": "Ghosts of the Deep",
+   "sourceType": "Dungeon"
+  },
+  {
+   "set": "Techeun's Regalia",
+   "b2": {
+    "name": "Queensfoil Rush",
+    "desc": "Gain a powerful overshield while performing your finisher. When you finish a target, release a slowing burst around you.",
+    "num": "Grants a +200 HP Overshield for the duration of the finisher. The slow radius is 7 meters",
+    "rating": "B"
+   },
+   "b4": {
+    "name": "Truth to Power",
+    "desc": "Gain increasing damage resistance when you deal damage or land final blows. Finishers grant accelerated progress. At max stacks, the recharge rate of your abilities is also increased.",
+    "num": "Each Damage instance scored grants Truth stacks, up to x999 stacks. Kills/finishers grant more stacks. Truth grants Damage Resist: x250 = 3.75%, x500 = 7.5%, x750 = 10%, x999 = 15%. At x999, turns into power, which boosts Ability Regeneration Rate on top of the DR.",
+    "rating": "S"
+   },
+   "source": "Shattered Throne",
+   "sourceType": "Dungeon"
+  },
+  {
+   "set": "Techsec",
+   "b2": {
+    "name": "Wrecker",
+    "desc": "You deal significantly increased Kinetic damage to combatant shields, overshields, vehicles, and constructs. Constructs include barricades, turrets, Stasis crystals, and other objects created in the field.",
+    "num": "Passively grants +200% increased Kinetic Damage towards Combatant Shields and Overshields. 15% increased Kinetic Damage towards Constructs. ",
+    "rating": "B"
+   },
+   "b4": {
+    "name": "Concussive Rounds",
+    "desc": "Defeating powerful combatants or breaking a combatant shield with Kinetic damage releases a disorienting Kinetic shockwave.",
+    "num": "Disorienting Blast deals 162 Kinetic Damage, Heavy staggering, and inflicts disorient in a 10 meter radius.",
+    "rating": "A"
+   },
+   "source": "Vanguard Engrams + Postmaster",
+   "sourceType": "Vendor (Zavala) + Lost Sectors*"
+  },
+  {
+   "set": "Thriving Survivor",
+   "b2": {
+    "name": "Opening Act",
+    "desc": "Final blows with grenades grant Heat weapons bonus stability and vent speed and grant Primary ammo weapons bonus stability and reload speed.",
+    "num": "Duration of buff is 15 seconds. ",
+    "rating": "C"
+   },
+   "b4": {
+    "name": "Room Clearing",
+    "desc": "Multiple final blows with Heat weapons or Primary ammo weapons grant bonuses to weapon and grenade stats and increased ammo generation for Heat weapons and Primary ammo weapons.",
+    "num": "Triggers upon scoring 3 kills within 4 seconds of each and grants Room Clearing: Buff duration is 10 seconds and grants +40 Grenade and +40 Weapons Stat and +40 ammo generation for Heat/primary ammo weapons.",
+    "rating": "B+"
+   },
+   "source": "Lawless Frontier",
+   "sourceType": "Destination"
+  },
+  {
+   "set": "Thunderhead",
+   "b2": {
+    "name": "License to Thrill",
+    "desc": "Activating your grenade or the Nanotech Tracer Missiles Origin Trait provides stacking resistance to incoming damage at point-blank range.",
+    "num": "Buff can stack up to x10 and lasts for 15 seconds. Quicksilver Storm micromissiles do synergize. Damage Resist at x1 stack is 12% against enemies within 5 meters. This scales up to 30% Damage Resist at max stacks.",
+    "rating": "C"
+   },
+   "b4": {
+    "name": "Lethal Weave",
+    "desc": "Defeating an unraveled combatant grants grenade ability energy. If you have max grenade energy, you are granted Special ammo meter progress instead.",
+    "num": "Grants +10% grenade energy on kill OR +10% special ammo progress if grenade is already full",
+    "rating": "B-"
+   },
+   "source": "Neomuna",
+   "sourceType": "Destination"
+  },
+  {
+   "set": "TM Custom",
+   "b2": {
+    "name": "Old Martian Diplomacy",
+    "desc": "Stowing a weapon after defeating a powerful combatant or a Guardian heals you a small amount and disorients nearby combatants.",
+    "num": "~+40 HP restored and 12 meter radius on disorient. 2 second internal cooldown",
+    "rating": "C"
+   },
+   "b4": {
+    "name": "High Noon",
+    "desc": "Freshly drawn weapons deal increased precision damage to combatants for a short period. Weapons with the Tex Balanced Stock Origin Trait equipped or Exotics manufactured by the Tex Mechanica Foundry gain further increased benefits.",
+    "num": "Grants +7% increased Precision Damage against Combatants for 3 Seconds. Bonus Doubles to +15% for Tex weapons Origin trait weapons and exotics, including DMT, Huckleberry, Lasy Word, Tarrabah, Chaperone, and Prospector.",
+    "rating": "A"
+   },
+   "source": "Spire of the Watcher",
+   "sourceType": "Dungeon"
+  },
+  {
+   "set": "Triumphal Anthem",
+   "b2": {
+    "name": "Scoot to Loot",
+    "desc": "Sliding collects nearby ammo and temporarily grants enhanced reload speed and handling to your weapons.",
+    "num": "15 meter radius and 10 second buff duration",
+    "rating": "PVP"
+   },
+   "b4": {
+    "name": "Shoot to Scoot",
+    "desc": "Dealing damage with your weapons temporarily grants enhanced sliding. Sliding provides damage resistance.",
+    "num": "3 second duration and +33% slide distance. 50% Damage resist while sliding",
+    "rating": "PVP"
+   },
+   "source": "Crucible + Crucible Engrams ",
+   "sourceType": "Portal + Vendor (Shaxx)"
+  },
+  {
+   "set": "Twofold Crown",
+   "b2": {
+    "name": "Crook and Flail",
+    "desc": "Picking up an ammo brick heals you.",
+    "num": "Grants +70 HP on Ammo Brich Pickup",
+    "rating": "B"
+   },
+   "b4": {
+    "name": "Gift of Sight",
+    "desc": "Final blows with Primary ammo weapons grant you briefly increased radar resolution.",
+    "num": "Duration is 5 seconds and can trigger off constucts.",
+    "rating": "E"
+   },
+   "source": "Trials of Osiris Engrams",
+   "sourceType": "Vendor (Saint-14)"
+  },
+  {
+   "set": "Veritas",
+   "b2": {
+    "name": "Lucent Transmutation",
+    "desc": "Performing a finisher on a combatant, or landing successive powered melee final blows, generates an Elemental pickup based on your Light subclass.",
+    "num": "Requires a finisher or 2 melee final blows (small .2 second cooldown between kills for some reason. DOES NOTHING if Strand/Stasis super is equipped. ",
+    "rating": "B"
+   },
+   "b4": {
+    "name": "Lucent Tithes",
+    "desc": "Performing a finisher on powerful combatants heals you and generates loyal Void moths.",
+    "num": "On elite+ finisher, Restores +50 HP and spawns 3 Loyal Void Moths that grant 22.5 HP Void Overshield to user and allies on impact.",
+    "rating": "B+"
+   },
+   "source": "Throne World + Throne World Engrams",
+   "sourceType": "Destination + Vendor (Fynch)"
+  },
+  {
+   "set": "Wayward Psyche",
+   "b2": {
+    "name": "Special Relativity",
+    "desc": "Picking up ammo reloads stowed Special weapons from reserves.",
+    "num": "Fully reloads",
+    "rating": "D"
+   },
+   "b4": {
+    "name": "Superluminal Motion",
+    "desc": "After dealing damage with your Super, health and shields regenerate over time while you are in motion. Additional Super damage refreshes this effect.",
+    "num": "Restores +30 HP/S for 11 seconds as long as you are moving.",
+    "rating": "D"
+   },
+   "source": "The Desert Perpetual (Epic)",
+   "sourceType": "Raid"
+  },
+  {
+   "set": "Wild Anthem",
+   "b2": {
+    "name": "Fanfare",
+    "desc": "Gain increased reload speed for the bottom half of your equipped weapon's magazine.",
+    "num": "While ammo is <= 50% or Magazine AND Ammo isnt 0, +15 Reload Speed and .95x Reload Duration Multiplier. Does not work with Bows, GLs, or Rockets (unless magazine isnt 1).",
+    "rating": "PVP"
+   },
+   "b4": {
+    "name": "Suros Harmony",
+    "desc": "Reloading a weapon grants it a bonus to handling and reduces incoming flinch for a short time. Weapons with the SUROS Synergy Origin Trait are granted increased range instead.",
+    "num": "After reload, +30 handling and some flinch resistance for 6 seconds. The Range benefit for the origin trait is +15 Range. Persists through stow only on the weapon it was initially triggered on.",
+    "rating": "PVP"
+   },
+   "source": "Crucible + Crucible Engrams ",
+   "sourceType": "Portal + Vendor (Shaxx)"
+  },
+  {
+   "set": "Wildwood",
+   "b2": {
+    "name": "Watchtower",
+    "desc": "Precision final blows while aiming down sights grant damage resistance until you stop aiming down sights.",
+    "num": "After a kill, Grants Resist x2 (25% Damage Resist) until no longer ADS",
+    "rating": "C"
+   },
+   "b4": {
+    "name": "Field Expertise",
+    "desc": "Precision final blows with any weapon grant a stacking bonus to reload speed, target acquisition, and weapon damage against non-boss combatants for a short duration. Weapon final blows with non-precision direct hits end this effect early.",
+    "num": "On precision kill, grants 1 stack of Field Expertise for 15 seconds, stacking up to 5 stacks. Lose all stacks on non-precision kill. At x1 stack, grants +3.5% non-boss combatant damage up to a max of +10% non-boss combtant damage at x5 stacks.",
+    "rating": "C"
+   },
+   "source": "European Dead Zone",
+   "sourceType": "Destination"
+  },
+  {
+   "set": "Yearning Echo",
+   "b2": {
+    "name": "Untold Greed",
+    "desc": "Picking up ammo, Orbs of Power, Elemental pickups, or destroying a Strand Tangle grants stacks of Untold Greed, slightly reducing damage taken and providing reload speed to equipped weapons. When your shields are broken, some stacks are lost.",
+    "num": "Untold Greed stacks up to x100. Reaching Critical Health removes 10 stacks.  Max DR is 15% at 25+ stacks.",
+    "rating": "A"
+   },
+   "b4": {
+    "name": "Overflowing Coffers",
+    "desc": "While you have stacks of Untold Greed, Orbs of Power and Elemental pickups provide more of their respective energy, and Strand Tangles deal increased damage. When your shields are broken, all stacks are converted into a fountain of Orbs of Power.",
+    "num": "DISABLED in Crucible. While at x5 untold greed or higher: once critical, all stacks consumed and 4 Orbs that grant 3.15% super energy spawn. Orbs spawn in front of guardian and are also granted to allies. 350% tangle damage (affects whirling maelstrom). ",
+    "rating": "S"
+   },
+   "source": "Grasp of Avarice",
+   "sourceType": "Dungeon"
+  }
+ ],
+ "exotics": [
+  {
+   "class": "Hunter",
+   "slot": "Helmet",
+   "name": "Assassin’s Cowl",
+   "perk": "Vanishing Execution",
+   "desc": "Powered melee final blows grant invisibility and health regeneration."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Gauntlets",
+   "name": "Athrys’s Embrace",
+   "perk": "Ruthless Waltz",
+   "desc": "Weighted Knife gains bouncing capability and increased precision damage after precision hits."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Helmet",
+   "name": "Blight Ranger",
+   "perk": "Voltaic Mirror",
+   "desc": "Reflecting projectiles with Arc Staff dramatically increases damage output (currently heavily restricted in PvE effectiveness)."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Leg",
+   "name": "Bombardiers",
+   "perk": "Parting Gift",
+   "desc": "Dodging leaves behind a delayed explosive that matches subclass element."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Gauntlets",
+   "name": "Caliban’s Hand",
+   "perk": "Explosive Knives",
+   "desc": "Powered knife kills cause ignition explosions on Solar kills or direct impacts."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Helmet",
+   "name": "Celestial Nighthawk",
+   "perk": "Hawkeye Hack",
+   "desc": "Modifies Golden Gun into a single high-damage shot that generates Orbs on precision kills."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Helmet",
+   "name": "Cyrtarachne’s Facade",
+   "perk": "Acrobat’s Focus",
+   "desc": "Grapple grants Woven Mail and improves survivability while airborne or Grappling."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Chest",
+   "name": "Dragon’s Shadow",
+   "perk": "Wraithmetal Mail",
+   "desc": ""
+  },
+  {
+   "class": "Hunter",
+   "slot": "Helmet",
+   "name": "Foetracer",
+   "perk": "Relentless Tracker",
+   "desc": "Damaging strong targets marks them and grants weapon damage bonuses."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Leg",
+   "name": "Fr0st-EE5",
+   "perk": "Rapid Cooldown",
+   "desc": "Sprinting increases ability regeneration rates."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Chest",
+   "name": "Gemini Jester",
+   "perk": "Misdirection",
+   "desc": "Dodging disorients nearby enemies and removes radar temporarily."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Helmet",
+   "name": "Graviton Forfeit",
+   "perk": "Vanishing Shadow",
+   "desc": "Extends invisibility duration and improves melee, reload, and recovery while invisible."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Chest",
+   "name": "Gyrfalcon’s Hauberk",
+   "perk": "See Me, Feel Me",
+   "desc": "Void invisibility grants Volatile rounds and weapon damage bonuses."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Helmet",
+   "name": "Knucklehead Radar",
+   "perk": "Upgraded Sensor Pack",
+   "desc": "Radar remains active while aiming and improves target tracking."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Gauntlets",
+   "name": "Liar’s Handshake",
+   "perk": "Cross Counter",
+   "desc": "Powered Arc melee or being struck enables a powerful counterpunch heal/damage combo."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Chest",
+   "name": "Lucky Raspberry",
+   "perk": "Probability Matrix",
+   "desc": "Arc Bolt Grenades chain and have a chance to fully recharge on hit."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Helmet",
+   "name": "Mask of Bakris",
+   "perk": "Light Shift",
+   "desc": "Replaces Stasis dodge with a teleport blink that buffs Arc and Stasis weapon damage."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Helmet",
+   "name": "Mask of the Quiet One",
+   "perk": "Dreaded Visage",
+   "desc": ""
+  },
+  {
+   "class": "Hunter",
+   "slot": "Gauntlets",
+   "name": "Mechaneer’s Tricksleeves",
+   "perk": "Surprise Attack",
+   "desc": "Improves sidearm handling and damage when critically wounded."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Gauntlets",
+   "name": "Mothkeeper’s Wraps",
+   "perk": "Mothkeeper’s Flight",
+   "desc": "Grenades spawn Void moths that track targets and detonate or provide overshields."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Gauntlets",
+   "name": "Oathkeeper",
+   "perk": "Adamantine Brace",
+   "desc": "Bow charge can be held indefinitely and improves draw consistency."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Chest",
+   "name": "Omnioculus",
+   "perk": "Beyond the Veil",
+   "desc": "Improves invisibility uptime and grants damage resistance and melee energy."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Chest",
+   "name": "Ophidia Spathe",
+   "perk": "Scissor Fingers",
+   "desc": "Grants an additional throwing knife charge."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Leg",
+   "name": "Orpheus Rig",
+   "perk": "Uncanny Arrows",
+   "desc": "Grants additional Shadowshot shot and returns Super energy for tethered targets."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Leg",
+   "name": "Radiant Dance Machines",
+   "perk": "The Dance",
+   "desc": "Rapid dodging improves mobility and weapon handling for short duration."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Chest",
+   "name": "Raiju’s Harness",
+   "perk": "Flux Overload",
+   "desc": "Enhances Arc Staff chaining and Super management."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Gauntlets",
+   "name": "Renewal Grasps",
+   "perk": "Iceflare Bolts",
+   "desc": "Duskfield Grenades create large Stasis fields that reduce enemy damage output."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Gauntlets",
+   "name": "Sealed Ahamkara Grasps",
+   "perk": "Nightmare Fuel",
+   "desc": "Melee damage auto-reloads weapons for a short time."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Gauntlets",
+   "name": "Shinobu’s Vow",
+   "perk": "New Tricks",
+   "desc": "Grants an additional Skip Grenade charge and improves tracking and energy return."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Gauntlets",
+   "name": "Sixth Coyote",
+   "perk": "Double Dodge",
+   "desc": "Grants an additional dodge charge."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Leg",
+   "name": "St0mp-EE5",
+   "perk": "Hydraulic Boosters",
+   "desc": "Increases sprint speed, slide distance, and jump height."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Leg",
+   "name": "Star-Eater Scales",
+   "perk": "Feast of Light",
+   "desc": ""
+  },
+  {
+   "class": "Hunter",
+   "slot": "Chest",
+   "name": "The Sixth Coyote",
+   "perk": "Double Dodge",
+   "desc": ""
+  },
+  {
+   "class": "Hunter",
+   "slot": "Gauntlets",
+   "name": "Triton Vice",
+   "perk": "Abyssal Edge",
+   "desc": "Glaive melee kills increase ammo and enhance projectile behavior."
+  },
+  {
+   "class": "Hunter",
+   "slot": "Gauntlets",
+   "name": "Young Ahamkara’s Spine",
+   "perk": "Wish-Dragon Teeth",
+   "desc": "Tripmine Grenades gain increased duration, radius, and energy return on damage."
+  },
+  {
+   "class": "Titan",
+   "slot": "Leg",
+   "name": "Abeyant Leap",
+   "perk": "Puppeteer's Control",
+   "desc": "Drengr's Lash launches additional tracking projectiles and grants Woven Mail."
+  },
+  {
+   "class": "Titan",
+   "slot": "Gauntlets",
+   "name": "ACD/0 Feedback Fence",
+   "perk": "Fury Conductors",
+   "desc": "Melee hits build armor charge. Being struck by melee attacks releases Arc damage to nearby enemies."
+  },
+  {
+   "class": "Titan",
+   "slot": "Chest",
+   "name": "Actium War Rig",
+   "perk": "Auto-Loading Link",
+   "desc": "Continuously reloads Auto Rifles and Machine Guns from reserves."
+  },
+  {
+   "class": "Titan",
+   "slot": "Gauntlets",
+   "name": "Aeon Safe",
+   "perk": "Sect of Insight / Force / Vigor",
+   "desc": "Selectable support perks focused on ammo generation, ally support, or ability regeneration."
+  },
+  {
+   "class": "Titan",
+   "slot": "Helmet",
+   "name": "An Insurmountable Skullfort",
+   "perk": "Transfusion Matrix",
+   "desc": "Arc melee kills restore health and immediately refund melee energy."
+  },
+  {
+   "class": "Titan",
+   "slot": "Leg",
+   "name": "Antaeus Wards",
+   "perk": "Reflective Vents",
+   "desc": "Sliding reflects incoming projectiles after sprinting."
+  },
+  {
+   "class": "Titan",
+   "slot": "Chest",
+   "name": "Arbor Warden",
+   "perk": "Barri-Nade",
+   "desc": "Converts Barricade into a throwable projectile that deploys on impact."
+  },
+  {
+   "class": "Titan",
+   "slot": "Chest",
+   "name": "Armamentarium",
+   "perk": "And Another Thing",
+   "desc": "Gain an additional grenade charge."
+  },
+  {
+   "class": "Titan",
+   "slot": "Gauntlets",
+   "name": "Ashen Wake",
+   "perk": "Bring the Heat",
+   "desc": "Fusion Grenades explode instantly and grenade kills refund grenade energy."
+  },
+  {
+   "class": "Titan",
+   "slot": "Leg",
+   "name": "Blastwave Striders",
+   "perk": "Blastwave Striders",
+   "desc": "Charged explosions scatter Stasis crystals and grant Frost Armor while reducing self-damage from explosions."
+  },
+  {
+   "class": "Titan",
+   "slot": "Helmet",
+   "name": "Cadmus Ridge Lancecap",
+   "perk": "Lancer's Vigil",
+   "desc": "Diamond Lances create additional Stasis effects and interact with Rally Barricades."
+  },
+  {
+   "class": "Titan",
+   "slot": "Gauntlets",
+   "name": "Citan's Ramparts",
+   "perk": "Assault Barricade",
+   "desc": "Barricades can be shot through by allies and yourself, but have reduced health and duration."
+  },
+  {
+   "class": "Titan",
+   "slot": "Chest",
+   "name": "Crest of Alpha Lupi",
+   "perk": "Survival Well",
+   "desc": "Barricade releases a healing pulse. Supers generate an additional Orb of Power."
+  },
+  {
+   "class": "Titan",
+   "slot": "Chest",
+   "name": "Cuirass of the Falling Star",
+   "perk": "Glorious Charge",
+   "desc": "Greatly increases Thundercrash impact damage and grants an overshield after impact."
+  },
+  {
+   "class": "Titan",
+   "slot": "Gauntlets",
+   "name": "Doom Fang Pauldron",
+   "perk": "Horns of Doom",
+   "desc": "Void melee kills grant Super energy. Sentinel Shield hits extend Super duration."
+  },
+  {
+   "class": "Titan",
+   "slot": "Leg",
+   "name": "Dunemarchers",
+   "perk": "Linear Actuators",
+   "desc": "Increased sprint speed. Sprinting charges a chain-lightning melee attack."
+  },
+  {
+   "class": "Titan",
+   "slot": "Helmet",
+   "name": "Eternal Warrior",
+   "perk": "Resolute",
+   "desc": "Gain an overshield when activating Fists of Havoc. Arc weapon kills after a Super gain a damage bonus."
+  },
+  {
+   "class": "Titan",
+   "slot": "Chest",
+   "name": "Hallowfire Heart",
+   "perk": "Sunfire Furnace",
+   "desc": "Solar abilities recharge faster. Recharge rate increases further while Super energy is full."
+  },
+  {
+   "class": "Titan",
+   "slot": "Chest",
+   "name": "Hazardous Propulsion",
+   "perk": "Rocket-Powered Pistons",
+   "desc": "Precision hits and kills load Exodus Rockets that fire when using Barricade."
+  },
+  {
+   "class": "Titan",
+   "slot": "Chest",
+   "name": "Heart of Inmost Light",
+   "perk": "Overflowing Light",
+   "desc": "Using one ability empowers the other abilities, increasing regeneration and effectiveness."
+  },
+  {
+   "class": "Titan",
+   "slot": "Helmet",
+   "name": "Helm of Saint-14",
+   "perk": "Starless Night",
+   "desc": "Enemies entering Ward of Dawn are blinded. Allies passing through gain an overshield."
+  },
+  {
+   "class": "Titan",
+   "slot": "Chest",
+   "name": "Hoarfrost-Z",
+   "perk": "Glacial Fortification",
+   "desc": "Barricade becomes a wall of Stasis crystals."
+  },
+  {
+   "class": "Titan",
+   "slot": "Gauntlets",
+   "name": "Icefall Mantle",
+   "perk": "Glacial Guard",
+   "desc": "Replaces Barricade with a personal overshield."
+  },
+  {
+   "class": "Titan",
+   "slot": "Helmet",
+   "name": "Khepri's Horn",
+   "perk": "Solar Rampart",
+   "desc": "Barricades unleash a wave of Solar energy. Solar final blows recharge Barricade energy."
+  },
+  {
+   "class": "Titan",
+   "slot": "Leg",
+   "name": "Lion Rampant",
+   "perk": "Jump Jets",
+   "desc": "Improves lift mobility and airborne hip-fire effectiveness."
+  },
+  {
+   "class": "Titan",
+   "slot": "Helmet",
+   "name": "Loreley Splendor Helm",
+   "perk": "Cauterizing Flame",
+   "desc": "When critically wounded or when casting Barricade, create a Sunspot with enhanced restoration."
+  },
+  {
+   "class": "Titan",
+   "slot": "Helmet",
+   "name": "Mask of the Quiet One",
+   "perk": "Dreaded Visage",
+   "desc": "Taking damage grants ability energy. Kills while critically wounded restore health."
+  },
+  {
+   "class": "Titan",
+   "slot": "Leg",
+   "name": "MK. 44 Stand Asides",
+   "perk": "Seriously, Watch Out",
+   "desc": "Grants an overshield while sprinting with Shoulder Charge abilities ready and refunds melee energy on hits."
+  },
+  {
+   "class": "Titan",
+   "slot": "Gauntlets",
+   "name": "No Backup Plans",
+   "perk": "Force Multiplier",
+   "desc": "Shotgun kills grant benefits to Void Overshields and shotgun-focused gameplay."
+  },
+  {
+   "class": "Titan",
+   "slot": "Helmet",
+   "name": "One-Eyed Mask",
+   "perk": "Vengeance",
+   "desc": "Targets that damage you are marked. Defeating them grants an overshield."
+  },
+  {
+   "class": "Titan",
+   "slot": "Leg",
+   "name": "Path of the Burning Steps",
+   "perk": "Firewalker",
+   "desc": "Solar final blows build weapon damage bonuses and provide resistance to Stasis effects."
+  },
+  {
+   "class": "Titan",
+   "slot": "Leg",
+   "name": "Peacekeepers",
+   "perk": "Mecha Holster",
+   "desc": "Improves SMG handling, movement, and automatically reloads stowed SMGs."
+  },
+  {
+   "class": "Titan",
+   "slot": "Leg",
+   "name": "Peregrine Greaves",
+   "perk": "Peregrine Strike",
+   "desc": "Greatly increases Shoulder Charge damage while airborne."
+  },
+  {
+   "class": "Titan",
+   "slot": "Gauntlets",
+   "name": "Point-Contact Cannon Brace",
+   "perk": "Hammer and Anvil",
+   "desc": "Powered Arc melees create lightning strikes and refund melee energy."
+  },
+  {
+   "class": "Titan",
+   "slot": "Helmet",
+   "name": "Precious Scars",
+   "perk": "Kintsugi",
+   "desc": "Weapon kills matching your subclass create healing bursts for nearby allies. Revives grant overshields."
+  },
+  {
+   "class": "Titan",
+   "slot": "Gauntlets",
+   "name": "Pyrogale Gauntlets",
+   "perk": "Burning Maul",
+   "desc": "Modifies Burning Maul into a powerful single-target attack and enhances Consecration."
+  },
+  {
+   "class": "Titan",
+   "slot": "Gauntlets",
+   "name": "Second Chance",
+   "perk": "Wilting Counter",
+   "desc": "Gain an additional Shield Throw charge. Shield Throws weaken targets."
+  },
+  {
+   "class": "Titan",
+   "slot": "Chest",
+   "name": "Severance Enclosure",
+   "perk": "Spheromatik Trigger",
+   "desc": "Powered melee kills and finishers create damaging explosions."
+  },
+  {
+   "class": "Titan",
+   "slot": "Gauntlets",
+   "name": "Stronghold",
+   "perk": "Clenched Fist",
+   "desc": "Blocking with swords greatly improves survivability and healing."
+  },
+  {
+   "class": "Titan",
+   "slot": "Gauntlets",
+   "name": "Synthoceps",
+   "perk": "Biotic Enhancements",
+   "desc": "Increased melee and Super damage when surrounded by enemies."
+  },
+  {
+   "class": "Titan",
+   "slot": "Gauntlets",
+   "name": "Wishful Ignorance",
+   "perk": "Hands of the Hecatoncheires",
+   "desc": "Improves Frenzied Blade and Strand melee-focused gameplay."
+  },
+  {
+   "class": "Titan",
+   "slot": "Gauntlets",
+   "name": "Wormgod Caress",
+   "perk": "Burning Fists",
+   "desc": "Melee kills dramatically increase melee damage for a short duration."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Gauntlets",
+   "name": "Aeon Soul",
+   "perk": "Sect of Insight / Sect of Force / Sect of Vigor",
+   "desc": "Grants one of three selectable Aeon Cult roles focused on ammo generation, ally support, or ability regeneration."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Helmet",
+   "name": "Apotheosis Veil",
+   "perk": "Insatiable",
+   "desc": "Immediately regenerate health, melee, grenade, and Rift energy upon casting your Super. Nearby allies gain increased class ability regeneration."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Helmet",
+   "name": "Astrocyte Verse",
+   "perk": "Move to Survive",
+   "desc": "Blink farther and more frequently. Weapon ready speed is improved after blinking."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Gauntlets",
+   "name": "Ballidorse Wrathweavers",
+   "perk": "Hearts of Ice",
+   "desc": "Empower nearby allies when casting Winter's Wrath and improve Stasis weapon damage bonuses."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Leg",
+   "name": "Boots of the Assembler",
+   "perk": "Blessing of Order",
+   "desc": "Noble Seekers generated by your Rift travel to allies and extend Rift duration."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Gauntlets",
+   "name": "Briarbinds",
+   "perk": "One With the Void",
+   "desc": "Void Souls travel farther, last longer, and can be retrieved and redeployed."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Helmet",
+   "name": "Cenotaph Mask",
+   "perk": "High Priority",
+   "desc": "Continuously damaging a target with a Trace Rifle marks it. Allies deal increased damage to marked targets and heavy ammo can be generated for allies against powerful foes."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Chest",
+   "name": "Chromatic Fire",
+   "perk": "Crystalline Transistor",
+   "desc": "Precision final blows with Kinetic weapons create elemental explosions matching your subclass."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Gauntlets",
+   "name": "Claws of Ahamkara",
+   "perk": "The Whispers",
+   "desc": "Gain an additional melee charge."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Gauntlets",
+   "name": "Contraverse Hold",
+   "perk": "Chaotic Exchanger",
+   "desc": "Gain damage resistance while charging Void grenades. Charged Void grenade hits return grenade energy."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Helmet",
+   "name": "Crown of Tempests",
+   "perk": "Conduction Tines",
+   "desc": "Arc ability or Jolt kills increase recharge rate of Arc abilities and extend Stormtrance duration."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Helmet",
+   "name": "Dawn Chorus",
+   "perk": "Rites of Ember",
+   "desc": "Improves Scorch effects and grants melee energy when Scorch damages targets. Daybreak projectiles deal increased damage to scorched targets."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Helmet",
+   "name": "Eye of Another World",
+   "perk": "Cerebral Uplink",
+   "desc": "Highlights priority targets and improves regeneration speed of grenade, melee and Rift abilities."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Helmet",
+   "name": "Fallen Sunstar",
+   "perk": "Ionic Conductor",
+   "desc": "Ionic Traces travel faster and grant additional ability energy. Nearby allies also gain ability energy from your Ionic Traces."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Helmet",
+   "name": "Felwinter's Helm",
+   "perk": "Warlord's End",
+   "desc": "Powered melee final blows or finishers create a burst that weakens nearby enemies. Stronger enemies create larger bursts."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Leg",
+   "name": "Geomag Stabilizers",
+   "perk": "Close Enough",
+   "desc": "Chaos Reach duration is extended while dealing damage to targets."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Gauntlets",
+   "name": "Getaway Artist",
+   "perk": "Dynamic Duo",
+   "desc": "Convert your grenade into an Arc Soul. Amplified Arc Souls are stronger and last longer."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Gauntlets",
+   "name": "Karnstein Armlets",
+   "perk": "Vampire's Caress",
+   "desc": "Melee final blows restore health and grant continuous healing for a short duration."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Leg",
+   "name": "Lunafaction Boots",
+   "perk": "Alchemical Etchings",
+   "desc": "Your Rifts automatically reload weapons and improve weapon range for allies."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Chest",
+   "name": "Mantle of Battle Harmony",
+   "perk": "Absorption Cells",
+   "desc": "Weapon kills matching your subclass element grant Super energy. When Super is full, matching weapon kills grant a damage bonus."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Helmet",
+   "name": "Mataiodoxia",
+   "perk": "Piercing Barbs",
+   "desc": "Arcane Needle suspends targets and creates additional effects against suspended enemies."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Gauntlets",
+   "name": "Necrotic Grip",
+   "perk": "Grasp of the Devourer",
+   "desc": "Damaging enemies with melee attacks poisons them and spreads poison to nearby targets."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Helmet",
+   "name": "Nezarec's Sin",
+   "perk": "Abyssal Extractors",
+   "desc": "Void damage kills increase ability energy recharge rate."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Gauntlets",
+   "name": "Nothing Manacles",
+   "perk": "Scatter Charge",
+   "desc": "Gain an additional Scatter Grenade charge. Scatter Grenades track targets more aggressively."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Gauntlets",
+   "name": "Osmiomancy Gloves",
+   "perk": "Fervid Coldsnap",
+   "desc": "Gain an additional Coldsnap Grenade charge. Coldsnap impacts return grenade energy."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Chest",
+   "name": "Phoenix Protocol",
+   "perk": "Battle-Hearth",
+   "desc": "Kills and assists inside Well of Radiance return Super energy."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Chest",
+   "name": "Promethium Spur",
+   "perk": "Embers of Light",
+   "desc": "Solar weapon final blows build energy. Daybreak kills and Rift interactions create combined Healing and Empowering Rifts."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Chest",
+   "name": "Rain of Fire",
+   "perk": "Soaring Fusilier",
+   "desc": "Air dodges reload equipped weapons. Fusion Rifles and Linear Fusion Rifles gain benefits from airborne play."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Chest",
+   "name": "Rime-Coat Raiment",
+   "perk": "Bleak Domain",
+   "desc": "Enhances Bleak Watcher turrets and creates Stasis crystals around their area of effect."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Chest",
+   "name": "Sanguine Alchemy",
+   "perk": "Blood Magic",
+   "desc": "Weapon kills while standing in a Rift extend its duration."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Leg",
+   "name": "Secant Filaments",
+   "perk": "Devouring Rift",
+   "desc": "Empowering Rift grants Devour and allows weapons to disrupt Overload Champions."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Helmet",
+   "name": "Skull of Dire Ahamkara",
+   "perk": "Actual Grandeur",
+   "desc": "Nova Bomb kills grant Super energy. Provides damage resistance while casting Nova Bomb."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Helmet",
+   "name": "Speaker's Sight",
+   "perk": "Visage of the Speaker",
+   "desc": "Healing grenade deployments create a healing turret that supports allies."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Chest",
+   "name": "Starfire Protocol",
+   "perk": "Fusion Harness",
+   "desc": "Grants an additional Fusion Grenade charge. Empowered weapon damage grants grenade energy."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Chest",
+   "name": "Stormdancer's Brace",
+   "perk": "Ascending Amplitude",
+   "desc": "Stormtrance kills increase Stormtrance damage and return Super energy when it ends."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Gauntlets",
+   "name": "Sunbracers",
+   "perk": "Helium Spirals",
+   "desc": "Powered Solar melee kills grant a period of unlimited Solar Grenade throws."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Gauntlets",
+   "name": "Swarmers",
+   "perk": "Swarmer's Call",
+   "desc": "Destroying Tangles creates Threadlings. Threadlings unravel targets they damage."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Helmet",
+   "name": "The Stag",
+   "perk": "Dearly Departed",
+   "desc": "Rift energy is granted when critically wounded. On death, creates a healing Rift at your location."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Leg",
+   "name": "Transversive Steps",
+   "perk": "Strange Protractor",
+   "desc": "Increases sprint speed and automatically reloads weapons while sprinting."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Helmet",
+   "name": "Verity's Brow",
+   "perk": "The Fourth Magic",
+   "desc": "Weapon kills matching your subclass element grant grenade damage and grenade regeneration bonuses. Nearby allies gain increased grenade regeneration when you throw a grenade."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Chest",
+   "name": "Vesper of Radius",
+   "perk": "Planetary Torrent",
+   "desc": "Rifts release Arc shockwaves and recharge faster when surrounded by enemies."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Chest",
+   "name": "Wings of Sacred Dawn",
+   "perk": "Tome of Dawn",
+   "desc": "Gain damage resistance and improved airborne accuracy while aiming in the air."
+  },
+  {
+   "class": "Warlock",
+   "slot": "Gauntlets",
+   "name": "Winter's Guile",
+   "perk": "Warlord's Sigil",
+   "desc": "Eliminating enemies with melee attacks increases melee damage for a short duration."
+  }
+ ]
+}
