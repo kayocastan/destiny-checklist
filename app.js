@@ -1412,16 +1412,23 @@ function renderAlerts(logged) {
     if (post >= 15) al.push({ k: 'post' + cid, lv: post >= 19 ? 'bad' : 'w', ic: '✉', t: P ? `Correios do ${cname(cid)}: ${post}/21` : `${cname(cid)} postmaster: ${post}/21`, s: P ? 'acima de 21 os itens mais antigos somem' : 'past 21 the oldest items are lost', j: 'obj:post' });
     if (eng >= 9) al.push({ k: 'eng' + cid, lv: eng >= 10 ? 'bad' : 'w', ic: '◆', t: P ? `Engramas do ${cname(cid)}: ${eng}/10` : `${cname(cid)} engrams: ${eng}/10`, s: P ? 'os próximos vão para os correios' : 'the next ones go to the postmaster' });
   }
+  if (wishList().length && typeof invAll === 'function' && INVD) { // rolo desejado que chegou desde a última vez
+    const full = invAll().filter(wishFull), seen = LS.get('dc-wish-seen', null);
+    if (!seen) LS.set('dc-wish-seen', full.map(x => x.iid)); // primeira vez: o que já tinha não conta como novo
+    else for (const x of full.filter(x => !seen.includes(x.iid)).slice(0, 2)) al.push({ k: 'wish' + x.iid, lv: 'ok', ic: '☆', t: P ? `Caiu um rolo desejado: ${INVD[x.h]?.n || ''}` : `Wished roll dropped: ${INVD[x.h]?.n || ''}`, s: P ? 'toque para ver no inventário' : 'tap to see it in the inventory', j: 'inv:', wq: INVD[x.h]?.n || '', iid: x.iid });
+  }
   const vUsed = (profile.profileInventory?.data?.items || []).filter(i => i.bucketHash === VAULT_BUCKET).length;
   if (vUsed >= 650) al.push({ k: 'vault', lv: vUsed >= 690 ? 'bad' : 'w', ic: '▣', t: P ? `Cofre: ${vUsed}/700` : `Vault: ${vUsed}/700`, s: P ? 'abra a Limpeza do cofre' : 'open Vault cleanup', j: 'vlt:' });
   const gl = (profile.profileCurrencies?.data?.items || []).find(i => i.itemHash === GLIMMER)?.quantity || 0;
   if (gl >= 240000) al.push({ k: 'gl', lv: gl >= 250000 ? 'bad' : 'w', ic: '✦', t: P ? `Lumen: ${(gl / 1000).toFixed(0)} mil de 250 mil` : `Glimmer: ${(gl / 1000).toFixed(0)}k of 250k`, s: P ? 'no teto, o que ganhar se perde' : 'at the cap, new glimmer is lost' });
   const show = al.filter(a => hide[a.k] !== day);
   el.hidden = !show.length;
-  el.innerHTML = show.map(a => `<div class="acc-a ${a.lv}"><span class="ic" aria-hidden="true">${a.ic}</span>${a.j ? `<button type="button" class="t" data-alj="${a.j}"><b>${esc(a.t)}</b><small>${esc(a.s)}</small></button>` : `<span class="t"><b>${esc(a.t)}</b><small>${esc(a.s)}</small></span>`}<button type="button" class="x" data-alx="${a.k}" aria-label="${P ? 'Esconder por hoje' : 'Hide for today'}" title="${P ? 'Esconder por hoje' : 'Hide for today'}">✕</button></div>`).join('');
+  el.innerHTML = show.map(a => `<div class="acc-a ${a.lv}"><span class="ic" aria-hidden="true">${a.ic}</span>${a.j ? `<button type="button" class="t" data-alj="${a.j}"${a.iid ? ` data-alwi="${a.iid}" data-alwq="${esc(a.wq)}"` : ''}><b>${esc(a.t)}</b><small>${esc(a.s)}</small></button>` : `<span class="t"><b>${esc(a.t)}</b><small>${esc(a.s)}</small></span>`}<button type="button" class="x" data-alx="${a.k}" aria-label="${P ? 'Esconder por hoje' : 'Hide for today'}" title="${P ? 'Esconder por hoje' : 'Hide for today'}">✕</button></div>`).join('');
 }
 document.addEventListener('click', e => {
+  const xw = e.target.closest('[data-alx^="wish"]'); if (xw) { const x = xw; const sn = LS.get('dc-wish-seen', []); sn.push(x.dataset.alx.slice(4)); LS.set('dc-wish-seen', sn.slice(-300)); renderAlerts(true); return; }
   const x = e.target.closest('[data-alx]'); if (x) { const h = LS.get('dc-al-hide', {}), d = new Date().toDateString(); for (const k in h) if (h[k] !== d) delete h[k]; h[x.dataset.alx] = d; LS.set('dc-al-hide', h); renderAlerts(true); return; }
+  const jw = e.target.closest('[data-alwi]'); if (jw) { const j = jw; const sn = LS.get('dc-wish-seen', []); sn.push(j.dataset.alwi); LS.set('dc-wish-seen', sn.slice(-300)); INV.q = j.dataset.alwq; INV.f = 'all'; go('inv'); setTimeout(() => ivOpen(j.dataset.alwi), 300); return; }
   const j = e.target.closest('[data-alj]'); if (j) { const [t, id] = j.dataset.alj.split(':'); if (id === 'post') openSecs.add('post'); jumpTo(t, id); }
 });
 function render() {
@@ -4730,6 +4737,7 @@ function ivPkSug() {
 document.addEventListener('click', e => { const b = e.target.closest('[data-ivpk]'); if (!b) return; INV.q = 'perk:' + b.dataset.ivpk; render(); });
 const ivMatch = x => {
   const f = INV.f, q = palNorm(INV.q.trim()), d = INVD[x.h] || {}, t = tagOf(x.iid);
+  if (f === 'wish' && !(x.slot < 3 && wishHas(x.h, INVD[x.h]?.n))) return false;
   if ((f === 'rg' || f === 'rp' || f === 'rn') && (x.slot > 2 || rlGrade(x.iid, x.h) !== f[1]) || f === 'w' && x.slot > 2 || f === 'a' && x.slot < 3 || f === 'dup' && !x.dup || f === 'fav' && t !== 'fav' || f === 'junk' && t !== 'junk') return false;
   if (!q) return true;
   if (x.slot < 3 && !PKN.done) pkLoad();
@@ -4737,10 +4745,18 @@ const ivMatch = x => {
   const hay = palNorm([d.n, d.tl, x.slot < 3 ? pkNames(x) : '', x.ex ? 'exotico exotic' : '', x.dup ? 'repetidas repetida dupe dupes' : '', t === 'junk' ? 'lixo junk' : t === 'fav' ? 'favorito favorite' : t === 'keep' ? 'manter keep' : t === 'inf' ? 'infundir infuse' : '', ivt().slots[x.slot], ELEMENTS[x.el] || '', LS.get('dc-notes', {})[x.iid] || ''].join(' '));
   return q.split(/\s+/).every(w => hay.includes(w));
 };
-const ivTile = (x, big) => { const d = INVD[x.h] || {}, t = tagOf(x.iid), m = ivMatch(x); return `<button type="button" class="iv-t${big ? ' big' : ''}${x.ex ? ' ex' : ''}${m ? '' : ' dim'}${INV.picked.has(x.iid) ? ' pk' : ''}" data-iv="${x.iid}" draggable="true" title="${esc([d.n, x.pw ? '✦ ' + x.pw : '', d.tl].filter(Boolean).join(' · '))}" aria-label="${esc(d.n || '')}">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy" draggable="false">` : ''}${x.pw ? `<b>${x.pw}</b>` : ''}${t ? `<i class="iv-tg t-${t}">${{ fav: '★', keep: '✓', junk: '✕', inf: '⇪' }[t]}</i>` : ''}${x.el && ELEMENTS[x.el] && x.slot < 3 ? `<s class="el-${ELEMENTS[x.el]}"></s>` : ''}${x.slot < 3 ? rlBadge(rlGrade(x.iid, x.h)) : ''}${x.lk ? '<u class="iv-lk" aria-hidden="true"><svg viewBox="0 0 12 12" width="10" height="10" fill="currentColor"><path d="M3.5 5V3.6a2.5 2.5 0 0 1 5 0V5h.7c.4 0 .8.4.8.8v4.4c0 .4-.4.8-.8.8H2.8a.8.8 0 0 1-.8-.8V5.8c0-.4.4-.8.8-.8zm1.2 0h2.6V3.6a1.3 1.3 0 0 0-2.6 0z"/></svg></u>' : ''}</button>`; };
+/* Lista de desejos no inventário: arma com todas as colunas do rolo desejado = selo ☆ e aviso no topo quando chega uma nova */
+function wishFull(x) {
+  if (x.slot > 2) return false; const n = INVD[x.h]?.n, wl = wishList().find(y => y.h === x.h || (n && y.n && wishKey(y.n) === wishKey(n))); if (!wl) return false;
+  const cols = wl.r ? wl.r.filter(c => c?.length) : (wl.p || []).map(p => [p]); if (!cols.length) return false;
+  const hs = ivPerks(x), ics = hs.map(h => entCache[lang]?.['DestinyInventoryItemDefinition:' + h]?.ic).filter(Boolean);
+  if (!PKN.done) pkLoad();
+  return cols.every(c => c.some(o => hs.includes(o.h) || (o.ic && ics.includes(o.ic))));
+}
+const ivTile = (x, big) => { const d = INVD[x.h] || {}, t = tagOf(x.iid), m = ivMatch(x); return `<button type="button" class="iv-t${big ? ' big' : ''}${x.ex ? ' ex' : ''}${m ? '' : ' dim'}${INV.picked.has(x.iid) ? ' pk' : ''}" data-iv="${x.iid}" draggable="true" title="${esc([d.n, x.pw ? '✦ ' + x.pw : '', d.tl].filter(Boolean).join(' · '))}" aria-label="${esc(d.n || '')}">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy" draggable="false">` : ''}${x.pw ? `<b>${x.pw}</b>` : ''}${t ? `<i class="iv-tg t-${t}">${{ fav: '★', keep: '✓', junk: '✕', inf: '⇪' }[t]}</i>` : ''}${x.el && ELEMENTS[x.el] && x.slot < 3 ? `<s class="el-${ELEMENTS[x.el]}"></s>` : ''}${x.slot < 3 ? rlBadge(rlGrade(x.iid, x.h)) : ''}${x.slot < 3 && wishFull(x) ? `<i class="iv-wf" title="${lang === 'pt' ? 'Rolo desejado' : 'Wished roll'}">☆</i>` : ''}${x.lk ? '<u class="iv-lk" aria-hidden="true"><svg viewBox="0 0 12 12" width="10" height="10" fill="currentColor"><path d="M3.5 5V3.6a2.5 2.5 0 0 1 5 0V5h.7c.4 0 .8.4.8.8v4.4c0 .4-.4.8-.8.8H2.8a.8.8 0 0 1-.8-.8V5.8c0-.4.4-.8.8-.8zm1.2 0h2.6V3.6a1.3 1.3 0 0 0-2.6 0z"/></svg></u>' : ''}</button>`; };
 function ivBar() {
   const T = ivt(), chip = (k, t) => `<button type="button" class="lbd-chip${INV.f === k ? ' on' : ''}" data-ivf="${k}">${esc(t)}</button>`;
-  return `<div class="iv-bar"><label class="iv-q"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/></svg><input type="search" id="ivq" value="${esc(INV.q)}" placeholder="${esc(T.q)}" aria-label="${esc(T.q)}" autocomplete="off"></label>${ivPkSug()}<div class="lbd-chips">${chip('all', T.all)}${chip('w', T.w)}${chip('a', T.a)}${chip('dup', T.dup)}${chip('fav', T.fav)}${chip('junk', T.junk)}</div><small class="iv-tip">${esc(T.tip)}</small></div>${INV.msg ? `<p class="iv-msg${INV.msg.bad ? ' bad' : ''}">${esc(INV.msg.t)}</p>` : ''}`;
+  return `<div class="iv-bar"><label class="iv-q"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/></svg><input type="search" id="ivq" value="${esc(INV.q)}" placeholder="${esc(T.q)}" aria-label="${esc(T.q)}" autocomplete="off"></label>${ivPkSug()}<div class="lbd-chips">${chip('all', T.all)}${chip('w', T.w)}${chip('a', T.a)}${chip('dup', T.dup)}${chip('fav', T.fav)}${chip('wish', lang === 'pt' ? '☆ Desejados' : '☆ Wished')}${chip('junk', T.junk)}</div><small class="iv-tip">${esc(T.tip)}</small></div>${INV.msg ? `<p class="iv-msg${INV.msg.bad ? ' bad' : ''}">${esc(INV.msg.t)}</p>` : ''}`;
 }
 function invHTML() {
   const T = ivt(), W = u(); if (!have.c) return `<div class="panel"><p class="empty-msg wait">${esc(T.wait)}</p></div>`;
@@ -4893,8 +4909,36 @@ document.addEventListener('click', e => {
   const g = e.target.closest('[data-mpgo]'); if (g && !g.disabled) mpApply(x, +g.dataset.mpgo);
 });
 const STAT_NOBAR = new Set([4284893193, 3871231066, 2961396640, 1931675084, 2715839340, 447667954, 925767036, 2837207746]);
+/* Comparar dois itens: "Comparar" guarda o primeiro; no segundo, "Comparar com…" abre os dois lado a lado (vantagens e atributos alinhados) */
+function ivCmpHTML() {
+  const T = ivt(), P = lang === 'pt', A = ivFind(INV.cmp), B = ivFind(INV.sel); if (!A || !B) { INV.cmpView = false; return ''; }
+  const dA = INV.det[A.iid], dB = INV.det[B.iid]; if (!dA) ivLoadDet(A.iid); if (!dB) ivLoadDet(B.iid);
+  const ready = dA && dB && !dA.busy && !dB.busy && !dA.err && !dB.err;
+  const hd = x => { const D = INVD[x.h] || {}; return `<div class="cmp-h${x.ex ? ' ex' : ''}">${D.ic ? `<img src="${BNET}${D.ic}" alt="">` : ''}<span><b>${esc(D.n || '…')}</b><small>${esc([x.pw ? '✦ ' + x.pw : '', x.where === 'v' ? T.inV : u().classes[profile.characters.data[x.where]?.classType] || ''].filter(Boolean).join(' · '))}</small></span></div>`; };
+  let body = `<p class="wait">${esc(T.loadingItem)}</p>`;
+  if (ready) {
+    const isW = A.slot < 3, pk = (x, d) => d.so.map(s => d.en[s.plugHash]).filter(o => o && (isW ? LC_PERK.test(o.pc || '') : /^intrinsics|armor_archetypes/.test(o.pc || ''))).map(o => o.n);
+    const pa = pk(A, dA), pb = pk(B, dB), n = Math.max(pa.length, pb.length);
+    const perks = Array.from({ length: n }, (_, i) => `<div class="cmp-r"><span class="${pa[i] && pa[i] === pb[i] ? 'same' : ''}">${esc(pa[i] || '—')}</span><small></small><span class="${pa[i] && pa[i] === pb[i] ? 'same' : ''}">${esc(pb[i] || '—')}</span></div>`).join('');
+    const ids = [...new Set([...Object.keys(dA.st), ...Object.keys(dB.st)])].map(Number).filter(h => (dA.sd[h] || dB.sd[h])?.n);
+    if (!isW) ids.sort((a, b) => STAT_ORDER.indexOf(a) - STAT_ORDER.indexOf(b));
+    const stats = ids.map(h => { const a = dA.st[h]?.value ?? 0, b = dB.st[h]?.value ?? 0, nm = (dA.sd[h] || dB.sd[h]).n, bar = !STAT_NOBAR.has(h);
+      return `<div class="cmp-s"><b class="${a > b ? 'up' : ''}">${a}</b>${bar ? `<i class="cmp-bar l"><u style="width:${Math.min(100, a)}%"></u></i>` : '<i></i>'}<span>${esc(nm)}</span>${bar ? `<i class="cmp-bar"><u style="width:${Math.min(100, b)}%"></u></i>` : '<i></i>'}<b class="${b > a ? 'up' : ''}">${b}</b></div>`; }).join('');
+    const tot = x => isW ? 0 : Object.entries(INV.det[x.iid].st).filter(([h]) => STAT_ORDER.includes(+h)).reduce((t, [, v]) => t + v.value, 0);
+    body = `<span class="sea-k">${esc(isW ? T.perks : (P ? 'Arquétipo' : 'Archetype'))}</span>${perks || `<p class="lbd-n">—</p>`}<span class="sea-k">${esc(T.stats)}${isW ? '' : ` · ${P ? 'total' : 'total'} ${tot(A)} × ${tot(B)}`}</span>${stats}`;
+  }
+  return `<div class="pf-box ivd-box cmp-box"><button type="button" class="pf-x" aria-label="${esc(u().giClose)}">✕</button><header class="cmp-hd">${hd(A)}<span class="cmp-vs">×</span>${hd(B)}</header><div class="cmp-body">${body}</div>
+    <div class="ivd-row cmp-act"><button type="button" class="lbd-btn" data-ivcmpo="${A.iid}">${esc(P ? 'Abrir o da esquerda' : 'Open left')}</button><button type="button" class="lbd-btn" data-ivcmpo="${B.iid}">${esc(P ? 'Abrir o da direita' : 'Open right')}</button><button type="button" class="lbd-btn" data-ivcmpx>${esc(P ? 'Parar de comparar' : 'Stop comparing')}</button></div></div>`;
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#ivdlg')) return;
+  if (e.target.closest('[data-ivcmp]')) { const P = lang === 'pt'; if (INV.cmp && INV.cmp !== INV.sel) INV.cmpView = true; else { INV.cmp = INV.sel; INV.msg = { t: P ? 'Agora abra outro item e toque em Comparar com…' : 'Now open another item and tap Compare with…' }; } ivDraw(); return; }
+  const o = e.target.closest('[data-ivcmpo]'); if (o) { INV.cmpView = false; INV.sel = o.dataset.ivcmpo; INV.msg = null; ivDraw(); return; }
+  if (e.target.closest('[data-ivcmpx]')) { INV.cmp = null; INV.cmpView = false; INV.msg = null; ivDraw(); }
+});
 function ivDraw() {
   const d = $('ivdlg'), T = ivt(), W = u(); if (!d) return; const x = ivFind(INV.sel); if (!x) { d.close(); return; }
+  if (INV.cmpView) { const h = ivCmpHTML(); if (h) { d.innerHTML = h; return; } }
   const D = INVD[x.h] || {}, det = INV.det[x.iid], chars = ivChars(), tg = tagOf(x.iid), notes = LS.get('dc-notes', {});
   const copies = invAll().filter(y => y.h === x.h).length, loc = x.where === 'v' ? T.inV : T.on(W.classes[profile.characters.data[x.where]?.classType] || '') + (x.eq ? ' · ' + T.eqd : '');
   let perks = '', stats = '', wishC = '';
@@ -4916,7 +4960,7 @@ function ivDraw() {
   const btn = (to, eq, label, dis) => `<button type="button" class="lbd-btn" data-ivdo="${to}" data-iveq="${eq ? 1 : ''}"${dis || INV.busy ? ' disabled' : ''}>${esc(label)}</button>`;
   const canCls = c => x.slot < 3 || x.cls === 3 || x.cls === c.classType;
   d.innerHTML = `<div class="pf-box ivd-box"><button type="button" class="pf-x" aria-label="${esc(W.giClose)}">✕</button>
-    <header class="ivd-hd${x.ex ? ' ex' : ''}">${D.ic ? `<img src="${BNET}${D.ic}" alt="">` : ''}<div><small>${esc([x.ex ? 'Exótico' : '', D.tl, T.slots[x.slot]].filter(Boolean).join(' · '))}</small><h1>${esc(D.n || '…')}</h1><span class="ivd-ch">${wishC}${copies > 1 ? `<span class="tag-b">${esc(T.copies(copies))}</span>` : ''}</span></div><b class="ivd-pw">${x.pw ? '✦ ' + x.pw : ''}<small>${esc(loc)}</small></b></header>
+    <header class="ivd-hd${x.ex ? ' ex' : ''}">${D.ic ? `<img src="${BNET}${D.ic}" alt="">` : ''}<div><small>${esc([x.ex ? 'Exótico' : '', D.tl, T.slots[x.slot]].filter(Boolean).join(' · '))}</small><h1>${esc(D.n || '…')}</h1><span class="ivd-ch">${x.slot < 3 && D.n ? wishBtn({ h: x.h, n: D.n, ic: D.ic, tl: D.tl }) : ''}${wishC}${copies > 1 ? `<span class="tag-b">${esc(T.copies(copies))}</span>` : ''}</span></div><b class="ivd-pw">${x.pw ? '✦ ' + x.pw : ''}<small>${esc(loc)}</small></b></header>
     <div class="ivd-body"><div class="ivd-main"><div>${perks}</div><div>${stats}</div></div>
     <aside class="ivd-side"><span class="sea-k">${esc(T.equip)} <small class="lb-beta">${esc(T.beta)}</small></span><div class="ivd-row">${chars.map(c => btn(c.characterId, true, W.classes[c.classType], !canCls(c) || (x.eq && x.where === c.characterId))).join('')}</div>
       <span class="sea-k">${esc(T.move)}</span><div class="ivd-row">${x.where !== 'v' ? btn('v', false, T.vaultTo) : ''}${chars.filter(c => c.characterId !== x.where).map(c => btn(c.characterId, false, W.classes[c.classType])).join('')}</div>
@@ -4924,6 +4968,7 @@ function ivDraw() {
       <span class="sea-k">${esc(lkt().lockT)}</span><div class="ivd-row"><button type="button" class="lbd-btn ivd-lk${x.lk ? ' on' : ''}" data-ivlock="${x.lk ? 0 : 1}" title="${esc(x.lk ? lkt().tipU : lkt().tipL)}"${INV.busy ? ' disabled' : ''}>${esc(x.lk ? lkt().unlock : lkt().lock)}</button></div><label class="ivd-kl"><input type="checkbox" id="keeplock"${LS.get('dc-keeplock', true) ? ' checked' : ''}> ${esc(lkt().keepAuto)}</label>
       <span class="sea-k">${esc(T.tag)}</span><div class="ivd-row">${TAGS.map(t => `<button type="button" class="tag-b${tg === t ? ' t-' + t : ''}" data-ivtag="${t}">${esc(tagl()[t])}</button>`).join('')}</div>
       <label class="tr-q">${esc(T.note)}<input type="text" id="ivnote" maxlength="120" value="${esc(notes[x.iid] || '')}" placeholder="${esc(T.notePh)}"></label>
+      <span class="sea-k">${lang === 'pt' ? 'Comparar' : 'Compare'}</span><div class="ivd-row">${(() => { const c = INV.cmp && INV.cmp !== x.iid ? ivFind(INV.cmp) : null, ok = c && (c.slot < 3) === (x.slot < 3); return `<button type="button" class="lbd-btn${c ? ' on' : ''}" data-ivcmp${c && !ok ? ' disabled' : ''}>${esc(c ? (lang === 'pt' ? 'Comparar com ' : 'Compare with ') + (INVD[c.h]?.n || '') : INV.cmp === x.iid ? (lang === 'pt' ? 'Escolhido: abra outro item' : 'Picked: open another item') : (lang === 'pt' ? 'Comparar com outro item' : 'Compare with another item'))}</button>`; })()}</div>
       <span class="sea-k">${esc(T.more)}</span><a href="https://www.light.gg/db/items/${x.h}/" target="_blank" rel="noopener">${esc(T.lgg)} ↗</a></aside></div></div>`;
   if (!det) ivLoadDet(x.iid); if (!RL.st && x.slot < 3) rlLoad();
 }
@@ -4931,7 +4976,7 @@ function ivOpen(iid) {
   let d = $('ivdlg'); if (!d) { d = document.createElement('dialog'); d.id = 'ivdlg'; d.className = 'pf ivdlg'; document.body.append(d);
     d.addEventListener('click', e => { if (e.target === d || e.target.closest('.pf-x')) { d.close(); return; } const b = e.target.closest('[data-ivdo]'); if (b) { ivDo(INV.sel, b.dataset.ivdo, !!b.dataset.iveq); return; } const t = e.target.closest('[data-ivtag]'); if (t) { const m = LS.get('dc-tags', {}); if (m[INV.sel] === t.dataset.ivtag) delete m[INV.sel]; else m[INV.sel] = t.dataset.ivtag; LS.set('dc-tags', m); ivRefresh(); if (m[INV.sel] === 'keep') keepLock(INV.sel); return; } const p = e.target.closest('[data-ivperk]'); if (p) { const same = INV.perk === +p.dataset.ivperk; INV.perk = same ? null : +p.dataset.ivperk; INV.sock = !same && p.dataset.ivsock ? +p.dataset.ivsock : null; INV.mp = null; ivDraw(); } });
     d.addEventListener('change', e => { if (e.target.id !== 'ivnote') return; const m = LS.get('dc-notes', {}); const v = e.target.value.trim(); if (v) m[INV.sel] = v; else delete m[INV.sel]; const ks = Object.keys(m); if (ks.length > 500) delete m[ks[0]]; LS.set('dc-notes', m); }); }
-  INV.sel = iid; INV.perk = null; INV.sock = null; INV.mp = null; INV.msg = null; ivDraw(); if (!d.open) d.showModal();
+  INV.sel = iid; INV.perk = null; INV.sock = null; INV.mp = null; INV.msg = null; INV.cmpView = false; ivDraw(); if (!d.open) d.showModal();
 }
 document.addEventListener('click', e => {
   if (tab !== 'inv' && tab !== 'vlt') return;

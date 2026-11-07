@@ -2203,3 +2203,15 @@ html.grade .ob-opt{font-size:16px}
 .acc-a .t{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;background:none;border:0;padding:0;color:var(--fg);font:inherit;text-align:left}.acc-a button.t{cursor:pointer}.acc-a button.t:hover b{text-decoration:underline}
 .acc-a .t small{color:var(--muted);font-size:12.5px}
 .acc-a .x{background:none;border:0;color:var(--muted);cursor:pointer;padding:2px 6px;border-radius:6px;font-size:12px}.acc-a .x:hover{background:var(--chip);color:var(--fg)}
+.iv-wf{position:absolute;left:2px;bottom:1px;font-style:normal;font-size:13px;color:#f2d36b;text-shadow:0 0 3px #000,0 0 6px rgba(242,211,107,.7)}
+.acc-a.ok{border-color:rgba(242,211,107,.7);background:linear-gradient(90deg,rgba(242,211,107,.18),rgba(242,211,107,.06))}
+/* comparar dois itens */
+.cmp-box{max-width:760px}.cmp-hd{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:12px;align-items:center;padding:4px 30px 12px 0}
+.cmp-h{display:flex;gap:10px;align-items:center;min-width:0}.cmp-h:last-child{flex-direction:row-reverse;text-align:right}.cmp-h img{width:52px;height:52px;border-radius:6px;border:1px solid var(--line)}.cmp-h.ex img{border-color:#f2d36b}
+.cmp-h span{display:grid;min-width:0}.cmp-h b{font-family:var(--display,inherit);font-size:20px;line-height:1.1}.cmp-h small{color:var(--muted);font-size:12.5px}
+.cmp-vs{font:700 20px var(--mono);color:var(--muted)}
+.cmp-body{display:grid;gap:6px}.cmp-r{display:grid;grid-template-columns:minmax(0,1fr) 12px minmax(0,1fr);gap:8px;font-size:14px}.cmp-r span{padding:6px 10px;border-radius:8px;background:var(--chip)}.cmp-r span:last-child{text-align:right}.cmp-r .same{opacity:.6}
+.cmp-s{display:grid;grid-template-columns:36px minmax(0,1fr) 120px minmax(0,1fr) 36px;gap:8px;align-items:center;font-size:13.5px}.cmp-s span{text-align:center;color:var(--muted)}.cmp-s b{font-family:var(--mono)}.cmp-s b:last-child{text-align:right}.cmp-s b.up{color:#7fe08f}
+.cmp-bar{height:6px;border-radius:3px;background:var(--chip);overflow:hidden;display:flex}.cmp-bar u{background:var(--acc);display:block}.cmp-bar.l{justify-content:flex-end}
+.cmp-act{margin-top:12px}
+@media (max-width:560px){.cmp-s{grid-template-columns:30px minmax(0,1fr) 84px minmax(0,1fr) 30px;font-size:12.5px}}
