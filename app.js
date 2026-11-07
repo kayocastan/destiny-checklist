@@ -1432,6 +1432,7 @@ function render() {
   $('tabs').innerHTML = GROUPS.map(g => `<button class="tab" type="button" data-group="${g.id}" aria-current="${groupOf(tab)?.id === g.id}">${esc(U.tabs[g.id])}</button>`).join('');
   botNav();
   // atalho do Orla Bot no topo (só membros da Orla): confere o clã uma vez por dia, mesmo sem abrir a aba Clã
+  { const vb = $('vidbtn'); if (vb) vb.hidden = !member || !LS.get('dc-ownchk', {}).o; } // atalho da página /videos: só o dono do site
   { const gb = $('gradebtn'); if (gb) { if (GD?.clan?.gid) LS.set('dc-orla', { ok: GD.clan.gid === ORLA_CLAN, at: Date.now() }); const o = LS.get('dc-orla', null);
     if (member && (!o || Date.now() - o.at > 864e5) && !orlaChk) { orlaChk = true; bungie(`/GroupV2/User/${member.type}/${member.id}/0/1/`).then(r => { LS.set('dc-orla', { ok: (r.results || []).some(x => String(x.group?.groupId) === ORLA_CLAN), at: Date.now() }); render(); }).catch(() => {}); }
     gb.hidden = !member || !(o?.ok || orlaOK() || GRADE); gb.classList.toggle('on', GRADE); gb.title = lang === 'pt' ? 'Orla Bot: criar ou ver grades do clã' : 'Orla Bot: create or see clan rosters'; } }
@@ -5106,7 +5107,7 @@ TD.m = LS.get('dc-td-mode', 'solo');
 const tdGrp = c => c.kind === 'mis' ? 'solo' : c.kind !== 'rot' ? 'solo' : c.id.startsWith('rot-raid') ? 'g6' : 'g3';
 function todoHTML2() {
   const T = tdt(), T2 = td2t(); if (!profile || !have.a) return '';
-  if (BETA) return todoHTML3();
+  if (FX) return todoHTML3();
   const hid = LS.get('dc-todo-hide', {}), now = Date.now(); for (const k of Object.keys(hid)) if (hid[k] < now) delete hid[k];
   const ok = { solo: ['solo'], g3: ['solo', 'g3'], g6: ['solo', 'g3', 'g6'] }[TD.m] || ['solo'];
   const F0 = featured(), mis = F0.other.length ? [{ id: 'mis-' + F0.other.map(o => o.h).join('-'), kind: 'mis', score: 20, t: T2.misT(F0.other.map(o => o.n)), why: T2.misW(F0.other[0].where, F0.other[0].lv), min: 30, gl: T2.misG, until: T.until, act: [] }] : [];

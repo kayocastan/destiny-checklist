@@ -2184,3 +2184,9 @@ html.grade .ob-opt{font-size:16px}
 .t3 .t2-main{min-width:0}.t3-hero,.t3-rest{grid-template-columns:minmax(0,1fr)}.t3-big,.t3-row{min-width:0}.t3-yt{flex-wrap:wrap}
 .t3 .t2-side .t2-n{min-width:0}.t3 .t2-side .t2-n small{white-space:normal}
 .t3-pin{display:grid;place-items:center;font-size:18px;background:var(--chip)}
+/* Esta semana: destaques mais baixos */
+.t3-big{gap:4px;padding:11px 16px}.t3-t{font-size:20px}.t3-st{font-size:13.5px}.t3-acts{margin-top:2px;gap:6px}.t3-acts .lbd-btn,.t3-ex{padding:4px 10px;font-size:13px}.t3-yt .chip{font-size:12px}
+.t3-big:not(.open){grid-template-columns:minmax(0,1fr) auto;column-gap:14px}.t3-big:not(.open)>.t3-bh,.t3-big:not(.open)>.t3-t,.t3-big:not(.open)>.t3-st,.t3-big:not(.open)>.t3-where{grid-column:1}.t3-big:not(.open)>.t3-yt{grid-column:1}
+.t3-big:not(.open)>.t3-acts{grid-column:2;grid-row:1/span 4;align-self:center;flex-direction:column;align-items:stretch}.t3-big:not(.open) .t3-ex{margin-left:0;justify-content:center}
+@media (max-width:640px){.t3-big:not(.open){grid-template-columns:1fr}.t3-big:not(.open)>.t3-acts{grid-column:1;grid-row:auto;flex-direction:row}}
+.vidbtn{background:rgba(255,80,80,.12)!important;border-color:rgba(255,80,80,.5)!important}
