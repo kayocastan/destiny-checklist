@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Status · DPI</title>
+<meta name="description" content="O DPI, o servidor, o Orla Bot e a API da Bungie estão funcionando agora?">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+<link rel="stylesheet" href="/styles.css">
+<style>
+  *{box-sizing:border-box} body{margin:0}
+  .st{max-width:640px;margin:0 auto;padding:28px 16px 48px;display:grid;gap:16px}
+  .st h1{margin:0;font-family:var(--display);font-size:34px;line-height:1}
+  .st .top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .st .top a{font-size:14px;color:var(--fg);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--surface)}
+  .sum{padding:14px 16px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-weight:600}
+  .sum.ok{border-color:color-mix(in srgb,var(--done) 55%,transparent)} .sum.bad{border-color:color-mix(in srgb,var(--hard) 60%,transparent)}
+  ul{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
+  li{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px 16px}
+  li+li{border-top:1px solid var(--line)}
+  li i{width:12px;height:12px;border-radius:50%;background:var(--chip)} li.ok i{background:var(--done)} li.bad i{background:var(--hard)} li.warn i{background:#e8b43c}
+  li b{display:block;font-size:15.5px} li small{display:block;color:var(--muted);font-size:13.5px;margin-top:2px}
+  li span.m{font-family:var(--mono);font-size:12.5px;color:var(--muted);white-space:nowrap}
+  .foot{font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<main class="st">
+  <div class="top"><div><span class="eyebrow" style="font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--muted)">DPI · DESTINY PARALLEL INTERFACE</span><h1>Status</h1></div><a href="/">← Voltar ao site</a></div>
+  <div class="sum" id="sum">Conferindo…</div>
+  <ul id="list"></ul>
+  <p class="foot">Atualiza sozinha a cada minuto. Se algo estiver fora do ar, as outras partes do site seguem funcionando com o que já está guardado no seu aparelho.</p>
+</main>
+<script>
+(() => {
+  const API = 'https://dni-api.dni-site.workers.dev';
+  const hm = t => new Date(t).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  const ago = t => { const m = Math.round((Date.now() - t) / 6e4); return m < 1 ? 'agora' : m < 60 ? `há ${m} min` : `há ${Math.round(m / 60)} h`; };
+  const get = async (url, opt) => { const c = new AbortController(), k = setTimeout(() => c.abort(), 8000); const t0 = performance.now();
+    try { const r = await fetch(url, { cache: 'no-store', signal: c.signal, ...opt }); const j = await r.json().catch(() => null); return { ok: r.ok, j, ms: Math.round(performance.now() - t0) }; } catch { return { ok: false }; } finally { clearTimeout(k); } };
+  const checks = [
+    ['Site', async () => { const r = await get('/data/changelog.json'); return r.ok ? { s: 'ok', d: `Última novidade: ${r.j?.[0]?.titulo || '—'}`, ms: r.ms } : { s: 'bad', d: 'Não carregou os dados do site.' }; }],
+    ['Servidor do DPI', async () => { const r = await get(API + '/health'); if (!r.ok) return { s: 'bad', d: 'Não respondeu (sincronização, clã e links de build podem falhar).' };
+      const h = r.j?.hourly, late = h && Date.now() - h > 2.5 * 36e5; return { s: late ? 'warn' : 'ok', d: h ? `Última leitura do clã às ${hm(h)} (${ago(h)})${late ? ', atrasada' : ''}` : 'Online', ms: r.ms }; }],
+    ['Orla Bot', async () => { const o = await get('/data/orla.json'); if (!o.j?.api) return { s: 'warn', d: 'Endereço do bot não configurado.' };
+      const r = await get(o.j.api + '/health'); return r.ok ? { s: 'ok', d: `Online · ${r.j?.open ?? 0} grade(s) marcada(s)`, ms: r.ms } : { s: 'bad', d: 'Não respondeu (grades e /orla no Discord podem falhar).' }; }],
+    ['API da Bungie', async () => { const c = await get('/api/config'); if (!c.j?.apiKey) return { s: 'warn', d: 'Chave da API indisponível.' };
+      const r = await get('https://www.bungie.net/Platform/GlobalAlerts/', { headers: { 'X-API-Key': c.j.apiKey } });
+      if (!r.ok || r.j?.ErrorCode !== 1) return { s: 'bad', d: r.j?.Message || 'A Bungie não respondeu (manutenção?).' };
+      const al = (r.j.Response || []).map(a => a.AlertHtml?.replace(/<[^>]+>/g, '')).filter(Boolean);
+      return { s: al.length ? 'warn' : 'ok', d: al.length ? 'Aviso da Bungie: ' + al[0] : 'Online, sem avisos da Bungie', ms: r.ms }; }],
+  ];
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  async function run() {
+    const res = await Promise.all(checks.map(async ([n, f]) => [n, await f().catch(() => ({ s: 'bad', d: 'Erro ao conferir.' }))]));
+    document.getElementById('list').innerHTML = res.map(([n, r]) => `<li class="${r.s}"><i></i><span><b>${esc(n)}</b><small>${esc(r.d)}</small></span><span class="m">${r.ms ? r.ms + ' ms' : ''}</span></li>`).join('');
+    const bad = res.filter(([, r]) => r.s === 'bad').length, warn = res.filter(([, r]) => r.s === 'warn').length, sum = document.getElementById('sum');
+    sum.className = 'sum ' + (bad ? 'bad' : 'ok'); sum.textContent = (bad ? `⚠ ${bad} serviço(s) fora do ar` : warn ? '✓ Funcionando, com avisos' : '✓ Tudo funcionando') + ` · conferido às ${hm(Date.now())}`;
+  }
+  run(); setInterval(run, 60000);
+})();
+</script>
+</body>
+</html>

@@ -55,6 +55,10 @@
       "destination": "/status.html"
     },
     {
+      "source": "/estado",
+      "destination": "/estado.html"
+    },
+    {
       "source": "/grade",
       "destination": "/index.html"
     },
@@ -74,5 +78,6 @@
       "source": "/g/:s",
       "destination": "https://dni-api.dni-site.workers.dev/gpage/:s"
     }
-  ]
+  ],
+  "ignoreCommand": "if [ \"$VERCEL_GIT_COMMIT_REF\" = \"main\" ]; then exit 1; else echo \"branch $VERCEL_GIT_COMMIT_REF: sem publicacao (so a main publica)\"; exit 0; fi"
 }
