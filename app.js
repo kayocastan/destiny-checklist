@@ -876,7 +876,28 @@ function vidLoad() { if (VID?.at > Date.now() - 6 * 36e5 || vidLoad.busy || type
   fetch(APIW + '/videos').then(r => r.json()).then(j => { const m = {}; for (const v of j.list || []) (m[v.k] ||= []).push([v.url, v.pt || v.en, v.en || v.pt]); VID = { at: Date.now(), m }; LS.set('dc-vid', VID); render(); }).catch(() => {}).finally(() => { vidLoad.busy = false; }); }
 const ytList = a => { if (!VID || VID.at < Date.now() - 6 * 36e5) setTimeout(vidLoad); return [...(Array.isArray(a?.yt) ? a.yt : a?.yt ? [[a.yt]] : []), ...(a && VID?.m?.[vidKey(a)] || [])].filter(x => YT_OK(x[0])); };
 const ytId = url => { try { const x = new URL(url); return x.hostname === 'youtu.be' ? x.pathname.slice(1) : x.searchParams.get('v') || ''; } catch { return ''; } };
-const actYt = (kind, key) => { const a = actDefOf(kind, key); if (!a) return ''; const yl = ytList(a);
+/* Guia por encontro (data/guides.json; o cadastro pelo site vem depois): botão "📖 Guia" ao lado de Vídeos e Imagens */
+let GUIDES = null; function gdeLoad() { if (gdeLoad.busy || GUIDES) return; gdeLoad.busy = true; fetch('/data/guides.json').then(r => r.json()).then(j => { GUIDES = j; render(); }).catch(() => { GUIDES = {}; }); }
+const GDE = { k: '', i: 0 };
+function gdeDraw() {
+  const d = $('gdedlg'), g = GUIDES?.[GDE.k], a = actDefOf(...GDE.k.split(':')), P = lang === 'pt'; if (!d || !g) return; const e = g.enc[GDE.i] || g.enc[0];
+  d.innerHTML = `<div class="pf-box gde-box"><button type="button" class="pf-x" aria-label="${esc(u().giClose)}">✕</button><header class="gde-hd"><small>${P ? 'GUIA POR ENCONTRO' : 'ENCOUNTER GUIDE'}</small><h1>${esc(a ? L(a.n) : '')}</h1></header>
+    <div class="gde-tabs" role="tablist">${g.enc.map((x, i) => `<button type="button" role="tab" aria-selected="${i === GDE.i}" data-gdei="${i}"><small>${i + 1}</small>${esc(x.n)}</button>`).join('')}</div>
+    <article class="gde-c"><h2>${GDE.i + 1} · ${esc(e.n)}</h2>
+      <span class="sea-k">${P ? 'OBJETIVO' : 'OBJECTIVE'}</span><p class="gde-obj">${esc(e.obj)}</p>
+      ${e.roles?.length ? `<span class="sea-k">${P ? 'PAPÉIS' : 'ROLES'}</span><div class="gde-roles">${e.roles.map(([n, t]) => `<span><b>${esc(n)}</b> · ${esc(t)}</span>`).join('')}</div>` : ''}
+      <span class="sea-k">${P ? 'PASSO A PASSO' : 'STEP BY STEP'}</span><ol class="gde-steps">${e.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>
+      ${e.tip ? `<p class="gde-tip"><b>${P ? 'Dica:' : 'Tip:'}</b> ${esc(e.tip)}</p>` : ''}</article>
+    <footer class="gde-ft"><span>${P ? 'Resumo de guias da comunidade' : 'Summary of community guides'}: ${(g.src || []).map(([n, u2]) => `<a href="${esc(u2)}" target="_blank" rel="noopener">${esc(n)} ↗</a>`).join(', ')}</span>${a ? actYtRaw(...GDE.k.split(':')) : ''}</footer></div>`;
+}
+function gdeOpen(k) {
+  let d = $('gdedlg'); if (!d) { d = document.createElement('dialog'); d.id = 'gdedlg'; d.className = 'pf gdedlg'; document.body.append(d);
+    d.addEventListener('click', e => { if (e.target === d || e.target.closest('.pf-x')) { d.close(); return; } const t = e.target.closest('[data-gdei]'); if (t) { GDE.i = +t.dataset.gdei; gdeDraw(); } }); }
+  GDE.k = k; GDE.i = 0; gdeDraw(); if (!d.open) d.showModal();
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-gde]'); if (!b) return; e.preventDefault(); e.stopPropagation(); gdeOpen(b.dataset.gde); }, true);
+const actYt = (kind, key) => { if (!GUIDES) setTimeout(gdeLoad); const g = GUIDES?.[(kind === 'dg' ? 'dg' : kind) + ':' + key]; return (g ? `<button type="button" class="chip gde" data-gde="${kind}:${esc(key)}">📖 ${esc(lang === 'pt' ? `Guia (${g.enc.length})` : `Guide (${g.enc.length})`)}</button>` : '') + actYtRaw(kind, key); };
+const actYtRaw = (kind, key) => { const a = actDefOf(kind, key); if (!a) return ''; const yl = ytList(a);
   const v = yl.length === 1 ? `<a class="chip yt" href="${esc(yl[0][0])}" target="_blank" rel="noopener">▶ ${esc(u().ytGuide)}</a>` : yl.length > 1 ? `<button type="button" class="chip yt" data-ytl="${kind}:${esc(key)}">▶ ${esc(u().ytMany(yl.length))}</button>` : ''; return v + (a.gi?.length ? `<button type="button" class="chip gi" data-gal="${kind}:${esc(key)}">🖼 ${esc(u().giBtn(a.gi.length))}</button>` : ''); };
 /* galeria de imagens do guia: só baixa as imagens quando abre */
 const GAL = { l: [], i: 0, t: '', seq: 0 };
