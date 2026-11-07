@@ -2176,3 +2176,8 @@ html.grade .ob-opt{font-size:16px}
 .t3-mb{display:flex;align-items:center;gap:6px;flex:0 0 140px;margin-left:auto}.t3-mb .sea-bar{flex:1}.t3-mb small{font:600 12px var(--mono);color:var(--muted)}.t3-mb+.chev{margin-left:8px}
 .t3-rb{display:grid;gap:8px;padding:0 14px 12px}
 @media (max-width:640px){.t3 .t3-top .t2-how{margin-left:0}.t3-mb{display:none}}
+/* rolos bons: os contadores viram filtros (clique de novo para tirar) */
+.rl-k button{display:grid;justify-items:start;padding:4px 12px;border-radius:10px;border:1px solid;color:var(--fg);font:inherit;cursor:pointer;text-align:left;transition:transform .1s}
+.rl-k button:hover{transform:translateY(-1px)}.rl-k button[aria-pressed="true"]{box-shadow:0 0 0 2px currentColor inset}
+.rl-k button.g[aria-pressed="true"]{color:#7fe08f;background:rgba(127,224,143,.2)}.rl-k button.p[aria-pressed="true"]{color:#f2d36b;background:rgba(242,211,107,.18)}.rl-k button.n[aria-pressed="true"]{color:#ff8a7a;background:rgba(255,138,122,.18)}
+.rl-k button[aria-pressed="true"] b{color:var(--fg)}
