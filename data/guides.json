@@ -9,43 +9,43 @@
   ],
   "enc": [
    {
-    "n": "Boca do Inferno (início)",
-    "obj": "Carregar o Cálice da Luz e passá-lo de mão em mão para construir a ponte de entrada.",
+    "n": "Entrada (Chalice)",
+    "obj": "Carregar o Chalice e passá-lo de mão em mão para construir a ponte de entrada.",
     "roles": [
      [
-      "Cálice",
+      "Chalice",
       "2+ revezando"
      ]
     ],
     "steps": [
-     "Pegue o Cálice e segure até a barra encher.",
+     "Pegue o Chalice e segure até a barra encher.",
      "Interaja com a placa para depositar a carga.",
-     "Passe o Cálice para outra pessoa, que repete o processo.",
+     "Passe o Chalice para outra pessoa, que repete o processo.",
      "Continue revezando até a ponte ficar pronta."
     ],
-    "tip": "Passe rápido: alguém precisa pegar o Cálice até 10 s depois de cheio, ou quem segura morre."
+    "tip": "Passe rápido: alguém precisa pegar o Chalice até 10 s depois de cheio, ou quem segura morre."
    },
    {
-    "n": "O Abismo",
+    "n": "The Abyss",
     "obj": "Acender as lanternas no caminho escuro até o fim e ativar a placa da ponte.",
     "roles": [
      [
-      "Cálice",
-      "revezam para ficar Iluminados"
+      "Chalice",
+      "revezam para ficar Enlightened"
      ]
     ],
     "steps": [
-     "Carregue o Cálice e passe adiante para que todos fiquem Iluminados.",
-     "Em cada lanterna, veja se há nó de preservação: se houver, deposite o Cálice para ativar o próximo grupo de lanternas e pegue de volta.",
-     "Use o Iluminado para acender as lanternas (elas explodem em ~15 s).",
-     "Fique perto das lanternas acesas para baixar o Peso da Escuridão.",
-     "No fim, use o Iluminado na placa para começar a ponte."
+     "Carregue o Chalice e passe adiante para que todos fiquem Enlightened.",
+     "Em cada lanterna, veja se há nó de preservação: se houver, deposite o Chalice para ativar o próximo grupo de lanternas e pegue de volta.",
+     "Use o Enlightened para acender as lanternas (elas explodem em ~15 s).",
+     "Fique perto das lanternas acesas para baixar o Weight of Darkness.",
+     "No fim, use o Enlightened na placa para começar a ponte."
     ],
-    "tip": "Acender qualquer lanterna reinicia o tempo de Engolido pela Escuridão de todos: não parem de andar. Gancho e Lâmina Ansiosa ajudam."
+    "tip": "Acender qualquer lanterna reinicia o tempo da escuridão de todos: não parem de andar. Grapple e Eager Edge ajudam."
    },
    {
-    "n": "A Ponte",
-    "obj": "Construir a ponte, mandar os Iluminados com espada para matar os Guardiões do Portão e passar todo mundo para o outro lado.",
+    "n": "The Bridge",
+    "obj": "Construir a ponte, mandar os Enlightened com espada para matar os Gatekeepers e passar todo mundo para o outro lado.",
     "roles": [
      [
       "Placa",
@@ -57,46 +57,46 @@
      ],
      [
       "Espada",
-      "Iluminado atravessa"
+      "Enlightened atravessa"
      ],
      [
-      "Cálice",
+      "Chalice",
       "1"
      ]
     ],
     "steps": [
-     "Carregue o Cálice, fique Iluminado e deposite na placa para construir.",
-     "Mantenha 1 na placa e 1 embaixo de cada Totem Aniquilador (senão todos morrem).",
-     "Mate o Portador da Espada; um Iluminado pega a espada e atravessa.",
-     "Do outro lado, mate o Guardião do Portão e guarde a espada no nó (cada Guardião morto traz um novo Portador).",
+     "Carregue o Chalice, fique Enlightened e deposite na placa para construir.",
+     "Mantenha 1 na placa e 1 embaixo de cada Annihilator Totem (senão todos morrem).",
+     "Mate o Swordbearer; um Enlightened pega a espada e atravessa.",
+     "Do outro lado, mate o Gatekeeper e guarde a espada no nó (cada Gatekeeper morto traz um novo Swordbearer).",
      "Com 3 do outro lado, eles assumem a construção; continuem passando o resto.",
-     "Com os 6 atravessados, limpem as ondas e usem as espadas guardadas nos Guardiões."
+     "Com os 6 atravessados, limpem as ondas e usem as espadas guardadas nos Gatekeepers."
     ],
     "tip": "Fuzil de batedor ou de precisão ajuda cada lado a cobrir o outro de longe."
    },
    {
-    "n": "Caminho dos Servos",
-    "obj": "Subir a colina matando Servos e Gritadores para abrir o buraco no chão.",
+    "n": "Subida dos Servos",
+    "obj": "Subir a colina matando Servos e Shriekers para abrir o buraco no chão.",
     "roles": [
      [
-      "Cálice",
+      "Chalice",
       "revezam"
      ]
     ],
     "steps": [
-     "Segure o Cálice para ficar Iluminado.",
+     "Segure o Chalice para ficar Enlightened.",
      "Passe pela barreira.",
-     "Mate o Gritador para tirar a próxima barreira.",
-     "Repita até o topo e deposite o Cálice para abrir o buraco."
+     "Mate o Shrieker para tirar a próxima barreira.",
+     "Repita até o topo e deposite o Chalice para abrir o buraco."
     ],
-    "tip": "Mantenha o Cálice girando para sempre ter alguém pronto para a próxima barreira."
+    "tip": "Mantenha o Chalice girando para sempre ter alguém pronto para a próxima barreira."
    },
    {
-    "n": "Ir Yût, a Cantora da Morte",
-    "obj": "Matar os Feiticeiros e tirar vida suficiente da chefe antes do fim da Liturgia Sombria.",
+    "n": "Ir Yût, the Deathsinger",
+    "obj": "Matar os Feiticeiros e tirar vida suficiente da chefe antes do fim da Deathsong.",
     "roles": [
      [
-      "Iluminados",
+      "Enlightened",
       "3 matam Feiticeiros"
      ],
      [
@@ -109,37 +109,37 @@
      ]
     ],
     "steps": [
-     "Dividam em 2 grupos de 3 e matem os Cavaleiros Empolados para abrir os Gritadores.",
-     "Matem os Gritadores para abrir a sala do cristal e peguem o Cálice.",
-     "Carreguem o Cálice para ter 3 Iluminados.",
+     "Dividam em 2 grupos de 3 e matem os Cavaleiros para abrir os Shriekers.",
+     "Matem os Shriekers para abrir a sala do cristal e peguem o Chalice.",
+     "Carreguem o Chalice para ter 3 Enlightened.",
      "O vigia avisa em que salas estão os Feiticeiros.",
-     "Matem os Feiticeiros quase juntos e depois juntem todos no dano (os Iluminados podem usar Expurgar)."
+     "Matem os Feiticeiros quase juntos e depois juntem todos no dano (os Enlightened têm a habilidade extra do Chalice)."
     ],
-    "tip": "A Liturgia começa quando o primeiro Feiticeiro morre ou depois de 3 min: sejam rápidos."
+    "tip": "O Deathsong começa quando o primeiro Feiticeiro morre ou depois de 3 min: sejam rápidos."
    },
    {
-    "n": "Crota, Filho de Oryx",
-    "obj": "Tirar o escudo do Crota com as espadas, dar dano em fases e destruir a Sobrealma a tempo.",
+    "n": "Crota, Son of Oryx",
+    "obj": "Tirar o escudo do Crota com as espadas, dar dano em fases e destruir a Oversoul a tempo.",
     "roles": [
      [
       "Espada",
       "3"
      ],
      [
-      "Sobrealma",
-      "1 Iluminado"
+      "Oversoul",
+      "1 Enlightened"
      ],
      [
       "Suporte",
-      "Poço (Arcano), Malho/Canhão (Titã), Tempestade (Caçador)"
+      "Well of Radiance (Arcano) e Supers de dano (Titã e Caçador)"
      ]
     ],
     "steps": [
-     "Matem os Explosivos nas torres para chamar Ogros e o Portador da Espada.",
-     "Um Iluminado pega a espada e tira o escudo do Crota (2 ou 3 espadas).",
-     "Mantenham o Cálice girando e usem Expurgar para dano extra.",
-     "Um Iluminado destrói a Sobrealma antes dos 30 s (isso encerra a fase de dano).",
-     "Repitam pelo menos 3 fases; na final, Poços no chão e munição pesada."
+     "Matem os Explosivos nas torres para chamar Ogros e o Swordbearer.",
+     "Um Enlightened pega a espada e tira o escudo do Crota (2 ou 3 espadas).",
+     "Mantenham o Chalice girando e usem a habilidade de Enlightened para dano extra.",
+     "Um Enlightened destrói a Oversoul antes dos 30 s (isso encerra a fase de dano).",
+     "Repitam pelo menos 3 fases; na final, Wells of Radiance no chão e munição pesada."
     ],
     "tip": "Uma granada de cura em quem está de espada ajuda a aguentar os golpes do Crota."
    }
@@ -154,35 +154,35 @@
   ],
   "enc": [
    {
-    "n": "Confluxos",
-    "obj": "Impedir que os Vex se sacrifiquem nos Confluxos, matando-os antes de chegarem.",
+    "n": "Confluxes",
+    "obj": "Impedir que os Vex se sacrifiquem nos Confluxes, matando-os antes de chegarem.",
     "roles": [
      [
       "Defesa",
-      "2 por Confluxo no fim"
+      "2 por Conflux no fim"
      ]
     ],
     "steps": [
-     "Comece defendendo o Confluxo do meio ou circulando para matar quem nasce.",
-     "Com 2 Confluxos, dividam o time um de cada lado.",
-     "Com 3 Confluxos, 2 pessoas em cada.",
-     "Matem Serpes e Campeões rápido com Super ou pesada: Serpe que se sacrifica derruba o time.",
-     "Evitem as poças azuis/brancas (Marca de Negação); limpem no poço central."
+     "Comece defendendo o Conflux do meio ou circulando para matar quem nasce.",
+     "Com 2 Confluxes, dividam o time um de cada lado.",
+     "Com 3 Confluxes, 2 pessoas em cada.",
+     "Matem Wyverns e Campeões rápido com Super ou pesada: Wyvern que se sacrifica derruba o time.",
+     "Evitem as poças azuis/brancas (Mark of Negation); limpem no poço central."
     ],
-    "tip": "Falem o tempo todo para nenhum Vex a mais chegar ao Confluxo."
+    "tip": "Falem o tempo todo para nenhum Vex a mais chegar ao Conflux."
    },
    {
-    "n": "Oráculos",
-    "obj": "Destruir os Oráculos na ordem em que apareceram, em 5 rodadas (3 a 7 Oráculos).",
+    "n": "Oracles",
+    "obj": "Destruir os Oracles na ordem em que apareceram, em 5 rodadas (3 a 7 Oracles).",
     "roles": [
      [
-      "Oráculos",
-      "1 por área (6 pessoas, 7 Oráculos)"
+      "Oracles",
+      "1 por área (6 pessoas, 7 Oracles)"
      ]
     ],
     "steps": [
-     "Cada pessoa fica numa área onde nasce um Oráculo.",
-     "Contem os toques e anotem a ordem de cada Oráculo.",
+     "Cada pessoa fica numa área onde nasce um Oracle.",
+     "Contem os toques e anotem a ordem de cada Oracle.",
      "Fale seu número quando ele aparecer e de novo na hora de destruir.",
      "Destruam na ordem: fora de ordem ou atrasado marca o time e pode derrubar todos.",
      "Cuidem dos Goblins, Minotauros e Hobgoblins atiradores."
@@ -190,15 +190,15 @@
     "tip": "Deem nome às posições (E1–E3, D1–D4, meio) para os avisos ficarem rápidos."
    },
    {
-    "n": "Templário",
-    "obj": "Destruir 3 Oráculos em ordem, tirar o escudo do Templário com a Relíquia e dar dano até ele cair.",
+    "n": "The Templar",
+    "obj": "Destruir 3 Oracles em ordem, tirar o escudo do Templar com a Relic e dar dano até ele cair.",
     "roles": [
      [
-      "Relíquia",
+      "Relic",
       "1"
      ],
      [
-      "Oráculos",
+      "Oracles",
       "2"
      ],
      [
@@ -207,20 +207,20 @@
      ]
     ],
     "steps": [
-     "Peguem a Relíquia para começar.",
-     "Destruam os 3 primeiros Oráculos na ordem.",
-     "Usem o Super da Relíquia para tirar o escudo do Templário.",
+     "Peguem a Relic para começar.",
+     "Destruam os 3 primeiros Oracles na ordem.",
+     "Usem o Super da Relic para tirar o escudo do Templar.",
      "Com o escudo fora, mirem no nariz (ponto fraco).",
-     "Quando ele teleportar, repitam; quem tem a Relíquia pode bloquear o teleporte no círculo (mas nascem Pretorianos)."
+     "Quando ele teleportar, repitam; quem tem a Relic pode bloquear o teleporte no círculo (mas nascem Praetorians)."
     ],
-    "tip": "Relíquia no chão precisa ser pega em 10 s, senão o time cai."
+    "tip": "Relic no chão precisa ser pega em 10 s, senão o time cai."
    },
    {
-    "n": "Guardiões do Portão",
-    "obj": "Levar a Relíquia pelos portais para matar os Pretorianos e no fim defender um Confluxo.",
+    "n": "Gatekeepers",
+    "obj": "Levar a Relic pelos portais para matar os Praetorians e no fim defender um Conflux.",
     "roles": [
      [
-      "Relíquia",
+      "Relic",
       "revezando"
      ],
      [
@@ -233,27 +233,27 @@
      ]
     ],
     "steps": [
-     "Matem o primeiro Guardião e peguem a Relíquia no meio.",
+     "Matem o primeiro Gatekeeper e peguem a Relic no meio.",
      "Fiquem nas placas para abrir os dois portais; 1 pessoa entra em cada.",
-     "Quem está no portal avisa onde está o Pretoriano; a Relíquia vai até lá, tira o escudo e mata.",
-     "A Relíquia só passa por portal 1 vez a cada 45 s: larguem para o próximo pegar.",
-     "Depois dos Pretorianos, defendam o Confluxo central contra Pretorianos e 3 Serpes."
+     "Quem está no portal avisa onde está o Praetorian; a Relic vai até lá, tira o escudo e mata.",
+     "A Relic só passa por portal 1 vez a cada 45 s: larguem para o próximo pegar.",
+     "Depois dos Praetorians, defendam o Conflux central contra Praetorians e 3 Wyverns."
     ],
-    "tip": "Super de Saraivada de Lâminas, Esmagatrovão ou Bomba Nova matam as Serpes rápido."
+    "tip": "Super de Blade Barrage, Thundercrash ou Nova Bomb matam as Wyverns rápido."
    },
    {
-    "n": "Labirinto das Górgonas (passagem)",
-    "obj": "Atravessar sem ser visto pelas Górgonas.",
+    "n": "Gorgons' Labyrinth (passagem)",
+    "obj": "Atravessar sem ser visto pelas Gorgons.",
     "roles": [],
     "steps": [
      "Saia pelo lado esquerdo do labirinto.",
-     "Pule as pedras grandes pela esquerda para fugir das Górgonas."
+     "Pule as pedras grandes pela esquerda para fugir das Gorgons."
     ],
-    "tip": "Se uma Górgona te ver, o time todo cai."
+    "tip": "Se uma Gorgon te ver, o time todo cai."
    },
    {
-    "n": "Atheon, Confluxo do Tempo",
-    "obj": "Destruir 9 Oráculos em 3 teleportes e dar dano no Atheon durante a Vingança do Tempo.",
+    "n": "Atheon, Time's Conflux",
+    "obj": "Destruir 9 Oracles em 3 teleportes e dar dano no Atheon durante a Time's Vengeance.",
     "roles": [
      [
       "Fora",
@@ -261,18 +261,18 @@
      ],
      [
       "Dentro",
-      "3 (com a Relíquia) destroem Oráculos"
+      "3 (com a Relic) destroem Oracles"
      ]
     ],
     "steps": [
      "Destruam o cubo Vex para começar e matem Harpias até 3 pessoas serem teleportadas.",
      "Os teleportados avisam o lado: selva à direita, deserto à esquerda.",
-     "Quem ficou fora avisa a ordem dos Oráculos e abre o portal certo na placa.",
-     "Dentro, destruam na ordem; a Relíquia mata Pretorianos e limpa a marca.",
-     "Com 9 Oráculos, saiam e deem dano nos 30 s de Vingança do Tempo.",
+     "Quem ficou fora avisa a ordem dos Oracles e abre o portal certo na placa.",
+     "Dentro, destruam na ordem; a Relic mata Praetorians e limpa a marca.",
+     "Com 9 Oracles, saiam e deem dano nos 30 s de Time's Vengeance.",
      "Repitam até ele cair."
     ],
-    "tip": "Xenófago mata Oráculo com 1 tiro; fuzil de precisão é o reserva."
+    "tip": "Xenophage mata Oracle com 1 tiro; fuzil de precisão é o reserva."
    }
   ]
  },
@@ -293,10 +293,10 @@
      "Peguem o elevador central.",
      "Interajam com a plataforma do encontro escolhido (os 3 primeiros podem ser em qualquer ordem)."
     ],
-    "tip": "Cada plataforma diz o chefe: Ritmo Vivo (Serpe), Função Inversa (Hobgoblin), Visão Clara (Hidra)."
+    "tip": "Cada plataforma diz o chefe: Iatros (Wyvern), Agraios (Hobgoblin), Epoptes (Hidra)."
    },
    {
-    "n": "Ritmo Vivo · Iatros",
+    "n": "Iatros, Inward-Turned",
     "obj": "Depositar Chronos na Ampulheta, montar as plataformas e dar dano nas janelas de tempo.",
     "roles": [
      [
@@ -323,12 +323,12 @@
     "tip": "A cor do Chronos mostra onde o chefe aparece. No dano, alguém precisa depositar um Chronos de Minotauro para não cair todo mundo."
    },
    {
-    "n": "Função Inversa · Agraios",
+    "n": "Agraios, Inherent",
     "obj": "Derrotar as 3 formas do Agraios carregando os anéis aceleradores e cuidando dos efeitos ligados.",
     "roles": [
      [
       "Efeitos",
-      "3 (Cíclico, Absoluto, Constante)"
+      "3 (Cyclic, Absolute, Constant)"
      ],
      [
       "Adds",
@@ -338,15 +338,15 @@
     "steps": [
      "Matem a Hidra grande e depois os 5 Minotauros.",
      "Levem os Chronons dos Minotauros para carregar os 5 anéis.",
-     "Quem tem efeito mata as Serpes embaixo das plataformas dos chefes.",
+     "Quem tem efeito mata as Wyverns embaixo das plataformas dos chefes.",
      "O efeito A deposita no pilar certo; B e C avisam os anéis que não estão vermelhos, e o time leva os Chronons certos.",
-     "A passa pelos 5 anéis e ganha uma Gaiola de Detenção, que usa em B nos 2–3 s finais para bloquear o laser.",
+     "A passa pelos 5 anéis e ganha uma Detention Cage, que usa em B nos 2–3 s finais para bloquear o laser.",
      "Façam o dano (dá para estender 2 vezes)."
     ],
     "tip": "Fiquem fora da linha do laser do chefe; se o tempo zerar, o raio mata na hora."
    },
    {
-    "n": "Visão Clara · Epoptes",
+    "n": "Epoptes, Lord of Quanta",
     "obj": "Quebrar os olhos de escudo das salas laterais e depois o olho principal para abrir o dano.",
     "roles": [
      [
@@ -363,41 +363,41 @@
      ]
     ],
     "steps": [
-     "Limpem os adds e matem os 2 Ciclopes Magistrados.",
+     "Limpem os adds e matem os 2 Ciclopes.",
      "Duas pessoas pisam juntas nas placas (efeito de 30 s) e entram nas salas.",
      "Dentro, avisam e atiram nos olhos dos pilares; fora, avisam o olho que não brilha no triângulo.",
-     "Com os 6 olhos de escudo quebrados, os de dentro ganham a Lanceta e matam o chefe interno.",
+     "Com os 6 olhos de escudo quebrados, os de dentro ganham a Lancet e matam o chefe interno.",
      "Atirem no olho principal para abrir o dano (2–3 ciclos)."
     ],
     "tip": "Avisos claros: atirar no olho errado começa a contagem de queda antes."
    },
    {
-    "n": "Fim dos Tempos · Koregos",
+    "n": "Koregos, the Worldline",
     "obj": "Cumprir as fases com efeitos, subir a plataforma e aguentar o final.",
     "roles": [
      [
       "Placa esquerda",
-      "3–4 (Constante)"
+      "3–4 (Constant)"
      ],
      [
       "Placa do meio",
-      "1 (Absoluto)"
+      "1 (Absolute)"
      ],
      [
       "Placa direita",
-      "1–2 (Cíclico)"
+      "1–2 (Cyclic)"
      ],
      [
-      "Canhão Trator",
+      "Tractor Cannon",
       "1+ para os Chronons"
      ]
     ],
     "steps": [
      "Interajam com o cubo Vex central para começar (6 min) e limpem até nascerem as 3 Hidras grandes.",
      "Matem as Hidras e pisem juntos nas placas para pegar os efeitos.",
-     "Os de Constante quebram 4 armas do chefe; A, B e C coordenam minas e Chronons até o Diamante Vex aparecer e quebram ele.",
+     "Os de Constant quebram 4 armas do chefe; A, B e C coordenam minas e Chronons até o Diamante Vex aparecer e quebram ele.",
      "Subam a plataforma e façam o triângulo de cubos 4 vezes para abrir o dano.",
-     "No dano, quem tem o Canhão Trator deposita os Chronons certos para estender.",
+     "No dano, quem tem o Tractor Cannon deposita os Chronons certos para estender.",
      "No fim, zerem a vida e desçam da plataforma em 30 s."
     ],
     "tip": "Descer da plataforma a tempo é obrigatório, senão todos caem."
@@ -413,11 +413,11 @@
   ],
   "enc": [
    {
-    "n": "Segurança da Cripta",
-    "obj": "Destruir os 6 fusíveis usando os aprimoramentos de Scanner e Operador.",
+    "n": "Crypt Security",
+    "obj": "Destruir os 6 fusíveis usando os aprimoramentos de Scanner e Operator.",
     "roles": [
      [
-      "Operador",
+      "Operator",
       "1 no porão"
      ],
      [
@@ -431,19 +431,19 @@
     ],
     "steps": [
      "Dividam em 2 times de 3, um de cada lado; 1 pessoa desce sozinha para o porão.",
-     "Peguem o Operador no terminal e matem o Vândalo para pegar o Scanner.",
-     "O Scanner vê os teclados acesos pelo chão e o Operador atira neles.",
+     "Peguem o Operator no terminal e matem o Vândalo para pegar o Scanner.",
+     "O Scanner vê os teclados acesos pelo chão e o Operator atira neles.",
      "Com os 4 teclados atingidos, 1 dos 6 fusíveis brilha; o Scanner avisa qual.",
      "Quem está em cima destrói o fusível; repitam até os 6 caírem."
     ],
     "tip": "Cada time fica do seu lado da sala para não perder tempo correndo entre fusíveis."
    },
    {
-    "n": "Atraks-1, Exo Decaído",
-    "obj": "Derrotar as réplicas e ejetar os efeitos de Replicação pelas eclusas até o final.",
+    "n": "Atraks-1, Fallen Exo",
+    "obj": "Derrotar as réplicas e ejetar os efeitos de Replication pelas eclusas até o final.",
     "roles": [
      [
-      "Operador",
+      "Operator",
       "1"
      ],
      [
@@ -458,14 +458,14 @@
     "steps": [
      "Dividam em 2 times: 3 no espaço e 3 na Cripta.",
      "O Scanner acha a réplica de Atraks que brilha, mata e passa o Scanner para o outro time.",
-     "Quem pega a Replicação segue o Operador até a eclusa acesa, que ele abre.",
-     "Dentro da eclusa, o Operador atira no efeito da cabeça de quem carrega.",
+     "Quem pega a Replication segue o Operator até a eclusa acesa, que ele abre.",
+     "Dentro da eclusa, o Operator atira no efeito da cabeça de quem carrega.",
      "Com 8 efeitos ejetados, todos vão para o espaço; o Scanner avisa cada réplica destacada no final."
     ],
-    "tip": "O Lamento é a melhor arma aqui: as réplicas somem segundos depois de levar dano."
+    "tip": "Lament é a melhor arma aqui: as réplicas somem segundos depois de levar dano."
    },
    {
-    "n": "Descida (passagem)",
+    "n": "The Descent (passagem)",
     "obj": "Fazer o percurso de saltos por fora da estação e voltar para dentro.",
     "roles": [],
     "steps": [
@@ -475,19 +475,19 @@
     "tip": "Tem um baú numa plataforma do lado esquerdo."
    },
    {
-    "n": "Taniks, Renascido",
-    "obj": "Levar os Núcleos Nucleares aos baldes certos enquanto atordoa Taniks, depois fugir pela escotilha.",
+    "n": "Taniks, Reborn",
+    "obj": "Levar os Nuclear Cores aos baldes certos enquanto atordoa Taniks, depois fugir pela escotilha.",
     "roles": [
      [
       "Scanner",
       "1"
      ],
      [
-      "Operador",
+      "Operator",
       "1"
      ],
      [
-      "Supressor",
+      "Suppressor",
       "1"
      ],
      [
@@ -496,16 +496,16 @@
      ]
     ],
     "steps": [
-     "Peguem Scanner, Operador e Supressor dos Vândalos.",
-     "O Scanner vê os baldes acesos e o Operador atira nos teclados para soltar os núcleos.",
-     "Duas pessoas levam os núcleos enquanto o Supressor atordoa Taniks pelos 3 drones.",
+     "Peguem Scanner, Operator e Suppressor dos Vândalos.",
+     "O Scanner vê os baldes acesos e o Operator atira nos teclados para soltar os núcleos.",
+     "Duas pessoas levam os núcleos enquanto o Suppressor atordoa Taniks pelos 3 drones.",
      "Depositem com Taniks atordoado; troquem o aprimoramento desativado no terminal.",
      "Com núcleos suficientes, desçam pela escotilha central e corram até o fim."
     ],
-    "tip": "Troquem o núcleo entre os carregadores antes de chegar a 10 de Radiação."
+    "tip": "Troquem o núcleo entre os carregadores antes de chegar a 10 de Radiation."
    },
    {
-    "n": "Taniks, a Abominação",
+    "n": "Taniks, the Abomination",
     "obj": "Depositar 4 Núcleos atordoando Taniks e depois derrotá-lo na fase de dano.",
     "roles": [
      [
@@ -513,11 +513,11 @@
       "1"
      ],
      [
-      "Operador",
+      "Operator",
       "1"
      ],
      [
-      "Supressor",
+      "Suppressor",
       "1"
      ],
      [
@@ -532,11 +532,11 @@
     "steps": [
      "Dividam em 3 duplas, uma por canto, e peguem os aprimoramentos dos Vândalos.",
      "O Scanner vê os 2 baldes ativos e o time atira nas asas de Taniks para soltar núcleos.",
-     "Quem carrega leva o núcleo; o Operador solta quem ficar preso no escudo roxo.",
-     "O Supressor atordoa Taniks pelos 3 drones e o time deposita; repitam até 4 núcleos.",
+     "Quem carrega leva o núcleo; o Operator solta quem ficar preso no escudo roxo.",
+     "O Suppressor atordoa Taniks pelos 3 drones e o time deposita; repitam até 4 núcleos.",
      "No dano, pulem o anel de fora mas não o de dentro; no final ele teleporta, achem e terminem."
     ],
-    "tip": "Proteção da Alvorada fora dos anéis e Poço da Radiância dentro mantêm o bônus de dano."
+    "tip": "Ward of Dawn fora dos anéis e Well of Radiance dentro mantêm o bônus de dano."
    }
   ]
  },
@@ -553,7 +553,7 @@
   ],
   "enc": [
    {
-    "n": "Kalli, a Corrompida",
+    "n": "Kalli, the Corrupted",
     "obj": "Limpar as 6 placas dos símbolos para deixar Kalli vulnerável e dar dano fugindo da explosão nas salas seguras.",
     "roles": [
      [
@@ -572,15 +572,15 @@
     "tip": "Combinem as salas seguras antes: cada Cavaleiro certo abre 3 salas, errar deixa menos salas."
    },
    {
-    "n": "Shuro Chi, a Corrompida",
+    "n": "Shuro Chi, the Corrupted",
     "obj": "Tirar 2 segmentos de vida e resolver os 3 quebra-cabeças dentro de 4 min em cada andar.",
     "roles": [
      [
-      "Prismas",
+      "Almonds",
       "3 formam o triângulo"
      ],
      [
-      "Olho de Riven",
+      "Eye of Riven",
       "1 (reveza a cada 90 s)"
      ],
      [
@@ -593,26 +593,26 @@
      ]
     ],
     "steps": [
-     "Limpem os adds, cheguem ao pergolado e matem o Capitão do Olho de Riven.",
-     "Peguem as Armas Prisma, fiquem nas placas e formem o triângulo de laser para tirar o escudo.",
-     "Deem dano até cair 1 segmento e usem o Super do Olho para interromper a explosão.",
+     "Limpem os adds, cheguem ao pergolado e matem o Capitão do Eye of Riven.",
+     "Peguem os almonds (que surgem nas placas), fiquem nas placas e formem o triângulo de laser para tirar o escudo.",
+     "Deem dano até cair 1 segmento e usem o Super do Eye of Riven para interromper a explosão.",
      "Avancem para o próximo pergolado e repitam.",
      "Na sala do quebra-cabeça, resolvam da esquerda para a direita, cada um num botão.",
      "Subam pelas esferas e repitam; terminar o quebra-cabeça reinicia o tempo."
     ],
-    "tip": "Um Arcano com Poço da Radiância ajuda muito no último andar."
+    "tip": "Um Arcano com Well of Radiance ajuda muito no último andar."
    },
    {
-    "n": "Morgeth, o Guardião da Torre",
-    "obj": "Pegar toda a Força Possuída antes de Morgeth carregar e dar dano interrompendo a explosão.",
+    "n": "Morgeth, the Spirekeeper",
+    "obj": "Pegar toda a Taken Strength antes de Morgeth carregar e dar dano interrompendo a explosão.",
     "roles": [
      [
-      "Força",
+      "Strength",
       "2 coletam"
      ],
      [
       "Limpeza",
-      "1 com Essência (0 de Força)"
+      "1 com Essence (0 de Strength)"
      ],
      [
       "Dano",
@@ -620,16 +620,16 @@
      ]
     ],
     "steps": [
-     "Peguem os pilares de Força Possuída pela arena (no máximo 2 por pessoa).",
-     "Matem os Olhos de Riven para pegar a Essência e usem a granada para soltar quem ficar preso em até 20 s.",
-     "Depois do último Olho, quem tiver menos Força pega o último pilar na frente do Morgeth.",
+     "Peguem os pilares de Taken Strength pela arena (no máximo 2 por pessoa).",
+     "Matem os Eyes of Riven para pegar a Essence e usem a granada para soltar quem ficar preso em até 20 s.",
+     "Depois do último Eye of Riven, quem tiver menos Strength pega o último pilar na frente do Morgeth.",
      "O grupo de dano atira no crítico das costas.",
-     "Derrubem as esferas Possuídas que ele lança e usem o Super da Essência perto de 90%."
+     "Derrubem as esferas Possuídas que ele lança e usem o Super da Essence perto de 90%."
     ],
-    "tip": "Limpar passa a Força para quem limpou: quem limpa precisa estar com 0."
+    "tip": "Limpar passa a Strength para quem limpou: quem limpa precisa estar com 0."
    },
    {
-    "n": "O Cofre (sem chefe)",
+    "n": "The Vault (sem chefe)",
     "obj": "Purificar as fechaduras duplicadas certas em 3 min para os 3 feixes de luz chegarem à porta.",
     "roles": [
      [
@@ -637,7 +637,7 @@
       "3, 1 em cada"
      ],
      [
-      "Essência",
+      "Essence",
       "1 por vez"
      ],
      [
@@ -648,14 +648,14 @@
     "steps": [
      "Fiquem nas 3 fechaduras juntos e falem o símbolo do meio de cada.",
      "Descubram quem tem duplicata e se ela está à esquerda ou à direita.",
-     "Matem um Olho de Riven e peguem a Essência (Penumbra ou Antumbra).",
+     "Matem um Eye of Riven e peguem a Essence (Penumbra ou Antumbra).",
      "Corram pelos túneis até o mecanismo central, sem deixar os Cavaleiros travarem.",
      "Purifiquem a certa: Penumbra para duplicata à esquerda, Antumbra à direita. Repitam até 3 feixes."
     ],
-    "tip": "Essência errada explode e mata quem carrega e quem está perto: confirmem antes."
+    "tip": "Essence errada explode e mata quem carrega e quem está perto: confirmem antes."
    },
    {
-    "n": "Riven das Mil Vozes",
+    "n": "Riven of a Thousand Voices",
     "obj": "Purificar os símbolos certos e atirar nos olhos chamados para destruir os pontos fracos e depois o coração.",
     "roles": [
      [
@@ -664,25 +664,25 @@
      ],
      [
       "Em cada grupo",
-      "1 Essência, 1 atrás do vidro avisando, 1 dano"
+      "1 Essence, 1 atrás do vidro avisando, 1 dano"
      ]
     ],
     "steps": [
      "Dividam em 2 grupos de 3 e vão para a sala azul ou amarela.",
      "Deem dano na boca ou provoquem o tentáculo para ela cambalear; avisem os 2 olhos acesos.",
-     "Quem tem a Essência fala os símbolos e quem está atrás do vidro guia a granada.",
+     "Quem tem a Essence fala os símbolos e quem está atrás do vidro guia a granada.",
      "Atirem na boca e destruam os olhos chamados antes de ela fechar a boca.",
      "Repitam no andar de cima e atirem nos pontos fracos na descida.",
-     "Subam pela luz no plano Ascendente e destruam o coração no final."
+     "Subam pela luz no Ascendant Plane e destruam o coração no final."
     ],
     "tip": "Uma pessoa por olho aceso: cada um só lembra de 1 olho, não de 6."
    },
    {
-    "n": "Caminhada da Rainha",
-    "obj": "Levar o Coração de Riven para fora, pelo Cofre, até os dois Techeuns no fim da escadaria; os 6 precisam chegar.",
+    "n": "Queenswalk",
+    "obj": "Levar o Heart of Riven para fora, pelo Cofre, até os dois Techeuns no fim da escadaria; os 6 precisam chegar.",
     "roles": [
      [
-      "Escolhido do Destino",
+      "Chosen by Fate",
       "1 carrega o coração (15 s)"
      ],
      [
@@ -691,17 +691,17 @@
      ],
      [
       "Dentro",
-      "entram no coração e pegam Força Possuída"
+      "entram no coração e pegam Taken Strength"
      ]
     ],
     "steps": [
-     "Quem recebe o Escolhido do Destino pega o Coração e corre para fora da garganta; a aura dele protege quem está perto.",
+     "Quem recebe o Chosen by Fate pega o Coração e corre para fora da garganta; a aura dele protege quem está perto.",
      "Com 3 s no tempo, o time de fora se afasta: quem estiver a 2 m é puxado para dentro do coração.",
-     "O carregador é teleportado para dentro; o primeiro a entrar pega a última Força Possuída do campo.",
-     "Cada pessoa que entra depois pega no máximo 2 Forças, deixando 1 para o próximo; cada entrada reinicia o tempo do carregador.",
+     "O carregador é teleportado para dentro; o primeiro a entrar pega a última Taken Strength do campo.",
+     "Cada pessoa que entra depois pega no máximo 2 Strength, deixando 1 para o próximo; cada entrada reinicia o tempo do carregador.",
      "O próximo carregador pega o coração do lado de fora e continua a corrida até os Techeuns."
     ],
-    "tip": "Dá para pegar o coração a ~2 m. Na 1ª corrida parem na boca da Riven e virem à esquerda; 3 Forças matam; matem os Poderes de Riven (Cavaleiros com espada)."
+    "tip": "Dá para pegar o coração a ~2 m. Na 1ª corrida parem na boca da Riven e virem à esquerda; 3 Strength matam; matem os Cavaleiros com espada."
    }
   ]
  },
@@ -714,8 +714,8 @@
   ],
   "enc": [
    {
-    "n": "Cataclismo",
-    "obj": "Encadear 4 séries de placas do Campo de Luz matando Psiônicos e Atormentadores para adiar a explosão.",
+    "n": "Cataclysm",
+    "obj": "Encadear 4 séries de placas do Field of Light matando Psiônicos e Tormentores para adiar a explosão.",
     "roles": [
      [
       "Corredor",
@@ -727,17 +727,17 @@
      ]
     ],
     "steps": [
-     "O corredor atira na esfera branca de uma placa acesa para pegar o Campo de Luz.",
+     "O corredor atira na esfera branca de uma placa acesa para pegar o Field of Light.",
      "Segue o feixe até a próxima placa e atira na esfera preta com o efeito ativo.",
      "Volta à placa acesa para pegar o efeito de novo (ela fica sempre 2 passos atrás).",
      "Os outros protegem o corredor e matam os Campeões de Barreira.",
-     "Psiônicos com escudo só morrem no corpo a corpo; matar os dois traz um Atormentador.",
-     "Matem o Atormentador rápido: cada um dá +30 s no tempo."
+     "Psiônicos com escudo só morrem no corpo a corpo; matar os dois traz um Tormentor.",
+     "Matem o Tormentor rápido: cada um dá +30 s no tempo."
     ],
     "tip": "Não peguem o efeito se outra pessoa já está com ele: isso bagunça as esferas."
    },
    {
-    "n": "Cisão",
+    "n": "Scission",
     "obj": "Completar 3 andares de sequências de placas dos dois lados antes do tempo acabar.",
     "roles": [
      [
@@ -760,7 +760,7 @@
     "tip": "Cada andar tem 2 min e o tempo não estende: velocidade importa."
    },
    {
-    "n": "Macrocosmo · Zo'Aurc",
+    "n": "Macrocosm · Zo'Aurc",
     "obj": "Trocar os planetas fora de lugar para o lado certo e abrir o dano no chefe.",
     "roles": [
      [
@@ -777,17 +777,17 @@
      ]
     ],
     "steps": [
-     "Matem os adds e os Centuriões Honrados para nascerem os Tenentes Terrestres.",
-     "Os Tenentes dão Troca Planetária (troca planetas) e Visão Planetária (mostra o brilho do seu lado).",
+     "Matem os adds e os Honored Centurions para nascerem os Terrestrial Lieutenants.",
+     "Os Lieutenants dão Planetary Swap (troca planetas) e Planetary Insight (mostra o brilho do seu lado).",
      "Cada corredor acha o planeta errado do seu lado, ativa a esfera, cruza e ativa a correspondente.",
      "Combinem com o outro lado usando E1–E6 e D1–D6.",
      "Com tudo certo, matem os Centuriões, leiam os planetas do centro e abram o dano.",
      "Peguem o efeito da cor do escudo do chefe (alterna Luz e Escuridão)."
     ],
-    "tip": "Só dá para fazer 2 vezes os Tenentes antes de cair o time: planejem as trocas."
+    "tip": "Só dá para fazer 2 vezes os Lieutenants antes de cair o time: planejem as trocas."
    },
    {
-    "n": "Nezarec, o Deus Final da Dor",
+    "n": "Nezarec, Final God of Pain",
     "obj": "Fazer as sequências de placas e criar refúgios para sobreviver à explosão, depois dar dano.",
     "roles": [
      [
@@ -805,10 +805,10 @@
     ],
     "steps": [
      "Os corredores fazem o zigue-zague de placas com Luz (esquerda) ou Escuridão (direita).",
-     "Quando o Ódio de Nezarec levantar alguém, os provocadores atiram no peito brilhante para pegar o efeito.",
+     "Quando Nezarec levantar alguém, os provocadores atiram no peito brilhante para pegar o efeito.",
      "Atirem nos dois ombros e avisem a cor: azul é Luz, laranja é Escuridão.",
      "O corredor da cor oposta cria um refúgio numa placa apagada antes da explosão.",
-     "No dano (~30 s), fiquem na placa de Campo de Luz mais perto do centro.",
+     "No dano (~30 s), fiquem na placa de Field of Light mais perto do centro.",
      "No final, usem tudo que sobrou."
     ],
     "tip": "O refúgio dura 14 s depois de sair da placa: passem por ele, não fiquem parados nele."
@@ -824,7 +824,7 @@
   ],
   "enc": [
    {
-    "n": "Relíquias e Portal",
+    "n": "Portal (relíquias)",
     "obj": "Levar as esferas de relíquia até as estátuas do centro para abrir o portal da Colmeia e limpar o pátio.",
     "roles": [
      [
@@ -861,8 +861,8 @@
     "tip": "É igual ao Destiny 1."
    },
    {
-    "n": "Totens Aniquiladores",
-    "obj": "Passar a Marca entre o time para carregar o Poder do Cantor da Morte e descarregar na placa do centro, sempre com alguém embaixo de cada Totem.",
+    "n": "Totems",
+    "obj": "Passar a Brand entre o time para carregar o Deathsinger's Power e descarregar na placa do centro, sempre com alguém embaixo de cada Totem.",
     "roles": [
      [
       "Lados",
@@ -870,29 +870,29 @@
      ],
      [
       "Em cada time",
-      "1 Marca, 1 descarrega no centro, 1 mata o Guardião da Praga"
+      "1 Brand, 1 descarrega no centro, 1 mata o Blightguard"
      ]
     ],
     "steps": [
      "Dividam em 2 times de 3.",
-     "Um pega a Marca na sala lateral, fica na placa embaixo do Totem e faz abates para juntar o Poder do Cantor da Morte.",
-     "Um colega mata o Guardião da Praga numa sacada do centro e ganha o Tomador de Marca.",
-     "Quem tem o Tomador interage para pegar a Marca de quem está segurando.",
-     "Quem está com o Poder vai à placa central e descarrega.",
-     "Revezem: cada Marca dura 30 s e quem segura morre se acabar. Não tem chefe."
+     "Um pega a Brand na sala lateral, fica na placa embaixo do Totem e faz abates para juntar o Deathsinger's Power.",
+     "Um colega mata o Blightguard numa sacada do centro e ganha o Brand Claimer.",
+     "Quem tem o Brand Claimer interage para pegar a Brand de quem está segurando.",
+     "Quem está com o Deathsinger's Power vai à placa central e descarrega.",
+     "Revezem: cada Brand dura 30 s e quem segura morre se acabar. Não tem chefe."
     ],
-    "tip": "Senhor do Trovão ajuda contra grupos e Cavaleiros das sacadas; evitem Tiro Sombrio no centro (lenta os inimigos que dão carga)."
+    "tip": "Thunderlord ajuda contra grupos e Cavaleiros das sacadas; evitem Shadowshot no centro (lenta os inimigos que dão carga)."
    },
    {
-    "n": "O Sacerdote da Guerra",
-    "obj": "Ativar as placas na ordem dos glifos para ganhar a Marca do Iniciado e dar dano dentro da aura.",
+    "n": "Warpriest",
+    "obj": "Ativar as placas na ordem dos glifos para ganhar a Brand of the Initiate e dar dano dentro da aura.",
     "roles": [
      [
       "Duplas",
       "3 (sacada esquerda, centro embaixo, sala da direita)"
      ],
      [
-      "Guardiões da Praga",
+      "Blightguards",
       "2 correm para matar"
      ]
     ],
@@ -900,19 +900,19 @@
      "Matem inimigos até nascerem os Cavaleiros, que começam a sequência.",
      "Fique na placa do meio e veja o monólito aceso: ele mostra a placa inicial. Saia.",
      "Na placa inicial, avise o próximo monólito aceso; pisem na 2ª e depois na 3ª placa.",
-     "Quem está na 3ª placa ganha a Marca do Iniciado.",
-     "Juntem dentro da aura e deem dano no Sacerdote.",
-     "Matem um Guardião da Praga para pegar o Tomador e passar a Marca antes do tempo acabar.",
-     "No fim do dano, se escondam atrás de um monólito para fugir do Óculo."
+     "Quem está na 3ª placa ganha a Brand of the Initiate.",
+     "Juntem dentro da aura e deem dano no Warpriest.",
+     "Matem um Blightguard para pegar o Brand Claimer e passar a Brand antes do tempo acabar.",
+     "No fim do dano, se escondam atrás de um monólito para fugir do Oculus."
     ],
-    "tip": "Deem dano entre o monólito do meio e o da direita; Tiro Sombrio com Divindade e Poço com Escudo da Sentinela não somam."
+    "tip": "Deem dano entre o monólito do meio e o da direita; Shadowshot com Divinity e Well of Radiance com Sentinel Shield não somam."
    },
    {
     "n": "Golgoroth",
-    "obj": "Dar dano na barriga do Golgoroth de dentro das Poças de Luz enquanto duas pessoas trocam o Olhar dele.",
+    "obj": "Dar dano na barriga do Golgoroth de dentro das Poças de Luz enquanto duas pessoas trocam o Gaze dele.",
     "roles": [
      [
-      "Olhar",
+      "Gaze",
       "2 (um puxa, outro atira nas costas)"
      ],
      [
@@ -922,13 +922,13 @@
     ],
     "steps": [
      "Destruam a esfera central para chamar o Golgoroth e limpem.",
-     "Um puxa a atenção e outro atira nas costas para pegar o Olhar.",
+     "Um puxa a atenção e outro atira nas costas para pegar o Gaze.",
      "O time de dano quebra uma esfera e entra na poça para atirar na barriga.",
-     "Quem tem o Olhar passa no último segundo e o time vai para a próxima esfera.",
-     "Quem pega Essência Instável se afasta antes de explodir.",
-     "A fase acaba com 6 esferas ou se o Olhar não for passado; são até 3 rodadas."
+     "Quem tem o Gaze passa no último segundo e o time vai para a próxima esfera.",
+     "Quem pega Unstable Light se afasta antes de explodir.",
+     "A fase acaba com 6 esferas ou se o Gaze não for passado; são até 3 rodadas."
     ],
-    "tip": "Cada esfera não usada marca a Tábua da Ruína (6 marcas = time cai); Poço da Radiância em cada poça."
+    "tip": "Cada esfera não usada marca a Tablet of Ruin (6 marcas = time cai); Well of Radiance em cada poça."
    },
    {
     "n": "Parede de pistões (passagem)",
@@ -942,11 +942,11 @@
     "tip": "Agora dá para agarrar nas beiradas, ficou mais fácil."
    },
    {
-    "n": "Filhas de Oryx",
-    "obj": "Fazer 3 ciclos do caminho Ascendente para juntar o Guardião da Praga, roubar a aura de uma Filha e derrotá-la em 2 min; depois a outra.",
+    "n": "Daughters of Oryx",
+    "obj": "Fazer 3 ciclos do caminho Ascendente para juntar o Blightguard, roubar a aura de uma Filha e derrotá-la em 2 min; depois a outra.",
     "roles": [
      [
-      "Dividido entre Dimensões",
+      "Torn Between Dimensions",
       "1 sorteado atravessa"
      ],
      [
@@ -961,7 +961,7 @@
     "steps": [
      "Matem o Cavaleiro da plataforma inicial e subam nela.",
      "Avisem onde está o símbolo flutuante e pisem na 2ª plataforma para formar o caminho.",
-     "Quem está Dividido atravessa e pega um pedaço do Guardião da Praga; repitam 3 vezes.",
+     "Quem está Torn atravessa e pega um pedaço do Blightguard; repitam 3 vezes.",
      "No 3º ciclo, ele pega a aura da Filha que está atirando.",
      "Juntem na aura e deem dano na Filha.",
      "Repitam com a segunda Filha."
@@ -969,11 +969,11 @@
     "tip": "Gjallarhorn e lança-foguetes lendários resolvem rápido; limpem logo as 4 Falanges Possuídas à direita da entrada."
    },
    {
-    "n": "Oryx, o Rei Possuído",
-    "obj": "Explodir as bombas de Luz Corrompida para atordoar Oryx e dar dano no peito até 25%, depois o final.",
+    "n": "Oryx, the Taken King",
+    "obj": "Explodir as bombas de Corrupted Light para atordoar Oryx e dar dano no peito até 25%, depois o final.",
     "roles": [
      [
-      "Dividido",
+      "Torn",
       "1 atravessa e pega a aura"
      ],
      [
@@ -987,15 +987,15 @@
     ],
     "steps": [
      "Cheguem perto da chama e limpem até Oryx escolher um lado; ativem a plataforma desse lado.",
-     "Quem está Dividido atravessa 3 vezes para juntar o Guardião da Praga.",
-     "Matem os Ogros Devoradores de Luz para soltar Luz Corrompida e os Cavaleiros que vêm comer as bombas.",
-     "O Dividido pega a Aura da Imortalidade no Receptáculo do meio.",
+     "Quem está Torn atravessa 3 vezes para juntar o Blightguard.",
+     "Matem os Light-Eater Ogres para soltar Corrupted Light e os Cavaleiros que vêm comer as bombas.",
+     "O Torn pega a Aura of Immortality no Receptáculo do meio.",
      "Quando aparecer 'Oryx chama a escuridão', 4 detonam as bombas e voltam para a aura.",
      "Deem dano no peito aberto com ele atordoado.",
-     "Depois sobrevivam às bombas ou matem a Sombra de Oryx na cúpula; repitam até 25%.",
+     "Depois sobrevivam às bombas ou matem a Shade of Oryx na cúpula; repitam até 25%.",
      "No final, matem 2 Ogros, detonem as bombas e deem dano no peito."
     ],
-    "tip": "Divindade em vez de Amarra, com fuzis de fusão linear e de precisão; cuidem da munição até chegar aos 25%."
+    "tip": "Divinity em vez de Tether, com fuzis de fusão linear e de precisão; cuidem da munição até chegar aos 25%."
    }
   ]
  },
@@ -1008,7 +1008,7 @@
   ],
   "enc": [
    {
-    "n": "Fugir da Mente Consagrada",
+    "n": "Evade the Consecrated Mind",
     "obj": "Abrir as barreiras Vex enquanto passa à frente do chefe e atravessar o campo aberto até o outro lado.",
     "roles": [
      [
@@ -1017,21 +1017,21 @@
      ],
      [
       "Trás",
-      "3 ficam com o chefe e pegam o Transbordo Voltaico"
+      "3 ficam com o chefe e pegam o Voltaic Overflow"
      ]
     ],
     "steps": [
      "3 ou 4 fazem a ligação da caixa Vex até a primeira porta; o encontro começa quando ela abre.",
-     "O time da frente vai até a próxima barreira, mata o Angélico e o Minotauro de Sobrecarga e liga a caixa para abrir.",
-     "O time de trás fica com a Mente Consagrada pegando o Transbordo Voltaico.",
+     "O time da frente vai até a próxima barreira, mata o Angelic e o Minotauro de Sobrecarga e liga a caixa para abrir.",
+     "O time de trás fica com a Consecrated Mind pegando o Voltaic Overflow.",
      "Quando o chefe avança, o time de trás passa à frente até a próxima barreira.",
      "Repitam até a última barreira (3 fechaduras, 3 caixas Vex).",
-     "No campo aberto, continuem pegando o Transbordo e passem pelos Ciclopes e Minotauros."
+     "No campo aberto, continuem pegando o Voltaic Overflow e passem pelos Ciclopes e Minotauros."
     ],
     "tip": "Munição de Sobrecarga para atordoar os Minotauros; deixem alguns matando Ciclopes para pelo menos 1 chegar ao fim."
    },
    {
-    "n": "Invocar a Mente Consagrada",
+    "n": "Summon the Consecrated Mind",
     "obj": "Proteger os 4 retransmissores dos cantos para baixar a barreira central e segurar o do centro por 3 ondas.",
     "roles": [
      [
@@ -1049,16 +1049,16 @@
     ],
     "steps": [
      "Matem os 3 Goblins do centro antes de subirem os dados.",
-     "4 vão para o Retransmissor 2 (sentido horário) e 2 ficam no 1 matando o Angélico e carregando com a caixa Vex.",
-     "Em cada canto, limpem os Hobgoblins de Barreira e o Angélico, liguem a caixa para ficar Iluminado e deixem 1 defensor.",
-     "Os flutuantes ajudam e mantêm o Iluminado ativo.",
-     "Cada canto recebe 3 Angélicos; com os 12 mortos a barreira central cai.",
+     "4 vão para o Retransmissor 2 (sentido horário) e 2 ficam no 1 matando o Angelic e carregando com a caixa Vex.",
+     "Em cada canto, limpem os Hobgoblins de Barreira e o Angelic, liguem a caixa para ficar Enlightened e deixem 1 defensor.",
+     "Os flutuantes ajudam e mantêm o Enlightened ativo.",
+     "Cada canto recebe 3 Angelics; com os 12 mortos a barreira central cai.",
      "Todos vão ao centro, liguem o retransmissor e segurem por 3 ondas."
     ],
-    "tip": "Iluminado dura ~44 s e é necessário para quebrar escudos brancos; usem os portais Vex para chegar rápido."
+    "tip": "Enlightened dura ~44 s e é necessário para quebrar escudos brancos; usem os portais Vex para chegar rápido."
    },
    {
-    "n": "Mente Consagrada",
+    "n": "Consecrated Mind",
     "obj": "Depositar 30 partículas no retransmissor aceso para abrir o dano e destruir os olhos vermelhos do chefe.",
     "roles": [
      [
@@ -1073,15 +1073,15 @@
     "steps": [
      "Liguem a caixa Vex ao retransmissor central para começar.",
      "O time de partículas mata Minotauros nas pistas; cada um junta até 10 e passa para o próximo.",
-     "Depositem no retransmissor aceso: isso dá Iluminado.",
-     "O time do chefe segue a Mente; quem pega o Transbordo fica preso e avisa se os olhos estão 'dentro' ou 'fora'.",
+     "Depositem no retransmissor aceso: isso dá Enlightened.",
+     "O time do chefe segue o chefe; quem pega o Voltaic Overflow fica preso e avisa se os olhos estão 'dentro' ou 'fora'.",
      "O preso atira na barbatana de cima; os outros dois na da esquerda e da direita.",
      "Com 30 partículas, o chefe vai até o banco: destruam todos os olhos vermelhos para expor o ponto fraco e atirem no centro."
     ],
-    "tip": "Quando os 3 do chefe tiverem o efeito Voltaico, troquem com alguém das partículas; o Fardo de Izanagi é ótimo aqui."
+    "tip": "Quando os 3 do chefe tiverem o efeito Voltaic Overflow, troquem com alguém das partículas; o Izanagi's Burden é ótimo aqui."
    },
    {
-    "n": "Mente Santificada",
+    "n": "Sanctified Mind",
     "obj": "Depositar 30 partículas em cada retransmissor ativo e ligar aos símbolos do chefe para atordoá-lo.",
     "roles": [
      [
@@ -1098,10 +1098,10 @@
      ]
     ],
     "steps": [
-     "Atirem no chefe e matem os inimigos, inclusive o Angélico, para liberar os retransmissores.",
+     "Atirem no chefe e matem os inimigos, inclusive o Angelic, para liberar os retransmissores.",
      "Destruam o ombro ou o joelho do chefe para abrir um portal; o time 1 entra, pega pelo menos 15 partículas e volta destruindo o mesmo membro.",
      "Alternem os times: joelho abre portal azul, ombro abre laranja.",
-     "Depositem no retransmissor da mesma cor (dá Iluminado).",
+     "Depositem no retransmissor da mesma cor (dá Enlightened).",
      "Com 30 em cada, o chefe mostra um sinal de + colorido: liguem do retransmissor da mesma cor (mín. 3, ideal 4).",
      "Quebrado o primeiro símbolo, liguem do outro retransmissor para o segundo.",
      "Juntem e deem dano na barriga."
@@ -1119,7 +1119,7 @@
   ],
   "enc": [
    {
-    "n": "Aquisição",
+    "n": "Acquisition",
     "obj": "Achar e atirar nos símbolos certos dos obeliscos antes de eles encherem.",
     "roles": [
      [
@@ -1137,18 +1137,18 @@
     ],
     "steps": [
      "Atirem no cristal central para abrir e fechar as portas.",
-     "Matem as Bússolas do Discípulo; o símbolo de cima do pilar diz de que lado elas aparecem.",
-     "Entrem na sala do símbolo do meio do pilar e matem os Guardiões dos Glifos.",
+     "Matem as Disciple's Compasses; o símbolo de cima do pilar diz de que lado elas aparecem.",
+     "Entrem na sala do símbolo do meio do pilar e matem os Glyphkeepers.",
      "Alguém avisa o símbolo certo (o de baixo do pilar) e grava.",
      "Saiam e repitam até 3 símbolos.",
      "Atirem nos 3 símbolos do obelisco quase juntos.",
      "Repitam nos outros dois obeliscos."
     ],
-    "tip": "Lança-granadas com Granadas Cegantes seguram os Aderentes; levem Imparável (aparecem Abominações Imparáveis)."
+    "tip": "Lança-granadas com Blinding Grenades seguram os Adherents; levem Imparável (aparecem Unstoppable Abominations)."
    },
    {
-    "n": "O Zelador",
-    "obj": "Atordoar o Zelador, coletar os símbolos e dar dano nos 3 andares e no final.",
+    "n": "The Caretaker",
+    "obj": "Atordoar o Caretaker, coletar os símbolos e dar dano nos 3 andares e no final.",
     "roles": [
      [
       "Atordoar",
@@ -1175,18 +1175,18 @@
      "Subam a escada para o próximo andar e repitam.",
      "No corredor final, avancem e fiquem o máximo em cada placa."
     ],
-    "tip": "Fuzis de fusão linear com Surto Aperfeiçoado de reserva; Botas Lunafacção ajudam na recarga."
+    "tip": "Fuzis de fusão linear; Lunafaction Boots ajudam na recarga."
    },
    {
-    "n": "Exibição",
-    "obj": "Levar os artefatos pelas salas, achar os símbolos iguais nos batentes e depositar antes da Ressonância Terminal acabar.",
+    "n": "Exhibition",
+    "obj": "Levar os artefatos pelas salas, achar os símbolos iguais nos batentes e depositar antes da Terminal Resonance acabar.",
     "roles": [
      [
       "Grupos",
       "2 de 3 (esquerda e direita)"
      ],
      [
-      "Olho de Riven",
+      "Eye of Riven",
       "1 destrói as amarras Possuídas"
      ],
      [
@@ -1200,24 +1200,24 @@
     ],
     "steps": [
      "Peguem o(s) artefato(s).",
-     "Limpem Desprezados, Possuídos e Guardiões dos Glifos vendo os símbolos que aparecem.",
+     "Limpem Desprezados, Possuídos e Glyphkeepers vendo os símbolos que aparecem.",
      "Avisem os símbolos e achem os que combinam.",
      "Atirem nos símbolos iguais do batente da saída para abrir a sala de depósito.",
      "Depositem e outras pessoas pegam de novo.",
-     "Repitam em cada sala usando o Olho de Riven nas amarras."
+     "Repitam em cada sala usando o Eye of Riven nas amarras."
     ],
     "tip": "Alguns símbolos só aparecem para quem tem artefato; matar a Ampulheta e cada depósito dão +40 s."
    },
    {
-    "n": "Rhulk, Discípulo da Testemunha",
-    "obj": "Usar a Força Sugadora e Emanante para depositar efeitos nos obeliscos e enfraquecer Rhulk pela glaive, depois dar dano.",
+    "n": "Rhulk, Disciple of the Witness",
+    "obj": "Usar a Leeching Force e Emanating Force para depositar efeitos nos obeliscos e enfraquecer Rhulk pela glaive, depois dar dano.",
     "roles": [
      [
-      "Sugadora",
+      "Leeching",
       "2 passam entre si"
      ],
      [
-      "Emanante",
+      "Emanating",
       "2 convertem nos raios de escuridão"
      ],
      [
@@ -1230,15 +1230,15 @@
      ]
     ],
     "steps": [
-     "Atirem no cristal central para começar e ganhar Força Sugadora.",
-     "Passem a Sugadora para os dois dos cristais laterais e convertam em Emanante dentro dos raios de escuridão.",
-     "Matem os Guardiões dos Glifos, avisem os símbolos e achem os obeliscos certos.",
-     "Depositem a Emanante nos obeliscos até 6 efeitos e o campo de força recuar.",
-     "Entrem na arena, atirem na glaive de Rhulk e convertam a Sugadora em Emanante.",
+     "Atirem no cristal central para começar e ganhar Leeching Force.",
+     "Passem a Leeching para os dois dos cristais laterais e convertam em Emanating Force dentro dos raios de escuridão.",
+     "Matem os Glyphkeepers, avisem os símbolos e achem os obeliscos certos.",
+     "Depositem a Emanating Force nos obeliscos até 6 efeitos e o campo de força recuar.",
+     "Entrem na arena, atirem na glaive de Rhulk e convertam a Leeching em Emanating Force.",
      "Depositem no canto do símbolo avisado até destruir 4 pontos fracos e abrir o dano.",
-     "Deem dano, recuem quando ele ficar imune e repitam; no final, matem antes de Escuridão Envolvente chegar a 10."
+     "Deem dano, recuem quando ele ficar imune e repitam; no final, matem antes de Pervading Darkness chegar a 10."
     ],
-    "tip": "Uma pessoa de Divindade (+30% de dano) e o resto com Simulante Adormecido ou fusão linear; guardem Supers de uma vez para o final."
+    "tip": "Uma pessoa de Divinity (+30% de dano) e o resto com Sleeper Simulant ou fusão linear; guardem Supers de uma vez para o final."
    }
   ]
  },
@@ -1251,50 +1251,50 @@
   ],
   "enc": [
    {
-    "n": "Substrato",
-    "obj": "Travar 6 pilares Condutores fazendo o sinal saltar entre placas e alimentando a caixa central com Ressonância.",
+    "n": "Substratum",
+    "obj": "Travar 6 Conductors fazendo o sinal saltar entre placas e alimentando a caixa central com Resonance.",
     "roles": [
      [
       "Times",
-      "2 de 3: 1 na placa ativa, 1 na sala do Condutor, 1 flutuante"
+      "2 de 3: 1 na placa ativa, 1 na sala do Conductor, 1 flutuante"
      ]
     ],
     "steps": [
-     "Peguem uma forma de Ressonância e depositem na caixa para começar (abre 2 portas).",
-     "Matem os Suplicantes e mandem um time por porta.",
-     "Cada time limpa 3 salas matando Hidras e o Campeão do fim para nascer um Atormentador.",
-     "Matem o Atormentador no centro para abrir 2 portas novas; a última sala tem a placa ativa.",
-     "Façam o sinal saltar entre as placas, peguem 3 formas, atirem no centro do Condutor e fiquem na placa dele para travar.",
-     "Com os 2 Condutores travados, voltem ao centro, matem o Subjugador e depositem a Ressonância; repitam até 6."
+     "Peguem uma forma de Resonance e depositem na caixa para começar (abre 2 portas).",
+     "Matem os Supplicants e mandem um time por porta.",
+     "Cada time limpa 3 salas matando Hidras e o Campeão do fim para nascer um Tormentor.",
+     "Matem o Tormentor no centro para abrir 2 portas novas; a última sala tem a placa ativa.",
+     "Façam o sinal saltar entre as placas, peguem 3 formas, atirem no centro do Conductor e fiquem na placa dele para travar.",
+     "Com os 2 Conductors travados, voltem ao centro, matem o Subjugator e depositem a Resonance; repitam até 6."
     ],
-    "tip": "Sempre fiquem na placa que recebe o sinal (senão nasce um Subjugador); 4 formas ou tempo zerado matam."
+    "tip": "Sempre fiquem na placa que recebe o sinal (senão nasce um Subjugator); 4 formas ou tempo zerado matam."
    },
    {
-    "n": "Dissipação · Arauto da Finalidade",
-    "obj": "Derrotar o Arauto depositando formas de Ressonância para o tempo da Forma Final não acabar.",
+    "n": "Dissipation · Herald of Finality",
+    "obj": "Derrotar o Herald depositando formas de Resonance para o tempo do Final Shape Looming não acabar.",
     "roles": [
      [
       "Duplas",
       "3 (meio, esquerda, direita)"
      ],
      [
-      "Chamado ao Ajuste",
+      "Call to Reckoning",
       "3 sorteados"
      ]
     ],
     "steps": [
-     "Dividam em 3 duplas, uma por área, e atirem na Praga do meio para começar.",
-     "Em cada área matem Atendentes, Cavaleiros Possuídos e o Trammel (minichefe).",
-     "Morto o primeiro Trammel, 3 recebem o Chamado ao Ajuste e vão ao buraco: atirem na cabeça do chefe, destruam as Pragas e quebrem a cabeça para ganhar o Favor Roubado.",
-     "Quem tem o Favor volta à sua área e avisa a forma do Condutor (esfera ou pirâmide).",
-     "Juntem 3 formas iguais saltando o sinal e travem o Condutor (a última forma que pegar define a pilha toda).",
+     "Dividam em 3 duplas, uma por área, e atirem na Blight do meio para começar.",
+     "Em cada área matem Attendants, Cavaleiros Possuídos e o Trammel (minichefe).",
+     "Morto o primeiro Trammel, 3 recebem o Call to Reckoning e vão ao buraco: atirem na cabeça do chefe, destruam as Blights e quebrem a cabeça para ganhar o Stolen Favor.",
+     "Quem tem o Stolen Favor volta à sua área e avisa a forma do Conductor (esfera ou pirâmide).",
+     "Juntem 3 formas iguais saltando o sinal e travem o Conductor (a última forma que pegar define a pilha toda).",
      "Com os 3 travados, depositem na caixa do buraco para abrir o dano; repitam quando ele ficar imune."
     ],
-    "tip": "Só quem tem o Chamado ao Ajuste dá dano na cabeça: protejam essas pessoas."
+    "tip": "Só quem tem o Call to Reckoning dá dano na cabeça: protejam essas pessoas."
    },
    {
-    "n": "Repositório",
-    "obj": "Atravessar 3 salas travando 3 Condutores por sala, cada um pedindo uma forma (triângulo, círculo ou quadrado).",
+    "n": "Repository",
+    "obj": "Atravessar 3 salas travando 3 Conductors por sala, cada um pedindo uma forma (triângulo, círculo ou quadrado).",
     "roles": [
      [
       "Duplas",
@@ -1303,16 +1303,16 @@
     ],
     "steps": [
      "Dividam em 3 duplas, cada uma com sua pista.",
-     "Matem o Atormentador da pista: quem mata ganha o Favor Roubado e vê a forma do Condutor.",
+     "Matem o Tormentor da pista: quem mata ganha o Stolen Favor e vê a forma do Conductor.",
      "Saltem o sinal entre as placas para gerar formas.",
-     "Peguem a forma que o Condutor pede e travem o certo (às vezes precisa trocar de pista).",
+     "Peguem a forma que o Conductor pede e travem o certo (às vezes precisa trocar de pista).",
      "Com tudo travado, limpem e matem o Campeão para abrir a porta.",
      "Repitam nas próximas salas, onde as ligações cruzam de lado."
     ],
-    "tip": "A forma da sua placa pode não ser a que o seu Condutor pede: confiram antes de pegar."
+    "tip": "A forma da sua placa pode não ser a que o seu Conductor pede: confiram antes de pegar."
    },
    {
-    "n": "Veracidade",
+    "n": "Verity",
     "obj": "Libertar os 3 de dentro combinando o objeto 3D da estátua de fora com o objeto 3D no bolso de cada um, 3 vezes.",
     "roles": [
      [
@@ -1332,14 +1332,14 @@
      "Matando 2 Cavaleiros, as formas viram um objeto 3D no bolso; quando bate com a estátua de fora, atravessem a parede.",
      "Repitam 3 vezes."
     ],
-    "tip": "Dentro, juntem primeiro todas as formas iguais na mão de uma pessoa; na Decimação Catatônica, Fantasma errado na estátua mata o colega."
+    "tip": "Dentro, juntem primeiro todas as formas iguais na mão de uma pessoa; na Catatonic Decimation, Fantasma errado na estátua mata o colega."
    },
    {
-    "n": "Zênite · A Testemunha",
-    "obj": "Destruir os 6 glifos da Testemunha e dar dano até derrotá-la no final.",
+    "n": "Zenith · The Witness",
+    "obj": "Destruir os 6 glifos da Witness e dar dano até derrotá-la no final.",
     "roles": [
      [
-      "Quebradores de Glifo",
+      "Glyphbreakers",
       "combinem quantos antes"
      ],
      [
@@ -1348,12 +1348,12 @@
      ]
     ],
     "steps": [
-     "Fiquem alguns segundos no ataque telegrafado de um braço para ganhar a Ressonância dele.",
-     "Atirem no bracelete desse braço: a cor diz a Ressonância que precisa (vermelho hexaedro, amarelo esfera, verde pirâmide).",
-     "Peguem essa Ressonância no ataque de outro braço sem levar o golpe.",
-     "Voltem ao braço original, fiquem na área e atirem rápido no bracelete para ganhar o Quebrador de Glifo.",
-     "Destruam um glifo; esperar 3 pessoas com o efeito quebra 3 de uma vez e evita Subjugadores.",
-     "No teste da Testemunha, atirem nos nós a mais para formar a forma do último braço que atiraram (errar derruba o time).",
+     "Fiquem alguns segundos no ataque telegrafado de um braço para ganhar a Resonance dele.",
+     "Atirem no bracelete desse braço: a cor diz a Resonance que precisa (vermelho hexaedro, amarelo esfera, verde pirâmide).",
+     "Peguem essa Resonance no ataque de outro braço sem levar o golpe.",
+     "Voltem ao braço original, fiquem na área e atirem rápido no bracelete para ganhar o Glyphbreaker.",
+     "Destruam um glifo; esperar 3 pessoas com o efeito quebra 3 de uma vez e evita Subjugators.",
+     "No teste da Witness, atirem nos nós a mais para formar a forma do último braço que atiraram (errar derruba o time).",
      "Com os 6 glifos quebrados, deem dano na plataforma central e pulem fora antes da pancada final."
     ],
     "tip": "Anotem o último braço em que atiraram antes do teste: ele define a forma."
@@ -1369,12 +1369,12 @@
   ],
   "enc": [
    {
-    "n": "Eco da Falange",
-    "obj": "Limpar as 4 placas de fumaça para deixar o Eco da Falange vulnerável e causar dano.",
+    "n": "Phalanx Echo",
+    "obj": "Limpar as 4 placas de fumaça para deixar o Phalanx Echo vulnerável e causar dano.",
     "roles": [
      [
       "Coletor",
-      "1 junta as motes (Luz ou Trevas)"
+      "1 junta as motes (Light ou Dark)"
      ],
      [
       "Limpeza",
@@ -1382,17 +1382,17 @@
      ]
     ],
     "steps": [
-     "Matem os inimigos e peguem Motes de Luz ou de Trevas.",
+     "Matem os inimigos e peguem Light ou Dark Motes.",
      "Usem as motes da cor certa para limpar cada uma das 4 placas.",
-     "Com as 4 limpas, a Falange fica vulnerável: dano.",
-     "Quando ela ficar imune, voltem a limpar as placas.",
-     "Repitam até ela cair e subam todos na placa de areia do centro."
+     "Com as 4 limpas, o Phalanx Echo fica vulnerável: dano.",
+     "Quando ele ficar imune, voltem a limpar as placas.",
+     "Repitam até ele cair e subam todos na placa de areia do centro."
     ],
-    "tip": "Combinem uma cor de mote antes de começar para ninguém zerar a carga do outro. Poço de Radiância + Guilhotina Cadente pode matar numa fase."
+    "tip": "Combinem uma cor de mote antes de começar para ninguém zerar a carga do outro. Well of Radiance + Falling Guillotine pode matar numa fase."
    },
    {
-    "n": "Deserto",
-    "obj": "Atravessar a área aberta limpando Possuídos e Pragas Possuídas até a entrada do Hexaedro.",
+    "n": "Wasteland",
+    "obj": "Atravessar a área aberta limpando Possuídos e Taken Blights até a entrada do Hexahedron.",
     "roles": [
      [
       "Grupo",
@@ -1401,15 +1401,15 @@
     ],
     "steps": [
      "Atravessem de pardal.",
-     "Limpem os Possuídos e as Pragas que bloqueiam o caminho.",
+     "Limpem os Possuídos e as Taken Blights que bloqueiam o caminho.",
      "Se perderem o rumo, sigam o Toland.",
      "Procurem a grande construção de pedra com uma entrada estreita.",
-     "Entrem no túnel de luz rosa para chegar ao Hexaedro."
+     "Entrem no túnel de luz rosa para chegar ao Hexahedron."
     ],
     "tip": "O Toland é o guia mais confiável do caminho."
    },
    {
-    "n": "Hexaedro",
+    "n": "Hexahedron",
     "obj": "Seguir o orbe do Toland e virar a sala 6 vezes limpando a placa certa; no fim, matar dois Centuriões Possuídos.",
     "roles": [
      [
@@ -1423,17 +1423,17 @@
     ],
     "steps": [
      "Achem o orbe do Toland e a placa logo abaixo dele (se ele estiver no 'teto', é a placa do lado do cubo que não está aceso).",
-     "Limpem os adds; os dois Hobgoblins voltam a cada 60 s e cada um gera um Eco de Cavaleiro.",
+     "Limpem os adds; os dois Hobgoblins voltam a cada 60 s e cada um gera um Knight Echo.",
      "Peguem as motes da cor que combina com a posição do Toland.",
-     "Limpem a placa: Hobgoblins e Ecos somem.",
+     "Limpem a placa: Hobgoblins e Knight Echoes somem.",
      "Peguem munição, recarreguem e subam na placa do centro para virar a sala.",
      "Repitam até 6 viradas; na última aparecem 2 Centuriões Possuídos."
     ],
-    "tip": "O Topo da Montanha e o Xenófago resolvem os Hobgoblins e Ecos. Virou a sala errada? É só pegar as motes certas de novo."
+    "tip": "The Mountaintop e o Xenophage resolvem os Hobgoblins e Knight Echoes. Virou a sala errada? É só pegar as motes certas de novo."
    },
    {
-    "n": "Eco de Kell",
-    "obj": "Limpar 3 placas e perseguir o Eco de Kell pelo corredor, dando dano antes de ele ficar imune.",
+    "n": "Kell Echo",
+    "obj": "Limpar 3 placas e perseguir o Kell Echo pelo corredor, dando dano antes de ele ficar imune.",
     "roles": [
      [
       "Placas",
@@ -1445,15 +1445,15 @@
      ]
     ],
     "steps": [
-     "Toquem no Toland para começar; aparecem 3 Ecos de Kell.",
-     "Vejam a cor necessária, matem 2 Ecos de Cavaleiro para pegar as motes e limpem a primeira placa.",
+     "Toquem no Toland para começar; aparecem 3 Kell Echoes.",
+     "Vejam a cor necessária, matem 2 Knight Echoes para pegar as motes e limpem a primeira placa.",
      "Matem o Ogro que aparece naquela placa.",
      "Repitam nas outras 2 placas.",
      "Peguem munição e vão para o centro para entrar na área do chefe.",
-     "Persigam o Eco pelo corredor matando Hobgoblins; com 10 acúmulos de Entropia Sombria você morre.",
+     "Persigam o Kell Echo pelo corredor matando Hobgoblins; com 10 acúmulos de Dark Entropy você morre.",
      "Deem dano no começo e no fim do corredor; após ~20 s ele fica imune. Voltem pelo triângulo de areia e repitam."
     ],
-    "tip": "Na parada final, Égide da Alvorada ou Poço de Radiância. Se a espada estiver tomando pisão, troquem por Xenófago ou lança-granadas; o teleporte dele atravessa cobertura."
+    "tip": "Na parada final, Ward of Dawn ou Well of Radiance. Se a espada estiver tomando pisão, troquem por Xenophage ou lança-granadas; o teleporte dele atravessa cobertura."
    }
   ]
  },
@@ -1466,12 +1466,12 @@
   ],
   "enc": [
    {
-    "n": "Necrópole",
-    "obj": "Matar os 3 mini-chefes com a espada Relíquia da Colmeia para quebrar as correntes.",
+    "n": "Necropolis",
+    "obj": "Matar os 3 mini-chefes com a Hive Relic sword para quebrar as correntes.",
     "roles": [
      [
       "Espada",
-      "quem estiver perto pega a Relíquia"
+      "quem estiver perto pega a Relic"
      ],
      [
       "Apoio",
@@ -1481,15 +1481,15 @@
     "steps": [
      "Olhem os símbolos na corrente da sala.",
      "Lá fora, achem os 3 símbolos em hologramas gigantes.",
-     "Peguem a espada Relíquia matando um Cavaleiro que patrulha (às vezes com um Ogro).",
-     "Em cada sala: Cavaleiro com ataque leve, Feiticeira com o ataque pesado à distância, Uivador com a guarda.",
+     "Peguem a Relic sword matando um Cavaleiro que patrulha (às vezes com um Ogro).",
+     "Em cada sala: Cavaleiro com ataque leve, Feiticeira com o ataque pesado à distância, Shrieker com a guarda.",
      "Com os 3 mortos, sigam o feixe de luz verde."
     ],
-    "tip": "Só a espada Relíquia fere esses mini-chefes; peguem uma antes de entrar na sala."
+    "tip": "Só a Relic sword fere esses mini-chefes; peguem uma antes de entrar na sala."
    },
    {
-    "n": "Túneis do Desespero",
-    "obj": "Apagar as 3 portas com orbes dos Cavaleiros Heréticos fugindo dos Ogros imortais.",
+    "n": "Tunnels of Despair",
+    "obj": "Apagar as 3 portas com orbes dos Heretical Knights fugindo dos Ogros imortais.",
     "roles": [
      [
       "Orbe",
@@ -1502,16 +1502,16 @@
     ],
     "steps": [
      "Atirem na teia que fecha a entrada da caverna.",
-     "Matem um Cavaleiro Herético e peguem o orbe dele.",
+     "Matem um Heretical Knight e peguem o orbe dele.",
      "Levem o orbe até uma das 3 portas e apaguem.",
      "Repitam nas outras portas.",
-     "Passem escondidos ou puxem os 3 Ogros Pária para longe."
+     "Passem escondidos ou puxem os 3 Harrowing Pariah Ogres para longe."
     ],
     "tip": "Os Ogros batem muito e não morrem: puxem para longe em vez de lutar."
    },
    {
-    "n": "Câmara do Sofrimento",
-    "obj": "Enterrar 6 orbes para apagar a porta atrás do Totem Aniquilador antes que os acúmulos de dano acabem com o time.",
+    "n": "Chamber of Suffering",
+    "obj": "Enterrar 6 orbes para apagar a porta atrás do Annihilator Totem antes que os acúmulos de dano acabem com o time.",
     "roles": [
      [
       "Placa",
@@ -1523,18 +1523,18 @@
      ]
     ],
     "steps": [
-     "Uma pessoa fica parada na placa debaixo do Totem Aniquilador.",
-     "Matem os Cavaleiros Heréticos e peguem os orbes.",
+     "Uma pessoa fica parada na placa debaixo do Annihilator Totem.",
+     "Matem os Heretical Knights e peguem os orbes.",
      "Cada orbe enterrado tira uma runa dos pilares.",
      "Matem logo os Cavaleiros que aparecem no alto: eles bombardeiam a placa.",
      "Usem Supers para limpar o excesso de inimigos.",
      "O 6º orbe termina o encontro."
     ],
-    "tip": "Velocidade é tudo: cada acúmulo de Maldição do Sofrimento aumenta o dano recebido (com 5 quase tudo mata de um tiro). Poço de Radiância ajuda quem está na placa."
+    "tip": "Velocidade é tudo: cada acúmulo de Curse of Suffering aumenta o dano recebido (com 5 quase tudo mata de um tiro). Well of Radiance ajuda quem está na placa."
    },
    {
-    "n": "O Rastelo",
-    "obj": "Quebrar as 3 travas matando a Feiticeira Ritualista perto de cada símbolo do labirinto.",
+    "n": "The Harrow",
+    "obj": "Quebrar as 3 travas matando o Malevolent Ritualist Wizard perto de cada símbolo do labirinto.",
     "roles": [
      [
       "Grupo",
@@ -1544,13 +1544,13 @@
     "steps": [
      "Anotem os 3 símbolos da parede de entrada.",
      "Achem os símbolos iguais pelo labirinto.",
-     "Matem a Feiticeira Ritualista Malévola perto de cada símbolo.",
+     "Matem o Malevolent Ritualist Wizard perto de cada símbolo.",
      "Quebrou as 3 travas, o caminho abre."
     ],
     "tip": "Cuidado com as armadilhas e quedas; as Feiticeiras tiram muita vida rápido."
    },
    {
-    "n": "Zulmak, Instrumento do Tormento",
+    "n": "Zulmak, Instrument of Torment",
     "obj": "Matar os 3 mini-chefes das torres, apagar o pedestal com os orbes e dar dano em Zulmak do centro.",
     "roles": [
      [
@@ -1563,14 +1563,14 @@
      ]
     ],
     "steps": [
-     "Matem os Cavaleiros do centro e peguem as espadas Relíquia.",
-     "Usem as espadas nos mini-chefes das torres (Cavaleiro: leve; Feiticeira: pesado; Uivador: guarda).",
+     "Matem os Cavaleiros do centro e peguem as Relic swords.",
+     "Usem as espadas nos mini-chefes das torres (Cavaleiro: leve; Feiticeira: pesado; Shrieker: guarda).",
      "Levem os 3 orbes ao pedestal do centro.",
      "Fiquem na arena do centro para dar dano.",
      "Quando Zulmak se ajoelhar para carregar o cristal, saiam do centro para fugir da explosão de fogo.",
      "Mudem de posição quando ele soltar o ataque longo que deixa fogo no chão."
     ],
-    "tip": "Combinem as posições antes de apagar o último orbe. O Fardo de Izanagi funciona bem, ou 1 com Divindade e os outros com lança-granadas."
+    "tip": "Combinem as posições antes de apagar o último orbe. O Izanagi's Burden funciona bem, ou 1 com Divinity e os outros com lança-granadas."
    }
   ]
  },
@@ -1583,8 +1583,8 @@
   ],
   "enc": [
    {
-    "n": "Érebo (Passagem Segura)",
-    "obj": "Seguir os símbolos entre os prédios matando os Arquitetos do Labirinto até a descida.",
+    "n": "Erebus (Search for Safe Passage)",
+    "obj": "Seguir os símbolos entre os prédios matando os Labyrinth Architects até a descida.",
     "roles": [
      [
       "Grupo",
@@ -1592,16 +1592,16 @@
      ]
     ],
     "steps": [
-     "Na entrada, matem o Arquiteto do Labirinto e os inimigos menores.",
+     "Na entrada, matem o Labyrinth Architect e os inimigos menores.",
      "Aparece um símbolo: achem o mesmo num dos prédios em volta.",
-     "O prédio certo tem outro Arquiteto e uma dúzia de inimigos.",
+     "O prédio certo tem outro Labyrinth Architect e uma dúzia de inimigos.",
      "Repitam até o símbolo do pássaro, que leva de volta ao prédio inicial.",
      "Limpem a área para liberar a descida."
     ],
     "tip": "Zona de escuridão: cada morte soma 40 s de espera e uma derrota do time reinicia a área."
    },
    {
-    "n": "Vorgeth, a Fome Sem Fim",
+    "n": "Vorgeth, the Boundless Hunger",
     "obj": "Tirar o escudo de Vorgeth com as marcas das Feiticeiras e apagar uma chama, depois dar dano.",
     "roles": [
      [
@@ -1615,16 +1615,16 @@
     ],
     "steps": [
      "Ignorem as Feiticeiras no começo e limpem os Vândalos e Goblins da sala.",
-     "Matem as Feiticeiras uma a uma e peguem a Marca do Peticionário.",
+     "Matem as Feiticeiras uma a uma e peguem a Petitioner's Mark.",
      "Cada marca reinicia o contador de 45 s; se zerar, a pessoa morre.",
-     "Com 4 marcas vira Fardo do Peticionário: usem para apagar uma chama.",
+     "Com 4 marcas vira Petitioner's Burden: usem para apagar uma chama.",
      "Com o escudo caído, dano em Vorgeth; atirem ou fujam das bombas teleguiadas.",
      "Repitam até ele cair."
     ],
     "tip": "Priorizem os Vândalos atiradores, protegidos pelos Goblins. Fiquem juntos para reviver rápido."
    },
    {
-    "n": "A Descida (Corredor dos Servos)",
+    "n": "The Descent (Thrallway)",
     "obj": "Chegar ao fim do corredor sem correr, sem pulo duplo e sem regenerar, com Servos voltando sem parar.",
     "roles": [
      [
@@ -1636,15 +1636,15 @@
      "Entrem: movimento e cura ficam limitados.",
      "Os Servos voltam infinitamente e atacam em bando.",
      "Fiquem em partes altas (bordas das escadas, caixas).",
-     "Use a Fenda de Cura do Arcano para recuperar vida.",
-     "Limpem os Servos Sombrios juntos.",
+     "Use a Healing Rift do Arcano para recuperar vida.",
+     "Limpem os Shadow Thrall juntos.",
      "Pulem a borda com névoa para sair."
     ],
     "tip": "Ficar no alto dá respiro; com Poder baixo esse trecho fica bem mais difícil."
    },
    {
-    "n": "Dul Incaru, o Eterno Retorno",
-    "obj": "Matar os 3 Cavaleiros Ferreiros do Destino para pegar Pensamento Finito e dar dano antes do tempo acabar.",
+    "n": "Dul Incaru, the Eternal Return",
+    "obj": "Matar os 3 Fatesmith Knights para pegar Finite Thought e dar dano antes do tempo acabar.",
     "roles": [
      [
       "Cavaleiros",
@@ -1659,7 +1659,7 @@
      "Atirem primeiro nos Cavaleiros (só batem de perto e andam devagar).",
      "Cada Cavaleiro morto solta um buff: juntem os 3 para mais dano.",
      "Quando eles perdem vida, Dul Incaru invoca um cristal: destruam para tirar os escudos (vêm 2 grupos de Psiônicos).",
-     "Segurem os Psiônicos com Tiro das Sombras ou Lâmina do Alvorecer.",
+     "Segurem os Psiônicos com Shadowshot ou Dawnblade.",
      "Com o buff ativo, dano em Dul Incaru; limpem o buff no braseiro central antes de zerar.",
      "Os Cavaleiros voltam em ~60 s."
     ],
@@ -1676,8 +1676,8 @@
   ],
   "enc": [
    {
-    "n": "Caverna do Tesouro",
-    "obj": "Juntar acúmulos de Carregado de Riquezas dos inimigos e depositar no cristal até ele encher.",
+    "n": "Loot Cave",
+    "obj": "Juntar acúmulos de Burdened by Riches dos inimigos e depositar no cristal até ele encher.",
     "roles": [
      [
       "Grupo",
@@ -1685,21 +1685,21 @@
      ]
     ],
     "steps": [
-     "Matem os inimigos e peguem os engramas: cada um dá Carregado de Riquezas.",
+     "Matem os inimigos e peguem os engramas: cada um dá Burdened by Riches.",
      "Com 10 acúmulos sua Super enche.",
      "O contador de 30 s mata se zerar.",
      "Entrem na caverna e fiquem perto do cristal para descarregar.",
-     "Repitam até aparecer \"Os restos se aquietaram\"."
+     "Repitam até aparecer \"The remains are quieted\"."
     ],
     "tip": "Fiquem perto da boca da caverna para depositar rápido."
    },
    {
-    "n": "Phry'zhia, a Insaciável",
+    "n": "Phry'zhia the Insatiable",
     "obj": "Depositar riquezas no cristal para tirar o escudo de Phry'zhia e dar dano.",
     "roles": [
      [
       "Canhão",
-      "1 pega o Canhão de Calor"
+      "1 pega o Scorch Cannon"
      ],
      [
       "Garagens",
@@ -1707,40 +1707,40 @@
      ]
     ],
     "steps": [
-     "Matem o Vândalo do fundo para pegar o Canhão de Calor.",
+     "Matem o Vândalo do fundo para pegar o Scorch Cannon.",
      "Atirem no gerador para abrir a porta de um lado (abrir um fecha o outro).",
-     "Limpem lá dentro e peguem Carregado de Riquezas.",
+     "Limpem lá dentro e peguem Burdened by Riches.",
      "Depositem no cristal.",
      "Repitam até o escudo cair.",
      "Dano em Phry'zhia."
     ],
-    "tip": "Barricada ou Fenda de Cura atrás do cristal ajudam. No Mestre aparecem Cavaleiros Antibarreira nas garagens."
+    "tip": "Barricade ou Healing Rift atrás do cristal ajudam. No Mestre aparecem Anti-Barrier Knights nas garagens."
    },
    {
-    "n": "Covil Submerso (escudo)",
-    "obj": "Destruir os Servidores Monitores e lançar as carcaças no canhão contra a estrutura central.",
+    "n": "Sunken Lair (shield)",
+    "obj": "Destruir os Abundance Monitor Servitors e lançar as carcaças no canhão contra a estrutura central.",
     "roles": [
      [
       "Canhão",
       "1 lança"
      ],
      [
-      "Servidor",
+      "Servitor",
       "2 baixam o escudo e empurram a carcaça"
      ]
     ],
     "steps": [
-     "Peguem o Canhão de Calor de um Vândalo.",
+     "Peguem o Scorch Cannon de um Vândalo.",
      "Atirem no gerador de um canhão de gravidade para pular entre plataformas.",
-     "Achem o grupo com um Servidor, matem e juntem riquezas.",
-     "Depositem no cristal da plataforma até o escudo do Servidor cair e matem-no.",
+     "Achem o grupo com um Servitor, matem e juntem riquezas.",
+     "Depositem no cristal da plataforma até o escudo do Servitor cair e matem-no.",
      "Em ~90 s, empurrem (ou soquem) a carcaça até o canhão.",
      "Mirem na estrutura central e disparem; 4 nós destruídos derrubam o escudo."
     ],
-    "tip": "No Mestre aparecem Capitães Sobrecarga em cada ponto: matem primeiro."
+    "tip": "No Mestre aparecem Overload Captains em cada ponto: matem primeiro."
    },
    {
-    "n": "Capitão Avarokk, o Cobiçoso",
+    "n": "Captain Avarokk, the Covetous",
     "obj": "Carregar geradores, juntar 60 acúmulos de riquezas e dar dano na fase de 30 s.",
     "roles": [
      [
@@ -1753,14 +1753,14 @@
      ]
     ],
     "steps": [
-     "Matem o Vândalo com o Canhão de Calor.",
+     "Matem o Vândalo com o Scorch Cannon.",
      "Atirem num dos 3 geradores (esquerda, direita ou frente).",
      "Os casulos dos lados soltam engramas: peguem para ganhar acúmulos.",
      "Depositem no cristal central: 60 tiram o escudo.",
      "Começa a fase de dano de 30 s.",
-     "Quando ele \"resistir à tentação\", repitam."
+     "Quando ele \"resists temptation once more\", repitam."
     ],
-    "tip": "No Mestre aparecem Servidores Antibarreira na coleta. Poço ou Égide onde os adds surgem limpa rápido."
+    "tip": "No Mestre aparecem Anti-Barrier Servitors na coleta. Well of Radiance ou Ward of Dawn onde os adds surgem limpa rápido."
    }
   ]
  },
@@ -1773,11 +1773,11 @@
   ],
   "enc": [
    {
-    "n": "Pesadelo de Gahlran",
-    "obj": "Alternar entre realidade e pesadelo para entregar Essências de Estandarte e dar dano em Gahlran.",
+    "n": "Nightmare of Gahlran",
+    "obj": "Alternar entre realidade e pesadelo para entregar Standard Essences e dar dano em Gahlran.",
     "roles": [
      [
-      "Essência",
+      "Essence",
       "1 pega e deposita"
      ],
      [
@@ -1786,45 +1786,45 @@
      ]
     ],
     "steps": [
-     "Matem os Guardiões do Sino e atirem no Sino da Conquista para entrar no pesadelo.",
-     "Matem os Porta-Estandartes (Psiônicos nas salas de canto) e peguem a essência.",
-     "Matem os Guardiões do Sino do pesadelo e atirem no sino para voltar.",
-     "Depositem na placa do símbolo certo (Cálice, Sol, Cães ou Machados).",
+     "Matem os Bellkeepers e atirem no Bell of Conquest para entrar no pesadelo.",
+     "Matem os Standard Bearers (Psiônicos nas salas de canto) e peguem a essência.",
+     "Matem os Bellkeepers do pesadelo e atirem no sino para voltar.",
+     "Depositem na placa do símbolo certo (Chalice, Sun, Dogs ou Axes).",
      "Uma pessoa em cada sala lateral: matem os Cabais e atirem no sino.",
-     "Matem as Visões de Gahlran para abrir as portas.",
+     "Matem as Visions of Gahlran para abrir as portas.",
      "Dano em Gahlran e voltem pelo sino antes de 60 s."
     ],
-    "tip": "\"Pesadelo Colapsando\" mata o time ao zerar. A realidade não tem tempo: aproveitem para juntar munição pesada."
+    "tip": "\"Nightmare Collapsing\" mata o time ao zerar. A realidade não tem tempo: aproveitem para juntar munição pesada."
    },
    {
-    "n": "Abrir o Cofre",
-    "obj": "Derrotar 3 Pesadelos entregando 6 essências (cada 2 deixam um vulnerável).",
+    "n": "Open the Vault",
+    "obj": "Derrotar 3 Nightmares entregando 6 essências (cada 2 deixam um vulnerável).",
     "roles": [
      [
       "Leitor",
       "1 avisa os símbolos"
      ],
      [
-      "Essência",
+      "Essence",
       "2 buscam no pesadelo"
      ]
     ],
     "steps": [
-     "Vejam os símbolos do chão e os blocos dos cantos que mostram onde os Porta-Estandartes aparecem.",
-     "Matem os Guardiões do Sino e entrem no pesadelo.",
-     "No símbolo certo, matem a Falange e o Colosso: surge o Porta-Estandarte.",
+     "Vejam os símbolos do chão e os blocos dos cantos que mostram onde os Standard Bearers aparecem.",
+     "Matem os Bellkeepers e entrem no pesadelo.",
+     "No símbolo certo, matem a Falange e o Colosso: surge o Standard Bearer.",
      "Peguem a essência, voltem e depositem.",
-     "Com a segunda essência o Pesadelo fica vulnerável (sem limite de tempo).",
+     "Com a segunda essência o Nightmare fica vulnerável (sem limite de tempo).",
      "Dano com Super e pesada; repitam para os 3."
     ],
     "tip": "Peguem as duas essências de uma vez para economizar viagens."
    },
    {
-    "n": "Pesadelo de Caiatl",
+    "n": "Nightmare of Caiatl",
     "obj": "Entregar 4 essências e atordoar Caiatl nos sinos durante a fase de dano.",
     "roles": [
      [
-      "Essência",
+      "Essence",
       "2 buscam nas sacadas"
      ],
      [
@@ -1840,7 +1840,7 @@
      "No pesadelo, interceptem Caiatl no sino para onde ela corre e atirem no sino: 10 s de atordoamento.",
      "Repitam nos outros 2 sinos; a fase acaba se ela chegar num sino."
     ],
-    "tip": "Perto do sino você ganha Ressonância Desperta (mais dano). Cada Psiônico morto dá mais tempo."
+    "tip": "Perto do sino você ganha Waking Resonance (mais dano). Cada Psiônico morto dá mais tempo."
    }
   ]
  },
@@ -1853,11 +1853,11 @@
   ],
   "enc": [
    {
-    "n": "Subida do Pináculo",
+    "n": "Ascend the Spire",
     "obj": "Carregar nós de Arco em sequência para ligar os elevadores e subir.",
     "roles": [
      [
-      "Eletricista",
+      "Arctrician",
       "1 com o buff"
      ],
      [
@@ -1866,7 +1866,7 @@
      ]
     ],
     "steps": [
-     "Matem os Minotauros Condutores para pegar o buff Eletricista.",
+     "Matem os Conduit Minotaurs para pegar o buff Arctrician.",
      "Achem os nós iniciais e sigam os cabos.",
      "Os cabos dão a volta no pináculo.",
      "Com todos carregados, peguem o elevador.",
@@ -1875,11 +1875,11 @@
     "tip": "A ordem importa: nó errado ou pulado desliga em segundos."
    },
    {
-    "n": "Akelous, a Corrente da Sereia",
+    "n": "Akelous, the Siren's Current",
     "obj": "Ligar as 4 varetas de combustível e destruir os olhos e o núcleo de Akelous.",
     "roles": [
      [
-      "Eletricista",
+      "Arctrician",
       "1 a 2 carregam nós"
      ],
      [
@@ -1888,7 +1888,7 @@
      ]
     ],
     "steps": [
-     "Matem os Minotauros Condutores e peguem Eletricista.",
+     "Matem os Conduit Minotaurs e peguem Arctrician.",
      "Carreguem os nós do centro para fora pelas passarelas.",
      "Com as 4 varetas ativas, Akelous vai para uma delas: dano.",
      "Destruam os olhos vermelhos primeiro.",
@@ -1898,12 +1898,12 @@
     "tip": "No fim do dano vem uma explosão que joga longe: desçam para as passarelas ou usem habilidades."
    },
    {
-    "n": "Persys, Ruína Primordial",
+    "n": "Persys, Primordial Ruin",
     "obj": "Iniciar a purga do reator com Persys dentro e dar dano quando ele sair vulnerável.",
     "roles": [
      [
       "Nós",
-      "1 a 2 com Eletricista"
+      "1 a 2 com Arctrician"
      ],
      [
       "Isca",
@@ -1911,9 +1911,9 @@
      ]
     ],
     "steps": [
-     "Limpem a sala e matem as Hidras Carcereiras: surgem Minotauros Condutores.",
-     "Com Eletricista, atirem nos nós dos pilares e no de cima da porta para abrir o reator.",
-     "Ativem os nós; com 2 reatores aparece \"Purga Iminente\".",
+     "Limpem a sala e matem as Incarcerator Hydras: surgem Conduit Minotaurs.",
+     "Com Arctrician, atirem nos nós dos pilares e no de cima da porta para abrir o reator.",
+     "Ativem os nós; com 2 reatores aparece \"Reactor Purge Imminent\".",
      "Atraiam Persys para a sala do reator e corram para a sala segura.",
      "Ativem os nós dos pilares e o de cima da porta para trancá-lo.",
      "Com a purga concluída, ele sai vulnerável: dano e repitam."
@@ -1931,11 +1931,11 @@
   ],
   "enc": [
    {
-    "n": "Ritual da Colmeia",
-    "obj": "Usar o Vestígio de Luz nas estátuas certas 4 vezes para abrir a porta.",
+    "n": "Hive Ritual",
+    "obj": "Usar o Vestige of Light nas estátuas certas 4 vezes para abrir a porta.",
     "roles": [
      [
-      "Vestígio",
+      "Vestige",
       "1 leva o buff"
      ],
      [
@@ -1944,17 +1944,17 @@
      ]
     ],
     "steps": [
-     "Matem os dois da porta e o Ogro Atador de Almas.",
+     "Matem os dois da porta e o Soulfire Binder Ogre.",
      "Sigam a gosma verde até a primeira runa e decorem o símbolo.",
      "Limpem e sigam até a segunda e terceira runa.",
-     "Matem o Portador da Luz na terceira e finalizem o Fantasma dele: Vestígio de Luz.",
-     "Na porta, matem a Tecedora de Véus e revelem a ilusão (Visão Profunda).",
+     "Matem o Lightbearer na terceira e finalizem o Fantasma dele: Vestige of Light.",
+     "Na porta, matem a Veilweaver Wizard e revelem a ilusão (Deepsight).",
      "Imbuam a estátua do símbolo certo; repitam 4 vezes."
     ],
     "tip": "Estátua errada mata quem carrega e zera o progresso. Pardal acelera a volta."
    },
    {
-    "n": "Ecthar, o Escudo de Savathûn",
+    "n": "Ecthar, Shield of Savathûn",
     "obj": "Tocar 3 runas debaixo d'água, imbuir 3 estátuas e quebrar o escudo de Ecthar.",
     "roles": [
      [
@@ -1969,19 +1969,19 @@
     "steps": [
      "Matem os 4 Acólitos, os 3 Cavaleiros e o Ogro.",
      "Revelem a ilusão e anotem as 3 runas acesas nas paredes.",
-     "Um mergulha e toca cada runa certa, cuidando da Resistência à Pressão e do chefe.",
-     "Matem cada Feiticeira Portadora da Luz e o Fantasma: quem finaliza imbui uma estátua (3x).",
-     "Matem o Cavaleiro do Poço, entrem na poça e quebrem o escudo.",
+     "Um mergulha e toca cada runa certa, cuidando da Pressure Resistance e do chefe.",
+     "Matem cada Lightbearer Wizard e o Fantasma: quem finaliza imbui uma estátua (3x).",
+     "Matem o Wellkeeper Knight, entrem na poça e quebrem o escudo.",
      "Dano até ele ficar imune e repitam."
     ],
-    "tip": "Poço de Radiância quase obrigatório; evitem foguete no espaço apertado. A primeira Feiticeira já surge após a primeira runa."
+    "tip": "Well of Radiance quase obrigatório; evitem foguete no espaço apertado. A primeira Feiticeira já surge após a primeira runa."
    },
    {
-    "n": "Simmumah ur-Nokru, Necromante Lúcida",
+    "n": "Simmumah ur-Nokru, Lucent Necromancer",
     "obj": "Revelar 3 runas matando Vorlog nos pontos certos, imbuir os 3 pontos e dar dano.",
     "roles": [
      [
-      "Vestígio",
+      "Vestige",
       "1 entra na câmara"
      ],
      [
@@ -1994,7 +1994,7 @@
      "Vejam os 3 pontos ligados (o coração sempre é um).",
      "Fiquem num ponto até o chão brilhar e matem Vorlog; o coração por último.",
      "Olhem pela lente no céu para o símbolo: revela a runa. Repitam nos outros.",
-     "Na câmara d'água, matem o Portador da Luz e o Fantasma (60 s de Vestígio) e anotem a runa.",
+     "Na câmara d'água, matem o Lightbearer e o Fantasma (60 s de Vestige) e anotem a runa.",
      "Voltem, revelem e imbuam o ponto certo; 3 vezes e começa o dano."
     ],
     "tip": "Quebrem o escudo na poça com a Arbalest. Mods de resistência a Arco ajudam."
@@ -2010,8 +2010,8 @@
   ],
   "enc": [
    {
-    "n": "Rathil, Primeiro Cavaleiro Partido",
-    "obj": "Converter os totens Possuídos em totens de Stasis antes do Desejo Iminente e dar dano.",
+    "n": "Rathil, First Broken Knight",
+    "obj": "Converter os totens Possuídos em totens de Stasis antes do Imminent Wish e dar dano.",
     "roles": [
      [
       "Totens",
@@ -2023,24 +2023,24 @@
      ]
     ],
     "steps": [
-     "Limpem até serem enjaulados e atirem nos 3 Olhos de Acólito para sair.",
+     "Limpem até serem enjaulados e atirem nos 3 Acolyte Eyes para sair.",
      "Fiquem nos círculos dos totens até virarem Stasis.",
-     "Convertam o máximo antes do Desejo Iminente zerar.",
+     "Convertam o máximo antes do Imminent Wish zerar.",
      "Dano em Rathil (a fase dura mais quanto mais totens).",
      "Repitam e resolvam o enigma da prisão."
     ],
     "tip": "Fiquem entre dois círculos sobrepostos para converter os dois juntos. Crítico fácil: sniper, escopeta ou espada."
    },
    {
-    "n": "Lócus do Lamento",
-    "obj": "Depositar Cargas Solares nos 4 braseiros para abrir as fases de dano, controlando o Frio Cortante.",
+    "n": "Locus of Wailing Grief",
+    "obj": "Depositar Solar Charges nos 4 braseiros para abrir as fases de dano, controlando o Biting Cold.",
     "roles": [
      [
       "Totens",
       "1"
      ],
      [
-      "Cargas",
+      "Solar Charges",
       "1"
      ],
      [
@@ -2049,21 +2049,21 @@
      ]
     ],
     "steps": [
-     "Atirem num Olho de Acólito; destruam a próxima onda para surgir os Cavaleiros Partidos.",
-     "Convertam os totens: cada um dá uma Carga Solar quando o tempo zerar.",
+     "Atirem num Acolyte Eye; destruam a próxima onda para surgir os Broken Knights.",
+     "Convertam os totens: cada um dá uma Solar Charge quando o tempo zerar.",
      "Depositem até acender os 4 braseiros.",
      "Dano perto de um braseiro (dá buff).",
      "Quando acabar, passem para o próximo; após os 4, voltem e repitam."
     ],
-    "tip": "Com 10 acúmulos de Frio Cortante você morre: os estandartes da parede limpam."
+    "tip": "Com 10 acúmulos de Biting Cold você morre: os estandartes da parede limpam."
    },
    {
-    "n": "Vingança de Hefnd, Quimera Arruinada",
+    "n": "Hefnd's Vengeance, Blighted Chimaera",
     "obj": "Empurrar o chefe pela montanha em 3 fases nas ilhas e finalizar no topo sem limite de tempo.",
     "roles": [
      [
-      "Maldição",
-      "1 soca os Bebe-Malefícios"
+      "Hex",
+      "1 soca os Corrupted Hex-Drinkers"
      ],
      [
       "Totens/olhos",
@@ -2075,14 +2075,14 @@
      ]
     ],
     "steps": [
-     "Destruam a Praga Possuída e os Olhos em volta do chefe.",
+     "Destruam a Taken Blight e os Acolyte Eyes em volta do chefe.",
      "Convertam totens para prolongar o buff de dano.",
-     "Soquem os Bebe-Malefícios Corrompidos para pegar a Maldição e não deixem devolver.",
+     "Soquem os Corrupted Hex-Drinkers para pegar o Hex of Vengeful Corruption e não deixem devolver.",
      "Dano até o limite de vida e subam para a próxima ilha (anti-horário).",
      "Repitam nas 3 de baixo.",
-     "No topo, fiquem numa ilha, destruam Olhos para ganhar tempo e mudem quando ele mudar."
+     "No topo, fiquem numa ilha, destruam Acolyte Eyes para ganhar tempo e mudem quando ele mudar."
     ],
-    "tip": "Ele fica longe: foguete e sniper, nada de escopeta. O Disparo Solar limpa os Olhos rápido."
+    "tip": "Ele fica longe: foguete e sniper, nada de escopeta. Sunshot limpa os Acolyte Eyes rápido."
    }
   ]
  },
@@ -2095,15 +2095,15 @@
   ],
   "enc": [
    {
-    "n": "Ativação",
-    "obj": "Achar painéis seguros com Escâner e Operador e entregar 3 núcleos nucleares.",
+    "n": "Activation",
+    "obj": "Achar painéis seguros com Scanner e Operator e entregar 3 nuclear cores.",
     "roles": [
      [
-      "Escâner",
+      "Scanner",
       "1"
      ],
      [
-      "Operador",
+      "Operator",
       "1"
      ],
      [
@@ -2112,25 +2112,25 @@
      ]
     ],
     "steps": [
-     "Interajam com a esfera e matem até surgir o Portador Viral com Escâner.",
-     "No corredor, outro Portador dá Operador.",
-     "O Escâner olha o radar: painel que some é perigoso.",
-     "O Operador atira só nos seguros: surge um núcleo.",
+     "Interajam com a esfera e matem até surgir o Viral Carrier com Scanner.",
+     "No corredor, outro Viral Carrier dá Operator.",
+     "O Scanner olha o radar: painel que some é perigoso.",
+     "O Operator atira só nos seguros: surge um núcleo.",
      "Levem ao salão, matem o Brig e depositem.",
      "Repitam até 3; guardem Super e pesada para o Brig final."
     ],
-    "tip": "Segurar o núcleo dá Radiação; com 10 você morre. Larguem para baixar."
+    "tip": "Segurar o núcleo dá Radiation; com 10 você morre. Larguem para baixar."
    },
    {
-    "n": "Raneiks Unificado",
+    "n": "Raneiks Unified",
     "obj": "Achar os 4 painéis certos pelos servidores destacados e dar dano em 25 s.",
     "roles": [
      [
-      "Operador",
+      "Operator",
       "1"
      ],
      [
-      "Supressor",
+      "Suppressor",
       "1"
      ],
      [
@@ -2140,24 +2140,24 @@
     ],
     "steps": [
      "No caminho, levem núcleos aos baldes numerados em ordem e fujam da linha de visão do feixe de Raneiks.",
-     "Na sala central, deixem o Operador num terminal e matem o Sacerdote para subir.",
-     "Matem os Shanks até surgir o Shank Supressor e peguem o buff.",
+     "Na sala central, deixem o Operator num terminal e matem o Machine Priest para subir.",
+     "Matem os Shanks até surgir o Suppressor Shank e peguem o buff.",
      "Usem a granada para criar a isca perto do chefe e destruam: ele se divide.",
      "Anotem os 2 servidores com luzes extras; repitam até 4 números.",
-     "O Operador atira nos painéis certos e o Supressor usa o buff: 25 s de dano."
+     "O Operator atira nos painéis certos e o Suppressor usa o buff: 25 s de dano."
     ],
-    "tip": "Titãs Solares com Consagração e Arcanos com Canção da Chama vão bem; Parasita e Hálito do Dragão também."
+    "tip": "Titãs Solares com Consecration e Arcanos com Song of Flame vão bem; Parasite e Dragon's Breath também."
    },
    {
-    "n": "Atraks Soberana (Marionetista Corrompida)",
+    "n": "Atraks Sovereign (The Corrupted Puppeteer)",
     "obj": "Remover o escudo entregando 2 núcleos e dar dano no centro e nas laterais.",
     "roles": [
      [
-      "Escâner",
+      "Scanner",
       "1"
      ],
      [
-      "Operador",
+      "Operator",
       "1"
      ],
      [
@@ -2166,14 +2166,14 @@
      ]
     ],
     "steps": [
-     "Usem o Supressor perto das Marionetes e destruam a isca: cai o campo de Radiação.",
-     "Matem as Marionetes: surgem Escâner e Operador.",
-     "O Escâner lê os 4 pilares; o Operador atira no certo e nos painéis do número azul.",
+     "Usem o Suppressor perto das Broken Puppets e destruam a isca: cai o campo de Radiation.",
+     "Matem as Broken Puppets: surgem Scanner e Operator.",
+     "O Scanner lê os 4 pilares; o Operator atira no certo e nos painéis do número azul.",
      "Desçam pelo lado das luzes vermelhas e ativem os painéis da sala dos terminais.",
-     "Destruam a Marionete que fica branca no radar, peguem o núcleo e depositem; 2 vezes.",
+     "Destruam a Broken Puppet que fica branca no radar, peguem o núcleo e depositem; 2 vezes.",
      "No elevador, dano no centro e depois nas laterais; o núcleo extra dá mais tempo."
     ],
-    "tip": "Consagração limpa as Marionetes rápido; Sinal Perdido, Anarquia e Abertura Grandiosa ajudam no dano."
+    "tip": "Consecration limpa as Broken Puppets rápido; Lost Signal, Anarchy e Grand Overture ajudam no dano."
    }
   ]
  },
@@ -2186,7 +2186,7 @@
   ],
   "enc": [
    {
-    "n": "Enigma das Lentes",
+    "n": "Riddle (lentes)",
     "obj": "Levar feixes de escuridão pelas lentes até a placa do símbolo certo (1, 2 e 3 feixes).",
     "roles": [
      [
@@ -2195,26 +2195,26 @@
      ],
      [
       "Adds",
-      "2 matam Subjugadores e Grims"
+      "2 matam Subjugators e Grims"
      ]
     ],
     "steps": [
      "Girem a lente central para começar.",
-     "Descubram o símbolo que falta (Grim da Verdade ou o enigma).",
-     "Matem os Subjugadores das salas para ganhar lentes.",
+     "Descubram o símbolo que falta (Truthspeaker Grim ou o enigma).",
+     "Matem os Subjugators das salas para ganhar lentes.",
      "Achem a placa certa e tracem o caminho de volta pela lente mais próxima.",
      "Girem o suporte antes de pôr a lente (quebra após 3 giros).",
      "Completem 1, 2 e 3 feixes nas três fases."
     ],
-    "tip": "Círculo errado faz surgir um Atormentador no centro."
+    "tip": "Círculo errado faz surgir um Tormentor no centro."
    },
    {
-    "n": "Fechadura Zoética",
-    "obj": "Travar as 4 rodas em Parar e a da esquerda em Matar para abrir a fase de dano nos Uivadores.",
+    "n": "Zoetic Lockset",
+    "obj": "Travar as 4 rodas em Stop e a da esquerda em Kill para abrir a fase de dano nos Shriekers.",
     "roles": [
      [
       "Rodas",
-      "1 com Lascas"
+      "1 com Resonance Splinters"
      ],
      [
       "Dano",
@@ -2222,17 +2222,17 @@
      ]
     ],
     "steps": [
-     "Matem Feiticeiras para pegar Lascas de Ressonância (1 a 3).",
-     "Travem a roda da direita em Parar.",
-     "Rodas mostrando Colmeia: mudem logo para não vir Ogros.",
-     "As duas seguintes também em Parar.",
-     "A da esquerda em Matar: começa o dano.",
-     "Juntos, dano em um dos 4 Uivadores; repitam."
+     "Matem Feiticeiras para pegar Resonance Splinters (1 a 3).",
+     "Travem a roda da direita em Stop.",
+     "Rodas mostrando Hive: mudem logo para não vir Ogros.",
+     "As duas seguintes também em Stop.",
+     "A da esquerda em Kill: começa o dano.",
+     "Juntos, dano em um dos 4 Shriekers; repitam."
     ],
-    "tip": "Simulador do Dorminhoco e Abertura Grandiosa vão bem; Localizador de Munição ajuda."
+    "tip": "Sleeper Simulant e Grand Overture vão bem; Ammo Finder ajuda."
    },
    {
-    "n": "Kerrev, o Apagado",
+    "n": "Kerrev, the Erased",
     "obj": "Apontar as lentes para as mentiras, deixar o obelisco queimar o escudo e dar dano.",
     "roles": [
      [
@@ -2250,13 +2250,13 @@
     ],
     "steps": [
      "Leiam os 2 enigmas da placa central: um verdadeiro, um mentira.",
-     "Na dúvida, matem o Grim da Verdade de uma sala lateral.",
+     "Na dúvida, matem o Truthspeaker Grim de uma sala lateral.",
      "Nas salas, apontem os feixes para as mentiras.",
-     "Matem os Atendentes para Fortalecimento Não Escrito e quebrem as travas de Filamento.",
+     "Matem os Unwritten Attendants para Unwritten Empowerment e quebrem as travas de Strand.",
      "Com tudo pronto, apertem o botão da placa do meio.",
      "Protejam-se do obelisco e deem dano; repitam."
     ],
-    "tip": "Mod de resistência a Filamento muito recomendado."
+    "tip": "Mod de resistência a Strand muito recomendado."
    }
   ]
  },
@@ -2269,16 +2269,16 @@
   ],
   "enc": [
    {
-    "n": "Forças do Império Barant",
-    "obj": "Derrotar 6 Aprendizes Sem Nome e os Behemoths.",
+    "n": "Barant Imperium Forces",
+    "obj": "Derrotar 6 Nameless Apprentices e os Behemoths.",
     "roles": [
      [
-      "Sombra",
+      "Shadow",
       "1 usa a granada especial"
      ],
      [
       "Isca",
-      "1 leva Aprendizes ao aparelho"
+      "1 leva Nameless Apprentices ao aparelho"
      ],
      [
       "Adds",
@@ -2286,21 +2286,21 @@
      ]
     ],
     "steps": [
-     "Interajam com a nave: surgem 3 Aprendizes imunes.",
+     "Interajam com a nave: surgem 3 Nameless Apprentices imunes.",
      "Levem um ao aparelho Cabal perto da barreira vermelha.",
      "Ativem a ponta do aparelho para estender o pilar de Arco.",
      "O ataque de Escuridão dele carrega o aparelho e derruba a barreira.",
-     "Nos túneis de pardal, juntem Sombra até Noviço.",
-     "Usem a granada especial nos escudos; 6 Aprendizes e os Behemoths."
+     "Nos túneis de pardal, juntem Shadow até Shadow Novice.",
+     "Usem a granada especial nos escudos; 6 Nameless Apprentices e os Behemoths."
     ],
-    "tip": "Sem pegar Sombra nos túneis, as Sombras Rastejantes matam. Cápsulas de queda matam quem estiver embaixo."
+    "tip": "Sem pegar Shadow nos túneis, as Creeping Shadows matam. Cápsulas de queda matam quem estiver embaixo."
    },
    {
-    "n": "Harrow, Aprendiz Dredgen",
+    "n": "Harrow, Dredgen Apprentice",
     "obj": "Derrubar os escudos de Harrow com isca e pilares e dar dano nas janelas.",
     "roles": [
      [
-      "Sombra",
+      "Shadow",
       "1"
      ],
      [
@@ -2315,12 +2315,12 @@
     "steps": [
      "Atirem no fusível da sala da bandeira e caiam na arena.",
      "Limpem e esperem abrirem as portas laterais.",
-     "Matem os Lacaios até Noviço, depois Aprendiz.",
+     "Matem os Lackeys até Shadow Novice, depois Shadow Apprentice.",
      "Usem a granada no aparelho certo e acertem 3 painéis em cada sala.",
      "Atraiam Harrow para as portas do hangar ou para os 4 pilares.",
      "Dano em ~30 s; na divisão, persigam-no pelo corredor."
     ],
-    "tip": "Pilares e fusíveis não voltam: ~3 fases. Lâmina Práxica, Lenda de Acrius ou Parasita."
+    "tip": "Pilares e fusíveis não voltam: ~3 fases. Praxic Blade, Legend of Acrius ou Parasite."
    },
    {
     "n": "Dredgen Sere",
@@ -2328,7 +2328,7 @@
     "roles": [
      [
       "Compelidor",
-      "1 vira Mestre das Sombras"
+      "1 vira Shadow Master"
      ],
      [
       "Orbes",
@@ -2336,13 +2336,13 @@
      ],
      [
       "Suporte",
-      "1 (ideal Poço)"
+      "1 (ideal Well of Radiance)"
      ]
     ],
     "steps": [
      "Aproximem-se para começar, longe do golpe inicial.",
-     "Nos 45 s de Atração Sombria, juntem Sombra e matem Aprendizes.",
-     "Ao zerar, no plano Possuído, compilem as 5 Sombras.",
+     "Nos 45 s de Lure of the Dark, juntem Gathering Shadow e matem Nameless Apprentices.",
+     "Ao zerar, no plano Possuído, compelem os 5 Blistered Shadows.",
      "Acertem painéis para criar plataformas até a quinta.",
      "Voltem, destruam os últimos orbes e deem dano.",
      "Depois, nas bordas, parem os pilares de Arco com a granada."
