@@ -830,7 +830,12 @@ function titMeta(sec) {
 const actDefOf = (kind, key) => (kind === 'raid' ? defs.raids : kind === 'dg' ? defs.dungeons : kind === 'xm' ? (defs.xmissions || []) : []).find(x => x.k === key);
 // vídeos: um link ou uma lista [url, nome pt, nome en]; com mais de um, abre uma lista para escolher
 const YT_OK = x => /^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//.test(x || '');
-const ytList = a => (Array.isArray(a?.yt) ? a.yt : a?.yt ? [[a.yt]] : []).filter(x => YT_OK(x[0]));
+// + vídeos cadastrados pelo dono na página /videos (servidor), guardados no aparelho e relidos a cada 6 h
+let VID = LS.get('dc-vid', null);
+const vidKey = a => { for (const [k, l] of [['raid', defs.raids], ['dg', defs.dungeons], ['xm', defs.xmissions || []]]) if (l.includes(a)) return k + ':' + a.k; return ''; };
+function vidLoad() { if (VID?.at > Date.now() - 6 * 36e5 || vidLoad.busy || typeof APIW === 'undefined' || !APIW) return; vidLoad.busy = true;
+  fetch(APIW + '/videos').then(r => r.json()).then(j => { const m = {}; for (const v of j.list || []) (m[v.k] ||= []).push([v.url, v.pt || v.en, v.en || v.pt]); VID = { at: Date.now(), m }; LS.set('dc-vid', VID); render(); }).catch(() => {}).finally(() => { vidLoad.busy = false; }); }
+const ytList = a => { if (!VID || VID.at < Date.now() - 6 * 36e5) setTimeout(vidLoad); return [...(Array.isArray(a?.yt) ? a.yt : a?.yt ? [[a.yt]] : []), ...(a && VID?.m?.[vidKey(a)] || [])].filter(x => YT_OK(x[0])); };
 const ytId = url => { try { const x = new URL(url); return x.hostname === 'youtu.be' ? x.pathname.slice(1) : x.searchParams.get('v') || ''; } catch { return ''; } };
 const actYt = (kind, key) => { const a = actDefOf(kind, key); if (!a) return ''; const yl = ytList(a);
   const v = yl.length === 1 ? `<a class="chip yt" href="${esc(yl[0][0])}" target="_blank" rel="noopener">▶ ${esc(u().ytGuide)}</a>` : yl.length > 1 ? `<button type="button" class="chip yt" data-ytl="${kind}:${esc(key)}">▶ ${esc(u().ytMany(yl.length))}</button>` : ''; return v + (a.gi?.length ? `<button type="button" class="chip gi" data-gal="${kind}:${esc(key)}">🖼 ${esc(u().giBtn(a.gi.length))}</button>` : ''); };
@@ -3083,7 +3088,7 @@ function adminHTML() {
   const gl = ga ? [...all, { n: (member.name || '').replace(/#\d+$/, ''), mid: member.id, on: true }].map(x => ({ x, v: GMET[x.mid]?.v === 2 ? actBadges(ga, h => GMET[x.mid].x?.[h]).g : 0 })).filter(r => r.v > 0).sort((a, b) => b.v - a.v).slice(0, 8) : [];
   const gT = `<section class="ad-s"><h2>${esc(T.gT)}</h2><small class="lbd-n">${esc(T.gN)}</small><label class="lbd-act"><span>${esc(T.act)}</span><select id="adg">${acts.map(([, a]) => `<option value="${a.k}"${ga === a ? ' selected' : ''}>${esc(L(a.n))}</option>`).join('')}</select></label>${gl.map(r => `<span class="ad-g"><span><b>${esc(r.x.n)}</b>${r.x.on ? ' <small class="ok">● online</small>' : ''}</span><b class="m acc">${esc(T.guided(r.v))}</b></span>`).join('') || `<p class="lbd-n">${esc(T.noG)}</p>`}${ga ? `<div class="ad-gcp"><button type="button" class="lbd-btn pri" data-adcp="first">📋 ${esc(T.cpFirst)}</button><small class="lbd-n">${esc(T.cpFirstN)}</small></div>` : ''}</section>`;
   const cpT = `<section class="ad-s ad-cp"><h2>${esc(T.copyT)}</h2><small class="lbd-n">${esc(T.copyN)}</small><div class="ad-cpb">${Object.entries(T.cp).map(([k, t]) => `<button type="button" class="lbd-btn" data-adcp="${k}">📋 ${esc(t)}</button>`).join('')}</div></section>`;
-  return `<div class="ad-only"><b>${esc(T.only)}</b><span>${esc(T.onlyN)}</span></div>${AD.msg ? `<p class="iv-msg${AD.msg.bad ? ' bad' : ''}">${esc(AD.msg.t)}</p>` : ''}${inT}${socHTML()}<section class="ad-s ad-wide ad-rec"><h2>${esc(T.recT)}</h2><div class="ad-rec-c">${reqT}${promoT}${newT}</div></section>${gT}`;
+  return `<div class="ad-only"><b>${esc(T.only)}</b><span>${esc(T.onlyN)}</span>${LS.get('dc-ownchk', {}).o ? `<a class="lbd-btn" href="/videos" style="margin-left:auto;text-decoration:none">▶ ${lang === 'pt' ? 'Vídeos de guia' : 'Guide videos'}</a>` : ''}</div>${AD.msg ? `<p class="iv-msg${AD.msg.bad ? ' bad' : ''}">${esc(AD.msg.t)}</p>` : ''}${inT}${socHTML()}<section class="ad-s ad-wide ad-rec"><h2>${esc(T.recT)}</h2><div class="ad-rec-c">${reqT}${promoT}${newT}</div></section>${gT}`;
 }
 function adCopy(k) {
   const T = adt(), C = GD.clan, now = Date.now(), all = C.list, seen = x => x.t > 864e5 * 365, d = t => Math.round((now - t) / 864e5);

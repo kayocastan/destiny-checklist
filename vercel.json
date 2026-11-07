@@ -59,6 +59,10 @@
       "destination": "/estado.html"
     },
     {
+      "source": "/videos",
+      "destination": "/videos.html"
+    },
+    {
       "source": "/grade",
       "destination": "/index.html"
     },

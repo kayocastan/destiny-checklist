@@ -12,7 +12,7 @@ const MAX_VALUE = 400_000;         // tamanho máximo de cada valor sincronizado
 
 const cors = req => ({
   'Access-Control-Allow-Origin': req.headers.get('Origin') || '*',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-API-Key',
   'Access-Control-Max-Age': '86400',
   Vary: 'Origin',
@@ -411,6 +411,19 @@ async function visits(env) {
   ]);
   return { today: t?.n || 0, todayLogged: t?.l || 0, d7: w?.n || 0, d30: m?.n || 0, total: all?.n || 0, since: all?.since || null, days };
 }
+// CMS de vídeos: só o dono do site cadastra, edita e apaga
+async function videosEdit(req, env, path) {
+  const uid = await who(req, env); if (!uid) return json(req, { error: 'auth' }, 401);
+  if (uid !== String(env.OWNER)) return json(req, { error: 'forbidden' }, 403);
+  const id = Number(path.split('/')[2] || 0), yt = u => /^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//.test(u || '');
+  if (req.method === 'DELETE' && id) { await env.DB.prepare('DELETE FROM vid WHERE id = ?').bind(id).run(); return json(req, { ok: true }); }
+  const b = await req.json().catch(() => null);
+  if (!b || !/^(raid|dg|xm):[\w-]{1,40}$/.test(b.k || '') || !yt(b.url)) return json(req, { error: 'Atividade ou link do YouTube inválido.' }, 400);
+  const pt = String(b.pt || '').slice(0, 80), en = String(b.en || '').slice(0, 80), ord = Number(b.ord) || 0;
+  if (req.method === 'PUT' && id) { await env.DB.prepare('UPDATE vid SET k = ?, url = ?, pt = ?, en = ?, ord = ?, at = ? WHERE id = ?').bind(b.k, b.url, pt, en, ord, Date.now(), id).run(); return json(req, { ok: true, id }); }
+  if (req.method === 'POST' && !id) { const r = await env.DB.prepare('INSERT INTO vid (k, url, pt, en, ord, at) VALUES (?, ?, ?, ?, ?, ?)').bind(b.k, b.url, pt, en, ord, Date.now()).run(); return json(req, { ok: true, id: r.meta.last_row_id }); }
+  return json(req, { error: 'method' }, 405);
+}
 async function stats(req, env) {
   const uid = await who(req, env);
   if (!uid) return json(req, { error: 'auth' }, 401);
@@ -463,6 +476,11 @@ export default {
       if (path === '/clan/social/backfill' && req.method === 'POST') return await socialBackfill(req, env, new URL(req.url));
       if (path === '/hit' && req.method === 'POST') return await hit(req, env);
       if (path === '/pub' && req.method === 'POST') return await pubPost(req, env);
+      if (path === '/videos' && req.method === 'GET') { // vídeos de guia do CMS (página /videos do dono), lidos por todos
+        const r = await env.DB.prepare('SELECT id, k, url, pt, en, ord FROM vid ORDER BY k, ord, id').all().catch(() => ({ results: [] }));
+        return new Response(JSON.stringify({ list: r.results }), { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=300', ...cors(req) } });
+      }
+      if (path === '/videos' || path.startsWith('/videos/')) return await videosEdit(req, env, path);
       if (path === '/sug' && req.method === 'POST') return await sugPost(req, env);
       if (path === '/sug/read' && req.method === 'POST') return await sugRead(req, env);
       if (path.startsWith('/pubimg/') && req.method === 'POST') return await pubImgPost(req, env, path.slice(8));
