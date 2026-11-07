@@ -455,7 +455,7 @@ export default {
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(req) });
     const path = new URL(req.url).pathname;
     try {
-      if (path !== '/stats' && path !== '/whoami' && !path.startsWith('/page/') && !path.startsWith('/gpage/') && !(path.startsWith('/pubimg/') && req.method === 'GET') && (await brake(env)) >= 2) return json(req, { error: 'brake' }, 503);
+      if (path !== '/stats' && path !== '/whoami' && path !== '/health' && !path.startsWith('/page/') && !path.startsWith('/gpage/') && !(path.startsWith('/pubimg/') && req.method === 'GET') && (await brake(env)) >= 2) return json(req, { error: 'brake' }, 503);
       if (path === '/defs' && req.method === 'POST') return await defs(req, env);
       if (path === '/sync' && (req.method === 'GET' || req.method === 'PUT')) return await sync(req, env);
       if (path === '/clan/notice' || path === '/clan/hours') return await clanRoute(req, env, path, new URL(req.url));
@@ -471,6 +471,10 @@ export default {
       if (path.startsWith('/page/') && req.method === 'GET') return await pubPage(req, env, path.slice(6));
       if (path.startsWith('/gpage/') && req.method === 'GET') return await gPage(req, env, path.slice(7));
       if (path === '/stats' && req.method === 'GET') return await stats(req, env);
+      if (path === '/health' && req.method === 'GET') { // página pública /estado: o servidor responde e quando foi a última rodada de hora em hora
+        const b = await env.DB.prepare("SELECT v FROM meta WHERE k = 'brake'").first().catch(() => null), m = b ? JSON.parse(b.v) : null;
+        return json(req, { ok: true, now: Date.now(), hourly: m?.at || null, brake: m?.level || 0 });
+      }
       if (path === '/whoami' && req.method === 'GET') { const uid = await who(req, env), owner = !!uid && uid === String(env.OWNER); const sug = owner ? (await env.DB.prepare('SELECT COUNT(*) n FROM sug WHERE rd = 0').first().catch(() => null))?.n || 0 : undefined; return json(req, { uid, owner, sug }); }
       if (path === '/') return json(req, { ok: true, service: 'dni-api' });
       return json(req, { error: 'not found' }, 404);

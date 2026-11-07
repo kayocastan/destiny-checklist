@@ -145,3 +145,20 @@ export async function syncPlayerActivities(env, discordId, curatedId) {
   await db.batch(stmts);
   return out;
 }
+
+// Presença: a conta jogou alguma das atividades (hashes) entre from e to? (histórico público de cada personagem)
+// true = jogou, false = não jogou, null = não deu para saber (perfil privado, erro)
+export async function playedBetween(env, membership, hashes, mode, fromMs, toMs) {
+  try {
+    const p = await request(env, 'GET', `/Destiny2/${membership.membershipType}/Profile/${membership.membershipId}/?components=Profiles`);
+    const chars = p.profile?.data?.characterIds || []; if (!chars.length) return null;
+    for (const c of chars) {
+      const h = await request(env, 'GET', `/Destiny2/${membership.membershipType}/Account/${membership.membershipId}/Character/${c}/Stats/Activities/?mode=${mode}&count=15`);
+      for (const a of h.activities || []) {
+        const t = Date.parse(a.period), ref = a.activityDetails?.referenceId, dir = a.activityDetails?.directorActivityHash;
+        if (t >= fromMs && t <= toMs && (hashes.has(ref) || hashes.has(dir))) return true;
+      }
+    }
+    return false;
+  } catch (e) { if (e instanceof BungieApiError) return null; throw e; }
+}

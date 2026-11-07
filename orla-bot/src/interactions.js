@@ -145,6 +145,16 @@ async function buttonPress(env, ctx, i) {
   return json({ type: 6 });
 }
 
+// ---------- /orla agenda ----------
+async function commandAgenda(env) {
+  const rows = (await env.DB.prepare(`SELECT a.id, a.name, a.capacity cap, a.starts_at s, a.discord_channel_id c, a.discord_message_id m,
+    (SELECT COUNT(*) FROM activity_participants p WHERE p.activity_id = a.id AND p.category = 'titular') tit FROM activities a ORDER BY replace(a.starts_at, ' ', 'T') LIMIT 15`).all()).results;
+  if (!rows.length) return ephemeral('Nenhuma grade marcada agora. Crie uma com `/orla grade` ou pelo site: ' + env.SITE_URL + '/grade');
+  const lines = rows.map(r => { const t = Math.floor(Date.parse(String(r.s).replace(' ', 'T')) / 1000), link = r.c && r.m ? ` · [abrir](https://discord.com/channels/${env.DISCORD_GUILD_ID}/${r.c}/${r.m})` : '';
+    return `**<t:${t}:f>** (<t:${t}:R>) · ${escapeMarkdown(r.name)} · ${r.tit}/${r.cap}${r.tit >= r.cap ? ' ✅' : ''}${link}`; });
+  return ephemeral(`📅 **Agenda do clã**\n${lines.join('\n')}\n\nNo site: ${env.SITE_URL}/grade`.slice(0, 1990));
+}
+
 // ---------- autocomplete ----------
 async function autocomplete(env, i, sub) {
   const focused = sub.options?.find(o => o.focused);
@@ -161,6 +171,7 @@ async function route(env, ctx, i) {
     if (i.type === 4) return sub?.name === 'grade' ? autocomplete(env, i, sub) : json({ type: 8, data: { choices: [] } });
     if (sub?.name === 'grade') return commandGrade(env, ctx, i, opts);
     if (sub?.name === 'registrar') return commandRegister(env, ctx, i, opts);
+    if (sub?.name === 'agenda') return commandAgenda(env);
     return json(ephemeral('Comando desconhecido.'));
   }
   if (i.type === 3 && i.data.custom_id?.startsWith('orla:activity:')) return buttonPress(env, ctx, i);

@@ -187,6 +187,27 @@ describe('API do DPI', () => {
     await env.DB.prepare(`UPDATE activities SET created_by_discord_id = '99' WHERE id = ?`).bind(id).run();
     r = await api(`/grades/${id}`, { method: 'PUT', body: JSON.stringify(body) }); expect(r.status).toBe(400);
   });
+  it('presença: 4 h depois, confere no histórico se cada titular jogou', async () => {
+    await link('10');
+    await env.DB.prepare(`INSERT INTO users (discord_user_id, discord_member_name, bungie_membership_id, bungie_membership_type, bungie_name, linked_at) VALUES ('20', 'b', '4612', 3, 'Outro#0001', 'x')`).run();
+    const grp = (await env.DB.prepare(`SELECT eligibility_group g FROM curated_bungie_activities WHERE id = 3`).first()).g; // Fim de Crota: Normal
+    const hash = (await env.DB.prepare('SELECT bungie_id h FROM bungie_activities WHERE eligibility_group = ?').bind(grp).first()).h;
+    const t0 = new Date(Date.now() - 5 * 36e5);
+    await env.DB.prepare(`INSERT INTO grade_hist (id, name, curated_id, capacity, starts_at, created_by, archived_at) VALUES (500, 'Fim de Crota: Normal', 3, 6, ?, '10', 'x')`).bind(t0.toISOString()).run();
+    await env.DB.prepare(`INSERT INTO grade_hist_p (activity_id, discord_user_id, category) VALUES (500, '10', 'titular'), (500, '20', 'titular')`).run();
+    vi.stubGlobal('fetch', vi.fn(async url => { const u = String(url);
+      if (u.includes('/Profile/')) return new Response(JSON.stringify({ ErrorCode: 1, Response: { profile: { data: { characterIds: ['c1'] } } } }));
+      if (u.includes('/Stats/Activities/')) return new Response(JSON.stringify({ ErrorCode: 1, Response: { activities: u.includes('/4611/') ? [{ period: new Date(t0.getTime() + 6e5).toISOString(), activityDetails: { referenceId: hash } }] : [] } }));
+      return new Response(null, { status: 204 }); }));
+    await worker.scheduled({}, env, ctx); await flush();
+    expect((await env.DB.prepare('SELECT discord_user_id d, played FROM grade_hist_p WHERE activity_id = 500 ORDER BY d').all()).results).toEqual([{ d: '10', played: 1 }, { d: '20', played: 0 }]);
+    expect((await env.DB.prepare('SELECT checked_at FROM grade_hist WHERE id = 500').first()).checked_at).toBeTruthy();
+  });
+  it('/orla agenda lista as grades marcadas', async () => {
+    await env.DB.prepare(`INSERT INTO activities (name, capacity, starts_at, description, created_by_discord_id, created_at) VALUES ('Crota', 6, ?, '', '1', 'x')`).bind(new Date(Date.now() + 36e5).toISOString()).run();
+    const r = await post(slash('agenda', []));
+    expect(r.body.type).toBe(4); expect(r.body.data.content).toMatch(/Agenda do clã[\s\S]*Crota · 0\/6/);
+  });
   it('/clan/panel: só admin; soma grades guardadas e abertas por pessoa', async () => {
     expect((await api('/clan/panel')).status).toBe(403); // membro comum (sem memberType)
     env.OWNER = '55'; // dono do DPI (conta Bungie.net do teste) vê mesmo sem ser admin

@@ -5,10 +5,11 @@
    Cron (1 min): apaga grades que começaram há mais de 1 hora. */
 import { handleInteraction } from './interactions.js';
 import { verifySignature, oauthUser, deleteMessage, DiscordError } from './discord.js';
-import { BungieApiError, currentUser, upsertUser, userGroups } from './bungie.js';
+import { BungieApiError, currentUser, upsertUser, userGroups, playedBetween } from './bungie.js';
 import { ActivityInputError } from './rules.js';
 import { createGrade, CATALOG_PREFIX, applySignup, editGrade } from './grades.js';
 import { catalog, searchActivities, matchActivity } from './search.js';
+import { commands } from './commands.js';
 
 const ORIGINS = ['https://destinyparallel.vercel.app', 'https://destiny-checklist.vercel.app'];
 const cors = req => {
@@ -63,7 +64,7 @@ const isAdmin = (env, me) => me.role >= 3 || (env.OWNER && me.uid === String(env
 async function clanPanel(env, days) {
   const since = new Date(Date.now() - days * 864e5).toISOString(), db = env.DB;
   const all = sql => db.prepare(sql).bind(since).all().then(r => r.results);
-  const [users, part, made, grades, exp, first] = await Promise.all([
+  const [users, part, made, grades, exp, first, pres] = await Promise.all([
     db.prepare('SELECT discord_user_id d, discord_member_name n, bungie_membership_id m, bungie_name b, linked_at at FROM users').all().then(r => r.results),
     all(`SELECT p.discord_user_id d, p.category c, SUM(CASE WHEN p.is_rookie = 1 THEN 1 ELSE 0 END) rk, COUNT(*) n, MAX(g.starts_at) last FROM (
            SELECT activity_id, discord_user_id, category, is_rookie FROM grade_hist_p UNION ALL SELECT activity_id, discord_user_id, category, is_rookie FROM activity_participants
@@ -77,8 +78,10 @@ async function clanPanel(env, days) {
     db.prepare(`SELECT pa.user_discord_id d, ba.eligibility_group g, MIN(ba.name) a, MIN(ba.type) t, SUM(pa.clear_count) c, MAX(pa.skill) s, MAX(pa.checked_at) at
                 FROM player_activities pa JOIN bungie_activities ba ON ba.bungie_id = pa.activity_bungie_id GROUP BY pa.user_discord_id, ba.eligibility_group`).all().then(r => r.results),
     db.prepare('SELECT MIN(archived_at) t FROM grade_hist').first(),
+    all(`SELECT p.discord_user_id d, SUM(CASE WHEN p.played = 1 THEN 1 ELSE 0 END) ok, SUM(CASE WHEN p.played = 0 THEN 1 ELSE 0 END) no FROM grade_hist_p p JOIN grade_hist g ON g.id = p.activity_id
+         WHERE p.category = 'titular' AND p.played IS NOT NULL AND replace(g.starts_at, ' ', 'T') >= ? GROUP BY p.discord_user_id`),
   ]);
-  return { days, users, part, made, grades, exp, histSince: first?.t || null, at: Date.now() };
+  return { days, users, part, made, grades, exp, pres, histSince: first?.t || null, at: Date.now() };
 }
 const registered = (env, ids) => env.DB.prepare(`SELECT * FROM users WHERE bungie_membership_id IN (${ids.map(() => '?').join(',')}) ORDER BY linked_at DESC LIMIT 1`).bind(...ids).first();
 
@@ -107,6 +110,11 @@ async function api(req, env, url) {
     return json(req, { activities: rows.map(({ id, name, type }) => ({ id, name, type })) });
   }
 
+  if (path === '/admin/commands' && req.method === 'POST') { // dono do DPI: registra os comandos /orla com o token guardado no Cloudflare
+    if (!(env.OWNER && me.uid === String(env.OWNER))) return json(req, { error: 'forbidden' }, 403);
+    const r = await fetch(`https://discord.com/api/v10/applications/${env.DISCORD_APP_ID}/guilds/${env.DISCORD_GUILD_ID}/commands`, { method: 'PUT', headers: { Authorization: `Bot ${env.DISCORD_TOKEN}`, 'Content-Type': 'application/json' }, body: JSON.stringify(commands) });
+    return json(req, { ok: r.ok, status: r.status, names: r.ok ? (await r.json()).map(c => c.name) : null }, r.ok ? 200 : 502);
+  }
   if (path === '/clan/panel' && req.method === 'GET') {
     if (!isAdmin(env, me)) return json(req, { error: 'forbidden' }, 403);
     const d = [30, 90, 365].includes(Number(url.searchParams.get('days'))) ? Number(url.searchParams.get('days')) : 30;
@@ -183,6 +191,27 @@ async function api(req, env, url) {
   return json(req, { error: 'not found' }, 404);
 }
 
+/* Presença: 4 h depois do início, confere (uma grade por minuto) se cada titular jogou a incursão/masmorra da grade. */
+async function presence(env) {
+  if (!env.BUNGIE_API_KEY) return;
+  const cut = new Date(Date.now() - 4 * 3600_000).toISOString(), old = new Date(Date.now() - 7 * 864e5).toISOString();
+  const g = await env.DB.prepare(`SELECT h.id, h.starts_at s, cb.eligibility_group grp FROM grade_hist h LEFT JOIN curated_bungie_activities cb ON cb.id = h.curated_id
+    WHERE h.checked_at IS NULL AND replace(h.starts_at, ' ', 'T') <= ? ORDER BY h.starts_at LIMIT 1`).bind(cut).first();
+  if (!g) return;
+  const done = () => env.DB.prepare('UPDATE grade_hist SET checked_at = ? WHERE id = ?').bind(new Date().toISOString(), g.id).run();
+  const kind = String(g.grp || '').split(':')[0].toLowerCase(), mode = kind === 'raid' ? 4 : kind === 'dungeon' ? 82 : null;
+  if (!mode || String(g.s) < old) return done(); // título livre, missão exótica ou antiga demais: não confere
+  const hashes = new Set((await env.DB.prepare('SELECT bungie_id FROM bungie_activities WHERE eligibility_group = ?').bind(g.grp).all()).results.map(r => r.bungie_id));
+  const t0 = Date.parse(String(g.s).replace(' ', 'T')), tit = (await env.DB.prepare(`SELECT p.discord_user_id d, u.bungie_membership_id m, u.bungie_membership_type t FROM grade_hist_p p LEFT JOIN users u ON u.discord_user_id = p.discord_user_id WHERE p.activity_id = ? AND p.category = 'titular'`).bind(g.id).all()).results;
+  const stmts = [];
+  for (const p of tit) {
+    const v = p.m && hashes.size ? await playedBetween(env, { membershipId: p.m, membershipType: p.t }, hashes, mode, t0 - 3600_000, t0 + 4 * 3600_000) : null;
+    stmts.push(env.DB.prepare('UPDATE grade_hist_p SET played = ? WHERE activity_id = ? AND discord_user_id = ?').bind(v == null ? null : v ? 1 : 0, g.id, p.d));
+  }
+  if (stmts.length) await env.DB.batch(stmts);
+  await done();
+}
+
 async function cleanup(env) {
   const cutoff = new Date(Date.now() - 3600_000).toISOString();
   const rows = (await env.DB.prepare(`SELECT id, discord_channel_id c, discord_message_id m FROM activities WHERE replace(starts_at, ' ', 'T') <= ?`).bind(cutoff).all()).results;
@@ -211,6 +240,7 @@ export default {
         if (!(await verifySignature(req, text, env.DISCORD_PUBLIC_KEY))) return new Response('assinatura inválida', { status: 401 });
         return await handleInteraction(env, ctx, JSON.parse(text));
       }
+      if (url.pathname === '/health') { const n = await env.DB.prepare('SELECT COUNT(*) n FROM activities').first().catch(() => null); return json(req, { ok: true, now: Date.now(), open: n?.n ?? null }); } // página pública /estado do DPI
       if (url.pathname === '/') return new Response('Orla Bot', { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
       return await api(req, env, url);
     } catch (e) {
@@ -218,5 +248,5 @@ export default {
       return json(req, { error: 'erro interno' }, 502);
     }
   },
-  async scheduled(_ev, env, ctx) { ctx.waitUntil(cleanup(env)); },
+  async scheduled(_ev, env, ctx) { ctx.waitUntil(cleanup(env).then(() => presence(env)).catch(e => console.error('cron', e?.stack || e))); },
 };
