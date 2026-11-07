@@ -2190,3 +2190,6 @@ html.grade .ob-opt{font-size:16px}
 .t3-big:not(.open)>.t3-acts{grid-column:2;grid-row:1/span 4;align-self:center;flex-direction:column;align-items:stretch}.t3-big:not(.open) .t3-ex{margin-left:0;justify-content:center}
 @media (max-width:640px){.t3-big:not(.open){grid-template-columns:1fr}.t3-big:not(.open)>.t3-acts{grid-column:1;grid-row:auto;flex-direction:row}}
 .vidbtn{background:rgba(255,80,80,.12)!important;border-color:rgba(255,80,80,.5)!important}
+.t3-big:not(.open)>.t3-acts{display:grid;grid-template-columns:repeat(2,auto);flex-direction:unset}
+.t3-big:not(.open)>.t3-acts>*{justify-content:center;text-align:center}
+@media (max-width:640px){.t3-big:not(.open)>.t3-acts{display:flex}}
