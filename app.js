@@ -905,8 +905,8 @@ function gfsOpen(k) {
       if (v === 'x') { d.close(); return; }
       if (v === '+' || v === '-') { GFS.z = Math.max(-1, Math.min(3, GFS.z + (v === '+' ? 1 : -1))); LS.set('dc-gfs-z', GFS.z); d.style.setProperty('--gz', 1 + GFS.z * .12); return; }
       if (v === 'r') { GFS.r = GFS.r ? 0 : 1; LS.set('dc-gfs-r', GFS.r); d.classList.toggle('nor', !GFS.r); t.classList.toggle('on', !!GFS.r); return; }
-      if (v.startsWith('#')) d.querySelector(v)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
-    d.addEventListener('scroll', () => { const cs = [...d.querySelectorAll('.gfs-cd')], y = d.scrollTop + 220; let on = 0; cs.forEach((c, i) => { if (c.offsetTop <= y) on = i; });
+      if (v.startsWith('#')) { const i = +v.slice(4); d.gfsJump = i; clearTimeout(d.gfsT); d.gfsT = setTimeout(() => { d.gfsJump = null; }, 900); d.querySelectorAll('.gfs-rl a').forEach((x, j) => x.classList.toggle('on', j === i)); d.querySelector(v)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
+    d.addEventListener('scroll', () => { const cs = [...d.querySelectorAll('.gfs-cd')], y = d.scrollTop + 220; let on = 0; cs.forEach((c, i) => { if (c.offsetTop <= y) on = i; }); if (d.scrollTop + d.clientHeight >= d.scrollHeight - 4 && !d.gfsJump) on = cs.length - 1; if (d.gfsJump != null) on = d.gfsJump;
       d.querySelectorAll('.gfs-rl a').forEach((x, i) => x.classList.toggle('on', i === on)); }, { passive: true }); }
   const TL = { enc: P ? 'Encontro' : 'Encounter', pas: P ? 'Passagem' : 'Passage', boss: P ? 'Chefe' : 'Boss', final: P ? 'Chefe final' : 'Final boss' };
   const ty = e => e.t || (/\(passagem\)/.test(e.n) ? 'pas' : 'enc'), nm = e => e.n.replace(/\s*\(passagem\)/, '');
