@@ -3,16 +3,18 @@
     "id": "2026-11-07",
     "de": "2026-11-01",
     "ate": "2026-11-07",
-    "titulo": "Grade do clã, builds mais certeiras e painel Hoje",
+    "titulo": "Grade do clã, novo Esta semana e builds mais certeiras",
     "itens": [
-      ["📅", "Grade do clã", "Membros da Orla ganharam o atalho Grade no topo: crie grades de incursão, masmorra ou missão exótica (até 6 meses à frente, horário de 10 em 10 min) e entre, fique na reserva ou saia direto pelo site. O Discord marca os confirmados e quem criou pode editar."],
-      ["🗓️", "Agenda do clã", "Cada grade aparece com a imagem da atividade ao fundo e botões para os vídeos e as imagens do guia."],
+      ["📅", "Grade do clã", "Membros da Orla ganharam o atalho Grade no topo: crie grades de incursão, masmorra ou missão exótica (até 6 meses à frente, horário de 10 em 10 min), com a busca que entende nome com acento errado ou em inglês. Entre, fique na reserva ou saia direto pelo site; quem criou pode editar e o Discord marca os confirmados. Depois de criar, um botão põe a grade na sua agenda (Google ou celular), e uma linha mostra quem do clã nunca fez e quem pode guiar."],
+      ["🗓️", "Agenda do clã", "As grades marcadas aparecem no /grade e agora também em Clã › Membros, com a imagem da atividade ao fundo, os vídeos e imagens do guia e os botões Entrar, Reserva e Sair. No Discord, /orla agenda lista as grades da semana."],
       ["🛠️", "Builds", "Aplicar build ficou mais certeiro: troca os exóticos um a um, pula (e lista pelo nome) aspectos, fragmentos e mods que você ainda não tem e confere o que realmente ficou equipado."],
       ["💾", "Loadouts", "Botão Equipar no cartão dos loadouts do jogo, e Gravar no jogo com nome, cor, ícone e checklist numa tela só; depois de gravar, você volta ao que estava usando."],
-      ["☀️", "Hoje", "Painel único: escolha Como você vai jogar? (Sozinho, Até 3 ou Grupo de 6) e veja só o que serve para você, com a rotação da semana compacta e a missão da semana."],
+      ["🎯", "Arsenal", "Os contadores Com rolo bom, Parcial e Nada de bom viraram filtros (um clique liga, outro desliga), e a busca do inventário acha armas pela vantagem: escreva perk:frenesi, por exemplo."],
+      ["☀️", "Hoje", "Novo Esta semana para você: escolha Como você vai jogar? e os destaques aparecem grandes, com vídeos, imagens, Guia, 1ª vez, Marcar grade e detalhes que abrem; no Sozinho entram as missões da semana com o local. No topo, a próxima grade do clã."],
       ["👥", "Clã", "Membros mostra 12 com Ver todos, e o mapa de horários do clã se atualiza sozinho, sem ninguém precisar abrir o site."],
-      ["🛡️", "Para admins", "Quem joga com quem (enturmados e isolados, com busca e detalhe por pessoa), Entrada no clã com pedidos, promoções e novatos juntos, e a aba Discord do clã com o registro e a participação no Orla Bot."],
-      ["🧭", "Visual", "Ao abrir já logado, o topo mostra seu guardião direto, sem piscar a tela de entrada."]
+      ["🛡️", "Para admins", "Quem joga com quem (enturmados e isolados, com busca e detalhe por pessoa), Entrada no clã com pedidos, promoções e novatos juntos, e a aba Discord do clã com o registro no Orla Bot, a participação nas grades e a presença: quem confirmou e jogou mesmo."],
+      ["🧭", "Visual", "Ao abrir já logado, o topo mostra seu guardião direto, sem piscar a tela de entrada."],
+      ["🟢", "Status", "Nova página /estado (link no rodapé) mostra se o site, o servidor, o Orla Bot e a API da Bungie estão funcionando e a hora da última leitura do clã."]
     ]
   },
   {
