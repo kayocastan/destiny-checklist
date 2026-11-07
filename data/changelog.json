@@ -1,37 +1,118 @@
 [
-  {
-    "id": "2026-11-07",
-    "de": "2026-11-01",
-    "ate": "2026-11-07",
-    "titulo": "Grade do clã, novo Esta semana e builds mais certeiras",
-    "itens": [
-      ["📅", "Grade do clã", "Membros da Orla ganharam o atalho Grade no topo: crie grades de incursão, masmorra ou missão exótica (até 6 meses à frente, horário de 10 em 10 min), com a busca que entende nome com acento errado ou em inglês. Entre, fique na reserva ou saia direto pelo site; quem criou pode editar e o Discord marca os confirmados. Depois de criar, um botão põe a grade na sua agenda (Google ou celular), e uma linha mostra quem do clã nunca fez e quem pode guiar."],
-      ["🗓️", "Agenda do clã", "As grades marcadas aparecem no /grade e agora também em Clã › Membros, com a imagem da atividade ao fundo, os vídeos e imagens do guia e os botões Entrar, Reserva e Sair. No Discord, /orla agenda lista as grades da semana."],
-      ["🛠️", "Builds", "Aplicar build ficou mais certeiro: troca os exóticos um a um, pula (e lista pelo nome) aspectos, fragmentos e mods que você ainda não tem e confere o que realmente ficou equipado."],
-      ["💾", "Loadouts", "Botão Equipar no cartão dos loadouts do jogo, e Gravar no jogo com nome, cor, ícone e checklist numa tela só; depois de gravar, você volta ao que estava usando."],
-      ["🎯", "Arsenal", "Os contadores Com rolo bom, Parcial e Nada de bom viraram filtros (um clique liga, outro desliga), e a busca do inventário acha armas pela vantagem: escreva perk:frenesi, por exemplo."],
-      ["☀️", "Hoje", "Novo Esta semana para você: escolha Como você vai jogar? e os destaques aparecem grandes, com vídeos, imagens, Guia, 1ª vez, Marcar grade e detalhes que abrem; no Sozinho entram as missões da semana com o local. No topo, a próxima grade do clã."],
-      ["👥", "Clã", "Membros mostra 12 com Ver todos, e o mapa de horários do clã se atualiza sozinho, sem ninguém precisar abrir o site."],
-      ["🛡️", "Para admins", "Quem joga com quem (enturmados e isolados, com busca e detalhe por pessoa), Entrada no clã com pedidos, promoções e novatos juntos, e a aba Discord do clã com o registro no Orla Bot, a participação nas grades e a presença: quem confirmou e jogou mesmo."],
-      ["🧭", "Visual", "Ao abrir já logado, o topo mostra seu guardião direto, sem piscar a tela de entrada."],
-      ["🟢", "Status", "Nova página /estado (link no rodapé) mostra se o site, o servidor, o Orla Bot e a API da Bungie estão funcionando e a hora da última leitura do clã."]
-    ]
-  },
-  {
-    "id": "2026-10-31",
-    "de": "2026-10-28",
-    "ate": "2026-10-31",
-    "titulo": "Guias, Ao vivo, lista de desejos e clã",
-    "itens": [
-      ["🗺️", "Guias", "Incursões, masmorras e missões exóticas com vídeos (vários por atividade: baús secretos, desafios, coletáveis) e galeria de mapas e imagens. Atividades fora do jogo somem sozinhas."],
-      ["🔴", "Ao vivo", "Veja o fireteam e a build de cada um, com atalho para a página, os vídeos e as imagens da atividade que vocês estão fazendo."],
-      ["🎯", "Objetivos", "Última sessão com recordes e solo (aparece depois de fechar o jogo), Esta semana em cartões, correios de cada personagem, aviso quando o Destiny 2 atualiza e ☆ Foco para títulos, atividades, exóticos e catalisadores."],
-      ["⭐", "Lista de desejos", "☆ nas armas e armaduras da build e dos vendedores: guarda o rolo da arma ou o atributo principal e secundário da armadura, mostra onde dropa e avisa quando está à venda."],
-      ["🛠️", "Builds", "Metas de build a partir da comparação e um botão Compartilhar: link fixo da build com prévia no Discord (até 5 por conta), link do perfil ou imagem."],
-      ["🛒", "Vendedores", "Xûr completo (exóticas, catalisadores e lendárias) e o foco da semana de Shaxx, Zavala e Saint-14."],
-      ["👥", "Clã", "Nova página do clã com o checklist de quem já fez cada incursão e masmorra e a comparação de conclusões entre guardiões."],
-      ["⚔️", "Atividades", "Filtros por dificuldade, falta arma, falta catalisador, quase lá, menos feitos e A–Z."],
-      ["🧭", "Visual", "Site agora é DPI, duas colunas em tela larga, setas e abas mais claras, dados que se atualizam sozinhos depois de uma atividade."]
-    ]
-  }
+ {
+  "id": "2026-11-07",
+  "de": "2026-11-01",
+  "ate": "2026-11-07",
+  "titulo": "Grade do clã, novo Esta semana e builds mais certeiras",
+  "itens": [
+   [
+    "📅",
+    "Grade do clã",
+    "Membros da Orla ganharam o atalho Grade no topo: crie grades de incursão, masmorra ou missão exótica (até 6 meses à frente, horário de 10 em 10 min), com a busca que entende nome com acento errado ou em inglês. Entre, fique na reserva ou saia direto pelo site; quem criou pode editar e o Discord marca os confirmados. Depois de criar, um botão põe a grade na sua agenda (Google ou celular), e uma linha mostra quem do clã nunca fez e quem pode guiar."
+   ],
+   [
+    "🗓️",
+    "Agenda do clã",
+    "As grades marcadas aparecem no /grade e agora também em Clã › Membros, com a imagem da atividade ao fundo, os vídeos e imagens do guia e os botões Entrar, Reserva e Sair. No Discord, /orla agenda lista as grades da semana."
+   ],
+   [
+    "📖",
+    "Guia por encontro",
+    "Todas as incursões e masmorras ganharam o botão Guia, com objetivo, funções sugeridas, passo a passo e dica de cada encontro (nomes de mecânicas em inglês, como no jogo). O novo Modo encontros abre tudo em tela cheia, um cartão por encontro com cor por tipo (encontro, chefe, passagem), faixa para pular entre eles e texto ajustável."
+   ],
+   [
+    "🛠️",
+    "Builds",
+    "Aplicar build ficou mais certeiro: troca os exóticos um a um, pula (e lista pelo nome) aspectos, fragmentos e mods que você ainda não tem e confere o que realmente ficou equipado."
+   ],
+   [
+    "💾",
+    "Loadouts",
+    "Botão Equipar no cartão dos loadouts do jogo, e Gravar no jogo com nome, cor, ícone e checklist numa tela só; depois de gravar, você volta ao que estava usando."
+   ],
+   [
+    "🎯",
+    "Arsenal",
+    "Os contadores Com rolo bom, Parcial e Nada de bom viraram filtros (um clique liga, outro desliga), e a busca do inventário acha armas pela vantagem: escreva perk:frenesi, por exemplo."
+   ],
+   [
+    "☀️",
+    "Hoje",
+    "Novo Esta semana para você: escolha Como você vai jogar? e os destaques aparecem grandes, com vídeos, imagens, Guia, 1ª vez, Marcar grade e detalhes que abrem; no Sozinho entram as missões da semana com o local. No topo, a próxima grade do clã."
+   ],
+   [
+    "👥",
+    "Clã",
+    "Membros mostra 12 com Ver todos, e o mapa de horários do clã se atualiza sozinho, sem ninguém precisar abrir o site."
+   ],
+   [
+    "🛡️",
+    "Para admins",
+    "Quem joga com quem (enturmados e isolados, com busca e detalhe por pessoa), Entrada no clã com pedidos, promoções e novatos juntos, e a aba Discord do clã com o registro no Orla Bot, a participação nas grades e a presença: quem confirmou e jogou mesmo."
+   ],
+   [
+    "🧭",
+    "Visual",
+    "Ao abrir já logado, o topo mostra seu guardião direto, sem piscar a tela de entrada."
+   ],
+   [
+    "🟢",
+    "Status",
+    "Nova página /estado (link no rodapé) mostra se o site, o servidor, o Orla Bot e a API da Bungie estão funcionando e a hora da última leitura do clã."
+   ]
+  ]
+ },
+ {
+  "id": "2026-10-31",
+  "de": "2026-10-28",
+  "ate": "2026-10-31",
+  "titulo": "Guias, Ao vivo, lista de desejos e clã",
+  "itens": [
+   [
+    "🗺️",
+    "Guias",
+    "Incursões, masmorras e missões exóticas com vídeos (vários por atividade: baús secretos, desafios, coletáveis) e galeria de mapas e imagens. Atividades fora do jogo somem sozinhas."
+   ],
+   [
+    "🔴",
+    "Ao vivo",
+    "Veja o fireteam e a build de cada um, com atalho para a página, os vídeos e as imagens da atividade que vocês estão fazendo."
+   ],
+   [
+    "🎯",
+    "Objetivos",
+    "Última sessão com recordes e solo (aparece depois de fechar o jogo), Esta semana em cartões, correios de cada personagem, aviso quando o Destiny 2 atualiza e ☆ Foco para títulos, atividades, exóticos e catalisadores."
+   ],
+   [
+    "⭐",
+    "Lista de desejos",
+    "☆ nas armas e armaduras da build e dos vendedores: guarda o rolo da arma ou o atributo principal e secundário da armadura, mostra onde dropa e avisa quando está à venda."
+   ],
+   [
+    "🛠️",
+    "Builds",
+    "Metas de build a partir da comparação e um botão Compartilhar: link fixo da build com prévia no Discord (até 5 por conta), link do perfil ou imagem."
+   ],
+   [
+    "🛒",
+    "Vendedores",
+    "Xûr completo (exóticas, catalisadores e lendárias) e o foco da semana de Shaxx, Zavala e Saint-14."
+   ],
+   [
+    "👥",
+    "Clã",
+    "Nova página do clã com o checklist de quem já fez cada incursão e masmorra e a comparação de conclusões entre guardiões."
+   ],
+   [
+    "⚔️",
+    "Atividades",
+    "Filtros por dificuldade, falta arma, falta catalisador, quase lá, menos feitos e A–Z."
+   ],
+   [
+    "🧭",
+    "Visual",
+    "Site agora é DPI, duas colunas em tela larga, setas e abas mais claras, dados que se atualizam sozinhos depois de uma atividade."
+   ]
+  ]
+ }
 ]
