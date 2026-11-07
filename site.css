@@ -2249,3 +2249,4 @@ html.grade .ob-opt{font-size:16px}
 .gde-steps{margin:0;padding-left:22px;display:grid;gap:5px;font-size:14.5px;line-height:1.45}
 .gde-tip{margin:4px 0 0;padding:10px 12px;border-radius:10px;border:1px solid rgba(242,211,107,.4);background:rgba(242,211,107,.08);font-size:14px}.gde-tip b{color:#f2d36b}
 .gde-ft{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12.5px;color:var(--muted)}.gde-ft a{color:var(--acc)}
+#list>.panel>.cal{grid-column:1/-1}

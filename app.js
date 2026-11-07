@@ -1534,7 +1534,7 @@ function render() {
   else { st.hidden = true; st.innerHTML = ''; }
   $('ldbtn').setAttribute('aria-pressed', tab === 'ld'); $('ldbtn').textContent = tab === 'ld' ? U.checklist : U.loadouts;
   document.body.classList.toggle('on-ld', tab === 'ld'); document.body.classList.toggle('no-clears', !OPTS.clears);
-  $('overall').hidden = isGd() || tab === 'gclo' || tab === 'vend' || tab === 'tri' || tab === 'inv' || tab === 'vlt' || tab === 'colx';
+  $('overall').hidden = isGd() || tab === 'gclo' || tab === 'vend' || tab === 'tri' || tab === 'inv' || tab === 'vlt' || tab === 'colx' || tab === 'cal';
   if (tab === 'tri') { $('list').innerHTML = triHTML(); return; }
   if (tab === 'colx') { $('list').innerHTML = colHTML(); return; }
   if (tab === 'inv' || tab === 'vlt') { const y = scrollY; $('list').innerHTML = tab === 'inv' ? invHTML() : vltHTML(); if (Math.abs(scrollY - y) > 2) scrollTo(0, y); return; }
