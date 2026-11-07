@@ -1,5 +1,21 @@
 [
   {
+    "id": "2026-11-07",
+    "de": "2026-11-01",
+    "ate": "2026-11-07",
+    "titulo": "Grade do clã, builds mais certeiras e painel Hoje",
+    "itens": [
+      ["📅", "Grade do clã", "Membros da Orla ganharam o atalho Grade no topo: crie grades de incursão, masmorra ou missão exótica (até 6 meses à frente, horário de 10 em 10 min) e entre, fique na reserva ou saia direto pelo site. O Discord marca os confirmados e quem criou pode editar."],
+      ["🗓️", "Agenda do clã", "Cada grade aparece com a imagem da atividade ao fundo e botões para os vídeos e as imagens do guia."],
+      ["🛠️", "Builds", "Aplicar build ficou mais certeiro: troca os exóticos um a um, pula (e lista pelo nome) aspectos, fragmentos e mods que você ainda não tem e confere o que realmente ficou equipado."],
+      ["💾", "Loadouts", "Botão Equipar no cartão dos loadouts do jogo, e Gravar no jogo com nome, cor, ícone e checklist numa tela só; depois de gravar, você volta ao que estava usando."],
+      ["☀️", "Hoje", "Painel único: escolha Como você vai jogar? (Sozinho, Até 3 ou Grupo de 6) e veja só o que serve para você, com a rotação da semana compacta e a missão da semana."],
+      ["👥", "Clã", "Membros mostra 12 com Ver todos, e o mapa de horários do clã se atualiza sozinho, sem ninguém precisar abrir o site."],
+      ["🛡️", "Para admins", "Quem joga com quem (enturmados e isolados, com busca e detalhe por pessoa), Entrada no clã com pedidos, promoções e novatos juntos, e a aba Discord do clã com o registro e a participação no Orla Bot."],
+      ["🧭", "Visual", "Ao abrir já logado, o topo mostra seu guardião direto, sem piscar a tela de entrada."]
+    ]
+  },
+  {
     "id": "2026-10-31",
     "de": "2026-10-28",
     "ate": "2026-10-31",
