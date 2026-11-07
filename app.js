@@ -5387,8 +5387,8 @@ function botNav() {
 const INST = { ev: null };
 addEventListener('beforeinstallprompt', e => { e.preventDefault(); INST.ev = e; });
 /* ---------- Busca geral (Ctrl+K): abas, atividades, títulos, exóticos, catalisadores, triunfos, membros do clã e guardiões ---------- */
-const PALT = { pt: { ph: 'Buscar abas, atividades, exóticos, títulos, triunfos, clã…', tab: 'Aba', clan: 'Clã', tri: 'Triunfo', player: q => `Procurar o guardião “${q}”`, filter: q => `Filtrar esta tela por “${q}”`, empty: 'Digite para buscar. ↑↓ para escolher, Enter para abrir.', none: 'Nada encontrado.' },
-  en: { ph: 'Search tabs, activities, exotics, titles, triumphs, clan…', tab: 'Tab', clan: 'Clan', tri: 'Triumph', player: q => `Look up guardian “${q}”`, filter: q => `Filter this screen by “${q}”`, empty: 'Type to search. ↑↓ to pick, Enter to open.', none: 'Nothing found.' } };
+const PALT = { pt: { ph: 'Buscar itens, abas, atividades, exóticos, títulos, triunfos, clã…', tab: 'Aba', clan: 'Clã', tri: 'Triunfo', player: q => `Procurar o guardião “${q}”`, filter: q => `Filtrar esta tela por “${q}”`, empty: 'Digite para buscar. ↑↓ para escolher, Enter para abrir.', none: 'Nada encontrado.' },
+  en: { ph: 'Search items, tabs, activities, exotics, titles, triumphs, clan…', tab: 'Tab', clan: 'Clan', tri: 'Triumph', player: q => `Look up guardian “${q}”`, filter: q => `Filter this screen by “${q}”`, empty: 'Type to search. ↑↓ to pick, Enter to open.', none: 'Nothing found.' } };
 const palt = () => PALT[lang === 'pt' ? 'pt' : 'en'];
 const PAL = { q: '', i: 0, res: [] };
 const palNorm = t => String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -5401,6 +5401,9 @@ function palIndex() {
     out.push({ t: sec.title, s: U.subs[sec.tab] || '', ic: sec.kind === 'raid' || sec.kind === 'dg' ? '⚔' : '◆', go: () => jumpTo(sec.tab, sec.id) });
     if (['exo', 'cat', 'tit'].includes(sec.tab)) for (const i of sec.items || []) out.push({ t: i.t, s: (U.subs[sec.tab] || '') + ' · ' + sec.title, ic: isDone(i) ? '✓' : '○', go: () => { jumpTo(sec.tab, sec.id); setTimeout(() => { const li = document.querySelector(`li[data-li="${CSS.escape(i.id)}"]`); if (li) { li.scrollIntoView({ behavior: 'smooth', block: 'center' }); li.classList.add('pal-hit'); setTimeout(() => li.classList.remove('pal-hit'), 2200); } }, 350); } });
   }
+  if (typeof invAll === 'function' && profile?.profileInventory) { const seen = new Map(), W = u(); // itens do inventário e do cofre: abre o detalhe
+    for (const x of invAll()) { const D = INVD[x.h]; if (!D?.n || x.slot > 7) continue; const k = D.n + '|' + x.where; if (seen.has(k)) continue; seen.set(k, 1);
+      out.push({ t: D.n, s: (lang === 'pt' ? 'Item · ' : 'Item · ') + [D.tl, x.pw ? '✦ ' + x.pw : '', x.where === 'v' ? (lang === 'pt' ? 'cofre' : 'vault') : W.classes[profile.characters.data[x.where]?.classType] || ''].filter(Boolean).join(' · '), ic: x.slot < 3 ? '⌖' : '⛨', go: () => { INV.q = ''; INV.f = 'all'; go('inv'); setTimeout(() => ivOpen(x.iid), 250); } }); } }
   for (const x of GD?.clan?.list || []) out.push({ t: x.n, s: T.clan, ic: '👤', go: () => { FD.q = ''; FD.results = null; openFind({ name: x.full || x.n, type: x.mt, id: x.mid }); } });
   return out;
 }
