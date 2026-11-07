@@ -756,7 +756,7 @@ function calHTML() {
     <div class="cal-cols"><div class="cal-b"><span class="sea-k">${P ? 'RESETS E VENDEDORES' : 'RESETS AND VENDORS'}</span>${rows}</div>
     <div class="cal-b"><span class="sea-k">${P ? 'EVENTOS EM ANDAMENTO' : 'ONGOING EVENTS'}</span>${evHTML}
       ${wt ? `<span class="sea-k">${P ? 'DESAFIOS DA SEMANA' : 'WEEKLY CHALLENGES'}</span><button type="button" class="cal-r cal-btn" data-jump="prog:"><i style="background:#7fe08f"></i><span><b>${P ? 'Desafios e recompensas' : 'Challenges and rewards'}</b><small>${P ? `${wd} de ${wt} feitos` : `${wd} of ${wt} done`}</small></span><span class="v" style="color:#7fe08f">${wd}/${wt}</span></button>` : ''}
-      ${S && S.e ? `<span class="sea-k">${P ? 'TEMPORADA' : 'SEASON'}</span><div class="cal-sea"><b>${esc(S.n)}</b><small>${P ? 'termina ' : 'ends '}${esc(new Date(S.e).toLocaleDateString(loc, { day: '2-digit', month: '2-digit', year: 'numeric' }))} · ${P ? 'faltam ' : ''}${cd(S.e - now)}${P ? '' : ' left'}</small><i class="sea-bar"><u style="width:${sp * 100}%"></u></i></div>` : ''}
+      ${S && S.e && S.e - now < 400 * 864e5 ? `<span class="sea-k">${P ? 'TEMPORADA' : 'SEASON'}</span><div class="cal-sea"><b>${esc(S.n)}</b><small>${P ? 'termina ' : 'ends '}${esc(new Date(S.e).toLocaleDateString(loc, { day: '2-digit', month: '2-digit', year: 'numeric' }))} · ${P ? 'faltam ' : ''}${cd(S.e - now)}${P ? '' : ' left'}</small><i class="sea-bar"><u style="width:${sp * 100}%"></u></i></div>` : ''}
     </div></div></section>`;
 }
 function nextReset() { const d = new Date(); d.setUTCHours(17, 0, 0, 0); while (d.getUTCDay() !== 2 || d <= Date.now()) d.setUTCDate(d.getUTCDate() + 1); return d.getTime(); }
