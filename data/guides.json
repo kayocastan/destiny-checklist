@@ -1359,5 +1359,996 @@
     "tip": "Anotem o último braço em que atiraram antes do teste: ele define a forma."
    }
   ]
+ },
+ "dg:proph": {
+  "src": [
+   [
+    "Shacknews",
+    "https://shacknews.com/article/118838/prophecy-dungeon-guide-destiny-2"
+   ]
+  ],
+  "enc": [
+   {
+    "n": "Eco da Falange",
+    "obj": "Limpar as 4 placas de fumaça para deixar o Eco da Falange vulnerável e causar dano.",
+    "roles": [
+     [
+      "Coletor",
+      "1 junta as motes (Luz ou Trevas)"
+     ],
+     [
+      "Limpeza",
+      "2 seguram os inimigos e cuidam das placas"
+     ]
+    ],
+    "steps": [
+     "Matem os inimigos e peguem Motes de Luz ou de Trevas.",
+     "Usem as motes da cor certa para limpar cada uma das 4 placas.",
+     "Com as 4 limpas, a Falange fica vulnerável: dano.",
+     "Quando ela ficar imune, voltem a limpar as placas.",
+     "Repitam até ela cair e subam todos na placa de areia do centro."
+    ],
+    "tip": "Combinem uma cor de mote antes de começar para ninguém zerar a carga do outro. Poço de Radiância + Guilhotina Cadente pode matar numa fase."
+   },
+   {
+    "n": "Deserto",
+    "obj": "Atravessar a área aberta limpando Possuídos e Pragas Possuídas até a entrada do Hexaedro.",
+    "roles": [
+     [
+      "Grupo",
+      "os 3 juntos"
+     ]
+    ],
+    "steps": [
+     "Atravessem de pardal.",
+     "Limpem os Possuídos e as Pragas que bloqueiam o caminho.",
+     "Se perderem o rumo, sigam o Toland.",
+     "Procurem a grande construção de pedra com uma entrada estreita.",
+     "Entrem no túnel de luz rosa para chegar ao Hexaedro."
+    ],
+    "tip": "O Toland é o guia mais confiável do caminho."
+   },
+   {
+    "n": "Hexaedro",
+    "obj": "Seguir o orbe do Toland e virar a sala 6 vezes limpando a placa certa; no fim, matar dois Centuriões Possuídos.",
+    "roles": [
+     [
+      "Leitor",
+      "1 avisa onde o Toland está"
+     ],
+     [
+      "Coletores",
+      "2 juntam as motes certas"
+     ]
+    ],
+    "steps": [
+     "Achem o orbe do Toland e a placa logo abaixo dele (se ele estiver no 'teto', é a placa do lado do cubo que não está aceso).",
+     "Limpem os adds; os dois Hobgoblins voltam a cada 60 s e cada um gera um Eco de Cavaleiro.",
+     "Peguem as motes da cor que combina com a posição do Toland.",
+     "Limpem a placa: Hobgoblins e Ecos somem.",
+     "Peguem munição, recarreguem e subam na placa do centro para virar a sala.",
+     "Repitam até 6 viradas; na última aparecem 2 Centuriões Possuídos."
+    ],
+    "tip": "O Topo da Montanha e o Xenófago resolvem os Hobgoblins e Ecos. Virou a sala errada? É só pegar as motes certas de novo."
+   },
+   {
+    "n": "Eco de Kell",
+    "obj": "Limpar 3 placas e perseguir o Eco de Kell pelo corredor, dando dano antes de ele ficar imune.",
+    "roles": [
+     [
+      "Placas",
+      "1 limpa as placas"
+     ],
+     [
+      "Ogros",
+      "2 cuidam dos Ogros e Cavaleiros"
+     ]
+    ],
+    "steps": [
+     "Toquem no Toland para começar; aparecem 3 Ecos de Kell.",
+     "Vejam a cor necessária, matem 2 Ecos de Cavaleiro para pegar as motes e limpem a primeira placa.",
+     "Matem o Ogro que aparece naquela placa.",
+     "Repitam nas outras 2 placas.",
+     "Peguem munição e vão para o centro para entrar na área do chefe.",
+     "Persigam o Eco pelo corredor matando Hobgoblins; com 10 acúmulos de Entropia Sombria você morre.",
+     "Deem dano no começo e no fim do corredor; após ~20 s ele fica imune. Voltem pelo triângulo de areia e repitam."
+    ],
+    "tip": "Na parada final, Égide da Alvorada ou Poço de Radiância. Se a espada estiver tomando pisão, troquem por Xenófago ou lança-granadas; o teleporte dele atravessa cobertura."
+   }
+  ]
+ },
+ "dg:pit": {
+  "src": [
+   [
+    "Shacknews",
+    "https://shacknews.com/article/114869/pit-of-heresy-guide-destiny-2"
+   ]
+  ],
+  "enc": [
+   {
+    "n": "Necrópole",
+    "obj": "Matar os 3 mini-chefes com a espada Relíquia da Colmeia para quebrar as correntes.",
+    "roles": [
+     [
+      "Espada",
+      "quem estiver perto pega a Relíquia"
+     ],
+     [
+      "Apoio",
+      "os outros limpam e protegem"
+     ]
+    ],
+    "steps": [
+     "Olhem os símbolos na corrente da sala.",
+     "Lá fora, achem os 3 símbolos em hologramas gigantes.",
+     "Peguem a espada Relíquia matando um Cavaleiro que patrulha (às vezes com um Ogro).",
+     "Em cada sala: Cavaleiro com ataque leve, Feiticeira com o ataque pesado à distância, Uivador com a guarda.",
+     "Com os 3 mortos, sigam o feixe de luz verde."
+    ],
+    "tip": "Só a espada Relíquia fere esses mini-chefes; peguem uma antes de entrar na sala."
+   },
+   {
+    "n": "Túneis do Desespero",
+    "obj": "Apagar as 3 portas com orbes dos Cavaleiros Heréticos fugindo dos Ogros imortais.",
+    "roles": [
+     [
+      "Orbe",
+      "1 leva o orbe até a porta"
+     ],
+     [
+      "Isca",
+      "1 afasta os Ogros"
+     ]
+    ],
+    "steps": [
+     "Atirem na teia que fecha a entrada da caverna.",
+     "Matem um Cavaleiro Herético e peguem o orbe dele.",
+     "Levem o orbe até uma das 3 portas e apaguem.",
+     "Repitam nas outras portas.",
+     "Passem escondidos ou puxem os 3 Ogros Pária para longe."
+    ],
+    "tip": "Os Ogros batem muito e não morrem: puxem para longe em vez de lutar."
+   },
+   {
+    "n": "Câmara do Sofrimento",
+    "obj": "Enterrar 6 orbes para apagar a porta atrás do Totem Aniquilador antes que os acúmulos de dano acabem com o time.",
+    "roles": [
+     [
+      "Placa",
+      "1 fica na placa debaixo do Totem"
+     ],
+     [
+      "Orbes",
+      "2 matam Cavaleiros e enterram os orbes"
+     ]
+    ],
+    "steps": [
+     "Uma pessoa fica parada na placa debaixo do Totem Aniquilador.",
+     "Matem os Cavaleiros Heréticos e peguem os orbes.",
+     "Cada orbe enterrado tira uma runa dos pilares.",
+     "Matem logo os Cavaleiros que aparecem no alto: eles bombardeiam a placa.",
+     "Usem Supers para limpar o excesso de inimigos.",
+     "O 6º orbe termina o encontro."
+    ],
+    "tip": "Velocidade é tudo: cada acúmulo de Maldição do Sofrimento aumenta o dano recebido (com 5 quase tudo mata de um tiro). Poço de Radiância ajuda quem está na placa."
+   },
+   {
+    "n": "O Rastelo",
+    "obj": "Quebrar as 3 travas matando a Feiticeira Ritualista perto de cada símbolo do labirinto.",
+    "roles": [
+     [
+      "Grupo",
+      "os 3 juntos"
+     ]
+    ],
+    "steps": [
+     "Anotem os 3 símbolos da parede de entrada.",
+     "Achem os símbolos iguais pelo labirinto.",
+     "Matem a Feiticeira Ritualista Malévola perto de cada símbolo.",
+     "Quebrou as 3 travas, o caminho abre."
+    ],
+    "tip": "Cuidado com as armadilhas e quedas; as Feiticeiras tiram muita vida rápido."
+   },
+   {
+    "n": "Zulmak, Instrumento do Tormento",
+    "obj": "Matar os 3 mini-chefes das torres, apagar o pedestal com os orbes e dar dano em Zulmak do centro.",
+    "roles": [
+     [
+      "Espadas",
+      "os 3, uma torre cada"
+     ],
+     [
+      "Dano",
+      "todos no centro"
+     ]
+    ],
+    "steps": [
+     "Matem os Cavaleiros do centro e peguem as espadas Relíquia.",
+     "Usem as espadas nos mini-chefes das torres (Cavaleiro: leve; Feiticeira: pesado; Uivador: guarda).",
+     "Levem os 3 orbes ao pedestal do centro.",
+     "Fiquem na arena do centro para dar dano.",
+     "Quando Zulmak se ajoelhar para carregar o cristal, saiam do centro para fugir da explosão de fogo.",
+     "Mudem de posição quando ele soltar o ataque longo que deixa fogo no chão."
+    ],
+    "tip": "Combinem as posições antes de apagar o último orbe. O Fardo de Izanagi funciona bem, ou 1 com Divindade e os outros com lança-granadas."
+   }
+  ]
+ },
+ "dg:st": {
+  "src": [
+   [
+    "Shacknews",
+    "https://shacknews.com/article/107607/shattered-throne-dungeon-guide-destiny-2"
+   ]
+  ],
+  "enc": [
+   {
+    "n": "Érebo (Passagem Segura)",
+    "obj": "Seguir os símbolos entre os prédios matando os Arquitetos do Labirinto até a descida.",
+    "roles": [
+     [
+      "Grupo",
+      "os 3 juntos"
+     ]
+    ],
+    "steps": [
+     "Na entrada, matem o Arquiteto do Labirinto e os inimigos menores.",
+     "Aparece um símbolo: achem o mesmo num dos prédios em volta.",
+     "O prédio certo tem outro Arquiteto e uma dúzia de inimigos.",
+     "Repitam até o símbolo do pássaro, que leva de volta ao prédio inicial.",
+     "Limpem a área para liberar a descida."
+    ],
+    "tip": "Zona de escuridão: cada morte soma 40 s de espera e uma derrota do time reinicia a área."
+   },
+   {
+    "n": "Vorgeth, a Fome Sem Fim",
+    "obj": "Tirar o escudo de Vorgeth com as marcas das Feiticeiras e apagar uma chama, depois dar dano.",
+    "roles": [
+     [
+      "Marcas",
+      "1 junta 4 marcas"
+     ],
+     [
+      "Limpeza",
+      "2 seguram Vândalos e Goblins"
+     ]
+    ],
+    "steps": [
+     "Ignorem as Feiticeiras no começo e limpem os Vândalos e Goblins da sala.",
+     "Matem as Feiticeiras uma a uma e peguem a Marca do Peticionário.",
+     "Cada marca reinicia o contador de 45 s; se zerar, a pessoa morre.",
+     "Com 4 marcas vira Fardo do Peticionário: usem para apagar uma chama.",
+     "Com o escudo caído, dano em Vorgeth; atirem ou fujam das bombas teleguiadas.",
+     "Repitam até ele cair."
+    ],
+    "tip": "Priorizem os Vândalos atiradores, protegidos pelos Goblins. Fiquem juntos para reviver rápido."
+   },
+   {
+    "n": "A Descida (Corredor dos Servos)",
+    "obj": "Chegar ao fim do corredor sem correr, sem pulo duplo e sem regenerar, com Servos voltando sem parar.",
+    "roles": [
+     [
+      "Grupo",
+      "os 3 juntos"
+     ]
+    ],
+    "steps": [
+     "Entrem: movimento e cura ficam limitados.",
+     "Os Servos voltam infinitamente e atacam em bando.",
+     "Fiquem em partes altas (bordas das escadas, caixas).",
+     "Use a Fenda de Cura do Arcano para recuperar vida.",
+     "Limpem os Servos Sombrios juntos.",
+     "Pulem a borda com névoa para sair."
+    ],
+    "tip": "Ficar no alto dá respiro; com Poder baixo esse trecho fica bem mais difícil."
+   },
+   {
+    "n": "Dul Incaru, o Eterno Retorno",
+    "obj": "Matar os 3 Cavaleiros Ferreiros do Destino para pegar Pensamento Finito e dar dano antes do tempo acabar.",
+    "roles": [
+     [
+      "Cavaleiros",
+      "2 derrubam os Cavaleiros"
+     ],
+     [
+      "Psiônicos",
+      "1 segura as ondas dos lados"
+     ]
+    ],
+    "steps": [
+     "Atirem primeiro nos Cavaleiros (só batem de perto e andam devagar).",
+     "Cada Cavaleiro morto solta um buff: juntem os 3 para mais dano.",
+     "Quando eles perdem vida, Dul Incaru invoca um cristal: destruam para tirar os escudos (vêm 2 grupos de Psiônicos).",
+     "Segurem os Psiônicos com Tiro das Sombras ou Lâmina do Alvorecer.",
+     "Com o buff ativo, dano em Dul Incaru; limpem o buff no braseiro central antes de zerar.",
+     "Os Cavaleiros voltam em ~60 s."
+    ],
+    "tip": "Sem capacete, o Cavaleiro sai correndo: não tirem vida demais antes de estarem prontos. Usem a varanda de trás e os pilares como cobertura."
+   }
+  ]
+ },
+ "dg:goa": {
+  "src": [
+   [
+    "Shacknews",
+    "https://shacknews.com/article/128012/grasp-of-avarice-dungeon-guide-destiny-2"
+   ]
+  ],
+  "enc": [
+   {
+    "n": "Caverna do Tesouro",
+    "obj": "Juntar acúmulos de Carregado de Riquezas dos inimigos e depositar no cristal até ele encher.",
+    "roles": [
+     [
+      "Grupo",
+      "os 3 juntam e depositam"
+     ]
+    ],
+    "steps": [
+     "Matem os inimigos e peguem os engramas: cada um dá Carregado de Riquezas.",
+     "Com 10 acúmulos sua Super enche.",
+     "O contador de 30 s mata se zerar.",
+     "Entrem na caverna e fiquem perto do cristal para descarregar.",
+     "Repitam até aparecer \"Os restos se aquietaram\"."
+    ],
+    "tip": "Fiquem perto da boca da caverna para depositar rápido."
+   },
+   {
+    "n": "Phry'zhia, a Insaciável",
+    "obj": "Depositar riquezas no cristal para tirar o escudo de Phry'zhia e dar dano.",
+    "roles": [
+     [
+      "Canhão",
+      "1 pega o Canhão de Calor"
+     ],
+     [
+      "Garagens",
+      "2 limpam e depositam"
+     ]
+    ],
+    "steps": [
+     "Matem o Vândalo do fundo para pegar o Canhão de Calor.",
+     "Atirem no gerador para abrir a porta de um lado (abrir um fecha o outro).",
+     "Limpem lá dentro e peguem Carregado de Riquezas.",
+     "Depositem no cristal.",
+     "Repitam até o escudo cair.",
+     "Dano em Phry'zhia."
+    ],
+    "tip": "Barricada ou Fenda de Cura atrás do cristal ajudam. No Mestre aparecem Cavaleiros Antibarreira nas garagens."
+   },
+   {
+    "n": "Covil Submerso (escudo)",
+    "obj": "Destruir os Servidores Monitores e lançar as carcaças no canhão contra a estrutura central.",
+    "roles": [
+     [
+      "Canhão",
+      "1 lança"
+     ],
+     [
+      "Servidor",
+      "2 baixam o escudo e empurram a carcaça"
+     ]
+    ],
+    "steps": [
+     "Peguem o Canhão de Calor de um Vândalo.",
+     "Atirem no gerador de um canhão de gravidade para pular entre plataformas.",
+     "Achem o grupo com um Servidor, matem e juntem riquezas.",
+     "Depositem no cristal da plataforma até o escudo do Servidor cair e matem-no.",
+     "Em ~90 s, empurrem (ou soquem) a carcaça até o canhão.",
+     "Mirem na estrutura central e disparem; 4 nós destruídos derrubam o escudo."
+    ],
+    "tip": "No Mestre aparecem Capitães Sobrecarga em cada ponto: matem primeiro."
+   },
+   {
+    "n": "Capitão Avarokk, o Cobiçoso",
+    "obj": "Carregar geradores, juntar 60 acúmulos de riquezas e dar dano na fase de 30 s.",
+    "roles": [
+     [
+      "Canhão",
+      "1 dispara nos geradores"
+     ],
+     [
+      "Coleta",
+      "2 juntam engramas"
+     ]
+    ],
+    "steps": [
+     "Matem o Vândalo com o Canhão de Calor.",
+     "Atirem num dos 3 geradores (esquerda, direita ou frente).",
+     "Os casulos dos lados soltam engramas: peguem para ganhar acúmulos.",
+     "Depositem no cristal central: 60 tiram o escudo.",
+     "Começa a fase de dano de 30 s.",
+     "Quando ele \"resistir à tentação\", repitam."
+    ],
+    "tip": "No Mestre aparecem Servidores Antibarreira na coleta. Poço ou Égide onde os adds surgem limpa rápido."
+   }
+  ]
+ },
+ "dg:dual": {
+  "src": [
+   [
+    "Shacknews",
+    "https://www.shacknews.com/article/130585/destiny-2-duality-dungeon-guide"
+   ]
+  ],
+  "enc": [
+   {
+    "n": "Pesadelo de Gahlran",
+    "obj": "Alternar entre realidade e pesadelo para entregar Essências de Estandarte e dar dano em Gahlran.",
+    "roles": [
+     [
+      "Essência",
+      "1 pega e deposita"
+     ],
+     [
+      "Salas",
+      "1 em cada sala lateral do Colosso"
+     ]
+    ],
+    "steps": [
+     "Matem os Guardiões do Sino e atirem no Sino da Conquista para entrar no pesadelo.",
+     "Matem os Porta-Estandartes (Psiônicos nas salas de canto) e peguem a essência.",
+     "Matem os Guardiões do Sino do pesadelo e atirem no sino para voltar.",
+     "Depositem na placa do símbolo certo (Cálice, Sol, Cães ou Machados).",
+     "Uma pessoa em cada sala lateral: matem os Cabais e atirem no sino.",
+     "Matem as Visões de Gahlran para abrir as portas.",
+     "Dano em Gahlran e voltem pelo sino antes de 60 s."
+    ],
+    "tip": "\"Pesadelo Colapsando\" mata o time ao zerar. A realidade não tem tempo: aproveitem para juntar munição pesada."
+   },
+   {
+    "n": "Abrir o Cofre",
+    "obj": "Derrotar 3 Pesadelos entregando 6 essências (cada 2 deixam um vulnerável).",
+    "roles": [
+     [
+      "Leitor",
+      "1 avisa os símbolos"
+     ],
+     [
+      "Essência",
+      "2 buscam no pesadelo"
+     ]
+    ],
+    "steps": [
+     "Vejam os símbolos do chão e os blocos dos cantos que mostram onde os Porta-Estandartes aparecem.",
+     "Matem os Guardiões do Sino e entrem no pesadelo.",
+     "No símbolo certo, matem a Falange e o Colosso: surge o Porta-Estandarte.",
+     "Peguem a essência, voltem e depositem.",
+     "Com a segunda essência o Pesadelo fica vulnerável (sem limite de tempo).",
+     "Dano com Super e pesada; repitam para os 3."
+    ],
+    "tip": "Peguem as duas essências de uma vez para economizar viagens."
+   },
+   {
+    "n": "Pesadelo de Caiatl",
+    "obj": "Entregar 4 essências e atordoar Caiatl nos sinos durante a fase de dano.",
+    "roles": [
+     [
+      "Essência",
+      "2 buscam nas sacadas"
+     ],
+     [
+      "Sinos",
+      "1 lê e atordoa"
+     ]
+    ],
+    "steps": [
+     "Vejam os 2 símbolos perto das correntes e as sacadas com os mesmos símbolos.",
+     "No pesadelo, matem os Psiônicos das sacadas certas para surgir a essência.",
+     "Peguem, voltem e depositem no símbolo; limpem os adds.",
+     "Com 4 entregues, atirem na gema roxa para quebrar a corrente.",
+     "No pesadelo, interceptem Caiatl no sino para onde ela corre e atirem no sino: 10 s de atordoamento.",
+     "Repitam nos outros 2 sinos; a fase acaba se ela chegar num sino."
+    ],
+    "tip": "Perto do sino você ganha Ressonância Desperta (mais dano). Cada Psiônico morto dá mais tempo."
+   }
+  ]
+ },
+ "dg:sotw": {
+  "src": [
+   [
+    "Shacknews",
+    "https://shacknews.com/article/133423/spire-of-the-watcher-guide"
+   ]
+  ],
+  "enc": [
+   {
+    "n": "Subida do Pináculo",
+    "obj": "Carregar nós de Arco em sequência para ligar os elevadores e subir.",
+    "roles": [
+     [
+      "Eletricista",
+      "1 com o buff"
+     ],
+     [
+      "Apoio",
+      "2 limpam e apontam o próximo nó"
+     ]
+    ],
+    "steps": [
+     "Matem os Minotauros Condutores para pegar o buff Eletricista.",
+     "Achem os nós iniciais e sigam os cabos.",
+     "Os cabos dão a volta no pináculo.",
+     "Com todos carregados, peguem o elevador.",
+     "Repitam até o topo e abram o baú."
+    ],
+    "tip": "A ordem importa: nó errado ou pulado desliga em segundos."
+   },
+   {
+    "n": "Akelous, a Corrente da Sereia",
+    "obj": "Ligar as 4 varetas de combustível e destruir os olhos e o núcleo de Akelous.",
+    "roles": [
+     [
+      "Eletricista",
+      "1 a 2 carregam nós"
+     ],
+     [
+      "Limpeza",
+      "1 segura os adds"
+     ]
+    ],
+    "steps": [
+     "Matem os Minotauros Condutores e peguem Eletricista.",
+     "Carreguem os nós do centro para fora pelas passarelas.",
+     "Com as 4 varetas ativas, Akelous vai para uma delas: dano.",
+     "Destruam os olhos vermelhos primeiro.",
+     "Dano no núcleo (até 50% da vida por ciclo).",
+     "Repitam até cair."
+    ],
+    "tip": "No fim do dano vem uma explosão que joga longe: desçam para as passarelas ou usem habilidades."
+   },
+   {
+    "n": "Persys, Ruína Primordial",
+    "obj": "Iniciar a purga do reator com Persys dentro e dar dano quando ele sair vulnerável.",
+    "roles": [
+     [
+      "Nós",
+      "1 a 2 com Eletricista"
+     ],
+     [
+      "Isca",
+      "1 atrai Persys ao reator"
+     ]
+    ],
+    "steps": [
+     "Limpem a sala e matem as Hidras Carcereiras: surgem Minotauros Condutores.",
+     "Com Eletricista, atirem nos nós dos pilares e no de cima da porta para abrir o reator.",
+     "Ativem os nós; com 2 reatores aparece \"Purga Iminente\".",
+     "Atraiam Persys para a sala do reator e corram para a sala segura.",
+     "Ativem os nós dos pilares e o de cima da porta para trancá-lo.",
+     "Com a purga concluída, ele sai vulnerável: dano e repitam."
+    ],
+    "tip": "Cabo vermelho = porta, amarelo = reator. Sem Persys no reator durante a purga, o escudo não cai."
+   }
+  ]
+ },
+ "dg:gotd": {
+  "src": [
+   [
+    "Shacknews",
+    "https://www.shacknews.com/article/135676/ghosts-of-the-deep-dungeon-guide-destiny-2"
+   ]
+  ],
+  "enc": [
+   {
+    "n": "Ritual da Colmeia",
+    "obj": "Usar o Vestígio de Luz nas estátuas certas 4 vezes para abrir a porta.",
+    "roles": [
+     [
+      "Vestígio",
+      "1 leva o buff"
+     ],
+     [
+      "Runas",
+      "2 seguem a gosma e anotam"
+     ]
+    ],
+    "steps": [
+     "Matem os dois da porta e o Ogro Atador de Almas.",
+     "Sigam a gosma verde até a primeira runa e decorem o símbolo.",
+     "Limpem e sigam até a segunda e terceira runa.",
+     "Matem o Portador da Luz na terceira e finalizem o Fantasma dele: Vestígio de Luz.",
+     "Na porta, matem a Tecedora de Véus e revelem a ilusão (Visão Profunda).",
+     "Imbuam a estátua do símbolo certo; repitam 4 vezes."
+    ],
+    "tip": "Estátua errada mata quem carrega e zera o progresso. Pardal acelera a volta."
+   },
+   {
+    "n": "Ecthar, o Escudo de Savathûn",
+    "obj": "Tocar 3 runas debaixo d'água, imbuir 3 estátuas e quebrar o escudo de Ecthar.",
+    "roles": [
+     [
+      "Mergulho",
+      "1 toca as runas"
+     ],
+     [
+      "Sala",
+      "2 limpam e imbuem"
+     ]
+    ],
+    "steps": [
+     "Matem os 4 Acólitos, os 3 Cavaleiros e o Ogro.",
+     "Revelem a ilusão e anotem as 3 runas acesas nas paredes.",
+     "Um mergulha e toca cada runa certa, cuidando da Resistência à Pressão e do chefe.",
+     "Matem cada Feiticeira Portadora da Luz e o Fantasma: quem finaliza imbui uma estátua (3x).",
+     "Matem o Cavaleiro do Poço, entrem na poça e quebrem o escudo.",
+     "Dano até ele ficar imune e repitam."
+    ],
+    "tip": "Poço de Radiância quase obrigatório; evitem foguete no espaço apertado. A primeira Feiticeira já surge após a primeira runa."
+   },
+   {
+    "n": "Simmumah ur-Nokru, Necromante Lúcida",
+    "obj": "Revelar 3 runas matando Vorlog nos pontos certos, imbuir os 3 pontos e dar dano.",
+    "roles": [
+     [
+      "Vestígio",
+      "1 entra na câmara"
+     ],
+     [
+      "Dano",
+      "2 (Gjallarhorn + foguete)"
+     ]
+    ],
+    "steps": [
+     "Esmaguem o Fantasma perto de Simmumah e revelem a ilusão.",
+     "Vejam os 3 pontos ligados (o coração sempre é um).",
+     "Fiquem num ponto até o chão brilhar e matem Vorlog; o coração por último.",
+     "Olhem pela lente no céu para o símbolo: revela a runa. Repitam nos outros.",
+     "Na câmara d'água, matem o Portador da Luz e o Fantasma (60 s de Vestígio) e anotem a runa.",
+     "Voltem, revelem e imbuam o ponto certo; 3 vezes e começa o dano."
+    ],
+    "tip": "Quebrem o escudo na poça com a Arbalest. Mods de resistência a Arco ajudam."
+   }
+  ]
+ },
+ "dg:wr": {
+  "src": [
+   [
+    "Shacknews",
+    "https://shacknews.com/article/138052/destiny-2-warlords-ruin-guide"
+   ]
+  ],
+  "enc": [
+   {
+    "n": "Rathil, Primeiro Cavaleiro Partido",
+    "obj": "Converter os totens Possuídos em totens de Stasis antes do Desejo Iminente e dar dano.",
+    "roles": [
+     [
+      "Totens",
+      "2 convertem"
+     ],
+     [
+      "Dano",
+      "1"
+     ]
+    ],
+    "steps": [
+     "Limpem até serem enjaulados e atirem nos 3 Olhos de Acólito para sair.",
+     "Fiquem nos círculos dos totens até virarem Stasis.",
+     "Convertam o máximo antes do Desejo Iminente zerar.",
+     "Dano em Rathil (a fase dura mais quanto mais totens).",
+     "Repitam e resolvam o enigma da prisão."
+    ],
+    "tip": "Fiquem entre dois círculos sobrepostos para converter os dois juntos. Crítico fácil: sniper, escopeta ou espada."
+   },
+   {
+    "n": "Lócus do Lamento",
+    "obj": "Depositar Cargas Solares nos 4 braseiros para abrir as fases de dano, controlando o Frio Cortante.",
+    "roles": [
+     [
+      "Totens",
+      "1"
+     ],
+     [
+      "Cargas",
+      "1"
+     ],
+     [
+      "Dano",
+      "1"
+     ]
+    ],
+    "steps": [
+     "Atirem num Olho de Acólito; destruam a próxima onda para surgir os Cavaleiros Partidos.",
+     "Convertam os totens: cada um dá uma Carga Solar quando o tempo zerar.",
+     "Depositem até acender os 4 braseiros.",
+     "Dano perto de um braseiro (dá buff).",
+     "Quando acabar, passem para o próximo; após os 4, voltem e repitam."
+    ],
+    "tip": "Com 10 acúmulos de Frio Cortante você morre: os estandartes da parede limpam."
+   },
+   {
+    "n": "Vingança de Hefnd, Quimera Arruinada",
+    "obj": "Empurrar o chefe pela montanha em 3 fases nas ilhas e finalizar no topo sem limite de tempo.",
+    "roles": [
+     [
+      "Maldição",
+      "1 soca os Bebe-Malefícios"
+     ],
+     [
+      "Totens/olhos",
+      "1"
+     ],
+     [
+      "Dano",
+      "1"
+     ]
+    ],
+    "steps": [
+     "Destruam a Praga Possuída e os Olhos em volta do chefe.",
+     "Convertam totens para prolongar o buff de dano.",
+     "Soquem os Bebe-Malefícios Corrompidos para pegar a Maldição e não deixem devolver.",
+     "Dano até o limite de vida e subam para a próxima ilha (anti-horário).",
+     "Repitam nas 3 de baixo.",
+     "No topo, fiquem numa ilha, destruam Olhos para ganhar tempo e mudem quando ele mudar."
+    ],
+    "tip": "Ele fica longe: foguete e sniper, nada de escopeta. O Disparo Solar limpa os Olhos rápido."
+   }
+  ]
+ },
+ "dg:vh": {
+  "src": [
+   [
+    "Shacknews",
+    "https://shacknews.com/article/141768/destiny-2-vespers-host-guide"
+   ]
+  ],
+  "enc": [
+   {
+    "n": "Ativação",
+    "obj": "Achar painéis seguros com Escâner e Operador e entregar 3 núcleos nucleares.",
+    "roles": [
+     [
+      "Escâner",
+      "1"
+     ],
+     [
+      "Operador",
+      "1"
+     ],
+     [
+      "Núcleo",
+      "1"
+     ]
+    ],
+    "steps": [
+     "Interajam com a esfera e matem até surgir o Portador Viral com Escâner.",
+     "No corredor, outro Portador dá Operador.",
+     "O Escâner olha o radar: painel que some é perigoso.",
+     "O Operador atira só nos seguros: surge um núcleo.",
+     "Levem ao salão, matem o Brig e depositem.",
+     "Repitam até 3; guardem Super e pesada para o Brig final."
+    ],
+    "tip": "Segurar o núcleo dá Radiação; com 10 você morre. Larguem para baixar."
+   },
+   {
+    "n": "Raneiks Unificado",
+    "obj": "Achar os 4 painéis certos pelos servidores destacados e dar dano em 25 s.",
+    "roles": [
+     [
+      "Operador",
+      "1"
+     ],
+     [
+      "Supressor",
+      "1"
+     ],
+     [
+      "Batedor",
+      "1 anota os servidores"
+     ]
+    ],
+    "steps": [
+     "No caminho, levem núcleos aos baldes numerados em ordem e fujam da linha de visão do feixe de Raneiks.",
+     "Na sala central, deixem o Operador num terminal e matem o Sacerdote para subir.",
+     "Matem os Shanks até surgir o Shank Supressor e peguem o buff.",
+     "Usem a granada para criar a isca perto do chefe e destruam: ele se divide.",
+     "Anotem os 2 servidores com luzes extras; repitam até 4 números.",
+     "O Operador atira nos painéis certos e o Supressor usa o buff: 25 s de dano."
+    ],
+    "tip": "Titãs Solares com Consagração e Arcanos com Canção da Chama vão bem; Parasita e Hálito do Dragão também."
+   },
+   {
+    "n": "Atraks Soberana (Marionetista Corrompida)",
+    "obj": "Remover o escudo entregando 2 núcleos e dar dano no centro e nas laterais.",
+    "roles": [
+     [
+      "Escâner",
+      "1"
+     ],
+     [
+      "Operador",
+      "1"
+     ],
+     [
+      "Núcleo",
+      "1"
+     ]
+    ],
+    "steps": [
+     "Usem o Supressor perto das Marionetes e destruam a isca: cai o campo de Radiação.",
+     "Matem as Marionetes: surgem Escâner e Operador.",
+     "O Escâner lê os 4 pilares; o Operador atira no certo e nos painéis do número azul.",
+     "Desçam pelo lado das luzes vermelhas e ativem os painéis da sala dos terminais.",
+     "Destruam a Marionete que fica branca no radar, peguem o núcleo e depositem; 2 vezes.",
+     "No elevador, dano no centro e depois nas laterais; o núcleo extra dá mais tempo."
+    ],
+    "tip": "Consagração limpa as Marionetes rápido; Sinal Perdido, Anarquia e Abertura Grandiosa ajudam no dano."
+   }
+  ]
+ },
+ "dg:sd": {
+  "src": [
+   [
+    "The Game Post",
+    "https://thegamepost.com/destiny-2-sundered-doctrine-dungeon-guide/"
+   ]
+  ],
+  "enc": [
+   {
+    "n": "Enigma das Lentes",
+    "obj": "Levar feixes de escuridão pelas lentes até a placa do símbolo certo (1, 2 e 3 feixes).",
+    "roles": [
+     [
+      "Lentes",
+      "1 rastreia símbolos e posiciona"
+     ],
+     [
+      "Adds",
+      "2 matam Subjugadores e Grims"
+     ]
+    ],
+    "steps": [
+     "Girem a lente central para começar.",
+     "Descubram o símbolo que falta (Grim da Verdade ou o enigma).",
+     "Matem os Subjugadores das salas para ganhar lentes.",
+     "Achem a placa certa e tracem o caminho de volta pela lente mais próxima.",
+     "Girem o suporte antes de pôr a lente (quebra após 3 giros).",
+     "Completem 1, 2 e 3 feixes nas três fases."
+    ],
+    "tip": "Círculo errado faz surgir um Atormentador no centro."
+   },
+   {
+    "n": "Fechadura Zoética",
+    "obj": "Travar as 4 rodas em Parar e a da esquerda em Matar para abrir a fase de dano nos Uivadores.",
+    "roles": [
+     [
+      "Rodas",
+      "1 com Lascas"
+     ],
+     [
+      "Dano",
+      "2"
+     ]
+    ],
+    "steps": [
+     "Matem Feiticeiras para pegar Lascas de Ressonância (1 a 3).",
+     "Travem a roda da direita em Parar.",
+     "Rodas mostrando Colmeia: mudem logo para não vir Ogros.",
+     "As duas seguintes também em Parar.",
+     "A da esquerda em Matar: começa o dano.",
+     "Juntos, dano em um dos 4 Uivadores; repitam."
+    ],
+    "tip": "Simulador do Dorminhoco e Abertura Grandiosa vão bem; Localizador de Munição ajuda."
+   },
+   {
+    "n": "Kerrev, o Apagado",
+    "obj": "Apontar as lentes para as mentiras, deixar o obelisco queimar o escudo e dar dano.",
+    "roles": [
+     [
+      "Enigma",
+      "1 posiciona lentes"
+     ],
+     [
+      "Suporte",
+      "1 cura"
+     ],
+     [
+      "Dano",
+      "1"
+     ]
+    ],
+    "steps": [
+     "Leiam os 2 enigmas da placa central: um verdadeiro, um mentira.",
+     "Na dúvida, matem o Grim da Verdade de uma sala lateral.",
+     "Nas salas, apontem os feixes para as mentiras.",
+     "Matem os Atendentes para Fortalecimento Não Escrito e quebrem as travas de Filamento.",
+     "Com tudo pronto, apertem o botão da placa do meio.",
+     "Protejam-se do obelisco e deem dano; repitam."
+    ],
+    "tip": "Mod de resistência a Filamento muito recomendado."
+   }
+  ]
+ },
+ "dg:eq": {
+  "src": [
+   [
+    "Shacknews",
+    "https://www.shacknews.com/article/147168/how-to-complete-the-equilibrium-dungeon-in-destiny-2"
+   ]
+  ],
+  "enc": [
+   {
+    "n": "Forças do Império Barant",
+    "obj": "Derrotar 6 Aprendizes Sem Nome e os Behemoths.",
+    "roles": [
+     [
+      "Sombra",
+      "1 usa a granada especial"
+     ],
+     [
+      "Isca",
+      "1 leva Aprendizes ao aparelho"
+     ],
+     [
+      "Adds",
+      "1"
+     ]
+    ],
+    "steps": [
+     "Interajam com a nave: surgem 3 Aprendizes imunes.",
+     "Levem um ao aparelho Cabal perto da barreira vermelha.",
+     "Ativem a ponta do aparelho para estender o pilar de Arco.",
+     "O ataque de Escuridão dele carrega o aparelho e derruba a barreira.",
+     "Nos túneis de pardal, juntem Sombra até Noviço.",
+     "Usem a granada especial nos escudos; 6 Aprendizes e os Behemoths."
+    ],
+    "tip": "Sem pegar Sombra nos túneis, as Sombras Rastejantes matam. Cápsulas de queda matam quem estiver embaixo."
+   },
+   {
+    "n": "Harrow, Aprendiz Dredgen",
+    "obj": "Derrubar os escudos de Harrow com isca e pilares e dar dano nas janelas.",
+    "roles": [
+     [
+      "Sombra",
+      "1"
+     ],
+     [
+      "Isca",
+      "1"
+     ],
+     [
+      "Dano",
+      "1"
+     ]
+    ],
+    "steps": [
+     "Atirem no fusível da sala da bandeira e caiam na arena.",
+     "Limpem e esperem abrirem as portas laterais.",
+     "Matem os Lacaios até Noviço, depois Aprendiz.",
+     "Usem a granada no aparelho certo e acertem 3 painéis em cada sala.",
+     "Atraiam Harrow para as portas do hangar ou para os 4 pilares.",
+     "Dano em ~30 s; na divisão, persigam-no pelo corredor."
+    ],
+    "tip": "Pilares e fusíveis não voltam: ~3 fases. Lâmina Práxica, Lenda de Acrius ou Parasita."
+   },
+   {
+    "n": "Dredgen Sere",
+    "obj": "Destruir os 5 orbes Possuídos nos dois planos e repetir para dar dano.",
+    "roles": [
+     [
+      "Compelidor",
+      "1 vira Mestre das Sombras"
+     ],
+     [
+      "Orbes",
+      "1"
+     ],
+     [
+      "Suporte",
+      "1 (ideal Poço)"
+     ]
+    ],
+    "steps": [
+     "Aproximem-se para começar, longe do golpe inicial.",
+     "Nos 45 s de Atração Sombria, juntem Sombra e matem Aprendizes.",
+     "Ao zerar, no plano Possuído, compilem as 5 Sombras.",
+     "Acertem painéis para criar plataformas até a quinta.",
+     "Voltem, destruam os últimos orbes e deem dano.",
+     "Depois, nas bordas, parem os pilares de Arco com a granada."
+    ],
+    "tip": "Atirem nas mãos de Sere quando ele soltar raios para atordoá-lo."
+   }
+  ]
  }
 }
