@@ -545,6 +545,10 @@
    [
     "Shacknews",
     "https://www.shacknews.com/article/107313/destiny-2-last-wish-raid-guide"
+   ],
+   [
+    "AssistCity",
+    "https://assistcity.gitbook.io/destiny/raid-guides/last-wish/encounters/the-queenswalk"
    ]
   ],
   "enc": [
@@ -672,6 +676,32 @@
      "Subam pela luz no plano Ascendente e destruam o coração no final."
     ],
     "tip": "Uma pessoa por olho aceso: cada um só lembra de 1 olho, não de 6."
+   },
+   {
+    "n": "Caminhada da Rainha",
+    "obj": "Levar o Coração de Riven para fora, pelo Cofre, até os dois Techeuns no fim da escadaria; os 6 precisam chegar.",
+    "roles": [
+     [
+      "Escolhido do Destino",
+      "1 carrega o coração (15 s)"
+     ],
+     [
+      "Fora",
+      "escoltam e limpam"
+     ],
+     [
+      "Dentro",
+      "entram no coração e pegam Força Possuída"
+     ]
+    ],
+    "steps": [
+     "Quem recebe o Escolhido do Destino pega o Coração e corre para fora da garganta; a aura dele protege quem está perto.",
+     "Com 3 s no tempo, o time de fora se afasta: quem estiver a 2 m é puxado para dentro do coração.",
+     "O carregador é teleportado para dentro; o primeiro a entrar pega a última Força Possuída do campo.",
+     "Cada pessoa que entra depois pega no máximo 2 Forças, deixando 1 para o próximo; cada entrada reinicia o tempo do carregador.",
+     "O próximo carregador pega o coração do lado de fora e continua a corrida até os Techeuns."
+    ],
+    "tip": "Dá para pegar o coração a ~2 m. Na 1ª corrida parem na boca da Riven e virem à esquerda; 3 Forças matam; matem os Poderes de Riven (Cavaleiros com espada)."
    }
   ]
  },
@@ -782,6 +812,551 @@
      "No final, usem tudo que sobrou."
     ],
     "tip": "O refúgio dura 14 s depois de sair da placa: passem por ele, não fiquem parados nele."
+   }
+  ]
+ },
+ "raid:kf": {
+  "src": [
+   [
+    "Shacknews",
+    "https://www.shacknews.com/article/131935/kings-fall-raid-guide-destiny-2"
+   ]
+  ],
+  "enc": [
+   {
+    "n": "Relíquias e Portal",
+    "obj": "Levar as esferas de relíquia até as estátuas do centro para abrir o portal da Colmeia e limpar o pátio.",
+    "roles": [
+     [
+      "Lados",
+      "2 grupos de 3"
+     ],
+     [
+      "Esferas",
+      "1 por grupo"
+     ],
+     [
+      "Barreiras",
+      "2 por grupo quebram e limpam"
+     ]
+    ],
+    "steps": [
+     "Dividam em 2 grupos de 3, um para cada lado.",
+     "Cada grupo escolhe quem leva a esfera; os outros 2 limpam e quebram as barreiras das portas.",
+     "Ao pegar a esfera, as portas de volta fecham: quebrem as barreiras para abrir caminho.",
+     "Quem leva volta ao centro e deposita na estátua; cada esfera seguinte fica mais longe e a relíquia expira se segurar demais.",
+     "Cada depósito dá ~3 s a mais no tempo, ajudando o outro lado.",
+     "Com todas depositadas, limpem os inimigos do pátio para ativar o portal."
+    ],
+    "tip": "Deixem 1 ou 2 no centro limpando e quebrem a porta da próxima esfera antes."
+   },
+   {
+    "n": "Salto nas naves (passagem)",
+    "obj": "Pular de nave em nave até o fim.",
+    "roles": [],
+    "steps": [
+     "Pule da nave inicial para a próxima.",
+     "Sigam nave a nave até o fim."
+    ],
+    "tip": "É igual ao Destiny 1."
+   },
+   {
+    "n": "Totens Aniquiladores",
+    "obj": "Passar a Marca entre o time para carregar o Poder do Cantor da Morte e descarregar na placa do centro, sempre com alguém embaixo de cada Totem.",
+    "roles": [
+     [
+      "Lados",
+      "2 times de 3, um em cada sala"
+     ],
+     [
+      "Em cada time",
+      "1 Marca, 1 descarrega no centro, 1 mata o Guardião da Praga"
+     ]
+    ],
+    "steps": [
+     "Dividam em 2 times de 3.",
+     "Um pega a Marca na sala lateral, fica na placa embaixo do Totem e faz abates para juntar o Poder do Cantor da Morte.",
+     "Um colega mata o Guardião da Praga numa sacada do centro e ganha o Tomador de Marca.",
+     "Quem tem o Tomador interage para pegar a Marca de quem está segurando.",
+     "Quem está com o Poder vai à placa central e descarrega.",
+     "Revezem: cada Marca dura 30 s e quem segura morre se acabar. Não tem chefe."
+    ],
+    "tip": "Senhor do Trovão ajuda contra grupos e Cavaleiros das sacadas; evitem Tiro Sombrio no centro (lenta os inimigos que dão carga)."
+   },
+   {
+    "n": "O Sacerdote da Guerra",
+    "obj": "Ativar as placas na ordem dos glifos para ganhar a Marca do Iniciado e dar dano dentro da aura.",
+    "roles": [
+     [
+      "Duplas",
+      "3 (sacada esquerda, centro embaixo, sala da direita)"
+     ],
+     [
+      "Guardiões da Praga",
+      "2 correm para matar"
+     ]
+    ],
+    "steps": [
+     "Matem inimigos até nascerem os Cavaleiros, que começam a sequência.",
+     "Fique na placa do meio e veja o monólito aceso: ele mostra a placa inicial. Saia.",
+     "Na placa inicial, avise o próximo monólito aceso; pisem na 2ª e depois na 3ª placa.",
+     "Quem está na 3ª placa ganha a Marca do Iniciado.",
+     "Juntem dentro da aura e deem dano no Sacerdote.",
+     "Matem um Guardião da Praga para pegar o Tomador e passar a Marca antes do tempo acabar.",
+     "No fim do dano, se escondam atrás de um monólito para fugir do Óculo."
+    ],
+    "tip": "Deem dano entre o monólito do meio e o da direita; Tiro Sombrio com Divindade e Poço com Escudo da Sentinela não somam."
+   },
+   {
+    "n": "Golgoroth",
+    "obj": "Dar dano na barriga do Golgoroth de dentro das Poças de Luz enquanto duas pessoas trocam o Olhar dele.",
+    "roles": [
+     [
+      "Olhar",
+      "2 (um puxa, outro atira nas costas)"
+     ],
+     [
+      "Dano",
+      "4 quebram esferas e atiram das poças"
+     ]
+    ],
+    "steps": [
+     "Destruam a esfera central para chamar o Golgoroth e limpem.",
+     "Um puxa a atenção e outro atira nas costas para pegar o Olhar.",
+     "O time de dano quebra uma esfera e entra na poça para atirar na barriga.",
+     "Quem tem o Olhar passa no último segundo e o time vai para a próxima esfera.",
+     "Quem pega Essência Instável se afasta antes de explodir.",
+     "A fase acaba com 6 esferas ou se o Olhar não for passado; são até 3 rodadas."
+    ],
+    "tip": "Cada esfera não usada marca a Tábua da Ruína (6 marcas = time cai); Poço da Radiância em cada poça."
+   },
+   {
+    "n": "Parede de pistões (passagem)",
+    "obj": "Atravessar a parede de pistões e voltar.",
+    "roles": [],
+    "steps": [
+     "Sigam até a parede de pistões.",
+     "Atravessem pelos pistões.",
+     "Voltem pela parede."
+    ],
+    "tip": "Agora dá para agarrar nas beiradas, ficou mais fácil."
+   },
+   {
+    "n": "Filhas de Oryx",
+    "obj": "Fazer 3 ciclos do caminho Ascendente para juntar o Guardião da Praga, roubar a aura de uma Filha e derrotá-la em 2 min; depois a outra.",
+    "roles": [
+     [
+      "Dividido entre Dimensões",
+      "1 sorteado atravessa"
+     ],
+     [
+      "Plataformas",
+      "3–4 ativam"
+     ],
+     [
+      "Flutuantes",
+      "2 cobrem"
+     ]
+    ],
+    "steps": [
+     "Matem o Cavaleiro da plataforma inicial e subam nela.",
+     "Avisem onde está o símbolo flutuante e pisem na 2ª plataforma para formar o caminho.",
+     "Quem está Dividido atravessa e pega um pedaço do Guardião da Praga; repitam 3 vezes.",
+     "No 3º ciclo, ele pega a aura da Filha que está atirando.",
+     "Juntem na aura e deem dano na Filha.",
+     "Repitam com a segunda Filha."
+    ],
+    "tip": "Gjallarhorn e lança-foguetes lendários resolvem rápido; limpem logo as 4 Falanges Possuídas à direita da entrada."
+   },
+   {
+    "n": "Oryx, o Rei Possuído",
+    "obj": "Explodir as bombas de Luz Corrompida para atordoar Oryx e dar dano no peito até 25%, depois o final.",
+    "roles": [
+     [
+      "Dividido",
+      "1 atravessa e pega a aura"
+     ],
+     [
+      "Bombas",
+      "4 correm para detonar"
+     ],
+     [
+      "Aura",
+      "1 segura e dá dano"
+     ]
+    ],
+    "steps": [
+     "Cheguem perto da chama e limpem até Oryx escolher um lado; ativem a plataforma desse lado.",
+     "Quem está Dividido atravessa 3 vezes para juntar o Guardião da Praga.",
+     "Matem os Ogros Devoradores de Luz para soltar Luz Corrompida e os Cavaleiros que vêm comer as bombas.",
+     "O Dividido pega a Aura da Imortalidade no Receptáculo do meio.",
+     "Quando aparecer 'Oryx chama a escuridão', 4 detonam as bombas e voltam para a aura.",
+     "Deem dano no peito aberto com ele atordoado.",
+     "Depois sobrevivam às bombas ou matem a Sombra de Oryx na cúpula; repitam até 25%.",
+     "No final, matem 2 Ogros, detonem as bombas e deem dano no peito."
+    ],
+    "tip": "Divindade em vez de Amarra, com fuzis de fusão linear e de precisão; cuidem da munição até chegar aos 25%."
+   }
+  ]
+ },
+ "raid:gos": {
+  "src": [
+   [
+    "Shacknews",
+    "https://www.shacknews.com/article/114369/garden-of-salvation-raid-guide-destiny-2"
+   ]
+  ],
+  "enc": [
+   {
+    "n": "Fugir da Mente Consagrada",
+    "obj": "Abrir as barreiras Vex enquanto passa à frente do chefe e atravessar o campo aberto até o outro lado.",
+    "roles": [
+     [
+      "Frente",
+      "3 abrem as barreiras"
+     ],
+     [
+      "Trás",
+      "3 ficam com o chefe e pegam o Transbordo Voltaico"
+     ]
+    ],
+    "steps": [
+     "3 ou 4 fazem a ligação da caixa Vex até a primeira porta; o encontro começa quando ela abre.",
+     "O time da frente vai até a próxima barreira, mata o Angélico e o Minotauro de Sobrecarga e liga a caixa para abrir.",
+     "O time de trás fica com a Mente Consagrada pegando o Transbordo Voltaico.",
+     "Quando o chefe avança, o time de trás passa à frente até a próxima barreira.",
+     "Repitam até a última barreira (3 fechaduras, 3 caixas Vex).",
+     "No campo aberto, continuem pegando o Transbordo e passem pelos Ciclopes e Minotauros."
+    ],
+    "tip": "Munição de Sobrecarga para atordoar os Minotauros; deixem alguns matando Ciclopes para pelo menos 1 chegar ao fim."
+   },
+   {
+    "n": "Invocar a Mente Consagrada",
+    "obj": "Proteger os 4 retransmissores dos cantos para baixar a barreira central e segurar o do centro por 3 ondas.",
+    "roles": [
+     [
+      "Cantos",
+      "1 defensor em cada"
+     ],
+     [
+      "Rotação",
+      "4 no começo, sentido horário"
+     ],
+     [
+      "Flutuantes",
+      "1–2"
+     ]
+    ],
+    "steps": [
+     "Matem os 3 Goblins do centro antes de subirem os dados.",
+     "4 vão para o Retransmissor 2 (sentido horário) e 2 ficam no 1 matando o Angélico e carregando com a caixa Vex.",
+     "Em cada canto, limpem os Hobgoblins de Barreira e o Angélico, liguem a caixa para ficar Iluminado e deixem 1 defensor.",
+     "Os flutuantes ajudam e mantêm o Iluminado ativo.",
+     "Cada canto recebe 3 Angélicos; com os 12 mortos a barreira central cai.",
+     "Todos vão ao centro, liguem o retransmissor e segurem por 3 ondas."
+    ],
+    "tip": "Iluminado dura ~44 s e é necessário para quebrar escudos brancos; usem os portais Vex para chegar rápido."
+   },
+   {
+    "n": "Mente Consagrada",
+    "obj": "Depositar 30 partículas no retransmissor aceso para abrir o dano e destruir os olhos vermelhos do chefe.",
+    "roles": [
+     [
+      "Partículas",
+      "3 matam Minotauros e coletam"
+     ],
+     [
+      "Chefe",
+      "3: 1 preso avisa a cor, 2 atiram nos olhos"
+     ]
+    ],
+    "steps": [
+     "Liguem a caixa Vex ao retransmissor central para começar.",
+     "O time de partículas mata Minotauros nas pistas; cada um junta até 10 e passa para o próximo.",
+     "Depositem no retransmissor aceso: isso dá Iluminado.",
+     "O time do chefe segue a Mente; quem pega o Transbordo fica preso e avisa se os olhos estão 'dentro' ou 'fora'.",
+     "O preso atira na barbatana de cima; os outros dois na da esquerda e da direita.",
+     "Com 30 partículas, o chefe vai até o banco: destruam todos os olhos vermelhos para expor o ponto fraco e atirem no centro."
+    ],
+    "tip": "Quando os 3 do chefe tiverem o efeito Voltaico, troquem com alguém das partículas; o Fardo de Izanagi é ótimo aqui."
+   },
+   {
+    "n": "Mente Santificada",
+    "obj": "Depositar 30 partículas em cada retransmissor ativo e ligar aos símbolos do chefe para atordoá-lo.",
+    "roles": [
+     [
+      "Partículas 1",
+      "2 (um lado)"
+     ],
+     [
+      "Partículas 2",
+      "2 (outro lado)"
+     ],
+     [
+      "Plataformas",
+      "2 defendem e reconstroem"
+     ]
+    ],
+    "steps": [
+     "Atirem no chefe e matem os inimigos, inclusive o Angélico, para liberar os retransmissores.",
+     "Destruam o ombro ou o joelho do chefe para abrir um portal; o time 1 entra, pega pelo menos 15 partículas e volta destruindo o mesmo membro.",
+     "Alternem os times: joelho abre portal azul, ombro abre laranja.",
+     "Depositem no retransmissor da mesma cor (dá Iluminado).",
+     "Com 30 em cada, o chefe mostra um sinal de + colorido: liguem do retransmissor da mesma cor (mín. 3, ideal 4).",
+     "Quebrado o primeiro símbolo, liguem do outro retransmissor para o segundo.",
+     "Juntem e deem dano na barriga."
+    ],
+    "tip": "Priorizem a segunda ligação em vez de dano; reconstruam primeiro as plataformas do meio (a água machuca)."
+   }
+  ]
+ },
+ "raid:vow": {
+  "src": [
+   [
+    "Shacknews",
+    "https://www.shacknews.com/article/129163/vow-of-the-disciple-raid-guide-destiny-2"
+   ]
+  ],
+  "enc": [
+   {
+    "n": "Aquisição",
+    "obj": "Achar e atirar nos símbolos certos dos obeliscos antes de eles encherem.",
+    "roles": [
+     [
+      "Duplas",
+      "3, uma por obelisco"
+     ],
+     [
+      "Salas",
+      "quem estiver mais perto entra"
+     ],
+     [
+      "Leitor",
+      "1 avisa o símbolo do pilar de referência"
+     ]
+    ],
+    "steps": [
+     "Atirem no cristal central para abrir e fechar as portas.",
+     "Matem as Bússolas do Discípulo; o símbolo de cima do pilar diz de que lado elas aparecem.",
+     "Entrem na sala do símbolo do meio do pilar e matem os Guardiões dos Glifos.",
+     "Alguém avisa o símbolo certo (o de baixo do pilar) e grava.",
+     "Saiam e repitam até 3 símbolos.",
+     "Atirem nos 3 símbolos do obelisco quase juntos.",
+     "Repitam nos outros dois obeliscos."
+    ],
+    "tip": "Lança-granadas com Granadas Cegantes seguram os Aderentes; levem Imparável (aparecem Abominações Imparáveis)."
+   },
+   {
+    "n": "O Zelador",
+    "obj": "Atordoar o Zelador, coletar os símbolos e dar dano nos 3 andares e no final.",
+    "roles": [
+     [
+      "Atordoar",
+      "2 (cara e costas)"
+     ],
+     [
+      "Adds",
+      "2"
+     ],
+     [
+      "Símbolos",
+      "2 nas salas escuras"
+     ],
+     [
+      "Placas",
+      "3 dão bônus no dano"
+     ]
+    ],
+    "steps": [
+     "Os dois do atordoamento ficam na plataforma de baixo e alternam tiros na cara e nas costas.",
+     "Limpem inimigos e projéteis e atirem nos cristais para abrir as portas.",
+     "Um por vez entra na sala escura, pega 3 símbolos, atira no obelisco e no Crux para abrir a porta.",
+     "Com os 9 símbolos, usem as 3 placas de dano em sequência (10 s cada).",
+     "Subam a escada para o próximo andar e repitam.",
+     "No corredor final, avancem e fiquem o máximo em cada placa."
+    ],
+    "tip": "Fuzis de fusão linear com Surto Aperfeiçoado de reserva; Botas Lunafacção ajudam na recarga."
+   },
+   {
+    "n": "Exibição",
+    "obj": "Levar os artefatos pelas salas, achar os símbolos iguais nos batentes e depositar antes da Ressonância Terminal acabar.",
+    "roles": [
+     [
+      "Grupos",
+      "2 de 3 (esquerda e direita)"
+     ],
+     [
+      "Olho de Riven",
+      "1 destrói as amarras Possuídas"
+     ],
+     [
+      "Artefatos",
+      "revezam"
+     ],
+     [
+      "Sobrecarga",
+      "alguns para os Hobgoblins"
+     ]
+    ],
+    "steps": [
+     "Peguem o(s) artefato(s).",
+     "Limpem Desprezados, Possuídos e Guardiões dos Glifos vendo os símbolos que aparecem.",
+     "Avisem os símbolos e achem os que combinam.",
+     "Atirem nos símbolos iguais do batente da saída para abrir a sala de depósito.",
+     "Depositem e outras pessoas pegam de novo.",
+     "Repitam em cada sala usando o Olho de Riven nas amarras."
+    ],
+    "tip": "Alguns símbolos só aparecem para quem tem artefato; matar a Ampulheta e cada depósito dão +40 s."
+   },
+   {
+    "n": "Rhulk, Discípulo da Testemunha",
+    "obj": "Usar a Força Sugadora e Emanante para depositar efeitos nos obeliscos e enfraquecer Rhulk pela glaive, depois dar dano.",
+    "roles": [
+     [
+      "Sugadora",
+      "2 passam entre si"
+     ],
+     [
+      "Emanante",
+      "2 convertem nos raios de escuridão"
+     ],
+     [
+      "Símbolos",
+      "2 avisam"
+     ],
+     [
+      "Obelisco",
+      "1 avisa o local"
+     ]
+    ],
+    "steps": [
+     "Atirem no cristal central para começar e ganhar Força Sugadora.",
+     "Passem a Sugadora para os dois dos cristais laterais e convertam em Emanante dentro dos raios de escuridão.",
+     "Matem os Guardiões dos Glifos, avisem os símbolos e achem os obeliscos certos.",
+     "Depositem a Emanante nos obeliscos até 6 efeitos e o campo de força recuar.",
+     "Entrem na arena, atirem na glaive de Rhulk e convertam a Sugadora em Emanante.",
+     "Depositem no canto do símbolo avisado até destruir 4 pontos fracos e abrir o dano.",
+     "Deem dano, recuem quando ele ficar imune e repitam; no final, matem antes de Escuridão Envolvente chegar a 10."
+    ],
+    "tip": "Uma pessoa de Divindade (+30% de dano) e o resto com Simulante Adormecido ou fusão linear; guardem Supers de uma vez para o final."
+   }
+  ]
+ },
+ "raid:se": {
+  "src": [
+   [
+    "Shacknews",
+    "https://www.shacknews.com/article/140025/salvations-edge-raid-guide-destiny-2"
+   ]
+  ],
+  "enc": [
+   {
+    "n": "Substrato",
+    "obj": "Travar 6 pilares Condutores fazendo o sinal saltar entre placas e alimentando a caixa central com Ressonância.",
+    "roles": [
+     [
+      "Times",
+      "2 de 3: 1 na placa ativa, 1 na sala do Condutor, 1 flutuante"
+     ]
+    ],
+    "steps": [
+     "Peguem uma forma de Ressonância e depositem na caixa para começar (abre 2 portas).",
+     "Matem os Suplicantes e mandem um time por porta.",
+     "Cada time limpa 3 salas matando Hidras e o Campeão do fim para nascer um Atormentador.",
+     "Matem o Atormentador no centro para abrir 2 portas novas; a última sala tem a placa ativa.",
+     "Façam o sinal saltar entre as placas, peguem 3 formas, atirem no centro do Condutor e fiquem na placa dele para travar.",
+     "Com os 2 Condutores travados, voltem ao centro, matem o Subjugador e depositem a Ressonância; repitam até 6."
+    ],
+    "tip": "Sempre fiquem na placa que recebe o sinal (senão nasce um Subjugador); 4 formas ou tempo zerado matam."
+   },
+   {
+    "n": "Dissipação · Arauto da Finalidade",
+    "obj": "Derrotar o Arauto depositando formas de Ressonância para o tempo da Forma Final não acabar.",
+    "roles": [
+     [
+      "Duplas",
+      "3 (meio, esquerda, direita)"
+     ],
+     [
+      "Chamado ao Ajuste",
+      "3 sorteados"
+     ]
+    ],
+    "steps": [
+     "Dividam em 3 duplas, uma por área, e atirem na Praga do meio para começar.",
+     "Em cada área matem Atendentes, Cavaleiros Possuídos e o Trammel (minichefe).",
+     "Morto o primeiro Trammel, 3 recebem o Chamado ao Ajuste e vão ao buraco: atirem na cabeça do chefe, destruam as Pragas e quebrem a cabeça para ganhar o Favor Roubado.",
+     "Quem tem o Favor volta à sua área e avisa a forma do Condutor (esfera ou pirâmide).",
+     "Juntem 3 formas iguais saltando o sinal e travem o Condutor (a última forma que pegar define a pilha toda).",
+     "Com os 3 travados, depositem na caixa do buraco para abrir o dano; repitam quando ele ficar imune."
+    ],
+    "tip": "Só quem tem o Chamado ao Ajuste dá dano na cabeça: protejam essas pessoas."
+   },
+   {
+    "n": "Repositório",
+    "obj": "Atravessar 3 salas travando 3 Condutores por sala, cada um pedindo uma forma (triângulo, círculo ou quadrado).",
+    "roles": [
+     [
+      "Duplas",
+      "3, uma por pista de placas"
+     ]
+    ],
+    "steps": [
+     "Dividam em 3 duplas, cada uma com sua pista.",
+     "Matem o Atormentador da pista: quem mata ganha o Favor Roubado e vê a forma do Condutor.",
+     "Saltem o sinal entre as placas para gerar formas.",
+     "Peguem a forma que o Condutor pede e travem o certo (às vezes precisa trocar de pista).",
+     "Com tudo travado, limpem e matem o Campeão para abrir a porta.",
+     "Repitam nas próximas salas, onde as ligações cruzam de lado."
+    ],
+    "tip": "A forma da sua placa pode não ser a que o seu Condutor pede: confiram antes de pegar."
+   },
+   {
+    "n": "Veracidade",
+    "obj": "Libertar os 3 de dentro combinando o objeto 3D da estátua de fora com o objeto 3D no bolso de cada um, 3 vezes.",
+    "roles": [
+     [
+      "Fora",
+      "3 juntos"
+     ],
+     [
+      "Dentro",
+      "3, cada um sozinho numa sala"
+     ]
+    ],
+    "steps": [
+     "O encontro separa sozinho 3 de fora e 3 de dentro.",
+     "Os de fora combinam 2 formas 2D num objeto 3D em cada estátua, sem usar a forma que a estátua do parceiro de dentro tem.",
+     "Para trocar a forma, os de fora levam as formas coletadas e depositam nas estátuas.",
+     "Os de dentro matam Cavaleiros, depositam formas para mandar aos outros e juntam as 2 que a estátua deles não tem.",
+     "Matando 2 Cavaleiros, as formas viram um objeto 3D no bolso; quando bate com a estátua de fora, atravessem a parede.",
+     "Repitam 3 vezes."
+    ],
+    "tip": "Dentro, juntem primeiro todas as formas iguais na mão de uma pessoa; na Decimação Catatônica, Fantasma errado na estátua mata o colega."
+   },
+   {
+    "n": "Zênite · A Testemunha",
+    "obj": "Destruir os 6 glifos da Testemunha e dar dano até derrotá-la no final.",
+    "roles": [
+     [
+      "Quebradores de Glifo",
+      "combinem quantos antes"
+     ],
+     [
+      "Apoio",
+      "o resto"
+     ]
+    ],
+    "steps": [
+     "Fiquem alguns segundos no ataque telegrafado de um braço para ganhar a Ressonância dele.",
+     "Atirem no bracelete desse braço: a cor diz a Ressonância que precisa (vermelho hexaedro, amarelo esfera, verde pirâmide).",
+     "Peguem essa Ressonância no ataque de outro braço sem levar o golpe.",
+     "Voltem ao braço original, fiquem na área e atirem rápido no bracelete para ganhar o Quebrador de Glifo.",
+     "Destruam um glifo; esperar 3 pessoas com o efeito quebra 3 de uma vez e evita Subjugadores.",
+     "No teste da Testemunha, atirem nos nós a mais para formar a forma do último braço que atiraram (errar derruba o time).",
+     "Com os 6 glifos quebrados, deem dano na plataforma central e pulem fora antes da pancada final."
+    ],
+    "tip": "Anotem o último braço em que atiraram antes do teste: ele define a forma."
    }
   ]
  }
