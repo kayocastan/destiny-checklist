@@ -2193,3 +2193,13 @@ html.grade .ob-opt{font-size:16px}
 .t3-big:not(.open)>.t3-acts{display:grid;grid-template-columns:repeat(2,auto);flex-direction:unset}
 .t3-big:not(.open)>.t3-acts>*{justify-content:center;text-align:center}
 @media (max-width:640px){.t3-big:not(.open)>.t3-acts{display:flex}}
+.iv-pks{flex-basis:100%;display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:-2px}.iv-pks>small{color:var(--muted);font-size:13px}
+.iv-pks button{border:1px solid color-mix(in srgb,var(--acc) 45%,var(--line));background:color-mix(in srgb,var(--acc) 10%,transparent);color:var(--fg);border-radius:999px;padding:4px 11px;font:inherit;font-size:13.5px;cursor:pointer}.iv-pks button small{font-family:var(--mono);color:var(--muted)}
+/* alertas no topo da conta */
+.acc-al{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 6px}.acc-al[hidden]{display:none}
+.acc-a{display:flex;align-items:center;gap:8px;padding:6px 6px 6px 12px;border-radius:10px;border:1px solid rgba(242,211,107,.5);background:rgba(242,211,107,.09);font-size:13.5px}
+.acc-a.bad{border-color:rgba(255,138,122,.6);background:rgba(255,138,122,.1)}
+.acc-a .ic{font-size:15px;color:#f2d36b}.acc-a.bad .ic{color:#ff8a7a}
+.acc-a .t{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;background:none;border:0;padding:0;color:var(--fg);font:inherit;text-align:left}.acc-a button.t{cursor:pointer}.acc-a button.t:hover b{text-decoration:underline}
+.acc-a .t small{color:var(--muted);font-size:12.5px}
+.acc-a .x{background:none;border:0;color:var(--muted);cursor:pointer;padding:2px 6px;border-radius:6px;font-size:12px}.acc-a .x:hover{background:var(--chip);color:var(--fg)}

@@ -1399,12 +1399,37 @@ function applyUI() {
   $('langbtn').innerHTML = lang === 'en' ? '<b>EN</b><span class="sep">/</span><span>PT</span>' : '<span>EN</span><span class="sep">/</span><b>PT</b>';
   $('langbtn').title = lang === 'en' ? 'Mudar para português' : 'Switch to English';
 }
+/* Alertas no topo da conta: correios quase cheios, cofre perto do limite, engramas no máximo, lumen no teto.
+   Cada aviso some por hoje no ✕. */
+const ENGRAM_BUCKET = 375726501, GLIMMER = 3159615086;
+function renderAlerts(logged) {
+  const el = $('alerts'); if (!el) return;
+  if (!logged || !profile?.characters?.data) { el.hidden = true; return; }
+  const P = lang === 'pt', day = new Date().toDateString(), hide = LS.get('dc-al-hide', {}), al = [];
+  const cname = cid => { const c = profile.characters.data[cid]; return c ? (P ? ['Titã', 'Caçador', 'Arcano'] : ['Titan', 'Hunter', 'Warlock'])[c.classType] : ''; };
+  for (const cid of Object.keys(profile.characters.data)) {
+    const items = profile.characterInventories?.data?.[cid]?.items || [], post = items.filter(i => i.bucketHash === POST_BUCKET).length, eng = items.filter(i => i.bucketHash === ENGRAM_BUCKET).length;
+    if (post >= 15) al.push({ k: 'post' + cid, lv: post >= 19 ? 'bad' : 'w', ic: '✉', t: P ? `Correios do ${cname(cid)}: ${post}/21` : `${cname(cid)} postmaster: ${post}/21`, s: P ? 'acima de 21 os itens mais antigos somem' : 'past 21 the oldest items are lost', j: 'obj:post' });
+    if (eng >= 9) al.push({ k: 'eng' + cid, lv: eng >= 10 ? 'bad' : 'w', ic: '◆', t: P ? `Engramas do ${cname(cid)}: ${eng}/10` : `${cname(cid)} engrams: ${eng}/10`, s: P ? 'os próximos vão para os correios' : 'the next ones go to the postmaster' });
+  }
+  const vUsed = (profile.profileInventory?.data?.items || []).filter(i => i.bucketHash === VAULT_BUCKET).length;
+  if (vUsed >= 650) al.push({ k: 'vault', lv: vUsed >= 690 ? 'bad' : 'w', ic: '▣', t: P ? `Cofre: ${vUsed}/700` : `Vault: ${vUsed}/700`, s: P ? 'abra a Limpeza do cofre' : 'open Vault cleanup', j: 'vlt:' });
+  const gl = (profile.profileCurrencies?.data?.items || []).find(i => i.itemHash === GLIMMER)?.quantity || 0;
+  if (gl >= 240000) al.push({ k: 'gl', lv: gl >= 250000 ? 'bad' : 'w', ic: '✦', t: P ? `Lumen: ${(gl / 1000).toFixed(0)} mil de 250 mil` : `Glimmer: ${(gl / 1000).toFixed(0)}k of 250k`, s: P ? 'no teto, o que ganhar se perde' : 'at the cap, new glimmer is lost' });
+  const show = al.filter(a => hide[a.k] !== day);
+  el.hidden = !show.length;
+  el.innerHTML = show.map(a => `<div class="acc-a ${a.lv}"><span class="ic" aria-hidden="true">${a.ic}</span>${a.j ? `<button type="button" class="t" data-alj="${a.j}"><b>${esc(a.t)}</b><small>${esc(a.s)}</small></button>` : `<span class="t"><b>${esc(a.t)}</b><small>${esc(a.s)}</small></span>`}<button type="button" class="x" data-alx="${a.k}" aria-label="${P ? 'Esconder por hoje' : 'Hide for today'}" title="${P ? 'Esconder por hoje' : 'Hide for today'}">✕</button></div>`).join('');
+}
+document.addEventListener('click', e => {
+  const x = e.target.closest('[data-alx]'); if (x) { const h = LS.get('dc-al-hide', {}), d = new Date().toDateString(); for (const k in h) if (h[k] !== d) delete h[k]; h[x.dataset.alx] = d; LS.set('dc-al-hide', h); renderAlerts(true); return; }
+  const j = e.target.closest('[data-alj]'); if (j) { const [t, id] = j.dataset.alj.split(':'); if (id === 'post') openSecs.add('post'); jumpTo(t, id); }
+});
 function render() {
   applyUI();
   if (GRADE && !(auth && profile)) { gradeRender(); return; }
   const logged = !!(auth && profile);
   for (const id of ['tabs', 'overall', 'chars', 'refresh', 'logout']) $(id).hidden = !logged; $('ldbtn').hidden = true; document.body.classList.toggle('logged', logged);
-  renderWeek(); renderBuild(); renderLive();
+  renderWeek(); renderBuild(); renderLive(); renderAlerts(logged);
   if (!cfg) return;
   if (!logged) {
     if (!(auth && LS.get('dc-hdr', null))) { delete $('title').dataset.full; $('title').style.fontSize = ''; $('title').classList.remove('two'); $('title').textContent = 'Destiny Parallel Interface'; document.title = 'DPI · Destiny Parallel Interface'; $('eyebrow').textContent = 'Destiny 2'; renderGuardian(null); } // logado carregando: mantém o guardião da última visita
@@ -4693,6 +4718,16 @@ function pkLoad() {
   entities('DestinyInventoryItemDefinition', hs, lang).then(() => { PKN.done = true; }).catch(() => {}).finally(() => { PKN.busy = false; if (INV.q.trim()) render(); });
 }
 const pkNames = x => ivPerks(x).map(h => entCache[lang]?.['DestinyInventoryItemDefinition:' + h]?.n || '').join(' ');
+// sugestões de vantagem com nome parecido (sem acento, pedaço do nome ou 1-2 letras trocadas)
+function pkLev(a, b) { if (Math.abs(a.length - b.length) > 2) return 9; let p = Array.from({ length: b.length + 1 }, (_, j) => j); for (let i = 1; i <= a.length; i++) { const c = [i]; for (let j = 1; j <= b.length; j++) c[j] = Math.min(p[j] + 1, c[j - 1] + 1, p[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); p = c; } return p[b.length]; }
+function ivPkSug() {
+  const m = INV.q.match(/^\s*(?:perk|vantagem|vant)\s*:\s*(.*)$/i), t = palNorm(m ? m[1] : INV.q).trim(); if (t.length < 3 || !PKN.done) { if (t.length >= 3) pkLoad(); return ''; }
+  const names = new Map(); for (const x of invAll()) if (x.slot < 3) for (const h of ivPerks(x)) { const n = entCache[lang]?.['DestinyInventoryItemDefinition:' + h]?.n; if (n && !/^(Mira|Sight|Cano|Barrel|Carregador|Magazine)$/i.test(n)) names.set(n, (names.get(n) || 0) + 1); }
+  const sc = n => { const k = palNorm(n); if (k === t) return 0; if (k.startsWith(t)) return 4; if (k.includes(t)) return 3; if (k.split(' ').some(w => w.length >= 4 && pkLev(w, t) <= (t.length >= 7 ? 2 : 1))) return 2; return pkLev(k, t) <= 2 ? 1 : 0; };
+  const list = [...names].map(([n, c]) => [n, c, sc(n)]).filter(x => x[2]).sort((a, b) => b[2] - a[2] || b[1] - a[1]).slice(0, 6);
+  return list.length ? `<div class="iv-pks" role="listbox"><small>${lang === 'pt' ? 'Vantagens:' : 'Perks:'}</small>${list.map(([n, c]) => `<button type="button" data-ivpk="${esc(n)}">${esc(n)} <small>${c}</small></button>`).join('')}</div>` : '';
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-ivpk]'); if (!b) return; INV.q = 'perk:' + b.dataset.ivpk; render(); });
 const ivMatch = x => {
   const f = INV.f, q = palNorm(INV.q.trim()), d = INVD[x.h] || {}, t = tagOf(x.iid);
   if ((f === 'rg' || f === 'rp' || f === 'rn') && (x.slot > 2 || rlGrade(x.iid, x.h) !== f[1]) || f === 'w' && x.slot > 2 || f === 'a' && x.slot < 3 || f === 'dup' && !x.dup || f === 'fav' && t !== 'fav' || f === 'junk' && t !== 'junk') return false;
@@ -4705,7 +4740,7 @@ const ivMatch = x => {
 const ivTile = (x, big) => { const d = INVD[x.h] || {}, t = tagOf(x.iid), m = ivMatch(x); return `<button type="button" class="iv-t${big ? ' big' : ''}${x.ex ? ' ex' : ''}${m ? '' : ' dim'}${INV.picked.has(x.iid) ? ' pk' : ''}" data-iv="${x.iid}" draggable="true" title="${esc([d.n, x.pw ? '✦ ' + x.pw : '', d.tl].filter(Boolean).join(' · '))}" aria-label="${esc(d.n || '')}">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy" draggable="false">` : ''}${x.pw ? `<b>${x.pw}</b>` : ''}${t ? `<i class="iv-tg t-${t}">${{ fav: '★', keep: '✓', junk: '✕', inf: '⇪' }[t]}</i>` : ''}${x.el && ELEMENTS[x.el] && x.slot < 3 ? `<s class="el-${ELEMENTS[x.el]}"></s>` : ''}${x.slot < 3 ? rlBadge(rlGrade(x.iid, x.h)) : ''}${x.lk ? '<u class="iv-lk" aria-hidden="true"><svg viewBox="0 0 12 12" width="10" height="10" fill="currentColor"><path d="M3.5 5V3.6a2.5 2.5 0 0 1 5 0V5h.7c.4 0 .8.4.8.8v4.4c0 .4-.4.8-.8.8H2.8a.8.8 0 0 1-.8-.8V5.8c0-.4.4-.8.8-.8zm1.2 0h2.6V3.6a1.3 1.3 0 0 0-2.6 0z"/></svg></u>' : ''}</button>`; };
 function ivBar() {
   const T = ivt(), chip = (k, t) => `<button type="button" class="lbd-chip${INV.f === k ? ' on' : ''}" data-ivf="${k}">${esc(t)}</button>`;
-  return `<div class="iv-bar"><label class="iv-q"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/></svg><input type="search" id="ivq" value="${esc(INV.q)}" placeholder="${esc(T.q)}" aria-label="${esc(T.q)}" autocomplete="off"></label><div class="lbd-chips">${chip('all', T.all)}${chip('w', T.w)}${chip('a', T.a)}${chip('dup', T.dup)}${chip('fav', T.fav)}${chip('junk', T.junk)}</div><small class="iv-tip">${esc(T.tip)}</small></div>${INV.msg ? `<p class="iv-msg${INV.msg.bad ? ' bad' : ''}">${esc(INV.msg.t)}</p>` : ''}`;
+  return `<div class="iv-bar"><label class="iv-q"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/></svg><input type="search" id="ivq" value="${esc(INV.q)}" placeholder="${esc(T.q)}" aria-label="${esc(T.q)}" autocomplete="off"></label>${ivPkSug()}<div class="lbd-chips">${chip('all', T.all)}${chip('w', T.w)}${chip('a', T.a)}${chip('dup', T.dup)}${chip('fav', T.fav)}${chip('junk', T.junk)}</div><small class="iv-tip">${esc(T.tip)}</small></div>${INV.msg ? `<p class="iv-msg${INV.msg.bad ? ' bad' : ''}">${esc(INV.msg.t)}</p>` : ''}`;
 }
 function invHTML() {
   const T = ivt(), W = u(); if (!have.c) return `<div class="panel"><p class="empty-msg wait">${esc(T.wait)}</p></div>`;
