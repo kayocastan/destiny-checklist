@@ -58,5 +58,5 @@ Detalhes em `docs/sugestoes.md`.
 |---|---|
 | `/estado` | status público: site, servidor, Orla Bot e API da Bungie |
 | `/grade` | grades do clã (Orla Bot), só membros da Orla |
-| `/videos` | cadastro de vídeos de guia (só o dono do site) |
+| `/guias` | edição dos guias de cada atividade: vídeos, imagens e guia por encontro (só o dono do site; `/videos` redireciona para cá) |
 | `/status` | uso do servidor (só o dono do site) |
