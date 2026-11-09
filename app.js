@@ -160,20 +160,21 @@ const lastKid = LS.get('dc-kids', {});
 const resolveTab = t => KIDS[t] ? (KIDS[t].includes(lastKid[t]) ? lastKid[t] : KIDS[t][0]) : t;
 const isGd = () => tab === 'gd' || tab === 'gcl' || tab === 'gclb' || tab === 'gclg' || tab === 'gcla' || tab === 'gcld' || tab === 'gst' || tab === 'grep'; // Guardião: builds/favoritos/clã e estatísticas
 // Página de teste (/beta): só para o dono do site; recursos novos aparecem aqui antes de ir para todos
+const VAULT_MAX = 1300; // espaços do cofre (1300 desde o Update 9.7.0)
 const BETA = location.pathname.replace(/\/+$/, '') === '/beta'; // página de testes do dono (/beta)
 const FX = true; // recursos que passaram pelo /beta e agora valem para todos
 if (FX) GROUPS[0].subs = ['obj', 'prog', 'cal'];
 if (BETA) GROUPS[3].subs = ['gd', 'gar', 'grep', 'gst']; // Armaduras (tier list dos conjuntos): só no /beta por enquanto
-/* /beta · diretrizes de interface (Vercel Web Interface Guidelines) e boas práticas de desempenho, só nesta página:
+/* Diretrizes de interface (Vercel Web Interface Guidelines) e boas práticas de desempenho (passaram pelo /beta):
    classe html.bx liga os estilos (site.css, bloco "BX"); conexões antecipadas; link para pular ao conteúdo; status anunciado a leitores de tela */
-if (BETA) {
+if (FX) {
   const de = document.documentElement; de.classList.add('bx');
   for (const h of ['https://www.bungie.net', 'https://dni-api.dni-site.workers.dev']) { const l = document.createElement('link'); l.rel = 'preconnect'; l.href = h; l.crossOrigin = ''; document.head.append(l); }
   const sk = document.createElement('a'); sk.className = 'bx-skip'; sk.href = '#list'; sk.textContent = lang === 'pt' ? 'Pular para o conteúdo' : 'Skip to content'; sk.addEventListener('click', e => { e.preventDefault(); const m = document.getElementById('list'); m.tabIndex = -1; m.focus({ preventScroll: true }); m.scrollIntoView({ block: 'start' }); }); document.body.prepend(sk);
   const st = document.getElementById('status'); if (st) { st.setAttribute('role', 'status'); st.setAttribute('aria-live', 'polite'); }
   document.querySelectorAll('h1, .gh-id').forEach(x => x.setAttribute('translate', 'no'));
 }
-const idle = f => BETA && window.requestIdleCallback ? requestIdleCallback(f, { timeout: 1500 }) : setTimeout(f); // tarefas que podem esperar o navegador ficar livre
+const idle = f => window.requestIdleCallback ? requestIdleCallback(f, { timeout: 1500 }) : setTimeout(f); // tarefas que podem esperar o navegador ficar livre
 const GRADE = location.pathname.replace(/\/+$/, '') === '/grade'; // interface do Orla Bot (só membros do clã Orla Emaranhada; os demais veem a página em branco)
 const ORLA_CLAN = '5280120', orlaOK = () => GD?.clan?.gid === ORLA_CLAN;
 let orlaChk = false;
@@ -336,8 +337,8 @@ async function loadAccount() {
   }
   marks = new Set(LS.get('dc-marks-' + member.id, []));
   syncPull();
-  // no /beta: os pedidos ao vivo saem já, em paralelo com a leitura da cópia guardada (sem esperar o IndexedDB)
-  const PRE = BETA ? Object.fromEntries(Object.keys(PARTS).map(k => [k, bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=${PARTS[k]}`)])) : null;
+  // os pedidos ao vivo saem já, em paralelo com a leitura da cópia guardada (sem esperar o IndexedDB)
+  const PRE = FX ? Object.fromEntries(Object.keys(PARTS).map(k => [k, bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=${PARTS[k]}`)])) : null;
   if (PRE) for (const p of Object.values(PRE)) p.catch(() => {});
   // 1) cópia da última visita, se houver
   let usingCache = false;
@@ -1529,7 +1530,7 @@ async function loadVault(my) {
   const loc = await entities('DestinyInventoryItemDefinition', dupH, lang === 'pt' ? 'pt' : 'en'), en = loc; if (my !== gen) return;
   const row = h => ({ n: loc[h]?.n || en[h]?.n || '', tl: loc[h]?.tl || '', ic: loc[h]?.ic || '', c: cnt[h], tt: en[h]?.tt, it: en[h]?.it });
   const dups = dupH.map(row).filter(x => x.n && (x.it === 2 || x.it === 3)).sort((a, b) => b.c - a.c || a.n.localeCompare(b.n));
-  VAULT = { used: items.length, max: 600, exo: dups.filter(x => x.tt === 6), leg: dups.filter(x => x.tt !== 6) };
+  VAULT = { used: items.length, max: VAULT_MAX, exo: dups.filter(x => x.tt === 6), leg: dups.filter(x => x.tt !== 6) };
   if (isGd()) render();
 }
 function vaultHTML() {
@@ -1575,7 +1576,7 @@ function renderAlerts(logged) {
     else for (const x of full.filter(x => !seen.includes(x.iid)).slice(0, 2)) al.push({ k: 'wish' + x.iid, lv: 'ok', ic: '☆', t: P ? `Caiu um rolo desejado: ${INVD[x.h]?.n || ''}` : `Wished roll dropped: ${INVD[x.h]?.n || ''}`, s: P ? 'toque para ver no inventário' : 'tap to see it in the inventory', j: 'inv:', wq: INVD[x.h]?.n || '', iid: x.iid });
   }
   const vUsed = (profile.profileInventory?.data?.items || []).filter(i => i.bucketHash === VAULT_BUCKET).length;
-  if (vUsed >= 650) al.push({ k: 'vault', lv: vUsed >= 690 ? 'bad' : 'w', ic: '▣', t: P ? `Cofre: ${vUsed}/700` : `Vault: ${vUsed}/700`, s: P ? 'abra a Limpeza do cofre' : 'open Vault cleanup', j: 'vlt:' });
+  if (vUsed >= VAULT_MAX - 50) al.push({ k: 'vault', lv: vUsed >= VAULT_MAX - 10 ? 'bad' : 'w', ic: '▣', t: P ? `Cofre: ${vUsed}/${VAULT_MAX}` : `Vault: ${vUsed}/${VAULT_MAX}`, s: P ? 'abra a Limpeza do cofre' : 'open Vault cleanup', j: 'vlt:' });
   const gl = (profile.profileCurrencies?.data?.items || []).find(i => i.itemHash === GLIMMER)?.quantity || 0;
   if (gl >= 240000) al.push({ k: 'gl', lv: gl >= 250000 ? 'bad' : 'w', ic: '✦', t: P ? `Lumen: ${(gl / 1000).toFixed(0)} mil de 250 mil` : `Glimmer: ${(gl / 1000).toFixed(0)}k of 250k`, s: P ? 'no teto, o que ganhar se perde' : 'at the cap, new glimmer is lost' });
   const show = al.filter(a => hide[a.k] !== day);
@@ -4942,7 +4943,7 @@ function invHTML() {
   const cols = narrow ? (INV.mc === 'v' ? [] : chars.filter(c => c.characterId === INV.mc)) : chars, showV = !narrow || INV.mc === 'v';
   const vItems = all.filter(x => x.where === 'v'), wv = vItems.filter(x => x.slot < 3).length, av = vItems.filter(x => x.slot >= 3).length, vUsed = (profile.profileInventory?.data?.items || []).filter(i => i.bucketHash === VAULT_BUCKET).length;
   const head = c => `<div class="iv-ch${c.characterId === charId ? ' cur' : ''}"${c.emblemBackgroundPath ? ` style="--emb:url('${BNET}${c.emblemBackgroundPath}')"` : ''}><b>${esc(W.classes[c.classType] || '')}</b><span>✦ ${c.light}</span></div>`;
-  const vHead = `<div class="iv-ch iv-vh"><b>${esc(T.vault)}</b><span>${vUsed}/700</span><i class="sea-bar"><u style="width:${Math.min(100, vUsed / 7)}%"></u></i></div>`;
+  const vHead = `<div class="iv-ch iv-vh"><b>${esc(T.vault)}</b><span>${vUsed}/${VAULT_MAX}</span><i class="sea-bar"><u style="width:${Math.min(100, vUsed / VAULT_MAX * 100)}%"></u></i></div>`;
   const mob = narrow ? `<div class="iv-mc">${chars.map(c => `<button type="button" class="char" data-ivmc="${c.characterId}" aria-pressed="${INV.mc === c.characterId}">${esc(W.classes[c.classType] || '')}<span class="pw">${c.light}</span></button>`).join('')}<button type="button" class="char" data-ivmc="v" aria-pressed="${INV.mc === 'v'}">${esc(T.vault)}<span class="pw">${vUsed}</span></button></div>` : '';
   const rows = [0, 1, 2, 3, 4, 5, 6, 7].map(s => {
     const cells = cols.map(c => { const cid = c.characterId, eq = all.find(x => x.where === cid && x.eq && x.slot === s), inv = all.filter(x => x.where === cid && !x.eq && x.slot === s).sort((a, b) => b.pw - a.pw); return `<div class="iv-c" data-ivdrop="${cid}" data-ivslot="${s}"><div class="iv-eq" data-ivdropeq="${cid}">${eq ? ivTile(eq, true) : '<span class="iv-none"></span>'}</div><div class="iv-inv">${inv.map(x => ivTile(x)).join('')}</div></div>`; }).join('');
@@ -4959,7 +4960,7 @@ function vltHTML() {
   const wN = V.filter(x => x.slot < 3).length, aN = V.filter(x => x.slot >= 3).length, oN = Math.max(0, vUsed - wN - aN);
   const catDef = [['w', T.wAll, x => x.slot < 3, 0], ['w0', T.slots[0], x => x.slot === 0, 1], ['w1', T.slots[1], x => x.slot === 1, 1], ['w2', T.slots[2], x => x.slot === 2, 1], ['a', T.aAll, x => x.slot >= 3, 0], ...[0, 1, 2].map(c => ['a' + c, W.classes[c], x => x.slot >= 3 && x.cls === c, 1])];
   const cur = catDef.find(c => c[0] === INV.vc) || catDef[0], dupN = f => new Set(V.filter(x => f(x) && x.dup).map(x => x.h)).size;
-  const side = `<aside class="tr-side vl-side"><div class="vl-cap"><span><b>${esc(T.vault)}</b><span>${vUsed} / 700</span></span><i class="vl-bar"><u style="width:${wN / 7}%"></u><u class="a" style="width:${aN / 7}%"></u><u class="o" style="width:${oN / 7}%"></u></i><small>${T.cap(wN, aN, oN).map((t, i) => `<span class="k${i}">■ ${esc(t)}</span>`).join('')}</small></div>
+  const side = `<aside class="tr-side vl-side"><div class="vl-cap"><span><b>${esc(T.vault)}</b><span>${vUsed} / ${VAULT_MAX}</span></span><i class="vl-bar"><u style="width:${wN / VAULT_MAX * 100}%"></u><u class="a" style="width:${aN / VAULT_MAX * 100}%"></u><u class="o" style="width:${oN / VAULT_MAX * 100}%"></u></i><small>${T.cap(wN, aN, oN).map((t, i) => `<span class="k${i}">■ ${esc(t)}</span>`).join('')}</small></div>
     <label class="tr-q">${esc(lang === 'pt' ? 'Buscar no cofre' : 'Search the vault')}<input type="search" id="ivq" value="${esc(INV.q)}" autocomplete="off"></label>
     <span class="sea-k">${esc(T.grp)}</span><div class="vl-seg">${[['type', T.gT], ['slot', T.gS], ['el', T.gE]].map(([k, t]) => `<button type="button" data-vg="${k}" aria-pressed="${INV.vg === k}">${esc(t)}</button>`).join('')}</div>
     ${member ? `<div class="vl-lc"><b>${esc(lw().lcIn)}</b><small>${esc(lw().lcInD)}</small><button type="button" class="lb-run" data-lcopen>${esc(lw().lcBtn)} ↗</button></div>` : ''}<span class="sea-k">${esc(T.cats)}</span><div class="tr-cats">${catDef.map(([k, t, f, lv]) => { const n = V.filter(f).length, dn = dupN(f); return `<button type="button" class="tr-cat${lv ? ' sub' : ''}" data-vc="${k}" aria-pressed="${INV.vc === k}"><span>${esc(t)}</span>${dn ? `<small class="vl-d">${dn} rep.</small>` : ''}<small>${n}</small></button>`; }).join('')}</div></aside>`;
