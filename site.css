@@ -2353,7 +2353,7 @@ html.bx :where(h1,h2,h3,h4){text-wrap:balance}
 html.bx :where(p,li,small){text-wrap:pretty}
 html.bx #list,html.bx .gh-pw,html.bx dialog{font-variant-numeric:tabular-nums}
 /* conteúdo longo não estoura a coluna */
-html.bx #list :where(b,strong,h3,h4,span){overflow-wrap:anywhere}
+html.bx #list :where(b,strong,h3,h4){overflow-wrap:break-word}
 /* âncoras não ficam escondidas sob a barra fixa */
 html.bx :where([id],h2,h3){scroll-margin-top:84px}
 /* select nativo legível no Windows com tema escuro */
