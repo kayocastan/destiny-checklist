@@ -29,10 +29,10 @@
   .card{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:16px;display:grid;gap:12px;min-width:0}
   .ahd{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.ahd h2{margin:0;font-family:var(--display);font-size:30px;line-height:1}
   .st{font:500 12px var(--mono);padding:3px 9px;border-radius:6px;background:var(--chip);color:var(--muted)}.st.ed{background:color-mix(in srgb,var(--exotic) 18%,transparent);color:var(--exotic)}
-  .tabs{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}.tabs button{font:inherit;font-size:14.5px;padding:8px 16px;border:0;background:transparent;color:var(--muted);cursor:pointer}
-  .tabs button[aria-pressed=true]{background:color-mix(in srgb,var(--arc) 18%,transparent);color:var(--fg);font-weight:600}
-  .bar{position:sticky;bottom:0;z-index:2;display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 16px;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--surface) 94%,#000)}
-  .bar .sp{flex:1}
+  .gtabs{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}.gtabs button{font:inherit;font-size:14.5px;padding:8px 16px;border:0;background:transparent;color:var(--muted);cursor:pointer}
+  .gtabs button[aria-pressed=true]{background:color-mix(in srgb,var(--arc) 18%,transparent);color:var(--fg);font-weight:600}
+  .sbar{position:sticky;bottom:12px;z-index:2;display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 16px;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--surface) 94%,#000)}
+  .sbar .sp{flex:1}
   label.f{display:grid;gap:5px;font:500 11.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
   input,select,textarea{font:400 15px var(--body);color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 10px;width:100%;min-width:0;text-transform:none;letter-spacing:0}
   textarea{resize:vertical;min-height:42px;line-height:1.45}
@@ -158,11 +158,11 @@
     const a = ACT[S.k], t = S.tab === 'vid' ? 'lnk' : S.tab, o = GOV[t + ':' + S.k];
     const status = o ? `<span class="st ed">Editado por você · ${new Date(o.at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>` : '<span class="st">Padrão do site</span>';
     $('main').innerHTML = `<div class="card"><div class="ahd"><div><span class="tag">${esc(GR.find(g => S.k.startsWith(g[0] + ':'))[1].toUpperCase())}</span><h2>${esc(N(a))}</h2></div>${status}</div>
-      <div class="tabs">${[['enc', 'Encontros'], ['vid', 'Vídeos'], ['img', 'Imagens']].map(([v, l]) => `<button type="button" data-tab="${v}" aria-pressed="${S.tab === v}">${l}</button>`).join('')}</div></div>
+      <div class="gtabs">${[['enc', 'Encontros'], ['vid', 'Vídeos'], ['img', 'Imagens']].map(([v, l]) => `<button type="button" data-tab="${v}" aria-pressed="${S.tab === v}">${l}</button>`).join('')}</div></div>
       <div class="card">${S.tab === 'enc' ? encHTML() : S.tab === 'vid' ? vidHTML() : imgHTML()}</div>
-      <div class="bar"><button type="button" class="btn pri" data-save ${S.dirty ? '' : 'disabled'}>Salvar</button><button type="button" class="btn" data-undo ${S.dirty ? '' : 'disabled'}>Desfazer mudanças</button>${o ? '<button type="button" class="btn del" data-reset>Voltar ao padrão do site</button>' : ''}<span class="sp"></span><span class="msg ${S.msg?.ok ? 'ok' : S.msg ? 'bad' : ''}">${esc(S.msg?.t || (S.dirty ? 'Mudanças não salvas' : ''))}</span></div>`;
+      <div class="sbar"><button type="button" class="btn pri" data-save ${S.dirty ? '' : 'disabled'}>Salvar</button><button type="button" class="btn" data-undo ${S.dirty ? '' : 'disabled'}>Desfazer mudanças</button>${o ? '<button type="button" class="btn del" data-reset>Voltar ao padrão do site</button>' : ''}<span class="sp"></span><span class="msg ${S.msg?.ok ? 'ok' : S.msg ? 'bad' : ''}">${esc(S.msg?.t || (S.dirty ? 'Mudanças não salvas' : ''))}</span></div>`;
   }
-  const setDirty = () => { if (!S.dirty) { S.dirty = true; S.msg = null; const b = document.querySelector('[data-save]'), u = document.querySelector('[data-undo]'); if (b) b.disabled = false; if (u) u.disabled = false; const m = document.querySelector('.bar .msg'); if (m) { m.textContent = 'Mudanças não salvas'; m.className = 'msg'; } } };
+  const setDirty = () => { if (!S.dirty) { S.dirty = true; S.msg = null; const b = document.querySelector('[data-save]'), u = document.querySelector('[data-undo]'); if (b) b.disabled = false; if (u) u.disabled = false; const m = document.querySelector('.sbar .msg'); if (m) { m.textContent = 'Mudanças não salvas'; m.className = 'msg'; } } };
   const leave = () => !S.dirty || confirm('Há mudanças não salvas. Descartar?');
   // edição de campos: atualiza a cópia sem redesenhar (o foco não se perde); a prévia é refeita
   $('main').addEventListener('input', ev => {
