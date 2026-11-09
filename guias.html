@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Guias · DPI</title>
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<style>
+  *{box-sizing:border-box} body{margin:0;font-family:var(--body)} [hidden]{display:none!important}
+  :root{--c-enc:var(--arc);--c-boss:var(--solar);--c-final:var(--hard)}
+  .gp{max-width:1400px;margin:0 auto;padding:24px 16px 60px;display:grid;gap:16px}
+  .top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .top h1{margin:0;font-family:var(--display);font-size:38px;line-height:1}.tag{font:500 12px var(--mono);letter-spacing:.08em;color:var(--muted)}
+  a.btn,.btn{font:inherit;font-size:14px;color:var(--fg);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--surface);cursor:pointer;white-space:nowrap}
+  .btn:disabled{opacity:.5;cursor:default}.btn.pri{background:var(--arc);border-color:var(--arc);color:#0b1520;font-weight:600}.btn.del{color:var(--hard)}.btn.sm{padding:5px 9px;font-size:13px}
+  .ib{font:inherit;font-size:14px;line-height:1;width:30px;height:30px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--fg);cursor:pointer;flex:none}.ib:disabled{opacity:.35;cursor:default}.ib.x{color:var(--hard)}
+  .msg{font-size:14px}.msg.ok{color:var(--done)}.msg.bad{color:var(--hard)}
+  .lay{display:grid;grid-template-columns:280px minmax(0,1fr);gap:16px;align-items:start}
+  .side{position:sticky;top:12px;display:grid;gap:8px;max-height:calc(100vh - 24px);overflow:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:12px}
+  .side input{margin-bottom:4px}.side h3{margin:8px 0 2px;font:500 11.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .act{display:flex;justify-content:space-between;gap:8px;align-items:center;width:100%;text-align:left;font:inherit;font-size:14.5px;color:var(--fg);background:none;border:1px solid transparent;border-radius:8px;padding:7px 9px;cursor:pointer}
+  .act:hover{background:var(--chip)}.act.on{border-color:var(--arc);background:color-mix(in srgb,var(--arc) 12%,transparent);font-weight:600}
+  .act small{font:500 11px var(--mono);color:var(--muted);white-space:nowrap}.act i{font-style:normal;color:var(--exotic)}
+  .main{display:grid;gap:14px;min-width:0}
+  .card{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:16px;display:grid;gap:12px;min-width:0}
+  .ahd{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.ahd h2{margin:0;font-family:var(--display);font-size:30px;line-height:1}
+  .st{font:500 12px var(--mono);padding:3px 9px;border-radius:6px;background:var(--chip);color:var(--muted)}.st.ed{background:color-mix(in srgb,var(--exotic) 18%,transparent);color:var(--exotic)}
+  .tabs{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}.tabs button{font:inherit;font-size:14.5px;padding:8px 16px;border:0;background:transparent;color:var(--muted);cursor:pointer}
+  .tabs button[aria-pressed=true]{background:color-mix(in srgb,var(--arc) 18%,transparent);color:var(--fg);font-weight:600}
+  .bar{position:sticky;bottom:0;z-index:2;display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 16px;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--surface) 94%,#000)}
+  .bar .sp{flex:1}
+  label.f{display:grid;gap:5px;font:500 11.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  input,select,textarea{font:inherit;font-size:15px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 10px;width:100%;min-width:0;text-transform:none;letter-spacing:0}
+  textarea{resize:vertical;min-height:42px;line-height:1.45}
+  .g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}.g3{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) 140px;gap:10px}
+  .encl{display:flex;gap:6px;flex-wrap:wrap}
+  .ec{display:flex;align-items:center;gap:7px;font:inherit;font-size:14px;color:var(--fg);background:var(--chip);border:1px solid var(--line);border-top:3px solid var(--c-enc);border-radius:9px;padding:7px 11px;cursor:pointer}
+  .ec b{font:700 16px var(--display);color:var(--muted)}.ec.boss{border-top-color:var(--c-boss)}.ec.final{border-top-color:var(--c-final)}.ec.pas{border-top:3px dashed var(--line)}
+  .ec.on{border-color:var(--arc);box-shadow:inset 0 0 0 1px var(--arc)}.ec.on b{color:var(--arc)}
+  .ed{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:16px;align-items:start}
+  .rows{display:grid;gap:8px}.row{display:flex;gap:6px;align-items:flex-start}.row>input,.row>textarea{flex:1}
+  .row .n{font:700 16px/34px var(--display);width:24px;text-align:center;color:var(--muted);flex:none}
+  .sec{display:grid;gap:8px;padding-top:4px}.sec>h4{margin:0;font:500 11.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .add{justify-self:start}
+  .pv{position:sticky;top:12px;border:1px solid var(--line);border-left:6px solid var(--c-enc);border-radius:14px;background:var(--bg);padding:16px;display:grid;gap:10px}
+  .pv.boss{border-left-color:var(--c-boss)}.pv.final{border-left-color:var(--c-final)}.pv.pas{border-left-style:dashed}
+  .pv h3{margin:0;font:700 28px/1.05 var(--display)}.pv .ty{font:500 11.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .pv p{margin:0;font-size:15px;line-height:1.45}.pv ol{margin:0;padding-left:22px;display:grid;gap:5px;font-size:14.5px;line-height:1.45}
+  .pv .rl{display:flex;flex-wrap:wrap;gap:6px}.pv .rl span{font-size:13.5px;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface)}.pv .rl b{color:var(--arc)}
+  .pv .tip{font-size:14px;padding:10px 12px;border-radius:10px;border:1px solid color-mix(in srgb,var(--exotic) 45%,transparent);background:color-mix(in srgb,var(--exotic) 8%,transparent)}
+  .pv .lbl{font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .vrow{display:grid;grid-template-columns:auto minmax(0,2fr) minmax(0,1.2fr) minmax(0,1.2fr) auto auto;gap:8px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:11px;background:var(--bg)}
+  .vrow.hid{opacity:.5}.mv{display:flex;flex-direction:column;gap:3px}.mv .ib{height:20px;font-size:11px}
+  .vrow .base{font:500 10.5px var(--mono);color:var(--muted);letter-spacing:.06em}
+  .hb{font:inherit;font-size:13px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--fg);padding:6px 9px;cursor:pointer;white-space:nowrap}.hb.on{color:var(--muted)}
+  .irow{display:grid;grid-template-columns:auto 120px minmax(0,1fr) minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:11px;background:var(--bg)}
+  .irow.hid{opacity:.5}.irow img{width:120px;height:68px;object-fit:cover;border-radius:7px;border:1px solid var(--line);background:var(--chip)}
+  .hint{margin:0;font-size:13.5px;color:var(--muted)}
+  @media (max-width:1000px){.lay{grid-template-columns:1fr}.side{position:static;max-height:300px}.ed{grid-template-columns:1fr}.pv{position:static}}
+  @media (max-width:700px){.g2,.g3{grid-template-columns:1fr}.vrow,.irow{grid-template-columns:auto minmax(0,1fr)}.vrow>*:nth-child(n+3),.irow>*:nth-child(n+3){grid-column:2}.irow img{grid-column:2;width:100%;height:auto;aspect-ratio:16/9}}
+</style>
+</head>
+<body>
+<main class="gp">
+  <div class="top"><div><span class="tag">DPI · SÓ PARA O DONO DO SITE</span><h1>Guias</h1></div><a class="btn" href="/">← Voltar ao site</a></div>
+  <p class="msg" id="gate">Conferindo seu login…</p>
+  <div class="lay" id="app" hidden>
+    <aside class="side"><input id="q" type="search" placeholder="Buscar atividade"><div id="acts"></div></aside>
+    <section class="main" id="main"></section>
+  </div>
+</main>
+<script>
+(async () => {
+  const $ = id => document.getElementById(id), esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const auth = (() => { try { return JSON.parse(localStorage.getItem('dc-auth')); } catch { return null; } })();
+  const gate = t => { $('gate').textContent = t; $('gate').className = 'msg bad'; };
+  const api = await fetch('/data/api.json').then(r => r.json()).then(j => j.url || j.api).catch(() => null);
+  if (!auth?.access_token || auth.access_expires < Date.now()) return gate('Entre no site (ou abra a página inicial para renovar o login) e volte aqui.');
+  const H = () => ({ Authorization: 'Bearer ' + auth.access_token, 'Content-Type': 'application/json' });
+  const who = await fetch(api + '/whoami', { headers: H() }).then(r => r.json()).catch(() => ({}));
+  if (!who.owner) return gate('Esta página é só para o dono do site.');
+  const [defs, GUIDES] = await Promise.all([fetch('/data/defs.json').then(r => r.json()), fetch('/data/guides.json', { cache: 'no-store' }).then(r => r.json()).catch(() => ({}))]);
+  let GOV = {}, VIDS = [];
+  async function loadRemote() {
+    const [g, v] = await Promise.all([fetch(api + '/guias?t=' + Date.now(), { cache: 'no-store' }).then(r => r.json()).catch(() => ({ m: {} })), fetch(api + '/videos?t=' + Date.now(), { cache: 'no-store' }).then(r => r.json()).catch(() => ({ list: [] }))]);
+    GOV = g.m || {}; VIDS = v.list || [];
+  }
+  await loadRemote();
+  $('gate').hidden = true; $('app').hidden = false;
+  const N = a => Array.isArray(a.n) ? (a.n[1] || a.n[0]) : a.n;
+  const GR = [['raid', 'Incursões', defs.raids], ['dg', 'Masmorras', defs.dungeons], ['xm', 'Missões exóticas', defs.xmissions || []]];
+  const ACT = {}; for (const [kind, , l] of GR) for (const a of l) ACT[kind + ':' + a.k] = a;
+  const TY = [['enc', 'Encontro'], ['boss', 'Chefe'], ['final', 'Chefe final'], ['pas', 'Passagem']];
+  const clone = x => JSON.parse(JSON.stringify(x));
+  const S = { k: new URLSearchParams(location.search).get('a') || 'raid:kf', tab: new URLSearchParams(location.search).get('t') || 'enc', i: 0, dirty: false, msg: null };
+  if (!ACT[S.k]) S.k = Object.keys(ACT)[0];
+  // padrões do site (o que aparece sem ajuste)
+  const baseLinks = k => { const a = ACT[k]; const l = Array.isArray(a.yt) ? a.yt : a.yt ? [[a.yt]] : []; return [...l.map(x => [x[0], x[1] || '', x[2] || '', 0, 'site']), ...VIDS.filter(v => v.k === k).sort((a, b) => a.ord - b.ord).map(v => [v.url, v.pt || '', v.en || '', 0, 'cms'])]; };
+  const baseImgs = k => (ACT[k].gi || []).map(x => [x[0], x[1] || '', x[2] || '', x[3] || 0, x[4] || 0, 0]);
+  const baseEnc = k => GUIDES[k] ? clone({ src: GUIDES[k].src || [], enc: GUIDES[k].enc }) : { src: [], enc: [] };
+  let W = null; // cópia em edição do que a aba mostra
+  function loadWork() {
+    const o = GOV[S.tab === 'vid' ? 'lnk:' + S.k : S.tab === 'img' ? 'img:' + S.k : 'enc:' + S.k];
+    W = S.tab === 'vid' ? (o ? o.l.map(x => [x[0], x[1] || '', x[2] || '', x[3] ? 1 : 0]) : baseLinks(S.k).map(x => x.slice(0, 4)))
+      : S.tab === 'img' ? (o ? clone(o.l) : baseImgs(S.k))
+      : (o ? { src: clone(o.src || []), enc: clone(o.enc) } : baseEnc(S.k));
+    if (S.tab === 'enc') { W.enc.forEach(e => { e.roles ||= []; e.steps ||= []; e.t ||= /\(passagem\)/.test(e.n) ? 'pas' : 'enc'; }); S.i = Math.min(S.i, Math.max(0, W.enc.length - 1)); }
+    S.dirty = false;
+  }
+  const edited = k => ['lnk', 'img', 'enc'].filter(t => GOV[t + ':' + k]);
+  function drawSide() {
+    const q = $('q').value.trim().toLowerCase();
+    $('acts').innerHTML = GR.map(([kind, t, l]) => { const xs = l.filter(a => !q || N(a).toLowerCase().includes(q)); return xs.length ? `<h3>${t}</h3>` + xs.map(a => { const k = kind + ':' + a.k, g = GOV['enc:' + k] || GUIDES[k], ed = edited(k).length;
+      return `<button type="button" class="act${k === S.k ? ' on' : ''}" data-act="${esc(k)}"><span>${esc(N(a))}${ed ? ' <i title="Editado por você">●</i>' : ''}</span><small>${g ? g.enc.length + ' enc' : '—'}</small></button>`; }).join('') : ''; }).join('');
+  }
+  const ytT = u => { try { const x = new URL(u); return +(x.searchParams.get('t') || '').replace(/s$/, '') || 0; } catch { return 0; } };
+  const ytSet = (u, sec) => { try { const x = new URL(u); if (sec > 0) x.searchParams.set('t', sec + 's'); else x.searchParams.delete('t'); return x.toString(); } catch { return u; } };
+  const mmss = s => s ? Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0') : '';
+  const secOf = v => { const m = String(v).trim().match(/^(\d+)(?::(\d{1,2}))?$/); return !m ? 0 : m[2] != null ? +m[1] * 60 + +m[2] : +m[1] * 60; };
+  const mv = (path, i, n) => `<span class="mv"><button type="button" class="ib" data-mv="${path}:${i}:-1" ${i ? '' : 'disabled'} aria-label="Subir">▲</button><button type="button" class="ib" data-mv="${path}:${i}:1" ${i < n - 1 ? '' : 'disabled'} aria-label="Descer">▼</button></span>`;
+  function pvHTML(e) {
+    const t = TY.find(x => x[0] === e.t)?.[1] || 'Encontro';
+    return `<div class="pv ${esc(e.t)}"><span class="lbl">Prévia</span><span class="ty">${t}</span><h3>${esc(e.n || 'Sem nome')}</h3>${e.obj ? `<p>${esc(e.obj)}</p>` : ''}
+      ${e.roles.some(r => r[0] || r[1]) ? `<span class="lbl">Funções sugeridas</span><div class="rl">${e.roles.filter(r => r[0] || r[1]).map(r => `<span><b>${esc(r[0])}</b> ${esc(r[1])}</span>`).join('')}</div>` : ''}
+      ${e.steps.some(Boolean) ? `<span class="lbl">Passo a passo</span><ol>${e.steps.filter(Boolean).map(s => `<li>${esc(s)}</li>`).join('')}</ol>` : ''}
+      ${e.tip ? `<div class="tip"><span class="lbl">Dica</span><br>${esc(e.tip)}</div>` : ''}${e.yt ? `<a class="btn sm" href="${esc(e.yt)}" target="_blank" rel="noopener">▶ Vídeo deste encontro${ytT(e.yt) ? ' (' + mmss(ytT(e.yt)) + ')' : ''}</a>` : ''}</div>`;
+  }
+  function encHTML() {
+    const L = W.enc, e = L[S.i];
+    const list = `<div class="encl">${L.map((x, i) => `<button type="button" class="ec ${esc(x.t)}${i === S.i ? ' on' : ''}" data-enc="${i}"><b>${String(i + 1).padStart(2, '0')}</b>${esc(x.n || 'Sem nome')}</button>`).join('')}<button type="button" class="btn sm" data-addenc>+ Encontro</button></div>`;
+    if (!e) return `${list}<p class="hint">Esta atividade ainda não tem guia por encontro. Use “+ Encontro” para começar.</p>${srcHTML()}`;
+    const yb = e.yt ? ytSet(e.yt, 0) : '', ys = ytT(e.yt);
+    return `${list}<div class="ed"><div class="card" style="background:var(--bg)">
+      <div class="row" style="justify-content:space-between;align-items:center"><b style="font-family:var(--display);font-size:22px">Encontro ${S.i + 1} de ${L.length}</b><span style="display:flex;gap:6px"><button type="button" class="ib" data-mv="enc:${S.i}:-1" ${S.i ? '' : 'disabled'} aria-label="Mover para antes">◀</button><button type="button" class="ib" data-mv="enc:${S.i}:1" ${S.i < L.length - 1 ? '' : 'disabled'} aria-label="Mover para depois">▶</button><button type="button" class="btn sm del" data-delenc>Apagar encontro</button></span></div>
+      <div class="g3"><label class="f">Nome<input data-f="n" value="${esc(e.n)}"></label><label class="f">Tipo<select data-f="t">${TY.map(([v, t]) => `<option value="${v}"${e.t === v ? ' selected' : ''}>${t}</option>`).join('')}</select></label><span></span></div>
+      <label class="f">Objetivo<textarea data-f="obj" rows="2">${esc(e.obj)}</textarea></label>
+      <div class="sec"><h4>Funções sugeridas</h4><div class="rows">${e.roles.map((r, i) => `<div class="row"><input data-r="${i}:0" value="${esc(r[0])}" placeholder="Função" style="flex:0 0 32%"><input data-r="${i}:1" value="${esc(r[1])}" placeholder="Quem / quantos / o que faz"><button type="button" class="ib x" data-delr="${i}" aria-label="Apagar">✕</button></div>`).join('')}</div><button type="button" class="btn sm add" data-addr>+ Função</button></div>
+      <div class="sec"><h4>Passo a passo</h4><div class="rows">${e.steps.map((s, i) => `<div class="row"><span class="n">${i + 1}</span><textarea data-s="${i}" rows="2">${esc(s)}</textarea>${mv('st', i, e.steps.length)}<button type="button" class="ib x" data-dels="${i}" aria-label="Apagar">✕</button></div>`).join('')}</div><button type="button" class="btn sm add" data-adds>+ Passo</button></div>
+      <label class="f">Dica<textarea data-f="tip" rows="2">${esc(e.tip || '')}</textarea></label>
+      <div class="sec"><h4>Vídeo deste encontro (opcional)</h4><div class="row"><input data-yt value="${esc(yb)}" placeholder="https://www.youtube.com/watch?v=…"><input data-yts value="${esc(mmss(ys))}" placeholder="min:seg" style="flex:0 0 110px"></div><p class="hint">O minuto vira o ponto de início do vídeo (ex.: 12:30).</p></div>
+    </div>${pvHTML(e)}</div>${srcHTML()}`;
+  }
+  const srcHTML = () => `<div class="card"><div class="sec"><h4>Fontes do guia</h4><div class="rows">${W.src.map((s, i) => `<div class="row"><input data-src="${i}:0" value="${esc(s[0])}" placeholder="Nome" style="flex:0 0 30%"><input data-src="${i}:1" value="${esc(s[1])}" placeholder="https://…"><button type="button" class="ib x" data-delsrc="${i}" aria-label="Apagar">✕</button></div>`).join('')}</div><button type="button" class="btn sm add" data-addsrc>+ Fonte</button></div></div>`;
+  function vidHTML() {
+    return `<p class="hint">Aparecem no botão ▶ da atividade, nesta ordem. Os que vêm do site também podem ser editados, escondidos ou apagados daqui.</p><div class="rows">${W.map((v, i) => `<div class="vrow${v[3] ? ' hid' : ''}">${mv('vid', i, W.length)}<input data-v="${i}:0" value="${esc(v[0])}" placeholder="https://www.youtube.com/watch?v=…"><input data-v="${i}:1" value="${esc(v[1])}" placeholder="Nome em português"><input data-v="${i}:2" value="${esc(v[2])}" placeholder="Nome em inglês"><button type="button" class="hb${v[3] ? ' on' : ''}" data-hidv="${i}">${v[3] ? 'Escondido' : 'Visível'}</button><button type="button" class="ib x" data-delv="${i}" aria-label="Apagar">✕</button></div>`).join('') || '<p class="hint">Nenhum vídeo.</p>'}</div><button type="button" class="btn sm add" data-addv>+ Vídeo</button>`;
+  }
+  function imgHTML() {
+    return `<p class="hint">Aparecem no botão 🖼 da atividade, nesta ordem. Imagem nova: cole um link https de uma imagem já hospedada.</p><div class="rows">${W.map((g, i) => `<div class="irow${g[5] ? ' hid' : ''}">${mv('img', i, W.length)}<a href="${esc(g[0])}" target="_blank" rel="noopener"><img src="${esc(g[0])}" alt="" loading="lazy"></a><input data-g="${i}:1" value="${esc(g[1])}" placeholder="Legenda em português"><input data-g="${i}:2" value="${esc(g[2])}" placeholder="Legenda em inglês"><button type="button" class="hb${g[5] ? ' on' : ''}" data-hidg="${i}">${g[5] ? 'Escondida' : 'Visível'}</button><button type="button" class="ib x" data-delg="${i}" aria-label="Apagar">✕</button></div>`).join('') || '<p class="hint">Nenhuma imagem.</p>'}</div>
+      <div class="row"><input id="nimg" placeholder="https://…/imagem.png"><button type="button" class="btn sm" data-addg>+ Imagem</button></div>`;
+  }
+  function draw() {
+    drawSide();
+    const a = ACT[S.k], t = S.tab === 'vid' ? 'lnk' : S.tab, o = GOV[t + ':' + S.k];
+    const status = o ? `<span class="st ed">Editado por você · ${new Date(o.at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>` : '<span class="st">Padrão do site</span>';
+    $('main').innerHTML = `<div class="card"><div class="ahd"><div><span class="tag">${esc(GR.find(g => S.k.startsWith(g[0] + ':'))[1].toUpperCase())}</span><h2>${esc(N(a))}</h2></div>${status}</div>
+      <div class="tabs">${[['enc', 'Encontros'], ['vid', 'Vídeos'], ['img', 'Imagens']].map(([v, l]) => `<button type="button" data-tab="${v}" aria-pressed="${S.tab === v}">${l}</button>`).join('')}</div></div>
+      <div class="card">${S.tab === 'enc' ? encHTML() : S.tab === 'vid' ? vidHTML() : imgHTML()}</div>
+      <div class="bar"><button type="button" class="btn pri" data-save ${S.dirty ? '' : 'disabled'}>Salvar</button><button type="button" class="btn" data-undo ${S.dirty ? '' : 'disabled'}>Desfazer mudanças</button>${o ? '<button type="button" class="btn del" data-reset>Voltar ao padrão do site</button>' : ''}<span class="sp"></span><span class="msg ${S.msg?.ok ? 'ok' : S.msg ? 'bad' : ''}">${esc(S.msg?.t || (S.dirty ? 'Mudanças não salvas' : ''))}</span></div>`;
+  }
+  const setDirty = () => { if (!S.dirty) { S.dirty = true; S.msg = null; const b = document.querySelector('[data-save]'), u = document.querySelector('[data-undo]'); if (b) b.disabled = false; if (u) u.disabled = false; const m = document.querySelector('.bar .msg'); if (m) { m.textContent = 'Mudanças não salvas'; m.className = 'msg'; } } };
+  const leave = () => !S.dirty || confirm('Há mudanças não salvas. Descartar?');
+  // edição de campos: atualiza a cópia sem redesenhar (o foco não se perde); a prévia é refeita
+  $('main').addEventListener('input', ev => {
+    const t = ev.target, d = t.dataset, e = W.enc?.[S.i];
+    if (d.f) e[d.f] = t.value; else if (d.r) { const [i, j] = d.r.split(':'); e.roles[i][j] = t.value; } else if (d.s) e.steps[d.s] = t.value;
+    else if (d.yt != null || d.yts != null) { const u = document.querySelector('[data-yt]').value.trim(), sec = secOf(document.querySelector('[data-yts]').value); e.yt = u ? ytSet(u, sec) : ''; if (!e.yt) delete e.yt; }
+    else if (d.src) { const [i, j] = d.src.split(':'); W.src[i][j] = t.value; } else if (d.v) { const [i, j] = d.v.split(':'); W[i][j] = t.value; } else if (d.g) { const [i, j] = d.g.split(':'); W[i][j] = t.value; } else return;
+    setDirty(); if (S.tab === 'enc' && e) { const pv = document.querySelector('.pv'); if (pv) pv.outerHTML = pvHTML(e); if (d.f === 'n' || d.f === 't') { const c = document.querySelector(`.ec[data-enc="${S.i}"]`); if (c) { c.className = `ec ${e.t} on`; c.innerHTML = `<b>${String(S.i + 1).padStart(2, '0')}</b>${esc(e.n || 'Sem nome')}`; } } }
+  });
+  $('main').addEventListener('change', ev => { if (ev.target.dataset.f === 't') ev.target.dispatchEvent(new Event('input', { bubbles: true })); });
+  const swap = (l, i, k) => { const j = i + k; if (j < 0 || j >= l.length) return; [l[i], l[j]] = [l[j], l[i]]; };
+  $('main').addEventListener('click', async ev => {
+    const b = ev.target.closest('button'); if (!b) return; const d = b.dataset, e = W.enc?.[S.i]; let ch = true;
+    if (d.tab) { if (d.tab === S.tab || !leave()) return; S.tab = d.tab; S.msg = null; loadWork(); draw(); return; }
+    if (d.enc) { S.i = +d.enc; draw(); return; }
+    if (d.mv) { const [p, i, k] = d.mv.split(':'); const L = p === 'enc' ? W.enc : p === 'st' ? e.steps : W; swap(L, +i, +k); if (p === 'enc') S.i = +i + +k; }
+    else if (d.addenc != null) { W.enc.push({ n: '', t: 'enc', obj: '', roles: [], steps: [''], tip: '' }); S.i = W.enc.length - 1; }
+    else if (d.delenc != null) { if (!confirm(`Apagar o encontro "${e.n || 'sem nome'}"?`)) return; W.enc.splice(S.i, 1); S.i = Math.max(0, S.i - 1); }
+    else if (d.addr != null) e.roles.push(['', '']); else if (d.delr) e.roles.splice(+d.delr, 1);
+    else if (d.adds != null) e.steps.push(''); else if (d.dels) e.steps.splice(+d.dels, 1);
+    else if (d.addsrc != null) W.src.push(['', '']); else if (d.delsrc) W.src.splice(+d.delsrc, 1);
+    else if (d.addv != null) W.push(['', '', '', 0]); else if (d.delv) W.splice(+d.delv, 1); else if (d.hidv) W[+d.hidv][3] = W[+d.hidv][3] ? 0 : 1;
+    else if (d.hidg) W[+d.hidg][5] = W[+d.hidg][5] ? 0 : 1; else if (d.delg) { if (!confirm('Tirar esta imagem da lista? (Para só ocultar, use Visível/Escondida.)')) return; W.splice(+d.delg, 1); }
+    else if (d.addg != null) { const u = $('nimg').value.trim(); if (!/^https:\/\//.test(u)) { S.msg = { t: 'Cole um link https da imagem.' }; draw(); return; }
+      const im = new Image(); im.src = u; await im.decode().catch(() => {}); if (!im.naturalWidth) { S.msg = { t: 'Não consegui abrir essa imagem.' }; draw(); return; } W.push([u, '', '', im.naturalWidth, im.naturalHeight, 0]); }
+    else if (d.undo != null) { loadWork(); S.msg = null; draw(); return; }
+    else if (d.save != null) { await save(); return; }
+    else if (d.reset != null) { if (!confirm('Apagar seus ajustes desta aba e voltar ao padrão do site?')) return; const t = S.tab === 'vid' ? 'lnk' : S.tab; const r = await fetch(api + '/guias/' + encodeURIComponent(t + ':' + S.k), { method: 'DELETE', headers: H() }).then(r => r.json()).catch(() => ({}));
+      if (r.ok) { delete GOV[t + ':' + S.k]; loadWork(); S.msg = { t: 'Voltou ao padrão do site.', ok: true }; } else S.msg = { t: r.error || 'Não deu para apagar.' }; draw(); return; }
+    else ch = false;
+    if (ch) { setDirty(); S.dirty = true; draw(); }
+  });
+  async function save() {
+    const t = S.tab === 'vid' ? 'lnk' : S.tab; let v;
+    if (t === 'lnk') { const l = W.map(x => [x[0].trim(), x[1].trim(), x[2].trim(), x[3] ? 1 : 0]).filter(x => x[0]); if (l.some(x => !/^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//.test(x[0]))) { S.msg = { t: 'Só links do YouTube (https://www.youtube.com/… ou https://youtu.be/…).' }; draw(); return; } v = { l }; }
+    else if (t === 'img') v = { l: W.map(x => [x[0], x[1].trim(), x[2].trim(), x[3] || 0, x[4] || 0, x[5] ? 1 : 0]) };
+    else { const enc = W.enc.map(e => { const o = { n: e.n.trim(), t: e.t, obj: (e.obj || '').trim(), roles: e.roles.map(r => [r[0].trim(), r[1].trim()]).filter(r => r[0] || r[1]), steps: e.steps.map(s => s.trim()).filter(Boolean), tip: (e.tip || '').trim() }; if (e.yt) o.yt = e.yt; return o; });
+      if (enc.some(e => !e.n)) { S.msg = { t: 'Todo encontro precisa de um nome.' }; draw(); return; }
+      if (enc.some(e => e.yt && !/^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//.test(e.yt))) { S.msg = { t: 'O vídeo do encontro precisa ser um link do YouTube.' }; draw(); return; }
+      v = { src: W.src.map(s => [s[0].trim(), s[1].trim()]).filter(s => s[0] && /^https?:\/\//.test(s[1])), enc }; }
+    const r = await fetch(api + '/guias/' + encodeURIComponent(t + ':' + S.k), { method: 'PUT', headers: H(), body: JSON.stringify(v) }).then(r => r.json()).catch(() => ({ error: 'Sem conexão com o servidor.' }));
+    if (r.ok) { GOV[t + ':' + S.k] = { ...v, at: Date.now() }; loadWork(); S.msg = { t: 'Salvo. No site, aparece em até alguns minutos (ou ao recarregar com o cache limpo).', ok: true }; } else S.msg = { t: r.error || 'Não deu para salvar.' };
+    draw();
+  }
+  $('acts').addEventListener('click', ev => { const b = ev.target.closest('[data-act]'); if (!b || b.dataset.act === S.k || !leave()) return; S.k = b.dataset.act; S.i = 0; S.msg = null; history.replaceState(null, '', '?a=' + S.k + '&t=' + S.tab); loadWork(); draw(); scrollTo({ top: 0 }); });
+  $('q').addEventListener('input', drawSide);
+  addEventListener('beforeunload', e => { if (S.dirty) e.preventDefault(); });
+  loadWork(); draw();
+})();
+</script>
+</body>
+</html>

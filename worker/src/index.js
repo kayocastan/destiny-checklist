@@ -424,6 +424,25 @@ async function videosEdit(req, env, path) {
   if (req.method === 'POST' && !id) { const r = await env.DB.prepare('INSERT INTO vid (k, url, pt, en, ord, at) VALUES (?, ?, ?, ?, ?, ?)').bind(b.k, b.url, pt, en, ord, Date.now()).run(); return json(req, { ok: true, id: r.meta.last_row_id }); }
   return json(req, { error: 'method' }, 405);
 }
+// Página /guias: só o dono grava; cada chave substitui o padrão do site para uma atividade (vídeos, imagens ou guia por encontro)
+async function guiasEdit(req, env, path) {
+  const uid = await who(req, env); if (!uid) return json(req, { error: 'auth' }, 401);
+  if (uid !== String(env.OWNER)) return json(req, { error: 'forbidden' }, 403);
+  const k = decodeURIComponent(path.slice(7));
+  if (!/^(lnk|img|enc):(raid|dg|xm):[\w-]{1,40}$/.test(k)) return json(req, { error: 'Chave inválida.' }, 400);
+  if (req.method === 'DELETE') { await env.DB.prepare('DELETE FROM gde WHERE k = ?').bind(k).run(); return json(req, { ok: true }); }
+  if (req.method !== 'PUT') return json(req, { error: 'method' }, 405);
+  const txt = await req.text(); if (txt.length > 120000) return json(req, { error: 'Grande demais.' }, 413);
+  let v; try { v = JSON.parse(txt); } catch { return json(req, { error: 'JSON inválido.' }, 400); }
+  const yt = u => /^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//.test(u || ''), str = x => typeof x === 'string';
+  const t = k.slice(0, 3);
+  const ok = t === 'lnk' ? Array.isArray(v?.l) && v.l.every(x => Array.isArray(x) && yt(x[0]) && str(x[1] ?? '') && str(x[2] ?? ''))
+    : t === 'img' ? Array.isArray(v?.l) && v.l.every(x => Array.isArray(x) && str(x[0]) && (/^https:\/\//.test(x[0]) || /^\/guides\/[\w./-]+$/.test(x[0])))
+    : Array.isArray(v?.enc) && v.enc.every(e => e && str(e.n) && str(e.obj ?? '') && Array.isArray(e.steps) && e.steps.every(str) && (!e.roles || (Array.isArray(e.roles) && e.roles.every(r => Array.isArray(r) && r.every(str)))) && (!e.yt || yt(e.yt)));
+  if (!ok) return json(req, { error: 'Dados inválidos (confira os links).' }, 400);
+  await env.DB.prepare('INSERT OR REPLACE INTO gde (k, v, at) VALUES (?, ?, ?)').bind(k, JSON.stringify(v), Date.now()).run();
+  return json(req, { ok: true });
+}
 async function stats(req, env) {
   const uid = await who(req, env);
   if (!uid) return json(req, { error: 'auth' }, 401);
@@ -480,6 +499,11 @@ export default {
         const r = await env.DB.prepare('SELECT id, k, url, pt, en, ord FROM vid ORDER BY k, ord, id').all().catch(() => ({ results: [] }));
         return new Response(JSON.stringify({ list: r.results }), { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=300', ...cors(req) } });
       }
+      if (path === '/guias' && req.method === 'GET') { // ajustes da página /guias, lidos por todos
+        const r = await env.DB.prepare('SELECT k, v, at FROM gde').all().catch(() => ({ results: [] })); const m = {}; for (const x of r.results) { try { m[x.k] = { ...JSON.parse(x.v), at: x.at }; } catch {} }
+        return new Response(JSON.stringify({ m }), { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=120', ...cors(req) } });
+      }
+      if (path.startsWith('/guias/')) return await guiasEdit(req, env, path);
       if (path === '/videos' || path.startsWith('/videos/')) return await videosEdit(req, env, path);
       if (path === '/sug' && req.method === 'POST') return await sugPost(req, env);
       if (path === '/sug/read' && req.method === 'POST') return await sugRead(req, env);

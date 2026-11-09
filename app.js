@@ -874,21 +874,25 @@ const YT_OK = x => /^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//.test(x || '')
 let VID = LS.get('dc-vid', null);
 const vidKey = a => { for (const [k, l] of [['raid', defs.raids], ['dg', defs.dungeons], ['xm', defs.xmissions || []]]) if (l.includes(a)) return k + ':' + a.k; return ''; };
 function vidLoad() { if (VID?.at > Date.now() - 6 * 36e5 || vidLoad.busy || typeof APIW === 'undefined' || !APIW) return; vidLoad.busy = true;
-  fetch(APIW + '/videos').then(r => r.json()).then(j => { const m = {}; for (const v of j.list || []) (m[v.k] ||= []).push([v.url, v.pt || v.en, v.en || v.pt]); VID = { at: Date.now(), m }; LS.set('dc-vid', VID); render(); }).catch(() => {}).finally(() => { vidLoad.busy = false; }); }
-const ytList = a => { if (!VID || VID.at < Date.now() - 6 * 36e5) setTimeout(vidLoad); return [...(Array.isArray(a?.yt) ? a.yt : a?.yt ? [[a.yt]] : []), ...(a && VID?.m?.[vidKey(a)] || [])].filter(x => YT_OK(x[0])); };
+  Promise.all([fetch(APIW + '/videos').then(r => r.json()), fetch(APIW + '/guias').then(r => r.json()).catch(() => ({ m: {} }))]).then(([j, gj]) => { const m = {}; for (const v of j.list || []) (m[v.k] ||= []).push([v.url, v.pt || v.en, v.en || v.pt]); VID = { at: Date.now(), m, g: gj.m || {} }; LS.set('dc-vid', VID); render(); }).catch(() => {}).finally(() => { vidLoad.busy = false; }); }
+// ajustes da página /guias (só o dono edita): vídeos, imagens e guia por encontro de cada atividade substituem o padrão
+const govOf = (t, k) => { if (!VID || VID.at < Date.now() - 6 * 36e5) setTimeout(vidLoad); return VID?.g?.[t + ':' + k] || null; };
+const giList = a => { const o = a && govOf('img', vidKey(a)); return o ? o.l.filter(x => !x[5]) : (a?.gi || []); };
+const gdeGet = k => govOf('enc', k) || GUIDES?.[k] || null;
+const ytList = a => { if (!VID || VID.at < Date.now() - 6 * 36e5) setTimeout(vidLoad); const o = a && VID?.g?.['lnk:' + vidKey(a)]; if (o) return o.l.filter(x => !x[3] && YT_OK(x[0])).map(x => [x[0], x[1] || x[2], x[2] || x[1]]); return [...(Array.isArray(a?.yt) ? a.yt : a?.yt ? [[a.yt]] : []), ...(a && VID?.m?.[vidKey(a)] || [])].filter(x => YT_OK(x[0])); };
 const ytId = url => { try { const x = new URL(url); return x.hostname === 'youtu.be' ? x.pathname.slice(1) : x.searchParams.get('v') || ''; } catch { return ''; } };
 /* Guia por encontro (data/guides.json; o cadastro pelo site vem depois): botão "📖 Guia" ao lado de Vídeos e Imagens */
 let GUIDES = null; function gdeLoad() { if (gdeLoad.busy || GUIDES) return; gdeLoad.busy = true; fetch('/data/guides.json').then(r => r.json()).then(j => { GUIDES = j; render(); }).catch(() => { GUIDES = {}; }); }
 const GDE = { k: '', i: 0 };
 function gdeDraw() {
-  const d = $('gdedlg'), g = GUIDES?.[GDE.k], a = actDefOf(...GDE.k.split(':')), P = lang === 'pt'; if (!d || !g) return; const e = g.enc[GDE.i] || g.enc[0];
+  const d = $('gdedlg'), g = gdeGet(GDE.k), a = actDefOf(...GDE.k.split(':')), P = lang === 'pt'; if (!d || !g) return; const e = g.enc[GDE.i] || g.enc[0];
   d.innerHTML = `<div class="pf-box gde-box"><button type="button" class="pf-x" aria-label="${esc(u().giClose)}">✕</button><header class="gde-hd"><small>${P ? 'GUIA POR ENCONTRO' : 'ENCOUNTER GUIDE'}</small><h1>${esc(a ? L(a.n) : '')}</h1></header>
     <div class="gde-tabs" role="tablist">${g.enc.map((x, i) => `<button type="button" role="tab" aria-selected="${i === GDE.i}" data-gdei="${i}"><small>${i + 1}</small>${esc(x.n)}</button>`).join('')}</div>
     <article class="gde-c"><h2>${GDE.i + 1} · ${esc(e.n)}</h2>
       <span class="sea-k">${P ? 'OBJETIVO' : 'OBJECTIVE'}</span><p class="gde-obj">${esc(e.obj)}</p>
       ${e.roles?.length ? `<span class="sea-k">${P ? 'PAPÉIS' : 'ROLES'}</span><div class="gde-roles">${e.roles.map(([n, t]) => `<span><b>${esc(n)}</b> · ${esc(t)}</span>`).join('')}</div>` : ''}
       <span class="sea-k">${P ? 'PASSO A PASSO' : 'STEP BY STEP'}</span><ol class="gde-steps">${e.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>
-      ${e.tip ? `<p class="gde-tip"><b>${P ? 'Dica:' : 'Tip:'}</b> ${esc(e.tip)}</p>` : ''}</article>
+      ${e.tip ? `<p class="gde-tip"><b>${P ? 'Dica:' : 'Tip:'}</b> ${esc(e.tip)}</p>` : ''}${YT_OK(e.yt) ? `<a class="chip yt gde-yt" href="${esc(e.yt)}" target="_blank" rel="noopener">▶ ${P ? 'Vídeo deste encontro' : 'Video for this encounter'}</a>` : ''}</article>
     <button type="button" class="gde-full" data-gdefs="${esc(GDE.k)}">⛶ ${P ? 'Modo encontros' : 'Encounter mode'}<small>${P ? 'todos os encontros em tela cheia, texto maior' : 'all encounters full screen, larger text'}</small></button>
     <footer class="gde-ft"><span>${P ? 'Resumo de guias da comunidade' : 'Summary of community guides'}: ${(g.src || []).map(([n, u2]) => `<a href="${esc(u2)}" target="_blank" rel="noopener">${esc(n)} ↗</a>`).join(', ')}</span>${a ? actYtRaw(...GDE.k.split(':')) : ''}</footer></div>`;
 }
@@ -945,7 +949,7 @@ document.addEventListener('input', e => { if (!e.target.matches?.('[data-armq]')
 /* Modo encontros: tela cheia só com os encontros, um cartão por encontro (tipo por cor), faixa de etapas e texto ajustável */
 const GFS = { z: LS.get('dc-gfs-z', 0), r: LS.get('dc-gfs-r', 1) };
 function gfsOpen(k) {
-  const g = GUIDES?.[k], [kind, key] = k.split(':'), a = actDefOf(kind, key), P = lang === 'pt'; if (!g) return;
+  const g = gdeGet(k), [kind, key] = k.split(':'), a = actDefOf(kind, key), P = lang === 'pt'; if (!g) return;
   let d = $('gdefs'); if (!d) { d = document.createElement('dialog'); d.id = 'gdefs'; d.className = 'gfs'; document.body.append(d);
     d.addEventListener('click', e => { const t = e.target.closest('[data-gfs]'); if (!t) return; const v = t.dataset.gfs;
       if (v === 'x') { d.close(); return; }
@@ -960,7 +964,7 @@ function gfsOpen(k) {
   const cards = g.enc.map((e, i) => { const t = ty(e), id = `gfs${i}`, nn = String(i + 1).padStart(2, '0');
     if (t === 'pas') return `<section class="gfs-cd pas" id="${id}"><div class="gfs-n">${nn}</div><div><div class="gfs-tg"><span class="gfs-ty pas">${TL.pas}</span><span>${P ? 'entre' : 'between'} ${String(i).padStart(2, '0')} ${P ? 'e' : 'and'} ${String(i + 2).padStart(2, '0')}</span></div><h2>${esc(nm(e))}</h2><p>${esc([e.obj, ...e.steps].join(' '))}</p></div>${e.tip ? `<div class="gfs-pt"><span class="gfs-l">${P ? 'Dica' : 'Tip'}</span>${esc(e.tip)}</div>` : ''}</section>`;
     c++; return `<section class="gfs-cd ${t}" id="${id}"><header><div class="gfs-n">${nn}</div><div><div class="gfs-tg"><span class="gfs-ty ${t}">${TL[t]}</span><span>${P ? 'Encontro' : 'Encounter'} ${c} ${P ? 'de' : 'of'} ${nb} · ${P ? 'etapa' : 'step'} ${nn}</span></div><h2>${esc(e.n)}</h2><p class="gfs-obj">${esc(e.obj)}</p></div></header>
-      <div class="gfs-bd"><div class="gfs-c1">${e.roles?.length ? `<div class="gfs-roles"><span class="gfs-l">${P ? 'Funções sugeridas' : 'Suggested roles'}</span><ul>${e.roles.map(([r, x]) => `<li><b>${esc(r)}</b><span>${esc(x)}</span></li>`).join('')}</ul></div>` : ''}${e.tip ? `<div class="gfs-tip"><span class="gfs-l">${P ? 'Dica' : 'Tip'}</span>${esc(e.tip)}</div>` : ''}</div>
+      <div class="gfs-bd"><div class="gfs-c1">${e.roles?.length ? `<div class="gfs-roles"><span class="gfs-l">${P ? 'Funções sugeridas' : 'Suggested roles'}</span><ul>${e.roles.map(([r, x]) => `<li><b>${esc(r)}</b><span>${esc(x)}</span></li>`).join('')}</ul></div>` : ''}${e.tip ? `<div class="gfs-tip"><span class="gfs-l">${P ? 'Dica' : 'Tip'}</span>${esc(e.tip)}</div>` : ''}${YT_OK(e.yt) ? `<a class="gfs-vid" href="${esc(e.yt)}" target="_blank" rel="noopener">▶ ${P ? 'Vídeo deste encontro' : 'Video for this encounter'}</a>` : ''}</div>
       <div class="gfs-c2"><span class="gfs-l">${P ? 'Passo a passo' : 'Step by step'}</span><ol>${e.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol></div></div></section>`; }).join('');
   const meta = [`${n} ${P ? 'etapas' : 'steps'}`, `${nb} ${P ? 'encontros' : 'encounters'}`, n - nb ? `${n - nb} ${P ? (n - nb > 1 ? 'passagens' : 'passagem') : 'passages'}` : '', a?.x ? `${P ? 'Exótico' : 'Exotic'}: ${a.x}` : '', a?.master ? (P ? 'Mestre disponível' : 'Master available') : ''].filter(Boolean);
   d.innerHTML = `<div class="gfs-top"><div class="gfs-bc"><b>DPI</b><span>/</span>${P ? 'Guia por encontro' : 'Encounter guide'}</div><div class="gfs-act"><button type="button" data-gfs="-" aria-label="${P ? 'Diminuir texto' : 'Smaller text'}">A−</button><button type="button" data-gfs="+" aria-label="${P ? 'Aumentar texto' : 'Larger text'}">A+</button><button type="button" data-gfs="r" class="${GFS.r ? 'on' : ''}">${P ? 'Funções' : 'Roles'}</button><button type="button" data-gfs="x" class="gfs-x">✕ ${P ? 'Fechar' : 'Close'} <kbd>Esc</kbd></button></div></div>
@@ -974,14 +978,14 @@ function gfsOpen(k) {
 document.addEventListener('click', e => { const b = e.target.closest('[data-gdefs]'); if (!b) return; e.preventDefault(); e.stopPropagation(); gfsOpen(b.dataset.gdefs); }, true);
 document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches?.('.gfs-rl a')) { e.preventDefault(); e.target.click(); } });
 document.addEventListener('click', e => { const b = e.target.closest('[data-gde]'); if (!b) return; e.preventDefault(); e.stopPropagation(); gdeOpen(b.dataset.gde); }, true);
-const actYt = (kind, key) => { if (!GUIDES) setTimeout(gdeLoad); const g = GUIDES?.[(kind === 'dg' ? 'dg' : kind) + ':' + key]; return (g ? `<button type="button" class="chip gde" data-gde="${kind}:${esc(key)}">📖 ${esc(lang === 'pt' ? `Guia (${g.enc.length})` : `Guide (${g.enc.length})`)}</button>` : '') + actYtRaw(kind, key); };
+const actYt = (kind, key) => { if (!GUIDES) setTimeout(gdeLoad); const g = gdeGet(kind + ':' + key); return (g ? `<button type="button" class="chip gde" data-gde="${kind}:${esc(key)}">📖 ${esc(lang === 'pt' ? `Guia (${g.enc.length})` : `Guide (${g.enc.length})`)}</button>` : '') + actYtRaw(kind, key); };
 const actYtRaw = (kind, key) => { const a = actDefOf(kind, key); if (!a) return ''; const yl = ytList(a);
-  const v = yl.length === 1 ? `<a class="chip yt" href="${esc(yl[0][0])}" target="_blank" rel="noopener">▶ ${esc(u().ytGuide)}</a>` : yl.length > 1 ? `<button type="button" class="chip yt" data-ytl="${kind}:${esc(key)}">▶ ${esc(u().ytMany(yl.length))}</button>` : ''; return v + (a.gi?.length ? `<button type="button" class="chip gi" data-gal="${kind}:${esc(key)}">🖼 ${esc(u().giBtn(a.gi.length))}</button>` : ''); };
+  const v = yl.length === 1 ? `<a class="chip yt" href="${esc(yl[0][0])}" target="_blank" rel="noopener">▶ ${esc(u().ytGuide)}</a>` : yl.length > 1 ? `<button type="button" class="chip yt" data-ytl="${kind}:${esc(key)}">▶ ${esc(u().ytMany(yl.length))}</button>` : ''; return v + (giList(a).length ? `<button type="button" class="chip gi" data-gal="${kind}:${esc(key)}">🖼 ${esc(u().giBtn(giList(a).length))}</button>` : ''); };
 /* galeria de imagens do guia: só baixa as imagens quando abre */
 const GAL = { l: [], i: 0, t: '', seq: 0 };
 function galOpen(kind, key, i = 0) {
-  const a = actDefOf(kind, key); if (!a?.gi?.length) return;
-  GAL.l = a.gi; GAL.i = i; GAL.t = L(a.n);
+  const a = actDefOf(kind, key), gl = giList(a); if (!gl.length) return;
+  GAL.l = gl; GAL.i = i; GAL.t = L(a.n);
   let d = $('galdlg'); if (!d) { d = document.createElement('dialog'); d.id = 'galdlg'; d.className = 'gal'; document.body.append(d); galWire(d); }
   galDraw(); if (!d.open) d.showModal();
 }
@@ -1602,7 +1606,7 @@ function render() {
   $('tabs').innerHTML = GROUPS.map(g => `<button class="tab" type="button" data-group="${g.id}" aria-current="${groupOf(tab)?.id === g.id}">${esc(U.tabs[g.id])}</button>`).join('');
   botNav();
   // atalho do Orla Bot no topo (só membros da Orla): confere o clã uma vez por dia, mesmo sem abrir a aba Clã
-  { const vb = $('vidbtn'); if (vb) vb.hidden = !member || !LS.get('dc-ownchk', {}).o; } // atalho da página /videos: só o dono do site
+  { const vb = $('vidbtn'); if (vb) vb.hidden = !member || !LS.get('dc-ownchk', {}).o; } // atalho da página /guias: só o dono do site
   { const gb = $('gradebtn'); if (gb) { if (GD?.clan?.gid) LS.set('dc-orla', { ok: GD.clan.gid === ORLA_CLAN, at: Date.now() }); const o = LS.get('dc-orla', null);
     if (member && (!o || Date.now() - o.at > 864e5) && !orlaChk) { orlaChk = true; bungie(`/GroupV2/User/${member.type}/${member.id}/0/1/`).then(r => { LS.set('dc-orla', { ok: (r.results || []).some(x => String(x.group?.groupId) === ORLA_CLAN), at: Date.now() }); render(); }).catch(() => {}); }
     gb.hidden = !member || !(o?.ok || orlaOK() || GRADE); gb.classList.toggle('on', GRADE); gb.title = lang === 'pt' ? 'Orla Bot: criar ou ver grades do clã' : 'Orla Bot: create or see clan rosters'; } }
@@ -3260,7 +3264,7 @@ function adminHTML() {
   const gl = ga ? [...all, { n: (member.name || '').replace(/#\d+$/, ''), mid: member.id, on: true }].map(x => ({ x, v: GMET[x.mid]?.v === 2 ? actBadges(ga, h => GMET[x.mid].x?.[h]).g : 0 })).filter(r => r.v > 0).sort((a, b) => b.v - a.v).slice(0, 8) : [];
   const gT = `<section class="ad-s"><h2>${esc(T.gT)}</h2><small class="lbd-n">${esc(T.gN)}</small><label class="lbd-act"><span>${esc(T.act)}</span><select id="adg">${acts.map(([, a]) => `<option value="${a.k}"${ga === a ? ' selected' : ''}>${esc(L(a.n))}</option>`).join('')}</select></label>${gl.map(r => `<span class="ad-g"><span><b>${esc(r.x.n)}</b>${r.x.on ? ' <small class="ok">● online</small>' : ''}</span><b class="m acc">${esc(T.guided(r.v))}</b></span>`).join('') || `<p class="lbd-n">${esc(T.noG)}</p>`}${ga ? `<div class="ad-gcp"><button type="button" class="lbd-btn pri" data-adcp="first">📋 ${esc(T.cpFirst)}</button><small class="lbd-n">${esc(T.cpFirstN)}</small></div>` : ''}</section>`;
   const cpT = `<section class="ad-s ad-cp"><h2>${esc(T.copyT)}</h2><small class="lbd-n">${esc(T.copyN)}</small><div class="ad-cpb">${Object.entries(T.cp).map(([k, t]) => `<button type="button" class="lbd-btn" data-adcp="${k}">📋 ${esc(t)}</button>`).join('')}</div></section>`;
-  return `<div class="ad-only"><b>${esc(T.only)}</b><span>${esc(T.onlyN)}</span>${LS.get('dc-ownchk', {}).o ? `<a class="lbd-btn" href="/videos" style="margin-left:auto;text-decoration:none">▶ ${lang === 'pt' ? 'Vídeos de guia' : 'Guide videos'}</a>` : ''}</div>${AD.msg ? `<p class="iv-msg${AD.msg.bad ? ' bad' : ''}">${esc(AD.msg.t)}</p>` : ''}${inT}${socHTML()}<section class="ad-s ad-wide ad-rec"><h2>${esc(T.recT)}</h2><div class="ad-rec-c">${reqT}${promoT}${newT}</div></section>${gT}`;
+  return `<div class="ad-only"><b>${esc(T.only)}</b><span>${esc(T.onlyN)}</span>${LS.get('dc-ownchk', {}).o ? `<a class="lbd-btn" href="/guias" style="margin-left:auto;text-decoration:none">📖 ${lang === 'pt' ? 'Guias' : 'Guides'}</a>` : ''}</div>${AD.msg ? `<p class="iv-msg${AD.msg.bad ? ' bad' : ''}">${esc(AD.msg.t)}</p>` : ''}${inT}${socHTML()}<section class="ad-s ad-wide ad-rec"><h2>${esc(T.recT)}</h2><div class="ad-rec-c">${reqT}${promoT}${newT}</div></section>${gT}`;
 }
 function adCopy(k) {
   const T = adt(), C = GD.clan, now = Date.now(), all = C.list, seen = x => x.t > 864e5 * 365, d = t => Math.round((now - t) / 864e5);

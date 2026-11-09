@@ -59,8 +59,8 @@
       "destination": "/estado.html"
     },
     {
-      "source": "/videos",
-      "destination": "/videos.html"
+      "source": "/guias",
+      "destination": "/guias.html"
     },
     {
       "source": "/grade",
@@ -83,5 +83,12 @@
       "destination": "https://dni-api.dni-site.workers.dev/gpage/:s"
     }
   ],
-  "ignoreCommand": "if [ \"$VERCEL_GIT_COMMIT_REF\" = \"main\" ]; then exit 1; else echo \"branch $VERCEL_GIT_COMMIT_REF: sem publicacao (so a main publica)\"; exit 0; fi"
+  "ignoreCommand": "if [ \"$VERCEL_GIT_COMMIT_REF\" = \"main\" ]; then exit 1; else echo \"branch $VERCEL_GIT_COMMIT_REF: sem publicacao (so a main publica)\"; exit 0; fi",
+  "redirects": [
+    {
+      "source": "/videos",
+      "destination": "/guias?t=vid",
+      "permanent": false
+    }
+  ]
 }
