@@ -428,9 +428,11 @@ async function videosEdit(req, env, path) {
 async function guiasEdit(req, env, path) {
   const uid = await who(req, env); if (!uid) return json(req, { error: 'auth' }, 401);
   if (uid !== String(env.OWNER)) return json(req, { error: 'forbidden' }, 403);
-  const k = decodeURIComponent(path.slice(7));
+  const hist = path.startsWith('/guias/h/'), k = decodeURIComponent(path.slice(hist ? 9 : 7));
   if (!/^(lnk|img|enc):(raid|dg|xm):[\w-]{1,40}$/.test(k)) return json(req, { error: 'Chave inválida.' }, 400);
-  if (req.method === 'DELETE') { await env.DB.prepare('DELETE FROM gde WHERE k = ?').bind(k).run(); return json(req, { ok: true }); }
+  if (hist) { const r = await env.DB.prepare('SELECT id, v, at FROM gde_h WHERE k = ? ORDER BY at DESC LIMIT 20').bind(k).all().catch(() => ({ results: [] })); return json(req, { list: r.results.map(x => ({ id: x.id, at: x.at, v: JSON.parse(x.v) })) }); }
+  const keep = async () => { const old = await env.DB.prepare('SELECT v, at FROM gde WHERE k = ?').bind(k).first().catch(() => null); if (old) { await env.DB.prepare('INSERT INTO gde_h (k, v, at) VALUES (?, ?, ?)').bind(k, old.v, old.at).run().catch(() => {}); await env.DB.prepare('DELETE FROM gde_h WHERE k = ? AND id NOT IN (SELECT id FROM gde_h WHERE k = ? ORDER BY at DESC LIMIT 20)').bind(k, k).run().catch(() => {}); } };
+  if (req.method === 'DELETE') { await keep(); await env.DB.prepare('DELETE FROM gde WHERE k = ?').bind(k).run(); return json(req, { ok: true }); }
   if (req.method !== 'PUT') return json(req, { error: 'method' }, 405);
   const txt = await req.text(); if (txt.length > 120000) return json(req, { error: 'Grande demais.' }, 413);
   let v; try { v = JSON.parse(txt); } catch { return json(req, { error: 'JSON inválido.' }, 400); }
@@ -440,6 +442,7 @@ async function guiasEdit(req, env, path) {
     : t === 'img' ? Array.isArray(v?.l) && v.l.every(x => Array.isArray(x) && str(x[0]) && (/^https:\/\//.test(x[0]) || /^\/guides\/[\w./-]+$/.test(x[0])))
     : Array.isArray(v?.enc) && v.enc.every(e => e && str(e.n) && str(e.obj ?? '') && Array.isArray(e.steps) && e.steps.every(str) && (!e.roles || (Array.isArray(e.roles) && e.roles.every(r => Array.isArray(r) && r.every(str)))) && (!e.yt || yt(e.yt)));
   if (!ok) return json(req, { error: 'Dados inválidos (confira os links).' }, 400);
+  await keep();
   await env.DB.prepare('INSERT OR REPLACE INTO gde (k, v, at) VALUES (?, ?, ?)').bind(k, JSON.stringify(v), Date.now()).run();
   return json(req, { ok: true });
 }

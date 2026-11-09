@@ -7,210 +7,345 @@
 <title>Guias · DPI</title>
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
-  *{box-sizing:border-box} body{margin:0;font-family:var(--body)} [hidden]{display:none!important}
-  :root{--c-enc:var(--arc);--c-boss:var(--solar);--c-final:var(--hard)}
-  .gp{max-width:1400px;margin:0 auto;padding:24px 16px 60px;display:grid;gap:16px}
-  .top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
-  .top h1{margin:0;font-family:var(--display);font-size:38px;line-height:1}.tag{font:500 12px var(--mono);letter-spacing:.08em;color:var(--muted)}
-  a.btn,.btn{font:inherit;font-size:14px;color:var(--fg);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--surface);cursor:pointer;white-space:nowrap}
-  .btn:disabled{opacity:.5;cursor:default}.btn.pri{background:var(--arc);border-color:var(--arc);color:#0b1520;font-weight:600}.btn.del{color:var(--hard)}.btn.sm{padding:5px 9px;font-size:13px}
-  .ib{font:inherit;font-size:14px;line-height:1;width:30px;height:30px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--fg);cursor:pointer;flex:none}.ib:disabled{opacity:.35;cursor:default}.ib.x{color:var(--hard)}
-  .msg{font-size:14px}.msg.ok{color:var(--done)}.msg.bad{color:var(--hard)}
-  .lay{display:grid;grid-template-columns:280px minmax(0,1fr);gap:16px;align-items:start}
-  .side{position:sticky;top:12px;display:grid;gap:8px;max-height:calc(100vh - 24px);overflow:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:12px}
-  .side input{margin-bottom:4px}.side h3{margin:8px 0 2px;font:500 11.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-  .act{display:flex;justify-content:space-between;gap:8px;align-items:center;width:100%;text-align:left;font:inherit;font-size:14.5px;color:var(--fg);background:none;border:1px solid transparent;border-radius:8px;padding:7px 9px;cursor:pointer}
-  .act:hover{background:var(--chip)}.act.on{border-color:var(--arc);background:color-mix(in srgb,var(--arc) 12%,transparent);font-weight:600}
-  .act small{font:500 11px var(--mono);color:var(--muted);white-space:nowrap}.act i{font-style:normal;color:var(--exotic)}
-  .main{display:grid;gap:14px;min-width:0}
-  .card{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:16px;display:grid;gap:12px;min-width:0}
-  .ahd{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.ahd h2{margin:0;font-family:var(--display);font-size:30px;line-height:1}
-  .st{font:500 12px var(--mono);padding:3px 9px;border-radius:6px;background:var(--chip);color:var(--muted)}.st.ed{background:color-mix(in srgb,var(--exotic) 18%,transparent);color:var(--exotic)}
-  .gtabs{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}.gtabs button{font:inherit;font-size:14.5px;padding:8px 16px;border:0;background:transparent;color:var(--muted);cursor:pointer}
-  .gtabs button[aria-pressed=true]{background:color-mix(in srgb,var(--arc) 18%,transparent);color:var(--fg);font-weight:600}
-  .sbar{position:sticky;bottom:12px;z-index:2;display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 16px;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--surface) 94%,#000)}
-  .sbar .sp{flex:1}
-  label.f{display:grid;gap:5px;font:500 11.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-  input,select,textarea{font:400 15px var(--body);color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 10px;width:100%;min-width:0;text-transform:none;letter-spacing:0}
-  textarea{resize:vertical;min-height:42px;line-height:1.45}
-  .g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}.g3{display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:10px}
-  .encl{display:flex;gap:6px;flex-wrap:wrap}
-  .ec{display:flex;align-items:center;gap:7px;font:inherit;font-size:14px;color:var(--fg);background:var(--chip);border:1px solid var(--line);border-top:3px solid var(--c-enc);border-radius:9px;padding:7px 11px;cursor:pointer}
-  .ec b{font:700 16px var(--display);color:var(--muted)}.ec.boss{border-top-color:var(--c-boss)}.ec.final{border-top-color:var(--c-final)}.ec.pas{border-top:3px dashed var(--line)}
-  .ec.on{border-color:var(--arc);box-shadow:inset 0 0 0 1px var(--arc)}.ec.on b{color:var(--arc)}
-  .ed{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:16px;align-items:start}
-  .rows{display:grid;gap:8px}.row{display:flex;gap:6px;align-items:flex-start}.row>input,.row>textarea{flex:1}
-  .row .n{font:700 16px/34px var(--display);width:24px;text-align:center;color:var(--muted);flex:none}
-  .sec{display:grid;gap:8px;padding-top:4px}.sec>h4{margin:0;font:500 11.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-  .add{justify-self:start}
-  .pv{position:sticky;top:12px;border:1px solid var(--line);border-left:6px solid var(--c-enc);border-radius:14px;background:var(--bg);padding:16px;display:grid;gap:10px}
-  .pv.boss{border-left-color:var(--c-boss)}.pv.final{border-left-color:var(--c-final)}.pv.pas{border-left-style:dashed}
-  .pv h3{margin:0;font:700 28px/1.05 var(--display)}.pv .ty{font:500 11.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-  .pv p{margin:0;font-size:15px;line-height:1.45}.pv ol{margin:0;padding-left:22px;display:grid;gap:5px;font-size:14.5px;line-height:1.45}
-  .pv .rl{display:flex;flex-wrap:wrap;gap:6px}.pv .rl span{font-size:13.5px;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface)}.pv .rl b{color:var(--arc)}
-  .pv .tip{font-size:14px;padding:10px 12px;border-radius:10px;border:1px solid color-mix(in srgb,var(--exotic) 45%,transparent);background:color-mix(in srgb,var(--exotic) 8%,transparent)}
-  .pv .lbl{font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-  .vrow{display:grid;grid-template-columns:auto minmax(0,2fr) minmax(0,1.2fr) minmax(0,1.2fr) auto auto;gap:8px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:11px;background:var(--bg)}
-  .vrow.hid{opacity:.5}.mv{display:flex;flex-direction:column;gap:3px}.mv .ib{height:20px;font-size:11px}
-  .vrow .base{font:500 10.5px var(--mono);color:var(--muted);letter-spacing:.06em}
-  .hb{font:inherit;font-size:13px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--fg);padding:6px 9px;cursor:pointer;white-space:nowrap}.hb.on{color:var(--muted)}
-  .irow{display:grid;grid-template-columns:auto 120px minmax(0,1fr) minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:11px;background:var(--bg)}
-  .irow.hid{opacity:.5}.irow img{width:120px;height:68px;object-fit:cover;border-radius:7px;border:1px solid var(--line);background:var(--chip)}
-  .hint{margin:0;font-size:13.5px;color:var(--muted)}
-  @media (max-width:1250px){.ed{grid-template-columns:1fr}.pv{position:static}}
-  @media (max-width:1000px){.lay{grid-template-columns:1fr}.side{position:static;max-height:300px}}
-  @media (max-width:700px){.g2,.g3{grid-template-columns:1fr}.vrow,.irow{grid-template-columns:auto minmax(0,1fr)}.vrow>*:nth-child(n+3),.irow>*:nth-child(n+3){grid-column:2}.irow img{grid-column:2;width:100%;height:auto;aspect-ratio:16/9}}
+  :root{--bg:#0d1219;--p1:#121a24;--p2:#18222e;--ln:#1f2a36;--ln2:#2a3542;--fg:#e8edf2;--mu:#8d99a6;--mu2:#9fb0c2;--mu3:#6c7a89;--tx:#c9d3dd;
+    --cy:#6fd3ff;--gr:#7fe08f;--ye:#f2d36b;--rd:#ff8a7a;
+    --display:"Rajdhani","Arial Narrow",sans-serif;--body:"IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;color-scheme:dark}
+  *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body)}[hidden]{display:none!important}
+  button,input,select,textarea{font:inherit;color:inherit}
+  .k{font:500 11px var(--mono);letter-spacing:.08em;color:var(--mu);text-transform:uppercase}
+  .gp{max-width:1440px;margin:0 auto;padding:24px 32px 40px;display:grid;gap:18px 22px;align-items:start}
+  .gp.v-list{grid-template-columns:300px minmax(0,1fr)}.gp.v-enc{grid-template-columns:280px minmax(0,1fr) 400px}
+  header{grid-column:1/-1;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  header .t{display:flex;flex-direction:column}header .t b{font:700 32px/1 var(--display)}
+  nav{display:flex;gap:6px;margin-left:24px}
+  nav button{padding:8px 16px;border-radius:10px;border:1px solid var(--ln2);background:none;font-size:14px;cursor:pointer}
+  nav button[aria-pressed=true]{background:rgba(111,211,255,.18);border-color:var(--cy);font-weight:600}
+  nav button[data-view=enc][aria-pressed=true]{background:rgba(127,224,143,.16);border-color:var(--gr)}
+  .last{margin-left:auto;font-size:13px;color:var(--mu2)}
+  .btn{padding:8px 14px;border:1px solid var(--ln2);border-radius:9px;background:none;font-size:14px;cursor:pointer;text-decoration:none;color:var(--fg);white-space:nowrap}
+  .btn:disabled{opacity:.45;cursor:default}
+  .btn.cy{background:var(--cy);border-color:var(--cy);color:#0b1520;font-weight:700}.btn.gr{background:var(--gr);border-color:var(--gr);color:#0b1520;font-weight:700}
+  .btn.rd{border-color:rgba(255,107,107,.5);color:var(--rd)}.btn.sm{padding:6px 10px;font-size:12.5px;border-radius:8px}
+  .lnk{background:none;border:0;padding:0;font-size:13px;color:var(--cy);cursor:pointer;justify-self:start;align-self:flex-start;text-align:left}
+  .gate{grid-column:1/-1;font-size:15px;color:var(--rd)}
+  aside{display:flex;flex-direction:column;gap:10px;min-width:0}
+  .srch{border:1px solid var(--ln2);border-radius:10px;padding:9px 12px;font-size:14px;background:none;width:100%}.srch::placeholder{color:var(--mu)}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}.chips button{padding:4px 10px;border-radius:999px;border:1px solid var(--ln2);background:none;font-size:12.5px;cursor:pointer}
+  .chips button[aria-pressed=true]{background:rgba(111,211,255,.18);border-color:var(--cy)}
+  .acts{display:flex;flex-direction:column;gap:4px;max-height:calc(100vh - 210px);overflow:auto;padding-right:2px}
+  .act{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:9px 12px;border-radius:10px;background:var(--p1);border:1px solid var(--ln);text-align:left;cursor:pointer}
+  .act.on{background:rgba(111,211,255,.12);border-color:var(--cy)}
+  .act span{display:flex;flex-direction:column;min-width:0}.act b{font-size:14px}.act small{font-size:12px;color:var(--mu2)}.act i{font:500 11px var(--mono);font-style:normal}
+  main{display:flex;flex-direction:column;gap:14px;min-width:0}
+  .mh{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.mh .th{width:64px;height:40px;border-radius:8px;object-fit:cover;background:linear-gradient(135deg,#3b4a2c,#18222e)}
+  .mh b{font:700 28px/1 var(--display)}.mh small{font-size:13px;color:var(--mu2)}.mh .btn{margin-left:auto}
+  .tbl{border:1px solid var(--ln);border-radius:14px;background:var(--p1);overflow:hidden}
+  .tr{display:grid;gap:12px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--ln)}.tr:last-child{border-bottom:0}
+  .tbl.v .tr{grid-template-columns:28px 76px minmax(0,1.6fr) minmax(0,1fr) 150px 150px}.tbl.i .tr{grid-template-columns:28px 96px minmax(0,1.6fr) minmax(0,.6fr) 150px 150px}
+  .tr.hd{font:500 11px var(--mono);letter-spacing:.08em;color:var(--mu)}
+  .tr.hid{opacity:.5}.tr.drag{opacity:.35}.tr.over{box-shadow:inset 0 2px 0 var(--cy)}.tr.sel{background:rgba(111,211,255,.06)}
+  .grip{color:var(--mu3);font-size:18px;cursor:grab;user-select:none;text-align:center}
+  .vth{width:76px;height:43px;border-radius:6px;object-fit:cover;background:linear-gradient(135deg,#3a2a2a,#1a1416);display:block}.tbl.i .vth{width:96px;height:54px}
+  .nm{display:flex;flex-direction:column;min-width:0}.nm b{font-size:14px}.nm small{font-size:12px;color:var(--mu2)}.nm a{font-size:11.5px;color:var(--cy);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ec{font-size:13px;color:var(--tx)}
+  .org{font:500 11.5px var(--mono);border:1px solid currentColor;border-radius:6px;padding:2px 7px;justify-self:start;white-space:nowrap}
+  .acts2{display:flex;gap:6px;justify-content:flex-end}
+  .empty{padding:18px 14px;color:var(--mu2);font-size:14px;margin:0}
+  .form{border:1px solid rgba(111,211,255,.45);border-radius:14px;background:var(--p1);padding:16px 18px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+  .form>b{grid-column:1/-1;font-size:15px}
+  label.f{display:flex;flex-direction:column;gap:5px;min-width:0}label.f>small{font:500 11px var(--mono);letter-spacing:.08em;color:var(--mu)}
+  .in{border:1px solid var(--ln2);border-radius:9px;padding:9px 11px;font-size:14px;background:var(--p1);width:100%;min-width:0}
+  .form .in{background:var(--bg)}
+  textarea.in{resize:vertical;line-height:1.4;min-height:40px;overflow:hidden}
+  .fbar{grid-column:1/-1;display:flex;gap:8px;align-items:center}.fbar .rd{margin-left:auto}
+  .notes{display:flex;gap:18px;font-size:13px;color:var(--mu2);line-height:1.5}.notes b{color:var(--fg)}
+  .msg{font-size:13.5px;margin:0}.msg.ok{color:var(--gr)}.msg.bad{color:var(--rd)}
+  .sel-act{border:1px solid var(--ln2);border-radius:10px;padding:9px 12px;font-size:14px;background:var(--bg);width:100%}
+  .er{display:grid;grid-template-columns:18px 22px minmax(0,1fr) auto;gap:8px;align-items:center;padding:9px 10px;border-radius:10px;background:var(--p1);border:1px solid var(--ln);cursor:pointer;text-align:left}
+  .er.on{background:rgba(127,224,143,.14);border-color:var(--gr)}.er b{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .er .n{font:500 12px var(--mono);color:var(--mu)}.er .s{font:500 11px var(--mono)}
+  .er.drag{opacity:.35}.er.over{box-shadow:0 -2px 0 var(--gr)}
+  .add{padding:9px 12px;border:1px dashed var(--ln2);border-radius:10px;font-size:14px;color:var(--mu2);text-align:center;background:none;cursor:pointer}
+  .srcb{margin-top:8px;border:1px solid var(--ln);border-radius:12px;padding:12px;font-size:13px;color:var(--mu2);line-height:1.5;background:var(--p1);display:grid;gap:6px}
+  .srcb>b{color:var(--fg)}.srcb a{color:var(--mu2)}.srcl{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.srcf{display:grid;gap:6px}
+  .eh{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.eh>b{font:700 24px var(--display)}
+  .draft{font:500 12px var(--mono);color:var(--ye);border:1px solid rgba(242,211,107,.5);border-radius:6px;padding:2px 7px}
+  .eh .hint{margin-left:auto;font-size:13px;color:var(--mu2)}
+  .g2{display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:12px}.g3{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:12px}
+  .lst{display:flex;flex-direction:column;gap:6px}
+  .rr{display:grid;grid-template-columns:18px 180px minmax(0,1fr) 28px;gap:8px;align-items:center}
+  .sr{display:grid;grid-template-columns:18px 22px minmax(0,1fr) 28px;gap:8px;align-items:center}.sr .n{font:500 12px var(--mono);color:var(--mu)}
+  .rr.drag,.sr.drag{opacity:.35}.rr.over,.sr.over{box-shadow:0 -2px 0 var(--gr)}
+  .x{background:none;border:0;color:var(--rd);cursor:pointer;font-size:15px}
+  .vsel{display:grid;grid-template-columns:minmax(0,1fr) 72px;gap:6px}
+  .bbar{display:flex;gap:8px;align-items:center;margin-top:4px;flex-wrap:wrap}.bbar .rd{margin-left:auto}
+  .pv{border-radius:14px;border:1px solid var(--ln2);background:var(--p2);padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+  .pv .tabs{display:flex;gap:5px;flex-wrap:wrap}.pv .tabs span{padding:4px 9px;border-radius:999px;font-size:11.5px;border:1px solid var(--ln);background:var(--p1)}
+  .pv .tabs span.on{background:rgba(127,224,143,.14);border-color:var(--gr)}
+  .pv>b{font:700 20px var(--display)}.pv>small{font:500 10.5px var(--mono);color:var(--mu)}.pv>span{font-size:13.5px;line-height:1.4}
+  .pv .roles{display:flex;gap:5px;flex-wrap:wrap}.pv .roles span{padding:3px 8px;border-radius:8px;border:1px solid var(--ln2);font-size:12px}.pv .roles b{color:var(--ye)}
+  .pv ol{margin:0;padding-left:18px;font-size:12.5px;line-height:1.4;color:var(--tx);display:flex;flex-direction:column;gap:3px}
+  .pv .tip{border-radius:9px;padding:8px 10px;background:rgba(242,211,107,.08);border:1px solid rgba(242,211,107,.35);font-size:12.5px}.pv .tip b{color:var(--ye)}
+  .pv .yt{font-size:12.5px;color:var(--cy);text-decoration:none}
+  .who{border:1px solid rgba(242,211,107,.45);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--tx);background:rgba(242,211,107,.06);line-height:1.5}.who b{color:var(--ye)}
+  .hist{border:1px solid var(--ln2);border-radius:12px;background:var(--p1);padding:12px 14px;display:grid;gap:8px;font-size:13px}
+  .hist div{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .sticky{position:sticky;top:16px}
+  @media (max-width:1250px){.gp.v-enc{grid-template-columns:260px minmax(0,1fr)}.gp.v-enc>.right{grid-column:2}}
+  @media (max-width:1000px){.gp{padding:18px 16px 40px}.gp.v-list,.gp.v-enc{grid-template-columns:1fr}.gp.v-enc>.right{grid-column:auto}nav{margin-left:0}.acts{max-height:260px}.sticky{position:static}
+    .tbl.v .tr,.tbl.i .tr{grid-template-columns:28px 76px minmax(0,1fr)}.tr>.ec,.tr>.org{grid-column:3}.tr>.acts2{grid-column:1/-1}.tr.hd{display:none}
+    .form{grid-template-columns:1fr 1fr}.notes{flex-direction:column;gap:6px}.rr{grid-template-columns:18px 120px minmax(0,1fr) 28px}.g2,.g3{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<main class="gp">
-  <div class="top"><div><span class="tag">DPI · SÓ PARA O DONO DO SITE</span><h1>Guias</h1></div><a class="btn" href="/">← Voltar ao site</a></div>
-  <p class="msg" id="gate">Conferindo seu login…</p>
-  <div class="lay" id="app" hidden>
-    <aside class="side"><input id="q" type="search" placeholder="Buscar atividade"><div id="acts"></div></aside>
-    <section class="main" id="main"></section>
-  </div>
-</main>
+<div class="gp v-list" id="app">
+  <header><div class="t"><span class="k">DPI · só para o dono do site</span><b>Guias</b></div>
+    <nav id="nav" hidden><button type="button" data-view="vid">▶ Vídeos</button><button type="button" data-view="img">🖼 Imagens</button><button type="button" data-view="enc">📖 Encontros</button></nav>
+    <span class="last" id="last"></span><a class="btn" href="/">← Voltar ao site</a></header>
+  <p class="gate" id="gate">Conferindo seu login…</p>
+</div>
 <script>
 (async () => {
   const $ = id => document.getElementById(id), esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const app = $('app'), gate = t => { $('gate').textContent = t; };
   const auth = (() => { try { return JSON.parse(localStorage.getItem('dc-auth')); } catch { return null; } })();
-  const gate = t => { $('gate').textContent = t; $('gate').className = 'msg bad'; };
   const api = await fetch('/data/api.json').then(r => r.json()).then(j => j.url || j.api).catch(() => null);
   if (!auth?.access_token || auth.access_expires < Date.now()) return gate('Entre no site (ou abra a página inicial para renovar o login) e volte aqui.');
   const H = () => ({ Authorization: 'Bearer ' + auth.access_token, 'Content-Type': 'application/json' });
   const who = await fetch(api + '/whoami', { headers: H() }).then(r => r.json()).catch(() => ({}));
   if (!who.owner) return gate('Esta página é só para o dono do site.');
   const [defs, GUIDES] = await Promise.all([fetch('/data/defs.json').then(r => r.json()), fetch('/data/guides.json', { cache: 'no-store' }).then(r => r.json()).catch(() => ({}))]);
-  let GOV = {}, VIDS = [];
-  async function loadRemote() {
-    const [g, v] = await Promise.all([fetch(api + '/guias?t=' + Date.now(), { cache: 'no-store' }).then(r => r.json()).catch(() => ({ m: {} })), fetch(api + '/videos?t=' + Date.now(), { cache: 'no-store' }).then(r => r.json()).catch(() => ({ list: [] }))]);
-    GOV = g.m || {}; VIDS = v.list || [];
-  }
-  await loadRemote();
-  $('gate').hidden = true; $('app').hidden = false;
+  const [g0, v0] = await Promise.all([fetch(api + '/guias?t=' + Date.now(), { cache: 'no-store' }).then(r => r.json()).catch(() => ({ m: {} })), fetch(api + '/videos?t=' + Date.now(), { cache: 'no-store' }).then(r => r.json()).catch(() => ({ list: [] }))]);
+  const GOV = g0.m || {}, VIDS = v0.list || [];
+  $('gate').remove(); $('nav').hidden = false;
+
   const N = a => Array.isArray(a.n) ? (a.n[1] || a.n[0]) : a.n;
-  const GR = [['raid', 'Incursões', defs.raids], ['dg', 'Masmorras', defs.dungeons], ['xm', 'Missões exóticas', defs.xmissions || []]];
-  const ACT = {}; for (const [kind, , l] of GR) for (const a of l) ACT[kind + ':' + a.k] = a;
-  const TY = [['enc', 'Encontro'], ['boss', 'Chefe'], ['final', 'Chefe final'], ['pas', 'Passagem']];
+  const GR = [['raid', 'Incursões', 'incursão', defs.raids], ['dg', 'Masmorras', 'masmorra', defs.dungeons], ['xm', 'Missões exóticas', 'missão exótica', defs.xmissions || []]];
+  const ACT = {}; for (const [kind, , , l] of GR) for (const a of l) ACT[kind + ':' + a.k] = a;
+  const kindOf = k => GR.find(g => k.startsWith(g[0] + ':'));
   const clone = x => JSON.parse(JSON.stringify(x));
-  const S = { k: new URLSearchParams(location.search).get('a') || 'raid:kf', tab: new URLSearchParams(location.search).get('t') || 'enc', i: 0, dirty: false, msg: null };
-  if (!ACT[S.k]) S.k = Object.keys(ACT)[0];
-  // padrões do site (o que aparece sem ajuste)
-  const baseLinks = k => { const a = ACT[k]; const l = Array.isArray(a.yt) ? a.yt : a.yt ? [[a.yt]] : []; return [...l.map(x => [x[0], x[1] || '', x[2] || '', 0, 'site']), ...VIDS.filter(v => v.k === k).sort((a, b) => a.ord - b.ord).map(v => [v.url, v.pt || '', v.en || '', 0, 'cms'])]; };
-  const baseImgs = k => (ACT[k].gi || []).map(x => [x[0], x[1] || '', x[2] || '', x[3] || 0, x[4] || 0, 0]);
-  const baseEnc = k => GUIDES[k] ? clone({ src: GUIDES[k].src || [], enc: GUIDES[k].enc }) : { src: [], enc: [] };
-  let W = null; // cópia em edição do que a aba mostra
-  function loadWork() {
-    const o = GOV[S.tab === 'vid' ? 'lnk:' + S.k : S.tab === 'img' ? 'img:' + S.k : 'enc:' + S.k];
-    W = S.tab === 'vid' ? (o ? o.l.map(x => [x[0], x[1] || '', x[2] || '', x[3] ? 1 : 0]) : baseLinks(S.k).map(x => x.slice(0, 4)))
-      : S.tab === 'img' ? (o ? clone(o.l) : baseImgs(S.k))
-      : (o ? { src: clone(o.src || []), enc: clone(o.enc) } : baseEnc(S.k));
-    if (S.tab === 'enc') { W.enc.forEach(e => { e.roles ||= []; e.steps ||= []; e.t ||= /\(passagem\)/.test(e.n) ? 'pas' : 'enc'; }); S.i = Math.min(S.i, Math.max(0, W.enc.length - 1)); }
-    S.dirty = false;
-  }
-  const edited = k => ['lnk', 'img', 'enc'].filter(t => GOV[t + ':' + k]);
-  function drawSide() {
-    const q = $('q').value.trim().toLowerCase();
-    $('acts').innerHTML = GR.map(([kind, t, l]) => { const xs = l.filter(a => !q || N(a).toLowerCase().includes(q)); return xs.length ? `<h3>${t}</h3>` + xs.map(a => { const k = kind + ':' + a.k, g = GOV['enc:' + k] || GUIDES[k], ed = edited(k).length;
-      return `<button type="button" class="act${k === S.k ? ' on' : ''}" data-act="${esc(k)}"><span>${esc(N(a))}${ed ? ' <i title="Editado por você">●</i>' : ''}</span><small>${g ? g.enc.length + ' enc' : '—'}</small></button>`; }).join('') : ''; }).join('');
-  }
-  const ytT = u => { try { const x = new URL(u); return +(x.searchParams.get('t') || '').replace(/s$/, '') || 0; } catch { return 0; } };
+  const YT = u => /^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//.test(u || '');
+  const ytId = u => { try { const x = new URL(u); return x.hostname === 'youtu.be' ? x.pathname.slice(1) : x.searchParams.get('v') || ''; } catch { return ''; } };
+  const ytT = u => { try { return +(new URL(u).searchParams.get('t') || '').replace(/s$/, '') || 0; } catch { return 0; } };
   const ytSet = (u, sec) => { try { const x = new URL(u); if (sec > 0) x.searchParams.set('t', sec + 's'); else x.searchParams.delete('t'); return x.toString(); } catch { return u; } };
   const mmss = s => s ? Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0') : '';
-  const secOf = v => { const m = String(v).trim().match(/^(\d+)(?::(\d{1,2}))?$/); return !m ? 0 : m[2] != null ? +m[1] * 60 + +m[2] : +m[1] * 60; };
-  const mv = (path, i, n) => `<span class="mv"><button type="button" class="ib" data-mv="${path}:${i}:-1" ${i ? '' : 'disabled'} aria-label="Subir">▲</button><button type="button" class="ib" data-mv="${path}:${i}:1" ${i < n - 1 ? '' : 'disabled'} aria-label="Descer">▼</button></span>`;
-  function pvHTML(e) {
-    const t = TY.find(x => x[0] === e.t)?.[1] || 'Encontro';
-    return `<div class="pv ${esc(e.t)}"><span class="lbl">Prévia</span><span class="ty">${t}</span><h3>${esc(e.n || 'Sem nome')}</h3>${e.obj ? `<p>${esc(e.obj)}</p>` : ''}
-      ${e.roles.some(r => r[0] || r[1]) ? `<span class="lbl">Funções sugeridas</span><div class="rl">${e.roles.filter(r => r[0] || r[1]).map(r => `<span><b>${esc(r[0])}</b> ${esc(r[1])}</span>`).join('')}</div>` : ''}
-      ${e.steps.some(Boolean) ? `<span class="lbl">Passo a passo</span><ol>${e.steps.filter(Boolean).map(s => `<li>${esc(s)}</li>`).join('')}</ol>` : ''}
-      ${e.tip ? `<div class="tip"><span class="lbl">Dica</span><br>${esc(e.tip)}</div>` : ''}${e.yt ? `<a class="btn sm" href="${esc(e.yt)}" target="_blank" rel="noopener">▶ Vídeo deste encontro${ytT(e.yt) ? ' (' + mmss(ytT(e.yt)) + ')' : ''}</a>` : ''}</div>`;
+  const secOf = v => { const m = String(v || '').trim().match(/^(\d+)(?::(\d{1,2}))?$/); return !m ? 0 : m[2] != null ? +m[1] * 60 + +m[2] : +m[1] * 60; };
+  const when = t => { const d = new Date(t), now = new Date(), hm = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); return d.toDateString() === now.toDateString() ? 'hoje ' + hm : d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' ' + hm; };
+  const TY = [['enc', 'Encontro'], ['boss', 'Chefe'], ['final', 'Chefe final'], ['pas', 'Passagem']];
+  const qs = new URLSearchParams(location.search);
+  const S = { view: ['vid', 'img', 'enc'].includes(qs.get('t')) ? qs.get('t') : 'vid', k: ACT[qs.get('a')] ? qs.get('a') : 'raid:ce', q: '', ed: null, i: 0, dirty: false, msg: null, hist: null, histOpen: false, srcEd: false, draftSeen: false };
+  S.cat = S.k.split(':')[0];
+
+  // o que o site mostra hoje (padrão ou ajuste salvo)
+  const linksOf = k => { const o = GOV['lnk:' + k]; if (o) return o.l.map(x => ({ u: x[0], pt: x[1] || '', en: x[2] || '', h: !!x[3], e: +x[4] || 0, lg: x[5] || '', o: x[6] || 'cms' }));
+    const a = ACT[k], l = Array.isArray(a.yt) ? a.yt : a.yt ? [[a.yt]] : [];
+    return [...l.map(x => ({ u: x[0], pt: x[1] || 'Guia em vídeo', en: x[2] || 'Video guide', h: false, e: 0, lg: '', o: 'site' })), ...VIDS.filter(v => v.k === k).sort((a, b) => a.ord - b.ord).map(v => ({ u: v.url, pt: v.pt || '', en: v.en || '', h: false, e: 0, lg: '', o: 'cms' }))]; };
+  const imgsOf = k => { const o = GOV['img:' + k]; if (o) return o.l.map(x => ({ u: x[0], pt: x[1] || '', en: x[2] || '', w: x[3] || 0, ht: x[4] || 0, h: !!x[5], o: x[6] || (x[0].startsWith('/guides/') ? 'site' : 'cms') }));
+    return (ACT[k].gi || []).map(x => ({ u: x[0], pt: x[1] || '', en: x[2] || '', w: x[3] || 0, ht: x[4] || 0, h: false, o: 'site' })); };
+  const norm = g => { g.enc.forEach(e => { e.roles ||= []; e.steps ||= []; e.tip ||= ''; e.obj ||= ''; e.t ||= /\(passagem\)/.test(e.n) ? 'pas' : 'enc'; }); return g; };
+  const encOf = k => { const o = GOV['enc:' + k] || GUIDES[k]; return norm(o ? clone({ src: o.src || [], enc: o.enc || [] }) : { src: [], enc: [] }); };
+  const lastAt = k => Math.max(0, ...['lnk', 'img', 'enc'].map(t => GOV[t + ':' + k]?.at || 0));
+
+  async function put(t, k, v) {
+    const r = await fetch(api + '/guias/' + encodeURIComponent(t + ':' + k), { method: 'PUT', headers: H(), body: JSON.stringify(v) }).then(r => r.json()).catch(() => ({ error: 'Sem conexão com o servidor.' }));
+    if (r.ok) GOV[t + ':' + k] = { ...v, at: Date.now() }; return r;
   }
-  function encHTML() {
-    const L = W.enc, e = L[S.i];
-    const list = `<div class="encl">${L.map((x, i) => `<button type="button" class="ec ${esc(x.t)}${i === S.i ? ' on' : ''}" data-enc="${i}"><b>${String(i + 1).padStart(2, '0')}</b>${esc(x.n || 'Sem nome')}</button>`).join('')}<button type="button" class="btn sm" data-addenc>+ Encontro</button></div>`;
-    if (!e) return `${list}<p class="hint">Esta atividade ainda não tem guia por encontro. Use “+ Encontro” para começar.</p>${srcHTML()}`;
-    const yb = e.yt ? ytSet(e.yt, 0) : '', ys = ytT(e.yt);
-    return `${list}<div class="ed"><div class="card" style="background:var(--bg)">
-      <div class="row" style="justify-content:space-between;align-items:center"><b style="font-family:var(--display);font-size:22px">Encontro ${S.i + 1} de ${L.length}</b><span style="display:flex;gap:6px"><button type="button" class="ib" data-mv="enc:${S.i}:-1" ${S.i ? '' : 'disabled'} aria-label="Mover para antes">◀</button><button type="button" class="ib" data-mv="enc:${S.i}:1" ${S.i < L.length - 1 ? '' : 'disabled'} aria-label="Mover para depois">▶</button><button type="button" class="btn sm del" data-delenc>Apagar encontro</button></span></div>
-      <div class="g3"><label class="f">Nome<input data-f="n" value="${esc(e.n)}"></label><label class="f">Tipo<select data-f="t">${TY.map(([v, t]) => `<option value="${v}"${e.t === v ? ' selected' : ''}>${t}</option>`).join('')}</select></label></div>
-      <label class="f">Objetivo<textarea data-f="obj" rows="2">${esc(e.obj)}</textarea></label>
-      <div class="sec"><h4>Funções sugeridas</h4><div class="rows">${e.roles.map((r, i) => `<div class="row"><input data-r="${i}:0" value="${esc(r[0])}" placeholder="Função" style="flex:0 0 32%"><input data-r="${i}:1" value="${esc(r[1])}" placeholder="Quem / quantos / o que faz"><button type="button" class="ib x" data-delr="${i}" aria-label="Apagar">✕</button></div>`).join('')}</div><button type="button" class="btn sm add" data-addr>+ Função</button></div>
-      <div class="sec"><h4>Passo a passo</h4><div class="rows">${e.steps.map((s, i) => `<div class="row"><span class="n">${i + 1}</span><textarea data-s="${i}" rows="2">${esc(s)}</textarea>${mv('st', i, e.steps.length)}<button type="button" class="ib x" data-dels="${i}" aria-label="Apagar">✕</button></div>`).join('')}</div><button type="button" class="btn sm add" data-adds>+ Passo</button></div>
-      <label class="f">Dica<textarea data-f="tip" rows="2">${esc(e.tip || '')}</textarea></label>
-      <div class="sec"><h4>Vídeo deste encontro (opcional)</h4><div class="row"><input data-yt value="${esc(yb)}" placeholder="https://www.youtube.com/watch?v=…"><input data-yts value="${esc(mmss(ys))}" placeholder="min:seg" style="flex:0 0 110px"></div><p class="hint">O minuto vira o ponto de início do vídeo (ex.: 12:30).</p></div>
-    </div>${pvHTML(e)}</div>${srcHTML()}`;
+  const saveLinks = (k, L) => put('lnk', k, { l: L.map(r => [r.u, r.pt, r.en, r.h ? 1 : 0, r.e || 0, r.lg || '', r.o]) });
+  const saveImgs = (k, L) => put('img', k, { l: L.map(r => [r.u, r.pt, r.en, r.w || 0, r.ht || 0, r.h ? 1 : 0, r.o]) });
+
+  let W = null; // cópia em edição da aba atual
+  const load = () => { W = S.view === 'vid' ? linksOf(S.k) : S.view === 'img' ? imgsOf(S.k) : encOf(S.k); S.dirty = false; S.ed = null; S.hist = null; S.histOpen = false; if (S.view === 'enc') S.i = Math.min(S.i, Math.max(0, W.enc.length - 1)); };
+
+  function sideHTML() {
+    const q = S.q.trim().toLowerCase();
+    const list = Object.keys(ACT).filter(k => q ? N(ACT[k]).toLowerCase().includes(q) : k.startsWith(S.cat + ':'));
+    return `<input class="srch" id="q" type="search" placeholder="🔍 Buscar atividade…" value="${esc(S.q)}">
+      <div class="chips">${GR.map(([c, t]) => `<button type="button" data-cat="${c}" aria-pressed="${!q && S.cat === c}">${t}</button>`).join('')}</div>
+      <div class="acts">${list.map(k => { const nv = linksOf(k).filter(x => !x.h).length, ni = imgsOf(k).filter(x => !x.h).length, g = GOV['enc:' + k] || GUIDES[k], ne = g?.enc?.length || 0;
+        const st = !ne ? ['vazio', 'var(--rd)'] : !nv ? ['sem vídeo', 'var(--ye)'] : ['✓', 'var(--gr)'];
+        return `<button type="button" class="act${k === S.k ? ' on' : ''}" data-act="${esc(k)}"><span><b>${esc(N(ACT[k]))}</b><small>${nv} vídeo${nv === 1 ? '' : 's'} · ${ni} image${ni === 1 ? 'm' : 'ns'} · ${ne ? ne + ' encontros' : 'sem guia'}</small></span><i style="color:${st[1]}">${st[0]}</i></button>`; }).join('') || '<p class="empty">Nada encontrado.</p>'}</div>`;
   }
-  const srcHTML = () => `<div class="card"><div class="sec"><h4>Fontes do guia</h4><div class="rows">${W.src.map((s, i) => `<div class="row"><input data-src="${i}:0" value="${esc(s[0])}" placeholder="Nome" style="flex:0 0 30%"><input data-src="${i}:1" value="${esc(s[1])}" placeholder="https://…"><button type="button" class="ib x" data-delsrc="${i}" aria-label="Apagar">✕</button></div>`).join('')}</div><button type="button" class="btn sm add" data-addsrc>+ Fonte</button></div></div>`;
+  const encOpts = sel => `<option value="0">Todos</option>${encOf(S.k).enc.map((e, i) => `<option value="${i + 1}"${+sel === i + 1 ? ' selected' : ''}>${i + 1} · ${esc(e.n)}</option>`).join('')}`;
+  const actOpts = sel => GR.map(([c, t, , l]) => `<optgroup label="${t}">${l.map(x => `<option value="${c}:${esc(x.k)}"${c + ':' + x.k === sel ? ' selected' : ''}>${esc(N(x))}</option>`).join('')}</optgroup>`).join('');
+  const msgP = () => S.msg ? `<p class="msg ${S.msg.ok ? 'ok' : 'bad'}">${esc(S.msg.t)}</p>` : '';
   function vidHTML() {
-    return `<p class="hint">Aparecem no botão ▶ da atividade, nesta ordem. Os que vêm do site também podem ser editados, escondidos ou apagados daqui.</p><div class="rows">${W.map((v, i) => `<div class="vrow${v[3] ? ' hid' : ''}">${mv('vid', i, W.length)}<input data-v="${i}:0" value="${esc(v[0])}" placeholder="https://www.youtube.com/watch?v=…"><input data-v="${i}:1" value="${esc(v[1])}" placeholder="Nome em português"><input data-v="${i}:2" value="${esc(v[2])}" placeholder="Nome em inglês"><button type="button" class="hb${v[3] ? ' on' : ''}" data-hidv="${i}">${v[3] ? 'Escondido' : 'Visível'}</button><button type="button" class="ib x" data-delv="${i}" aria-label="Apagar">✕</button></div>`).join('') || '<p class="hint">Nenhum vídeo.</p>'}</div><button type="button" class="btn sm add" data-addv>+ Vídeo</button>`;
+    const a = ACT[S.k], g = encOf(S.k), vis = W.filter(x => !x.h).length;
+    const org = r => r.h ? [(r.o === 'site' ? 'DO SITE' : 'CADASTRADO') + ' · ESCONDIDO', 'var(--mu3)'] : r.o === 'site' ? ['DO SITE', 'var(--mu2)'] : ['CADASTRADO', 'var(--cy)'];
+    const rows = W.map((r, i) => { const id = ytId(r.u), t = ytT(r.u), o = org(r), en = r.e ? `${r.e} · ${esc(g.enc[r.e - 1]?.n || '?')}${t ? ' · ' + mmss(t) : ''}` : 'todos' + (t ? ' · ' + mmss(t) : '');
+      return `<div class="tr${r.h ? ' hid' : ''}${S.ed === i ? ' sel' : ''}" draggable="true" data-dnd="${i}"><span class="grip" title="Arraste para mudar a ordem">⋮⋮</span>${id ? `<img class="vth" src="https://i.ytimg.com/vi/${esc(id)}/mqdefault.jpg" alt="" loading="lazy">` : '<span class="vth"></span>'}
+        <span class="nm"><b>${esc(r.pt || '(sem nome)')}</b><small>${esc(r.en)}${r.lg ? ' · ' + esc(r.lg) : ''}</small><a href="${esc(r.u)}" target="_blank" rel="noopener">${esc(r.u.replace(/^https:\/\/(www\.)?/, ''))}</a></span>
+        <span class="ec">${en}</span><span class="org" style="color:${o[1]}">${o[0]}</span><span class="acts2"><button type="button" class="btn sm" data-edit="${i}">Editar</button><button type="button" class="btn sm" data-hide="${i}" style="color:${r.h ? 'var(--gr)' : 'var(--fg)'}">${r.h ? 'Mostrar' : 'Esconder'}</button></span></div>`; }).join('');
+    const r = S.ed === 'new' ? { u: '', pt: '', en: '', e: 0, lg: 'PT-BR' } : W[S.ed];
+    const form = r ? `<section class="form"><b>${S.ed === 'new' ? 'Novo vídeo' : `Editando: “${esc(r.pt || r.u)}”`}</b>
+      <label class="f" style="grid-column:span 2"><small>LINK DO YOUTUBE</small><input class="in" id="fu" value="${esc(r.u ? ytSet(r.u, 0) : '')}" placeholder="https://www.youtube.com/watch?v=…"></label>
+      <label class="f"><small>NOME EM PORTUGUÊS</small><input class="in" id="fpt" value="${esc(r.pt)}"></label><label class="f"><small>NOME EM INGLÊS</small><input class="in" id="fen" value="${esc(r.en)}"></label>
+      <label class="f"><small>ENCONTRO (OPCIONAL)</small><select class="in" id="fe">${encOpts(r.e)}</select></label><label class="f"><small>COMEÇAR NO MINUTO</small><input class="in" id="ft" value="${esc(mmss(ytT(r.u)))}" placeholder="— (ex.: 12:40)"></label>
+      <label class="f"><small>ATIVIDADE</small><select class="in" id="fk">${actOpts(S.k)}</select></label>
+      <label class="f"><small>IDIOMA DO VÍDEO</small><select class="in" id="flg">${['PT-BR', 'EN', 'ES', ''].map(x => `<option value="${x}"${(r.lg || '') === x ? ' selected' : ''}>${x || '—'}</option>`).join('')}</select></label>
+      <div class="fbar"><button type="button" class="btn cy" data-fsave>Salvar</button><button type="button" class="btn" data-fcancel>Cancelar</button>${msgP()}${S.ed !== 'new' ? '<button type="button" class="btn rd" data-fdel>Apagar</button>' : ''}</div></section>` : msgP();
+    return `<div class="mh">${a.img ? `<img class="th" src="${esc(a.img)}" alt="">` : '<span class="th"></span>'}<b>${esc(N(a))}</b><small>${kindOf(S.k)[2]} · ${vis} vídeo${vis === 1 ? '' : 's'} · aparece em Esta semana, Atividades e Agenda</small><button type="button" class="btn cy" data-new>+ Adicionar vídeo</button></div>
+      <section class="tbl v"><div class="tr hd"><span></span><span>VÍDEO</span><span>NOME (PT / EN)</span><span>ENCONTRO · MINUTO</span><span>ORIGEM</span><span></span></div>${rows || '<p class="empty">Nenhum vídeo ainda.</p>'}</section>${form}
+      <div class="notes"><span><b>Tudo editável:</b> os vídeos que já vinham no site (“do site”) também podem ser editados, reordenados ou escondidos; nada se perde, dá para restaurar.</span><span><b>Arrastar ⋮⋮</b> muda a ordem em que aparecem no botão ▶.</span><span><b>Encontro:</b> o vídeo marcado vira o “Vídeo deste encontro” no guia.</span></div>
+      ${GOV['lnk:' + S.k] ? '<button type="button" class="lnk" data-reset style="color:var(--rd)">Voltar à lista padrão do site</button>' : ''}`;
   }
   function imgHTML() {
-    return `<p class="hint">Aparecem no botão 🖼 da atividade, nesta ordem. Imagem nova: cole um link https de uma imagem já hospedada.</p><div class="rows">${W.map((g, i) => `<div class="irow${g[5] ? ' hid' : ''}">${mv('img', i, W.length)}<a href="${esc(g[0])}" target="_blank" rel="noopener"><img src="${esc(g[0])}" alt="" loading="lazy"></a><input data-g="${i}:1" value="${esc(g[1])}" placeholder="Legenda em português"><input data-g="${i}:2" value="${esc(g[2])}" placeholder="Legenda em inglês"><button type="button" class="hb${g[5] ? ' on' : ''}" data-hidg="${i}">${g[5] ? 'Escondida' : 'Visível'}</button><button type="button" class="ib x" data-delg="${i}" aria-label="Apagar">✕</button></div>`).join('') || '<p class="hint">Nenhuma imagem.</p>'}</div>
-      <div class="row"><input id="nimg" placeholder="https://…/imagem.png"><button type="button" class="btn sm" data-addg>+ Imagem</button></div>`;
+    const a = ACT[S.k], vis = W.filter(x => !x.h).length;
+    const rows = W.map((r, i) => { const o = r.h ? [(r.o === 'site' ? 'DO SITE' : 'CADASTRADA') + ' · ESCONDIDA', 'var(--mu3)'] : r.o === 'site' ? ['DO SITE', 'var(--mu2)'] : ['CADASTRADA', 'var(--cy)'];
+      return `<div class="tr${r.h ? ' hid' : ''}${S.ed === i ? ' sel' : ''}" draggable="true" data-dnd="${i}"><span class="grip" title="Arraste para mudar a ordem">⋮⋮</span><a href="${esc(r.u)}" target="_blank" rel="noopener"><img class="vth" src="${esc(r.u)}" alt="" loading="lazy"></a>
+        <span class="nm"><b>${esc(r.pt || '(sem legenda)')}</b><small>${esc(r.en)}</small></span><span class="ec">${r.w && r.ht ? r.w + '×' + r.ht : ''}</span><span class="org" style="color:${o[1]}">${o[0]}</span>
+        <span class="acts2"><button type="button" class="btn sm" data-edit="${i}">Editar</button><button type="button" class="btn sm" data-hide="${i}" style="color:${r.h ? 'var(--gr)' : 'var(--fg)'}">${r.h ? 'Mostrar' : 'Esconder'}</button></span></div>`; }).join('');
+    const r = S.ed === 'new' ? { u: '', pt: '', en: '', o: 'cms' } : W[S.ed];
+    const form = r ? `<section class="form"><b>${S.ed === 'new' ? 'Nova imagem' : `Editando: “${esc(r.pt || r.u)}”`}</b>
+      <label class="f" style="grid-column:span 2"><small>LINK DA IMAGEM</small><input class="in" id="fu" value="${esc(r.u)}" placeholder="https://…/imagem.png" ${r.o === 'site' ? 'readonly' : ''}></label>
+      <label class="f"><small>LEGENDA EM PORTUGUÊS</small><input class="in" id="fpt" value="${esc(r.pt)}"></label><label class="f"><small>LEGENDA EM INGLÊS</small><input class="in" id="fen" value="${esc(r.en)}"></label>
+      <div class="fbar"><button type="button" class="btn cy" data-fsave>Salvar</button><button type="button" class="btn" data-fcancel>Cancelar</button>${msgP()}${S.ed !== 'new' ? '<button type="button" class="btn rd" data-fdel>Apagar</button>' : ''}</div></section>` : msgP();
+    return `<div class="mh">${a.img ? `<img class="th" src="${esc(a.img)}" alt="">` : '<span class="th"></span>'}<b>${esc(N(a))}</b><small>${kindOf(S.k)[2]} · ${vis} image${vis === 1 ? 'm' : 'ns'} · aparecem no botão 🖼 da atividade</small><button type="button" class="btn cy" data-new>+ Adicionar imagem</button></div>
+      <section class="tbl i"><div class="tr hd"><span></span><span>IMAGEM</span><span>LEGENDA (PT / EN)</span><span>TAMANHO</span><span>ORIGEM</span><span></span></div>${rows || '<p class="empty">Nenhuma imagem ainda.</p>'}</section>${form}
+      <div class="notes"><span><b>Imagem nova:</b> cole o link https de uma imagem já hospedada (Imgur, Discord etc.).</span><span><b>Arrastar ⋮⋮</b> muda a ordem da galeria.</span><span><b>Do site:</b> pode ser escondida e ter a legenda trocada.</span></div>
+      ${GOV['img:' + S.k] ? '<button type="button" class="lnk" data-reset style="color:var(--rd)">Voltar à lista padrão do site</button>' : ''}`;
   }
+  // encontros: lista · edição · prévia
+  const draftKey = () => 'gd-draft:' + S.k;
+  function encLeft() {
+    return `<select class="sel-act" id="selact">${actOpts(S.k)}</select><small class="k">Encontros · arraste para ordenar</small>
+      ${W.enc.map((e, i) => { const st = i === S.i ? (S.dirty ? ['editando', 'var(--ye)'] : ['aberto', 'var(--gr)']) : !e.steps.filter(Boolean).length ? ['vazio', 'var(--rd)'] : ['ok', 'var(--gr)'];
+        return `<button type="button" class="er${i === S.i ? ' on' : ''}" draggable="true" data-ednd="${i}" data-enc="${i}"><span class="grip">⋮⋮</span><span class="n">${i + 1}</span><b>${esc(e.n || 'Sem nome')}</b><span class="s" style="color:${st[1]}">${st[0]}</span></button>`; }).join('')}
+      <button type="button" class="add" data-addenc>+ Novo encontro</button>
+      <div class="srcb"><b>Fontes do guia</b>${S.srcEd ? `<div class="srcf">${W.src.map((s, i) => `<div class="srcl"><input class="in" data-src="${i}:0" value="${esc(s[0])}" placeholder="Nome" style="flex:1 1 90px"><input class="in" data-src="${i}:1" value="${esc(s[1])}" placeholder="https://…" style="flex:2 1 140px"><button type="button" class="x" data-delsrc="${i}">✕</button></div>`).join('')}<button type="button" class="lnk" data-addsrc>+ adicionar fonte</button><button type="button" class="lnk" data-srced>Pronto</button></div>`
+        : `<span>${W.src.length ? W.src.map(s => `<a href="${esc(s[1])}" target="_blank" rel="noopener">${esc(s[0])} ↗</a>`).join(' · ') : 'Nenhuma fonte.'} · <button type="button" class="lnk" data-srced>editar</button></span><button type="button" class="lnk" data-addsrc>+ adicionar fonte</button>`}</div>`;
+  }
+  function vidPick(e) { const L = linksOf(S.k).filter(x => !x.h), base = e.yt ? ytSet(e.yt, 0) : '', t = e.yt ? ytT(e.yt) : 0, has = L.some(x => ytSet(x.u, 0) === base);
+    return `<div class="vsel"><select class="in" id="evid"><option value="">Nenhum</option>${L.map(x => `<option value="${esc(ytSet(x.u, 0))}"${ytSet(x.u, 0) === base ? ' selected' : ''}>${esc(x.pt || x.u)}</option>`).join('')}${base && !has ? `<option value="${esc(base)}" selected>${esc(base)}</option>` : ''}</select><input class="in" id="evt" value="${esc(mmss(t))}" placeholder="min"></div>`; }
+  function histHTML() {
+    if (!S.histOpen) return '';
+    if (!S.hist) return '<div class="hist">Carregando histórico…</div>';
+    return `<div class="hist"><b>Versões anteriores</b>${S.hist.length ? S.hist.map((h, i) => `<div><span>${when(h.at)} · ${h.v.enc?.length || 0} encontros</span><button type="button" class="btn sm" data-restore="${i}">Voltar para esta</button></div>`).join('') : '<span style="color:var(--mu2)">Ainda não há versões anteriores. A cada publicação, a versão de antes fica guardada aqui.</span>'}</div>`;
+  }
+  function encMid() {
+    const e = W.enc[S.i];
+    if (!e) return `<div class="eh"><b>${esc(N(ACT[S.k]))}</b></div><p class="empty" style="padding:0">Esta atividade ainda não tem guia por encontro. Use “+ Novo encontro” para começar.</p>`;
+    return `<div class="eh"><b>${S.i + 1} · ${esc(e.n || 'Sem nome')}</b>${S.dirty ? '<span class="draft">RASCUNHO · NÃO SALVO</span>' : ''}<span class="hint">Ctrl+S salva</span></div>
+      <div class="g2"><label class="f"><small>NOME DO ENCONTRO</small><input class="in" data-f="n" value="${esc(e.n)}"></label><label class="f"><small>TIPO</small><select class="in" data-f="t">${TY.map(([v, t]) => `<option value="${v}"${e.t === v ? ' selected' : ''}>${t}</option>`).join('')}</select></label></div>
+      <label class="f"><small>OBJETIVO (1 FRASE)</small><textarea class="in" data-f="obj" rows="2">${esc(e.obj)}</textarea></label>
+      <div class="lst"><small class="k">Papéis</small>${e.roles.map((r, i) => `<div class="rr" draggable="true" data-rdnd="${i}"><span class="grip">⋮⋮</span><input class="in" data-r="${i}:0" value="${esc(r[0])}" placeholder="Papel"><input class="in" data-r="${i}:1" value="${esc(r[1])}" placeholder="Quem / quantos / o que faz"><button type="button" class="x" data-delr="${i}" aria-label="Apagar">✕</button></div>`).join('')}<button type="button" class="lnk" data-addr>+ papel</button></div>
+      <div class="lst"><small class="k">Passo a passo</small>${e.steps.map((s, i) => `<div class="sr" draggable="true" data-sdnd="${i}"><span class="grip">⋮⋮</span><span class="n">${i + 1}</span><textarea class="in" data-s="${i}" rows="1">${esc(s)}</textarea><button type="button" class="x" data-dels="${i}" aria-label="Apagar">✕</button></div>`).join('')}<button type="button" class="lnk" data-adds>+ passo</button></div>
+      <div class="g3"><label class="f"><small>DICA</small><textarea class="in" data-f="tip" rows="2">${esc(e.tip)}</textarea></label><label class="f"><small>VÍDEO DO ENCONTRO · MINUTO</small>${vidPick(e)}</label></div>
+      <div class="bbar"><button type="button" class="btn gr" data-publish ${S.dirty ? '' : 'disabled'}>Salvar e publicar</button><button type="button" class="btn" data-draft ${S.dirty ? '' : 'disabled'}>Salvar rascunho</button><button type="button" class="btn" data-hist>Histórico${S.hist ? ' (' + S.hist.length + ')' : ''}</button><button type="button" class="btn rd" data-delenc>Apagar encontro</button></div>
+      ${msgP()}${histHTML()}`;
+  }
+  function pvHTML() {
+    const e = W.enc[S.i]; if (!e) return '';
+    const short = n => n.replace(/\s*\(.*?\)/g, '').split(/[,·]/)[0].split(' ').slice(0, 2).join(' ');
+    return `<small class="k">Pré-visualização · como o clã vê</small><article class="pv"><div class="tabs">${W.enc.map((x, i) => `<span class="${i === S.i ? 'on' : ''}">${i + 1} ${esc(short(x.n || '…'))}</span>`).join('')}</div>
+      <b>${S.i + 1} · ${esc(e.n || 'Sem nome')}</b>${e.obj ? `<small>OBJETIVO</small><span>${esc(e.obj)}</span>` : ''}
+      ${e.roles.some(r => r[0] || r[1]) ? `<small>PAPÉIS</small><div class="roles">${e.roles.filter(r => r[0] || r[1]).map(r => `<span><b>${esc(r[0])}</b> · ${esc(r[1])}</span>`).join('')}</div>` : ''}
+      ${e.steps.some(Boolean) ? `<small>PASSO A PASSO</small><ol>${e.steps.filter(Boolean).map(s => `<li>${esc(s)}</li>`).join('')}</ol>` : ''}
+      ${e.tip ? `<span class="tip"><b>Dica:</b> ${esc(e.tip)}</span>` : ''}${e.yt ? `<a class="yt" href="${esc(e.yt)}" target="_blank" rel="noopener">▶ Vídeo deste encontro${ytT(e.yt) ? ' · ' + mmss(ytT(e.yt)) : ''}</a>` : ''}</article>
+      <div class="who"><b>Quem edita:</b> só você. A cada publicação, a versão anterior fica guardada no Histórico, com botão para voltar a ela.</div>`;
+  }
+  const fit = t => { t.style.height = 'auto'; t.style.height = t.scrollHeight + 2 + 'px'; };
   function draw() {
-    drawSide();
-    const a = ACT[S.k], t = S.tab === 'vid' ? 'lnk' : S.tab, o = GOV[t + ':' + S.k];
-    const status = o ? `<span class="st ed">Editado por você · ${new Date(o.at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>` : '<span class="st">Padrão do site</span>';
-    $('main').innerHTML = `<div class="card"><div class="ahd"><div><span class="tag">${esc(GR.find(g => S.k.startsWith(g[0] + ':'))[1].toUpperCase())}</span><h2>${esc(N(a))}</h2></div>${status}</div>
-      <div class="gtabs">${[['enc', 'Encontros'], ['vid', 'Vídeos'], ['img', 'Imagens']].map(([v, l]) => `<button type="button" data-tab="${v}" aria-pressed="${S.tab === v}">${l}</button>`).join('')}</div></div>
-      <div class="card">${S.tab === 'enc' ? encHTML() : S.tab === 'vid' ? vidHTML() : imgHTML()}</div>
-      <div class="sbar"><button type="button" class="btn pri" data-save ${S.dirty ? '' : 'disabled'}>Salvar</button><button type="button" class="btn" data-undo ${S.dirty ? '' : 'disabled'}>Desfazer mudanças</button>${o ? '<button type="button" class="btn del" data-reset>Voltar ao padrão do site</button>' : ''}<span class="sp"></span><span class="msg ${S.msg?.ok ? 'ok' : S.msg ? 'bad' : ''}">${esc(S.msg?.t || (S.dirty ? 'Mudanças não salvas' : ''))}</span></div>`;
+    app.className = 'gp ' + (S.view === 'enc' ? 'v-enc' : 'v-list');
+    document.querySelectorAll('#nav button').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === S.view));
+    const la = lastAt(S.k); $('last').textContent = S.view === 'enc' ? `${N(ACT[S.k])} · ${la ? 'editado por você, ' + when(la) : 'padrão do site'}` : la ? `Última alteração: você · ${when(la)}` : 'Sem alterações ainda';
+    const y = scrollY, sc = document.querySelector('.acts')?.scrollTop || 0;
+    [...app.children].forEach(c => { if (c.tagName !== 'HEADER') c.remove(); });
+    if (S.view === 'enc') {
+      const pd = localStorage.getItem(draftKey());
+      app.insertAdjacentHTML('beforeend', `<aside class="sticky">${encLeft()}</aside><main>${pd && !S.dirty && !S.draftSeen ? `<p class="msg" style="color:var(--ye)">Há um rascunho salvo desta atividade. <button type="button" class="lnk" data-loaddraft>Abrir rascunho</button> · <button type="button" class="lnk" data-dropdraft style="color:var(--rd)">Descartar</button></p>` : ''}${encMid()}</main><aside class="right"><div class="sticky" style="display:flex;flex-direction:column;gap:10px">${pvHTML()}</div></aside>`);
+    } else app.insertAdjacentHTML('beforeend', `<aside class="sticky">${sideHTML()}</aside><main>${S.view === 'vid' ? vidHTML() : imgHTML()}</main>`);
+    document.querySelectorAll('textarea.in').forEach(fit); scrollTo(0, y); const ac = document.querySelector('.acts'); if (ac) ac.scrollTop = sc;
+    history.replaceState(null, '', `?a=${S.k}&t=${S.view}`);
   }
-  const setDirty = () => { if (!S.dirty) { S.dirty = true; S.msg = null; const b = document.querySelector('[data-save]'), u = document.querySelector('[data-undo]'); if (b) b.disabled = false; if (u) u.disabled = false; const m = document.querySelector('.sbar .msg'); if (m) { m.textContent = 'Mudanças não salvas'; m.className = 'msg'; } } };
-  const leave = () => !S.dirty || confirm('Há mudanças não salvas. Descartar?');
-  // edição de campos: atualiza a cópia sem redesenhar (o foco não se perde); a prévia é refeita
-  $('main').addEventListener('input', ev => {
-    const t = ev.target, d = t.dataset, e = W.enc?.[S.i];
-    if (d.f) e[d.f] = t.value; else if (d.r) { const [i, j] = d.r.split(':'); e.roles[i][j] = t.value; } else if (d.s) e.steps[d.s] = t.value;
-    else if (d.yt != null || d.yts != null) { const u = document.querySelector('[data-yt]').value.trim(), sec = secOf(document.querySelector('[data-yts]').value); e.yt = u ? ytSet(u, sec) : ''; if (!e.yt) delete e.yt; }
-    else if (d.src) { const [i, j] = d.src.split(':'); W.src[i][j] = t.value; } else if (d.v) { const [i, j] = d.v.split(':'); W[i][j] = t.value; } else if (d.g) { const [i, j] = d.g.split(':'); W[i][j] = t.value; } else return;
-    setDirty(); if (S.tab === 'enc' && e) { const pv = document.querySelector('.pv'); if (pv) pv.outerHTML = pvHTML(e); if (d.f === 'n' || d.f === 't') { const c = document.querySelector(`.ec[data-enc="${S.i}"]`); if (c) { c.className = `ec ${e.t} on`; c.innerHTML = `<b>${String(S.i + 1).padStart(2, '0')}</b>${esc(e.n || 'Sem nome')}`; } } }
+  const leave = () => !S.dirty || confirm('Há mudanças não publicadas neste guia. Descartar?');
+  const flash = (t, ok) => { S.msg = { t, ok }; };
+  const softPv = () => { const r = document.querySelector('.right .sticky'); if (r) r.innerHTML = pvHTML(); const e = W.enc[S.i], h = document.querySelector('.eh>b'); if (h && e) h.textContent = `${S.i + 1} · ${e.n || 'Sem nome'}`; const c = document.querySelector(`.er[data-enc="${S.i}"] b`); if (c && e) c.textContent = e.n || 'Sem nome'; };
+
+  $('nav').addEventListener('click', ev => { const b = ev.target.closest('[data-view]'); if (!b || b.dataset.view === S.view || !leave()) return; S.view = b.dataset.view; S.msg = null; load(); draw(); });
+  app.addEventListener('input', ev => {
+    const t = ev.target, d = t.dataset;
+    if (t.id === 'q') { S.q = t.value; const a = t.closest('aside'), pos = t.selectionStart; a.innerHTML = sideHTML(); const q = $('q'); q.focus(); q.setSelectionRange(pos, pos); return; }
+    if (S.view !== 'enc') return; const e = W.enc[S.i];
+    if (d.f) e[d.f] = t.value; else if (d.r) { const [i, j] = d.r.split(':'); e.roles[i][j] = t.value; } else if (d.s != null) e.steps[d.s] = t.value;
+    else if (t.id === 'evid' || t.id === 'evt') { const u = $('evid').value; e.yt = u ? ytSet(u, secOf($('evt').value)) : ''; if (!e.yt) delete e.yt; }
+    else if (d.src) { const [i, j] = d.src.split(':'); W.src[i][j] = t.value; } else return;
+    if (t.tagName === 'TEXTAREA') fit(t);
+    if (!S.dirty) { S.dirty = true; S.msg = null; const pos = t.selectionStart, sel = d.f ? `[data-f="${d.f}"]` : d.r ? `[data-r="${d.r}"]` : d.s != null ? `[data-s="${d.s}"]` : d.src ? `[data-src="${d.src}"]` : '#' + t.id; draw(); const n = document.querySelector(sel); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch {} } }
+    else softPv();
   });
-  $('main').addEventListener('change', ev => { if (ev.target.dataset.f === 't') ev.target.dispatchEvent(new Event('input', { bubbles: true })); });
-  const swap = (l, i, k) => { const j = i + k; if (j < 0 || j >= l.length) return; [l[i], l[j]] = [l[j], l[i]]; };
-  $('main').addEventListener('click', async ev => {
-    const b = ev.target.closest('button'); if (!b) return; const d = b.dataset, e = W.enc?.[S.i]; let ch = true;
-    if (d.tab) { if (d.tab === S.tab || !leave()) return; S.tab = d.tab; S.msg = null; loadWork(); draw(); return; }
-    if (d.enc) { S.i = +d.enc; draw(); return; }
-    if (d.mv) { const [p, i, k] = d.mv.split(':'); const L = p === 'enc' ? W.enc : p === 'st' ? e.steps : W; swap(L, +i, +k); if (p === 'enc') S.i = +i + +k; }
-    else if (d.addenc != null) { W.enc.push({ n: '', t: 'enc', obj: '', roles: [], steps: [''], tip: '' }); S.i = W.enc.length - 1; }
-    else if (d.delenc != null) { if (!confirm(`Apagar o encontro "${e.n || 'sem nome'}"?`)) return; W.enc.splice(S.i, 1); S.i = Math.max(0, S.i - 1); }
+  app.addEventListener('change', ev => { if (ev.target.id !== 'selact') return; const k = ev.target.value; if (!leave()) { ev.target.value = S.k; return; } S.k = k; S.cat = k.split(':')[0]; S.i = 0; S.msg = null; S.draftSeen = false; load(); draw(); });
+  app.addEventListener('click', async ev => {
+    const b = ev.target.closest('button'); if (!b) return; const d = b.dataset;
+    if (d.cat) { S.cat = d.cat; S.q = ''; b.closest('aside').innerHTML = sideHTML(); return; }
+    if (d.act) { if (d.act === S.k) return; S.k = d.act; S.msg = null; load(); draw(); scrollTo({ top: 0 }); return; }
+    if (S.view !== 'enc') return listClick(d);
+    const e = W.enc[S.i]; let ch = true;
+    if (d.enc != null) { S.i = +d.enc; S.msg = null; S.histOpen = false; draw(); return; }
+    if (d.addenc != null) { W.enc.push({ n: 'Novo encontro', t: 'enc', obj: '', roles: [], steps: [''], tip: '' }); S.i = W.enc.length - 1; }
+    else if (d.delenc != null) { if (!e || !confirm(`Apagar o encontro "${e.n}"? (Só vale depois de publicar.)`)) return; W.enc.splice(S.i, 1); S.i = Math.max(0, S.i - 1); }
     else if (d.addr != null) e.roles.push(['', '']); else if (d.delr) e.roles.splice(+d.delr, 1);
     else if (d.adds != null) e.steps.push(''); else if (d.dels) e.steps.splice(+d.dels, 1);
-    else if (d.addsrc != null) W.src.push(['', '']); else if (d.delsrc) W.src.splice(+d.delsrc, 1);
-    else if (d.addv != null) W.push(['', '', '', 0]); else if (d.delv) W.splice(+d.delv, 1); else if (d.hidv) W[+d.hidv][3] = W[+d.hidv][3] ? 0 : 1;
-    else if (d.hidg) W[+d.hidg][5] = W[+d.hidg][5] ? 0 : 1; else if (d.delg) { if (!confirm('Tirar esta imagem da lista? (Para só ocultar, use Visível/Escondida.)')) return; W.splice(+d.delg, 1); }
-    else if (d.addg != null) { const u = $('nimg').value.trim(); if (!/^https:\/\//.test(u)) { S.msg = { t: 'Cole um link https da imagem.' }; draw(); return; }
-      const im = new Image(); im.src = u; await im.decode().catch(() => {}); if (!im.naturalWidth) { S.msg = { t: 'Não consegui abrir essa imagem.' }; draw(); return; } W.push([u, '', '', im.naturalWidth, im.naturalHeight, 0]); }
-    else if (d.undo != null) { loadWork(); S.msg = null; draw(); return; }
-    else if (d.save != null) { await save(); return; }
-    else if (d.reset != null) { if (!confirm('Apagar seus ajustes desta aba e voltar ao padrão do site?')) return; const t = S.tab === 'vid' ? 'lnk' : S.tab; const r = await fetch(api + '/guias/' + encodeURIComponent(t + ':' + S.k), { method: 'DELETE', headers: H() }).then(r => r.json()).catch(() => ({}));
-      if (r.ok) { delete GOV[t + ':' + S.k]; loadWork(); S.msg = { t: 'Voltou ao padrão do site.', ok: true }; } else S.msg = { t: r.error || 'Não deu para apagar.' }; draw(); return; }
+    else if (d.addsrc != null) { W.src.push(['', '']); S.srcEd = true; } else if (d.delsrc) W.src.splice(+d.delsrc, 1);
+    else if (d.srced != null) { S.srcEd = !S.srcEd; draw(); return; }
+    else if (d.publish != null) { await publish(); return; }
+    else if (d.draft != null) { try { localStorage.setItem(draftKey(), JSON.stringify({ at: Date.now(), w: W })); } catch {} S.dirty = false; S.draftSeen = true; flash('Rascunho salvo neste navegador (ainda não aparece no site).', true); draw(); return; }
+    else if (d.loaddraft != null) { try { W = norm(JSON.parse(localStorage.getItem(draftKey())).w); } catch {} S.i = 0; S.dirty = true; S.draftSeen = true; draw(); return; }
+    else if (d.dropdraft != null) { localStorage.removeItem(draftKey()); S.draftSeen = true; draw(); return; }
+    else if (d.hist != null) { S.histOpen = !S.histOpen; draw(); if (S.histOpen && !S.hist) { const r = await fetch(api + '/guias/h/' + encodeURIComponent('enc:' + S.k), { headers: H() }).then(r => r.json()).catch(() => ({ list: [] })); S.hist = r.list || []; draw(); } return; }
+    else if (d.restore != null) { const h = S.hist[+d.restore]; if (!h || !confirm(`Carregar a versão de ${when(h.at)}? Ela só vai para o site quando você publicar.`)) return; W = norm(clone({ src: h.v.src || [], enc: h.v.enc })); S.i = 0; S.histOpen = false; }
     else ch = false;
-    if (ch) { setDirty(); S.dirty = true; draw(); }
+    if (ch) { S.dirty = true; S.msg = null; draw(); }
   });
-  async function save() {
-    const t = S.tab === 'vid' ? 'lnk' : S.tab; let v;
-    if (t === 'lnk') { const l = W.map(x => [x[0].trim(), x[1].trim(), x[2].trim(), x[3] ? 1 : 0]).filter(x => x[0]); if (l.some(x => !/^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//.test(x[0]))) { S.msg = { t: 'Só links do YouTube (https://www.youtube.com/… ou https://youtu.be/…).' }; draw(); return; } v = { l }; }
-    else if (t === 'img') v = { l: W.map(x => [x[0], x[1].trim(), x[2].trim(), x[3] || 0, x[4] || 0, x[5] ? 1 : 0]) };
-    else { const enc = W.enc.map(e => { const o = { n: e.n.trim(), t: e.t, obj: (e.obj || '').trim(), roles: e.roles.map(r => [r[0].trim(), r[1].trim()]).filter(r => r[0] || r[1]), steps: e.steps.map(s => s.trim()).filter(Boolean), tip: (e.tip || '').trim() }; if (e.yt) o.yt = e.yt; return o; });
-      if (enc.some(e => !e.n)) { S.msg = { t: 'Todo encontro precisa de um nome.' }; draw(); return; }
-      if (enc.some(e => e.yt && !/^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//.test(e.yt))) { S.msg = { t: 'O vídeo do encontro precisa ser um link do YouTube.' }; draw(); return; }
-      v = { src: W.src.map(s => [s[0].trim(), s[1].trim()]).filter(s => s[0] && /^https?:\/\//.test(s[1])), enc }; }
-    const r = await fetch(api + '/guias/' + encodeURIComponent(t + ':' + S.k), { method: 'PUT', headers: H(), body: JSON.stringify(v) }).then(r => r.json()).catch(() => ({ error: 'Sem conexão com o servidor.' }));
-    if (r.ok) { GOV[t + ':' + S.k] = { ...v, at: Date.now() }; loadWork(); S.msg = { t: 'Salvo. No site, aparece em até alguns minutos (ou ao recarregar com o cache limpo).', ok: true }; } else S.msg = { t: r.error || 'Não deu para salvar.' };
+  async function publish() {
+    const enc = W.enc.map(e => { const o = { n: e.n.trim(), t: e.t, obj: e.obj.trim(), roles: e.roles.map(r => [r[0].trim(), r[1].trim()]).filter(r => r[0] || r[1]), steps: e.steps.map(s => s.trim()).filter(Boolean), tip: e.tip.trim() }; if (e.yt) o.yt = e.yt; return o; });
+    if (enc.some(e => !e.n)) { flash('Todo encontro precisa de um nome.'); draw(); return; }
+    const r = await put('enc', S.k, { src: W.src.map(s => [s[0].trim(), s[1].trim()]).filter(s => s[0] && /^https?:\/\//.test(s[1])), enc });
+    if (r.ok) { localStorage.removeItem(draftKey()); load(); flash('Publicado. No site, aparece em alguns minutos.', true); } else flash(r.error || 'Não deu para salvar.');
     draw();
   }
-  $('acts').addEventListener('click', ev => { const b = ev.target.closest('[data-act]'); if (!b || b.dataset.act === S.k || !leave()) return; S.k = b.dataset.act; S.i = 0; S.msg = null; history.replaceState(null, '', '?a=' + S.k + '&t=' + S.tab); loadWork(); draw(); scrollTo({ top: 0 }); });
-  $('q').addEventListener('input', drawSide);
+  // vídeos e imagens: cada ação já grava no servidor
+  async function commit(L, okMsg) { const r = await (S.view === 'vid' ? saveLinks(S.k, L) : saveImgs(S.k, L)); if (r.ok) { W = L; S.ed = null; flash(okMsg, true); } else flash(r.error || 'Não deu para salvar.'); draw(); }
+  async function listClick(d) {
+    if (d.new != null) { S.ed = 'new'; S.msg = null; draw(); $('fu')?.focus(); return; }
+    if (d.edit != null) { S.ed = +d.edit; S.msg = null; draw(); document.querySelector('.form')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); return; }
+    if (d.fcancel != null) { S.ed = null; S.msg = null; draw(); return; }
+    if (d.hide != null) { const L = clone(W); L[+d.hide].h = !L[+d.hide].h; return commit(L, L[+d.hide].h ? 'Escondido.' : 'Visível de novo.'); }
+    if (d.fdel != null) { if (!confirm('Apagar da lista? (Para só ocultar, use Esconder.)')) return; const L = clone(W); L.splice(S.ed, 1); return commit(L, 'Apagado.'); }
+    if (d.reset != null) { if (!confirm('Apagar seus ajustes e voltar à lista padrão do site?')) return; const t = S.view === 'vid' ? 'lnk' : 'img'; const r = await fetch(api + '/guias/' + encodeURIComponent(t + ':' + S.k), { method: 'DELETE', headers: H() }).then(r => r.json()).catch(() => ({}));
+      if (r.ok) { delete GOV[t + ':' + S.k]; load(); flash('Voltou ao padrão do site.', true); } else flash(r.error || 'Não deu.'); draw(); return; }
+    if (d.fsave == null) return;
+    const u = $('fu').value.trim(), pt = $('fpt').value.trim(), en = $('fen').value.trim();
+    if (S.view === 'vid') {
+      if (!YT(u)) { flash('Use um link do YouTube (https://www.youtube.com/… ou https://youtu.be/…).'); draw(); return; }
+      const row = { ...(S.ed === 'new' ? { h: false, o: 'cms' } : W[S.ed]), u: ytSet(u, secOf($('ft').value)), pt, en, e: +$('fe').value || 0, lg: $('flg').value }, k2 = $('fk').value;
+      if (k2 !== S.k) { const L2 = linksOf(k2); L2.push({ ...row, e: 0 }); const r2 = await saveLinks(k2, L2); if (!r2.ok) { flash(r2.error || 'Não deu para mover.'); draw(); return; }
+        const L = clone(W); if (S.ed !== 'new') L.splice(S.ed, 1); return commit(L, `Movido para ${N(ACT[k2])}.`); }
+      const L = clone(W); if (S.ed === 'new') L.push(row); else L[S.ed] = row; return commit(L, 'Salvo. No site, aparece em alguns minutos.');
+    }
+    if (!/^https:\/\//.test(u) && !u.startsWith('/guides/')) { flash('Cole um link https da imagem.'); draw(); return; }
+    let w = 0, ht = 0; if (S.ed === 'new' || u !== W[S.ed]?.u) { const im = new Image(); im.src = u; await im.decode().catch(() => {}); if (!im.naturalWidth) { flash('Não consegui abrir essa imagem.'); draw(); return; } w = im.naturalWidth; ht = im.naturalHeight; }
+    const row = { ...(S.ed === 'new' ? { h: false, o: 'cms' } : W[S.ed]), u, pt, en }; if (w) { row.w = w; row.ht = ht; }
+    const L = clone(W); if (S.ed === 'new') L.push(row); else L[S.ed] = row; return commit(L, 'Salvo. No site, aparece em alguns minutos.');
+  }
+  // arrastar para ordenar: vídeos/imagens (grava na hora), encontros, papéis e passos (vira rascunho)
+  let dragSrc = null; const attr = el => ['dnd', 'ednd', 'rdnd', 'sdnd'].find(a => el.dataset[a] != null);
+  app.addEventListener('dragstart', ev => { const r = ev.target.closest?.('[data-dnd],[data-ednd],[data-rdnd],[data-sdnd]'); if (!r) return; dragSrc = r; r.classList.add('drag'); ev.dataTransfer.effectAllowed = 'move'; ev.dataTransfer.setData('text/plain', ''); });
+  app.addEventListener('dragend', () => { dragSrc?.classList.remove('drag'); document.querySelectorAll('.over').forEach(x => x.classList.remove('over')); dragSrc = null; });
+  app.addEventListener('dragover', ev => { if (!dragSrc) return; const a = attr(dragSrc), t = ev.target.closest(`[data-${a}]`); if (!t) return; ev.preventDefault(); document.querySelectorAll('.over').forEach(x => x.classList.remove('over')); if (t !== dragSrc) t.classList.add('over'); });
+  app.addEventListener('drop', async ev => {
+    if (!dragSrc) return; const a = attr(dragSrc), t = ev.target.closest(`[data-${a}]`); if (!t || t === dragSrc) return; ev.preventDefault();
+    const from = +dragSrc.dataset[a], to = +t.dataset[a], mv = l => { const [x] = l.splice(from, 1); l.splice(to, 0, x); };
+    if (a === 'dnd') { const L = clone(W); mv(L); S.ed = null; return commit(L, 'Ordem salva.'); }
+    if (a === 'ednd') { mv(W.enc); S.i = to; } else if (a === 'rdnd') mv(W.enc[S.i].roles); else mv(W.enc[S.i].steps);
+    S.dirty = true; S.msg = null; draw();
+  });
+  // campos de texto dentro de linhas arrastáveis: o arrasto só começa pelo ⋮⋮
+  app.addEventListener('mousedown', ev => { const row = ev.target.closest('[data-rdnd],[data-sdnd],[data-dnd]'); if (row) row.draggable = !!ev.target.closest('.grip'); });
+  addEventListener('keydown', ev => { if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 's' && S.view === 'enc') { ev.preventDefault(); if (S.dirty) publish(); } });
   addEventListener('beforeunload', e => { if (S.dirty) e.preventDefault(); });
-  loadWork(); draw();
+  load(); draw();
 })();
 </script>
 </body>
