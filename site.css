@@ -2335,3 +2335,30 @@ dialog.gfs.nor .gfs-roles{display:none}
 .arm{grid-template-columns:minmax(0,1fr);min-width:0}.arm-main,.arm-tl,.arm-det,.arm-f{min-width:0}.arm-q{flex-basis:200px}
 .gde-yt{justify-self:start;margin-top:4px}
 .gfs-vid{display:inline-flex;margin-top:12px;padding:10px 16px;border-radius:10px;background:#c4302b;color:#fff;font-weight:600;font-size:calc(16px*var(--gz));text-decoration:none}
+/* ===== BX (/beta): Vercel Web Interface Guidelines, só com html.bx ===== */
+.bx-skip{position:fixed;left:12px;top:-60px;z-index:1000;padding:10px 16px;border-radius:10px;background:var(--acc);color:#0b1520;font-weight:600;text-decoration:none;transition:top .15s}
+.bx-skip:focus-visible{top:12px;outline:2px solid #fff;outline-offset:2px}
+/* foco visível e consistente em tudo que é clicável (teclado), sem anel no clique */
+html.bx :where(a,button,summary,select,input,textarea,[role=button],[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:6px}
+html.bx :where(.lsearch,.pal-in,.iv-q):focus-within{box-shadow:0 0 0 2px color-mix(in srgb,var(--acc) 70%,transparent);border-radius:10px}
+/* toque: sem atraso de duplo toque e sem flash cinza; o estado :active dá o retorno */
+html.bx :where(a,button,summary,select,input,label,[role=button]){touch-action:manipulation}
+html.bx{-webkit-tap-highlight-color:transparent}
+html.bx :where(button,a,[role=button]):active{filter:brightness(1.15)}
+/* rolagem: modais não "vazam" a rolagem para a página; sem efeito elástico com mouse */
+html.bx dialog{overscroll-behavior:contain}
+@media (pointer:fine){html.bx{overscroll-behavior:none}}
+/* texto: títulos sem palavra sozinha na última linha; parágrafos com quebra melhor; números alinhados */
+html.bx :where(h1,h2,h3,h4){text-wrap:balance}
+html.bx :where(p,li,small){text-wrap:pretty}
+html.bx #list,html.bx .gh-pw,html.bx dialog{font-variant-numeric:tabular-nums}
+/* conteúdo longo não estoura a coluna */
+html.bx #list :where(b,strong,h3,h4,span){overflow-wrap:anywhere}
+/* âncoras não ficam escondidas sob a barra fixa */
+html.bx :where([id],h2,h3){scroll-margin-top:84px}
+/* select nativo legível no Windows com tema escuro */
+html.bx select{background-color:var(--surface);color:var(--fg)}
+/* listas longas: o navegador só desenha os painéis que estão na tela (Triunfos, Coleções, Arsenal) */
+html.bx #list>.panel{content-visibility:auto;contain-intrinsic-size:auto 640px}
+/* menos movimento para quem pede no sistema */
+@media (prefers-reduced-motion:reduce){html.bx *,html.bx *::before,html.bx *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}

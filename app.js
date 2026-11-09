@@ -164,6 +164,16 @@ const BETA = location.pathname.replace(/\/+$/, '') === '/beta'; // página de te
 const FX = true; // recursos que passaram pelo /beta e agora valem para todos
 if (FX) GROUPS[0].subs = ['obj', 'prog', 'cal'];
 if (BETA) GROUPS[3].subs = ['gd', 'gar', 'grep', 'gst']; // Armaduras (tier list dos conjuntos): só no /beta por enquanto
+/* /beta · diretrizes de interface (Vercel Web Interface Guidelines) e boas práticas de desempenho, só nesta página:
+   classe html.bx liga os estilos (site.css, bloco "BX"); conexões antecipadas; link para pular ao conteúdo; status anunciado a leitores de tela */
+if (BETA) {
+  const de = document.documentElement; de.classList.add('bx');
+  for (const h of ['https://www.bungie.net', 'https://dni-api.dni-site.workers.dev']) { const l = document.createElement('link'); l.rel = 'preconnect'; l.href = h; l.crossOrigin = ''; document.head.append(l); }
+  const sk = document.createElement('a'); sk.className = 'bx-skip'; sk.href = '#list'; sk.textContent = 'Pular para o conteúdo'; sk.addEventListener('click', e => { e.preventDefault(); const m = document.getElementById('list'); m.tabIndex = -1; m.focus({ preventScroll: true }); m.scrollIntoView({ block: 'start' }); }); document.body.prepend(sk);
+  const st = document.getElementById('status'); if (st) { st.setAttribute('role', 'status'); st.setAttribute('aria-live', 'polite'); }
+  document.querySelectorAll('h1, .gh-id').forEach(x => x.setAttribute('translate', 'no'));
+}
+const idle = f => BETA && window.requestIdleCallback ? requestIdleCallback(f, { timeout: 1500 }) : setTimeout(f); // tarefas que podem esperar o navegador ficar livre
 const GRADE = location.pathname.replace(/\/+$/, '') === '/grade'; // interface do Orla Bot (só membros do clã Orla Emaranhada; os demais veem a página em branco)
 const ORLA_CLAN = '5280120', orlaOK = () => GD?.clan?.gid === ORLA_CLAN;
 let orlaChk = false;
@@ -326,6 +336,9 @@ async function loadAccount() {
   }
   marks = new Set(LS.get('dc-marks-' + member.id, []));
   syncPull();
+  // no /beta: os pedidos ao vivo saem já, em paralelo com a leitura da cópia guardada (sem esperar o IndexedDB)
+  const PRE = BETA ? Object.fromEntries(Object.keys(PARTS).map(k => [k, bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=${PARTS[k]}`)])) : null;
+  if (PRE) for (const p of Object.values(PRE)) p.catch(() => {});
   // 1) cópia da última visita, se houver
   let usingCache = false;
   if (!profile) {
@@ -356,7 +369,7 @@ async function loadAccount() {
   };
   // ordem: cabeçalho, a parte da aba aberta, e o resto
   const order = ['id', need, 'g', ...['q', 'a', 'b', 'c'].filter(k => k !== need)];
-  const results = await Promise.allSettled(order.map(k => bungie(url(k)).then(r => onPart(k, r))));
+  const results = await Promise.allSettled(order.map(k => (PRE?.[k] || bungie(url(k))).then(r => onPart(k, r))));
   const failed = results.find(r => r.status === 'rejected');
   if (failed) {
     if (failed.reason?.message === 'auth') throw failed.reason;
@@ -876,12 +889,12 @@ const vidKey = a => { for (const [k, l] of [['raid', defs.raids], ['dg', defs.du
 function vidLoad() { if (VID?.at > Date.now() - 6 * 36e5 || vidLoad.busy || typeof APIW === 'undefined' || !APIW) return; vidLoad.busy = true;
   Promise.all([fetch(APIW + '/videos').then(r => r.json()), fetch(APIW + '/guias').then(r => r.json()).catch(() => ({ m: {} }))]).then(([j, gj]) => { const m = {}; for (const v of j.list || []) (m[v.k] ||= []).push([v.url, v.pt || v.en, v.en || v.pt]); VID = { at: Date.now(), m, g: gj.m || {} }; LS.set('dc-vid', VID); render(); }).catch(() => {}).finally(() => { vidLoad.busy = false; }); }
 // ajustes da página /guias (só o dono edita): vídeos, imagens e guia por encontro de cada atividade substituem o padrão
-const govOf = (t, k) => { if (!VID || VID.at < Date.now() - 6 * 36e5) setTimeout(vidLoad); return VID?.g?.[t + ':' + k] || null; };
+const govOf = (t, k) => { if (!VID || VID.at < Date.now() - 6 * 36e5) idle(vidLoad); return VID?.g?.[t + ':' + k] || null; };
 const giList = a => { const o = a && govOf('img', vidKey(a)); return o ? o.l.filter(x => !x[5]) : (a?.gi || []); };
 const gdeGet = k => govOf('enc', k) || GUIDES?.[k] || null;
 // vídeo de um encontro: o do próprio guia ou um vídeo da atividade marcado para aquele encontro (página /guias)
 const encVid = (k, i, e) => YT_OK(e?.yt) ? e.yt : (VID?.g?.['lnk:' + k]?.l || []).find(x => !x[3] && +x[4] === i + 1 && YT_OK(x[0]))?.[0] || '';
-const ytList = a => { if (!VID || VID.at < Date.now() - 6 * 36e5) setTimeout(vidLoad); const o = a && VID?.g?.['lnk:' + vidKey(a)]; if (o) return o.l.filter(x => !x[3] && YT_OK(x[0])).map(x => [x[0], x[1] || x[2], x[2] || x[1]]); return [...(Array.isArray(a?.yt) ? a.yt : a?.yt ? [[a.yt]] : []), ...(a && VID?.m?.[vidKey(a)] || [])].filter(x => YT_OK(x[0])); };
+const ytList = a => { if (!VID || VID.at < Date.now() - 6 * 36e5) idle(vidLoad); const o = a && VID?.g?.['lnk:' + vidKey(a)]; if (o) return o.l.filter(x => !x[3] && YT_OK(x[0])).map(x => [x[0], x[1] || x[2], x[2] || x[1]]); return [...(Array.isArray(a?.yt) ? a.yt : a?.yt ? [[a.yt]] : []), ...(a && VID?.m?.[vidKey(a)] || [])].filter(x => YT_OK(x[0])); };
 const ytId = url => { try { const x = new URL(url); return x.hostname === 'youtu.be' ? x.pathname.slice(1) : x.searchParams.get('v') || ''; } catch { return ''; } };
 /* Guia por encontro (data/guides.json; o cadastro pelo site vem depois): botão "📖 Guia" ao lado de Vídeos e Imagens */
 let GUIDES = null; function gdeLoad() { if (gdeLoad.busy || GUIDES) return; gdeLoad.busy = true; fetch('/data/guides.json').then(r => r.json()).then(j => { GUIDES = j; render(); }).catch(() => { GUIDES = {}; }); }
@@ -980,7 +993,7 @@ function gfsOpen(k) {
 document.addEventListener('click', e => { const b = e.target.closest('[data-gdefs]'); if (!b) return; e.preventDefault(); e.stopPropagation(); gfsOpen(b.dataset.gdefs); }, true);
 document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches?.('.gfs-rl a')) { e.preventDefault(); e.target.click(); } });
 document.addEventListener('click', e => { const b = e.target.closest('[data-gde]'); if (!b) return; e.preventDefault(); e.stopPropagation(); gdeOpen(b.dataset.gde); }, true);
-const actYt = (kind, key) => { if (!GUIDES) setTimeout(gdeLoad); const g = gdeGet(kind + ':' + key); return (g ? `<button type="button" class="chip gde" data-gde="${kind}:${esc(key)}">📖 ${esc(lang === 'pt' ? `Guia (${g.enc.length})` : `Guide (${g.enc.length})`)}</button>` : '') + actYtRaw(kind, key); };
+const actYt = (kind, key) => { if (!GUIDES) idle(gdeLoad); const g = gdeGet(kind + ':' + key); return (g ? `<button type="button" class="chip gde" data-gde="${kind}:${esc(key)}">📖 ${esc(lang === 'pt' ? `Guia (${g.enc.length})` : `Guide (${g.enc.length})`)}</button>` : '') + actYtRaw(kind, key); };
 const actYtRaw = (kind, key) => { const a = actDefOf(kind, key); if (!a) return ''; const yl = ytList(a);
   const v = yl.length === 1 ? `<a class="chip yt" href="${esc(yl[0][0])}" target="_blank" rel="noopener">▶ ${esc(u().ytGuide)}</a>` : yl.length > 1 ? `<button type="button" class="chip yt" data-ytl="${kind}:${esc(key)}">▶ ${esc(u().ytMany(yl.length))}</button>` : ''; return v + (giList(a).length ? `<button type="button" class="chip gi" data-gal="${kind}:${esc(key)}">🖼 ${esc(u().giBtn(giList(a).length))}</button>` : ''); };
 /* galeria de imagens do guia: só baixa as imagens quando abre */
