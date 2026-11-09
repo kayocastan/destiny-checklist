@@ -2331,3 +2331,4 @@ dialog.gfs.nor .gfs-roles{display:none}
 @media (max-width:900px){.arm-main{grid-template-columns:1fr}.arm-det{position:static;order:-1}.arm-emp{display:none}.arm-c{width:calc(50% - 4px)}.arm-row{grid-template-columns:52px minmax(0,1fr)}.arm-t{font-size:24px}}
 .arm{container-type:inline-size}.arm-c{flex:1 1 180px;max-width:250px;width:auto}
 @container (max-width:820px){.arm-main{grid-template-columns:1fr}.arm-det{position:static;order:-1}.arm-emp{display:none}.arm-row{grid-template-columns:52px minmax(0,1fr)}.arm-t{font-size:24px}.arm-c{max-width:none}}
+.arm{padding:6px 4px 0}.arm-seg{display:inline-grid;grid-auto-flow:column;flex-wrap:nowrap;max-width:100%;overflow-x:auto}.arm-seg button{white-space:nowrap;font-size:13.5px;padding:7px 13px}.arm-seg button[aria-pressed=true]{background:color-mix(in srgb,var(--acc) 18%,transparent);color:var(--fg);font-weight:600}
