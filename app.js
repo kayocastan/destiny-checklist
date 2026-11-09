@@ -169,7 +169,7 @@ if (BETA) GROUPS[3].subs = ['gd', 'gar', 'grep', 'gst']; // Armaduras (tier list
 if (BETA) {
   const de = document.documentElement; de.classList.add('bx');
   for (const h of ['https://www.bungie.net', 'https://dni-api.dni-site.workers.dev']) { const l = document.createElement('link'); l.rel = 'preconnect'; l.href = h; l.crossOrigin = ''; document.head.append(l); }
-  const sk = document.createElement('a'); sk.className = 'bx-skip'; sk.href = '#list'; sk.textContent = 'Pular para o conteúdo'; sk.addEventListener('click', e => { e.preventDefault(); const m = document.getElementById('list'); m.tabIndex = -1; m.focus({ preventScroll: true }); m.scrollIntoView({ block: 'start' }); }); document.body.prepend(sk);
+  const sk = document.createElement('a'); sk.className = 'bx-skip'; sk.href = '#list'; sk.textContent = lang === 'pt' ? 'Pular para o conteúdo' : 'Skip to content'; sk.addEventListener('click', e => { e.preventDefault(); const m = document.getElementById('list'); m.tabIndex = -1; m.focus({ preventScroll: true }); m.scrollIntoView({ block: 'start' }); }); document.body.prepend(sk);
   const st = document.getElementById('status'); if (st) { st.setAttribute('role', 'status'); st.setAttribute('aria-live', 'polite'); }
   document.querySelectorAll('h1, .gh-id').forEach(x => x.setAttribute('translate', 'no'));
 }
