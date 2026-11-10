@@ -2362,3 +2362,5 @@ html.bx select{background-color:var(--surface);color:var(--fg)}
 html.bx #list>.panel{content-visibility:auto;contain-intrinsic-size:auto 640px}
 /* menos movimento para quem pede no sistema */
 @media (prefers-reduced-motion:reduce){html.bx *,html.bx *::before,html.bx *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+/* Agenda do clã: descrição escrita por quem criou a grade */
+.ob-desc{margin:6px 0 2px;font-size:14px;line-height:1.45;color:var(--fg);white-space:pre-line;overflow-wrap:break-word;max-width:70ch;padding:6px 10px;border-left:3px solid color-mix(in srgb,var(--acc) 60%,transparent);background:color-mix(in srgb,var(--bg) 55%,transparent);border-radius:0 8px 8px 0}
