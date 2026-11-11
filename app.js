@@ -932,18 +932,18 @@ function armHTML() {
   const seg = (k, opts) => `<div class="soc-seg arm-seg">${opts.map(([v, l]) => `<button type="button" data-arm="${k}:${v}" aria-pressed="${A[k] === v}">${esc(l)}</button>`).join('')}</div>`;
   const head = `<div class="arm-h"><div><h2>${esc(T.t)} <span class="soc-beta">BETA</span></h2><small class="lbd-n">${esc(T.sub)}</small></div>${seg('v', [['sets', T.sets], ['ex', T.ex], ['arch', T.arch]])}</div>`;
   const foot = `<p class="arm-cred">${esc(T.cred)}</p>`;
-  if (!D) return `<div class="panel"><section class="arm">${head}<p class="lbd-n wait">${esc(T.wait)}</p></section></div>`;
+  if (!D) return `<div class="panel"><section class="armt">${head}<p class="lbd-n wait">${esc(T.wait)}</p></section></div>`;
   const q = (A.q || '').trim().toLowerCase();
   if (A.v === 'arch') {
     const SC = { Health: 'var(--done)', Melee: 'var(--solar)', Grenade: 'var(--exotic)', Super: 'var(--arc)', Class: '#b48cf0', Weapons: 'var(--hard)' };
-    return `<div class="panel"><section class="arm">${head}<p class="lbd-n">${esc(T.arN)}</p><div class="arm-ar">${Object.entries(D.archetypes || {}).map(([n, st]) => { const e = Object.entries(st).sort((a, b) => b[1] - a[1]);
+    return `<div class="panel"><section class="armt">${head}<p class="lbd-n">${esc(T.arN)}</p><div class="arm-ar">${Object.entries(D.archetypes || {}).map(([n, st]) => { const e = Object.entries(st).sort((a, b) => b[1] - a[1]);
       return `<article class="arm-arc"><h3>${esc(n)}</h3>${e.map(([k, v], i) => `<div class="arm-st"><span><i style="background:${SC[k] || 'var(--muted)'}"></i>${esc(k)} <small>${i ? T.sec : T.main}</small></span><b>${v}</b><u><s style="width:${v / 30 * 100}%;background:${SC[k] || 'var(--muted)'}"></s></u></div>`).join('')}</article>`; }).join('')}</div>${foot}</section></div>`;
   }
   if (A.v === 'ex') {
     const cl = ['all', 'Hunter', 'Titan', 'Warlock'], CN = { all: T.all, Hunter: P ? 'Caçador' : 'Hunter', Titan: P ? 'Titã' : 'Titan', Warlock: P ? 'Arcano' : 'Warlock' };
     const l = (D.exotics || []).filter(x => (A.cls === 'all' || x.class === A.cls) && (!q || (x.name + ' ' + x.perk + ' ' + x.desc + ' ' + x.slot).toLowerCase().includes(q)));
     const bySlot = {}; for (const x of l) (bySlot[x.slot] ||= []).push(x);
-    return `<div class="panel"><section class="arm">${head}<div class="arm-f">${seg('cls', cl.map(c => [c, CN[c]]))}<input type="search" class="arm-q" data-armq value="${esc(A.q || '')}" placeholder="${esc(T.q)}"></div>
+    return `<div class="panel"><section class="armt">${head}<div class="arm-f">${seg('cls', cl.map(c => [c, CN[c]]))}<input type="search" class="arm-q" data-armq value="${esc(A.q || '')}" placeholder="${esc(T.q)}"></div>
       ${l.length ? Object.entries(bySlot).map(([sl, xs]) => `<h3 class="arm-sl">${esc(sl)} <small>${xs.length}</small></h3><div class="arm-exg">${xs.map(x => `<article class="arm-ex"><small>${esc(CN[x.class] || x.class)}</small><h4>${esc(x.name)}</h4><b>${esc(x.perk)}</b><p>${esc(x.desc)}</p></article>`).join('')}</div>`).join('') : `<p class="lbd-n">${esc(T.none)}</p>`}${foot}</section></div>`;
   }
   const rate = s => A.by === 'b2' ? s.b2.rating : A.by === 'b4' ? s.b4.rating : (armRank(s.b2.rating) <= armRank(s.b4.rating) ? s.b2.rating : s.b4.rating);
@@ -955,11 +955,11 @@ function armHTML() {
   const det = sel ? `<aside class="arm-det"><button type="button" class="arm-x" data-arm="sel:" aria-label="✕">✕</button><small>${esc(T.src)}: ${esc(sel.source.trim())} · ${esc(T[armSrc(sel.sourceType)])}</small><h3>${esc(sel.set)}</h3>${bonus(sel.b2, T.b2)}${bonus(sel.b4, T.b4)}</aside>` : `<aside class="arm-det arm-emp"><p>${esc(T.pick)}</p></aside>`;
   const card = s => { const r = rate(s), o = A.by === 'b2' ? s.b4.rating : s.b2.rating;
     return `<button type="button" class="arm-c${s.set === A.sel ? ' on' : ''}" data-arm="sel:${esc(s.set)}"><b>${esc(s.set)}</b><span class="arm-cs">${esc(T[armSrc(s.sourceType)])} · ${esc(s.source.trim())}</span><span class="arm-cr"><i class="t-${armTier(s.b2.rating)}">2 · ${esc(String(s.b2.rating).trim())}</i><i class="t-${armTier(s.b4.rating)}">4 · ${esc(String(s.b4.rating).trim())}</i></span></button>`; };
-  return `<div class="panel"><section class="arm">${head}
+  return `<div class="panel"><section class="armt">${head}
     <div class="arm-f">${seg('by', [['b4', T.b4], ['b2', T.b2], ['best', T.best]])}${seg('src', srcs.map(k => [k, T[k]]))}<input type="search" class="arm-q" data-armq value="${esc(A.q || '')}" placeholder="${esc(T.q)}"></div>
     <div class="arm-main"><div class="arm-tl">${rows.length ? rows.map(([t, xs]) => `<div class="arm-row"><div class="arm-t t-${t}">${t === 'PVP' ? esc(T.pvp) : t}<small>${xs.length}</small></div><div class="arm-cards">${xs.map(card).join('')}</div></div>`).join('') : `<p class="lbd-n">${esc(T.none)}</p>`}</div>${det}</div>${foot}</section></div>`;
 }
-document.addEventListener('click', e => { const b = e.target.closest('[data-arm]'); if (!b) return; const [k, ...v] = b.dataset.arm.split(':'); ARM[k] = v.join(':'); if (k === 'sel' && ARM.sel && (document.querySelector('.arm')?.offsetWidth || 0) < 820) setTimeout(() => document.querySelector('.arm-det')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+document.addEventListener('click', e => { const b = e.target.closest('[data-arm]'); if (!b) return; const [k, ...v] = b.dataset.arm.split(':'); ARM[k] = v.join(':'); if (k === 'sel' && ARM.sel && (document.querySelector('.armt')?.offsetWidth || 0) < 820) setTimeout(() => document.querySelector('.arm-det')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
   LS.set('dc-arm', ARM); render(); });
 document.addEventListener('input', e => { if (!e.target.matches?.('[data-armq]')) return; ARM.q = e.target.value; LS.set('dc-arm', ARM); clearTimeout(armHTML.t); armHTML.t = setTimeout(() => { const pos = e.target.selectionStart; render(); const i = document.querySelector('[data-armq]'); if (i) { i.focus(); i.setSelectionRange(pos, pos); } }, 200); });
 /* Modo encontros: tela cheia só com os encontros, um cartão por encontro (tipo por cor), faixa de etapas e texto ajustável */
