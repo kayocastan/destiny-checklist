@@ -5561,8 +5561,8 @@ document.addEventListener('click', e => { const b = e.target.closest('[data-rlmo
 
 /* ---------- Avaliar rolls (como o Roll Appraiser do light.gg): nota S/A/B/C pelo roll recomendado mais próximo da lista voltron,
    % de cada perk nos rolls recomendados, simulação de atributos e o que o clã usa equipado (servidor lê 1x por dia) ---------- */
-const RAPT = { pt: { t: 'Avaliar rolls', n: n => `${n} armas · cópias juntas`, all: 'Todas', dup: 'Só com cópias', sa: 'Nota S·A', c: 'Nota C', type: 'Tipo', anyT: 'Todos os tipos', q: 'Buscar arma ou perk', rec: p => `${p}% recomendado`, none: 'Sem roll recomendado na lista', legend: 'S = todas as colunas do roll recomendado mais próximo · A = falta 1 · B = faltam 2 · C = nada recomendado. A barra mostra quanto do roll bate com os recomendados.', copy: (i, n) => `${i} de ${n} cópias`, closest: 'Mais próximo de:', cols: (a, b) => `${a} de ${b} colunas`, perksT: 'Perks · % = quanto aparece nos rolls recomendados desta arma', tapSim: 'Toque num perk para simular', mine: 'o que está na sua arma', recL: 'recomendado pela lista', clanL: n => `popular no clã (${n} usam)`, sim: (a, b) => `Simulando: ${a} no lugar de ${b}`, statsT: 'Atributos · sua arma × simulação', note: 'Nota da lista:', best: '★ Escolher os perks mais recomendados', reset: 'Voltar aos perks da arma', similar: n => `Achar parecidos no inventário (${n})`, copies: n => `Comparar as ${n} cópias`, close: 'Fechar', loading: 'Carregando perks e atributos…', pick: 'Escolha uma arma na lista.', clanNo: 'O clã ainda não tem dados (o servidor lê as armas equipadas 1x por dia).', clanH: (n, k) => `${n} membro${n === 1 ? '' : 's'} do clã ${n === 1 ? 'usou' : 'usaram'} esta arma nos últimos 14 dias${k ? ` · ${k}` : ''}`, simil: 'Parecidos (mesmos perks principais)', back: '← todas as armas', approx: 'aproximado: perks com bônus condicional não entram' },
-  en: { t: 'Appraise rolls', n: n => `${n} weapons · copies grouped`, all: 'All', dup: 'Only duplicates', sa: 'Grade S·A', c: 'Grade C', type: 'Type', anyT: 'All types', q: 'Search weapon or perk', rec: p => `${p}% recommended`, none: 'No recommended roll in the list', legend: 'S = every column of the closest recommended roll · A = 1 missing · B = 2 missing · C = nothing recommended. The bar shows how much of the roll matches.', copy: (i, n) => `${i} of ${n} copies`, closest: 'Closest to:', cols: (a, b) => `${a} of ${b} columns`, perksT: 'Perks · % = how often it appears in this weapon\'s recommended rolls', tapSim: 'Tap a perk to simulate', mine: 'on your weapon', recL: 'recommended by the list', clanL: n => `popular in clan (${n} use it)`, sim: (a, b) => `Simulating: ${a} instead of ${b}`, statsT: 'Stats · your weapon × simulation', note: 'List note:', best: '★ Pick the most recommended perks', reset: 'Back to the weapon\'s perks', similar: n => `Find similar in inventory (${n})`, copies: n => `Compare the ${n} copies`, close: 'Close', loading: 'Loading perks and stats…', pick: 'Pick a weapon from the list.', clanNo: 'No clan data yet (the server reads equipped weapons once a day).', clanH: (n, k) => `${n} clan member${n === 1 ? '' : 's'} used this weapon in the last 14 days${k ? ` · ${k}` : ''}`, simil: 'Similar (same main perks)', back: '← all weapons', approx: 'approximate: conditional perk bonuses are not counted' } };
+const RAPT = { pt: { t: 'Avaliar rolls', n: n => `${n} armas · cópias juntas`, all: 'Todas', dup: 'Só com cópias', sa: 'Nota S·A', c: 'Nota C', type: 'Tipo', anyT: 'Todos os tipos', q: 'Buscar arma ou perk', rec: p => `${p}% recomendado`, none: 'Sem roll recomendado na lista', legend: 'S = todas as colunas do roll recomendado mais próximo · A = falta 1 · B = faltam 2 · C = nada recomendado. A barra mostra quanto do roll bate com os recomendados.', copy: (i, n) => `${i} de ${n} cópias`, closest: 'Mais próximo de:', cols: (a, b) => `${a} de ${b} colunas`, perksT: 'Perks · % = quanto aparece nos rolls recomendados desta arma', tapSim: 'Toque num perk para simular', mine: 'o que está na sua arma', recL: 'recomendado pela lista', clanL: n => `popular no clã (${n} usam)`, sim: (a, b) => `Simulando: ${a} no lugar de ${b}`, statsT: 'Atributos · sua arma × simulação', note: 'Nota da lista:', best: '★ Escolher os perks mais recomendados', reset: 'Voltar aos perks da arma', similar: n => `Achar parecidos no inventário (${n})`, copies: n => `Comparar as ${n} cópias`, close: 'Fechar', loading: 'Carregando perks e atributos…', pick: 'Escolha uma arma na lista.', clanNo: 'O clã ainda não tem dados (o servidor lê as armas equipadas 1x por dia).', clanH: (n, k) => `${n} membro${n === 1 ? '' : 's'} do clã ${n === 1 ? 'usou' : 'usaram'} esta arma nos últimos 14 dias${k ? ` · ${k}` : ''}`, simil: 'Parecidos (mesmos perks principais)', back: '← todas as armas', approx: 'aproximado: perks com bônus condicional não entram', onW: 'nesta cópia: dá para trocar no jogo', onWL: 'disponível nesta cópia', auto: '⚡ Aplicar os melhores perks na arma', autoN: 'Esta cópia já está com os melhores perks que ela tem.', applySim: 'Aplicar a simulação na arma', save: '💾 Salvar como roll desejado', saved: 'Salvo na Lista de desejos: você recebe um aviso quando cair uma cópia com esse roll.', going: (i, n) => `Trocando perks… ${i}/${n}`, okAll: n => `Pronto: ${n} perk${n === 1 ? '' : 's'} trocado${n === 1 ? '' : 's'} na arma.`, partial: (n, m) => `Parcial: ${n} trocado${n === 1 ? '' : 's'}; ${m} não ${m === 1 ? 'existe' : 'existem'} nesta cópia (salve como roll desejado).`, noneAv: 'Nenhum dos perks simulados existe nesta cópia. A Bungie só deixa trocar entre os perks que a cópia já tem; use “Salvar como roll desejado”.' },
+  en: { t: 'Appraise rolls', n: n => `${n} weapons · copies grouped`, all: 'All', dup: 'Only duplicates', sa: 'Grade S·A', c: 'Grade C', type: 'Type', anyT: 'All types', q: 'Search weapon or perk', rec: p => `${p}% recommended`, none: 'No recommended roll in the list', legend: 'S = every column of the closest recommended roll · A = 1 missing · B = 2 missing · C = nothing recommended. The bar shows how much of the roll matches.', copy: (i, n) => `${i} of ${n} copies`, closest: 'Closest to:', cols: (a, b) => `${a} of ${b} columns`, perksT: 'Perks · % = how often it appears in this weapon\'s recommended rolls', tapSim: 'Tap a perk to simulate', mine: 'on your weapon', recL: 'recommended by the list', clanL: n => `popular in clan (${n} use it)`, sim: (a, b) => `Simulating: ${a} instead of ${b}`, statsT: 'Stats · your weapon × simulation', note: 'List note:', best: '★ Pick the most recommended perks', reset: 'Back to the weapon\'s perks', similar: n => `Find similar in inventory (${n})`, copies: n => `Compare the ${n} copies`, close: 'Close', loading: 'Loading perks and stats…', pick: 'Pick a weapon from the list.', clanNo: 'No clan data yet (the server reads equipped weapons once a day).', clanH: (n, k) => `${n} clan member${n === 1 ? '' : 's'} used this weapon in the last 14 days${k ? ` · ${k}` : ''}`, simil: 'Similar (same main perks)', back: '← all weapons', approx: 'approximate: conditional perk bonuses are not counted', onW: 'on this copy: can be switched in game', onWL: 'available on this copy', auto: '⚡ Apply the best perks to the weapon', autoN: 'This copy already has the best perks it can roll.', applySim: 'Apply the simulation to the weapon', save: '💾 Save as wished roll', saved: 'Saved to the Wishlist: you get an alert when a copy with this roll drops.', going: (i, n) => `Switching perks… ${i}/${n}`, okAll: n => `Done: ${n} perk${n === 1 ? '' : 's'} switched on the weapon.`, partial: (n, m) => `Partial: ${n} switched; ${m} not on this copy (save as wished roll).`, noneAv: 'None of the simulated perks exist on this copy. Bungie only allows switching between perks the copy already has; use “Save as wished roll”.' } };
 const rapt = () => RAPT[lang === 'pt' ? 'pt' : 'en'];
 const RAP = { sel: '', f: 'all', ty: '', q: '', sim: {}, sh: '', cl: null };
 const RG_C = { S: '#7fe08f', A: '#a9e34b', B: '#f2d36b', C: '#ff8a7a' };
@@ -5586,8 +5586,9 @@ function rapCols(h) {
     const raw = await Promise.all(idx.map(async k => { const e = so.socketEntries?.[k] || {}, ps = e.randomizedPlugSetHash || e.reusablePlugSetHash;
       if (ps) { try { const p = await bungie(`/Destiny2/Manifest/DestinyPlugSetDefinition/${ps}/`, false); return [...new Set((p.reusablePlugItems || []).map(x => x.plugItemHash))]; } catch { return []; } }
       return [...new Set((e.reusablePlugItems || []).map(x => x.plugItemHash).concat(e.singleInitialItemHash ? [e.singleInitialItemHash] : []))]; }));
+    raw.forEach((c, i) => { c.si = idx[i]; });
     const en = await entities('DestinyInventoryItemDefinition', raw.flat(), lang === 'pt' ? 'pt' : 'en', true);
-    RCOLS[h] = raw.map(c => { const by = new Map(); for (const ph of c) { const e = en[ph]; if (!e?.n || WSKIP_PC.test(e.pc || '')) continue; const k = e.ic || e.n; if (!by.has(k)) by.set(k, { h: ph, n: e.n, ic: e.ic, hs: [ph] }); else by.get(k).hs.push(ph); } return [...by.values()]; }).filter(c => c.length);
+    RCOLS[h] = raw.map(c => { const by = new Map(); for (const ph of c) { const e = en[ph]; if (!e?.n || WSKIP_PC.test(e.pc || '')) continue; const k = e.ic || e.n; if (!by.has(k)) by.set(k, { h: ph, n: e.n, ic: e.ic, hs: [ph] }); else by.get(k).hs.push(ph); } const o = [...by.values()]; o.si = c.si; return o; }).filter(c => c.length);
     if ($('rapdlg')?.open) rapDraw();
   })().catch(() => { RCOLS[h] = []; if ($('rapdlg')?.open) rapDraw(); }));
   return null;
@@ -5605,6 +5606,33 @@ function rapClan() {
   (async () => { let g = LS.get('dc-cgid', null); if (!g || Date.now() - g.at > 7 * 864e5) { const r = await bungie(`/GroupV2/User/${member.type}/${member.id}/0/1/`).catch(() => null); g = { id: r?.results?.[0]?.group?.groupId || '', at: Date.now() }; LS.set('dc-cgid', g); }
     RAP.cl = g.id && APIW ? (await fetch(APIW + '/clan/rolls?g=' + g.id).then(r => r.json()).catch(() => ({}))).w || {} : {}; })().finally(() => { RAP.clBusy = false; if ($('rapdlg')?.open) rapDraw(); });
 }
+const RAPP = {}; // perks que cada cópia tem em cada encaixe (dá para trocar entre eles pela API)
+function rapAvail(iid) {
+  if (RAPP[iid] !== undefined) return RAPP[iid]; RAPP[iid] = null;
+  bungie(`/Destiny2/${member.type}/Profile/${member.id}/Item/${iid}/?components=305,310`).then(r => { const rp = r.reusablePlugs?.data?.plugs || {}; RAPP[iid] = Object.fromEntries(Object.entries(rp).map(([k, v]) => [k, v.filter(p => p.canInsert !== false && p.enabled !== false).map(p => p.plugItemHash)])); if (r.sockets?.data) (RL.so ||= {})[iid] = r.sockets.data; })
+    .catch(() => { RAPP[iid] = {}; }).finally(() => { if ($('rapdlg')?.open) rapDraw(); });
+  return null;
+}
+// troca os perks pela API e confere no jogo (a Bungie demora a refletir: até 4 tentativas, 2,5 s entre elas)
+async function rapApply(x, plan) {
+  const T = rapt(), ch = x.where !== 'v' ? x.where : Object.keys(profile.characters?.data || {})[0]; let ok = 0, i = 0, err = null;
+  for (const [si, h] of plan) {
+    RAP.msg = { t: T.going(++i, plan.length) }; rapDraw();
+    try { await wPost('/Destiny2/Actions/Items/InsertSocketPlugFree/', { plug: { socketIndex: +si, socketArrayType: 0, plugItemHash: h }, itemId: x.iid, characterId: ch }); }
+    catch (e) { err = e; continue; }
+    let seen = false;
+    for (let t = 0; t < 4 && !seen; t++) { if (t) await new Promise(r => setTimeout(r, 2500)); const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/Item/${x.iid}/?components=305`).catch(() => null); const so = r?.sockets?.data; if (so) { (RL.so ||= {})[x.iid] = so; seen = so.sockets?.[+si]?.plugHash === h; } }
+    if (!seen) { const so = RL.so?.[x.iid]?.sockets; if (so?.[+si]) so[+si].plugHash = h; } // aceito pela Bungie, ainda sem refletir: mostra o novo perk
+    ok++;
+  }
+  return { ok, err };
+}
+function rapSave(x, cols, fin) {
+  const l = wishList(), n = INVD[x.h]?.n || '', i = l.findIndex(y => y.h === x.h || (n && wishKey(y.n) === wishKey(n)));
+  const r = cols.map((c, k) => c.length > 1 && fin[k] ? [{ h: fin[k].h, n: fin[k].n, ic: fin[k].ic }] : []).filter(c => c.length);
+  const e = { h: x.h, n, ic: INVD[x.h]?.ic || '', tl: INVD[x.h]?.tl || '', p: r.map(c => ({ n: c[0].n, ic: c[0].ic })), r, at: Date.now() };
+  if (i >= 0) l.splice(i, 1); l.unshift(e); LS.set('dc-wish', l.slice(0, 40));
+}
 const rapList = () => { const all = invAll().filter(x => x.slot < 3), cnt = {}; all.forEach(x => cnt[x.h] = (cnt[x.h] || 0) + 1); return all.map(x => ({ x, r: rapGrade(x), k: cnt[x.h] })); };
 function rapOpen(iid) {
   let d = $('rapdlg'); if (!d) { d = document.createElement('dialog'); d.id = 'rapdlg'; d.className = 'rap'; document.body.append(d);
@@ -5616,11 +5644,22 @@ function rapOpen(iid) {
 function rapClick(e) {
   const b = e.target.closest('button,[data-rapsel]'); if (!b) return; const d = b.dataset;
   if (d.rapx != null) { $('rapdlg').close(); return; }
-  if (d.rapf) { RAP.f = d.rapf; RAP.sh = ''; } else if (d.rapsel) { RAP.sel = d.rapsel; RAP.sim = {}; } else if (d.rapmode) { RL.mode = d.rapmode; LS.set('dc-rlmode', RL.mode); RAP.sim = {}; }
+  if (d.rapf) { RAP.f = d.rapf; RAP.sh = ''; } else if (d.rapsel) { RAP.sel = d.rapsel; RAP.msg = null; RAP.sim = {}; } else if (d.rapmode) { RL.mode = d.rapmode; LS.set('dc-rlmode', RL.mode); RAP.sim = {}; }
   else if (d.rapp) { const [k, h] = d.rapp.split(':'); if (RAP.sim[k] === +h) delete RAP.sim[k]; else RAP.sim[k] = +h; }
-  else if (d.rapbest != null) RAP.sim = { ...RAP.bestSim }; else if (d.rapreset != null) RAP.sim = {};
+  else if (d.rapbest != null) { RAP.sim = { ...RAP.bestSim }; RAP.msg = null; } else if (d.rapreset != null) { RAP.sim = {}; RAP.msg = null; }
+  else if (d.rapsave != null) { const c = RAP.ctx; if (!c) return; const fin = c.cur.map((o, k) => RAP.sim[k] != null ? c.cols[k].find(y => y.h === RAP.sim[k]) : o); rapSave(c.x, c.cols, fin); RAP.msg = { ok: true, t: rapt().saved }; }
+  else if (d.rapauto != null || d.rapapply != null) { rapGo(d.rapauto != null); return; }
   else if (d.rapsim != null) RAP.f = 'sim'; else if (d.rapcopies) { RAP.sh = d.rapcopies; RAP.f = 'all'; } else if (d.rapback != null) { RAP.sh = ''; if (RAP.f === 'sim') RAP.f = 'all'; }
   else return; rapDraw(); if (d.rapsel && matchMedia('(max-width:900px)').matches) document.querySelector('.rap-ins')?.scrollIntoView({ behavior: 'smooth' });
+}
+async function rapGo(auto) {
+  const T = rapt(), c = RAP.ctx; if (!c || RAP.busy) return; let plan, lack = 0;
+  if (auto) { plan = RAP.autoPlan || []; if (!plan.length) { RAP.msg = { t: T.autoN }; rapDraw(); return; } }
+  else { plan = []; for (const [k, h] of Object.entries(RAP.sim)) { const o = c.cols[k]?.find(y => y.h === h); if (!o) continue; const ph = (RAPP[c.x.iid]?.[c.cols[k].si] || []).find(y => o.hs.includes(y)); if (ph) plan.push([c.cols[k].si, ph]); else lack++; }
+    if (!plan.length) { RAP.msg = { bad: true, t: T.noneAv }; rapDraw(); return; } }
+  RAP.busy = true; const r = await rapApply(c.x, plan); RAP.busy = false; RAP.sim = {};
+  RAP.msg = r.err && !r.ok ? { bad: true, t: wMsg(r.err) } : lack || r.err ? { t: T.partial(r.ok, lack + (plan.length - r.ok)) } : { ok: true, t: T.okAll(r.ok) };
+  rapDraw(); if (tab === 'inv' || tab === 'vlt') render();
 }
 function rapDraw() {
   const d = $('rapdlg'); if (!d) return; const T = rapt(), RT = rlt(), P = lang === 'pt';
@@ -5635,10 +5674,13 @@ function rapDraw() {
     let body = `<p class="rap-pad wait">${esc(T.loading)}</p>`;
     if (cols) {
       const L = r?.L || [], freq = (k, o) => { const req = L.filter(e => e[0].some(p => cols[k].some(c => c.hs.includes(p)))); return req.length ? Math.round(100 * req.filter(e => e[0].some(p => o.hs.includes(p))).length / req.length) : 0; };
-      const cur = cols.map(c => c.find(o => o.hs.some(h => have.has(h)))), simN = [];
+      const cur = cols.map(c => c.find(o => o.hs.some(h => have.has(h)))), simN = [], av = rapAvail(x.iid), onCopy = (k, o) => !!av && (av[cols[k].si] || []).some(h => o.hs.includes(h));
+      RAP.autoPlan = []; if (av) cols.forEach((c, k) => { let b = null, bf = -1; for (const o of c) { if (!onCopy(k, o)) continue; const f = freq(k, o); if (f > bf) { bf = f; b = o; } } if (b && b !== cur[k] && bf > (cur[k] ? freq(k, cur[k]) : -1)) RAP.autoPlan.push([cols[k].si, (av[cols[k].si] || []).find(h => b.hs.includes(h))]); });
+      RAP.ctx = { x, cols, cur };
       RAP.bestSim = {}; cols.forEach((c, k) => { let b = null, bf = 0; for (const o of c) { const f = freq(k, o); if (f > bf) { bf = f; b = o; } } if (b && b !== cur[k]) RAP.bestSim[k] = b.h; });
       const colH = cols.map((c, k) => `<div class="rap-col"><small>${cols.length >= 4 && k === 0 ? (P ? 'CANO' : 'BARREL') : cols.length >= 4 && k === 1 ? (P ? 'CARREGADOR' : 'MAGAZINE') : (P ? 'COLUNA ' : 'COLUMN ') + (k + 1)}</small>${c.slice().sort((a, b) => (b === cur[k]) - (a === cur[k]) || freq(k, b) - freq(k, a)).slice(0, 7).map(o => { const f = freq(k, o), mine = o === cur[k], sim = RAP.sim[k] === o.h, cn = cl ? o.hs.reduce((s, h) => s + (cl.p[h] || 0), 0) : 0;
-        return `<button type="button" class="rap-pk${mine ? ' mine' : ''}${sim ? ' sim' : ''}" data-rapp="${k}:${o.h}" aria-pressed="${sim}" title="${esc(o.n)}"><span class="rap-ic">${o.ic ? `<img src="${BNET}${o.ic}" alt="" loading="lazy">` : ''}${f ? '<i>✓</i>' : ''}</span><span class="rap-pn">${esc(o.n)}${cn ? `<em>${esc(P ? `clã ${cn}/${cl.n}` : `clan ${cn}/${cl.n}`)}</em>` : ''}</span><small class="${f ? 'on' : ''}">${f}%</small></button>`; }).join('')}</div>`).join('');
+        const oc = !mine && onCopy(k, o);
+        return `<button type="button" class="rap-pk${mine ? ' mine' : ''}${sim ? ' sim' : ''}${oc ? ' oc' : ''}" data-rapp="${k}:${o.h}" aria-pressed="${sim}" title="${esc(o.n + (oc ? ' · ' + T.onW : ''))}"><span class="rap-ic">${o.ic ? `<img src="${BNET}${o.ic}" alt="" loading="lazy">` : ''}${f ? '<i>✓</i>' : ''}</span><span class="rap-pn">${esc(o.n)}${cn ? `<em>${esc(P ? `clã ${cn}/${cl.n}` : `clan ${cn}/${cl.n}`)}</em>` : ''}</span><small class="${f ? 'on' : ''}">${f}%</small></button>`; }).join('')}</div>`).join('');
       Object.entries(RAP.sim).forEach(([k, h]) => { const o = cols[k]?.find(y => y.h === h); if (o && cur[k]) simN.push([o.n, cur[k].n]); });
       // atributos
       const base = RL.sts?.[x.iid]?.stats || {}, delta = {}; const ph = []; Object.entries(RAP.sim).forEach(([k, h]) => { const o = cols[k]?.find(y => y.h === h); if (!o) return; ph.push(o.h); if (cur[k]) ph.push(cur[k].h); });
@@ -5650,10 +5692,12 @@ function rapDraw() {
       const best = r ? r.e[0].map(p => cols.flat().find(o => o.hs.includes(p))?.n).filter(Boolean) : [];
       body = `<div class="rap-pad rap-b"><div class="rap-ph"><span class="k">${esc(T.perksT)}</span><span class="lbd-n">${esc(T.tapSim)}</span></div>
         <div class="rap-cols" style="--rc:${cols.length}">${colH}</div>
-        <div class="rap-lg"><span><i class="m"></i> ${esc(T.mine)}</span><span><i class="r"></i> ${esc(T.recL)}</span>${cl ? `<span><em>clã</em> ${esc(T.clanL(cl.n))}</span>` : ''}${simN.length ? `<span class="rap-simn">${esc(simN.map(([a, b]) => T.sim(a, b)).join(' · '))}</span>` : ''}</div>
+        <div class="rap-lg"><span><i class="m"></i> ${esc(T.mine)}</span><span><i class="o"></i> ${esc(T.onWL)}</span><span><i class="r"></i> ${esc(T.recL)}</span>${cl ? `<span><em>clã</em> ${esc(T.clanL(cl.n))}</span>` : ''}${simN.length ? `<span class="rap-simn">${esc(simN.map(([a, b]) => T.sim(a, b)).join(' · '))}</span>` : ''}</div>
         <div class="rap-low"><div class="rap-sts"><span class="k">${esc(T.statsT)}</span>${stH || `<small class="lbd-n">—</small>`}<small class="lbd-n">${esc(T.approx)}</small></div>
         <div class="rap-act">${r?.e[2] ? `<div class="rap-note"><b>${esc(T.note)}</b> ${esc(r.e[2])}</div>` : ''}<div class="rap-clan">${cl ? esc(T.clanH(cl.n, '')) : RAP.cl ? esc(T.clanNo) : ''}</div>
-        <button type="button" class="rap-pri" data-rapbest ${Object.keys(RAP.bestSim).length ? '' : 'disabled'}>${esc(T.best)}</button>${Object.keys(RAP.sim).length ? `<button type="button" class="rap-sec" data-rapreset>${esc(T.reset)}</button>` : ''}
+        <button type="button" class="rap-pri" data-rapauto ${RAP.busy || !av ? 'disabled' : ''}>${esc(T.auto)}</button>
+        <button type="button" class="rap-sec" data-rapbest ${Object.keys(RAP.bestSim).length ? '' : 'disabled'}>${esc(T.best)}</button>${Object.keys(RAP.sim).length ? `<button type="button" class="rap-sec rap-go" data-rapapply ${RAP.busy ? 'disabled' : ''}>${esc(T.applySim)}</button><button type="button" class="rap-sec" data-rapsave>${esc(T.save)}</button><button type="button" class="rap-sec" data-rapreset>${esc(T.reset)}</button>` : ''}
+        ${RAP.msg ? `<p class="rap-msg${RAP.msg.bad ? ' bad' : RAP.msg.ok ? ' ok' : ''}">${esc(RAP.msg.t)}</p>` : ''}
         <button type="button" class="rap-sec" data-rapsim ${simil.length ? '' : 'disabled'}>${esc(T.similar(simil.length))}</button>${cps.length > 1 ? `<button type="button" class="rap-sec" data-rapcopies="${x.h}">${esc(T.copies(cps.length))}</button>` : ''}</div></div></div>`;
       RAP.closest = best;
     } else simil = [];
