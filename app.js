@@ -5483,15 +5483,15 @@ function evoHTML() {
 }
 document.addEventListener('click', e => { const b = e.target.closest('[data-evper]'); if (!b) return; EV.per = b.dataset.evper; LS.set('dc-evper', EV.per); render(); });
 /* ---------- God rolls da comunidade: a lista pública que o DIM usa (voltron), baixada do GitHub e guardada no aparelho ---------- */
-const RLT = { pt: { t: 'God rolls da comunidade', src: 'Lista pública que o DIM usa (voltron)', upd: d => `atualizada em ${d}`, load: 'Baixando a lista da comunidade…', err: 'Não deu para baixar a lista agora.', mode: { pve: 'PvE', pvp: 'PvP', both: 'Os dois' }, g: 'Com god roll', p: 'Parcial', n: 'Nada de bom', fG: 'God roll', fN: 'Nada de bom', det: 'Roll da comunidade', detG: m => `God roll para ${m}`, detP: 'Roll parcial', detN: 'Nenhum roll recomendado bate', detNo: 'A lista não tem recomendação para esta arma.', legend: 'Selo verde nas vantagens recomendadas pela lista.', note: 'Nota da lista', leg: [['g', '✓ God roll', 'tem todas as vantagens de uma das recomendações'], ['p', '½ Parcial', 'tem pelo menos metade delas'], ['n', '✕ Nada de bom', 'tem menos da metade de qualquer recomendação']], lcT: 'Sem nada de bom (lista da comunidade)', lcN: 'Sugestões: confirme uma a uma. Favoritas e “manter” nunca entram.' },
-  en: { t: 'Community god rolls', src: 'Public list used by DIM (voltron)', upd: d => `updated ${d}`, load: 'Downloading the community list…', err: "Couldn't download the list right now.", mode: { pve: 'PvE', pvp: 'PvP', both: 'Both' }, g: 'God roll', p: 'Partial', n: 'Nothing good', fG: 'God roll', fN: 'Nothing good', det: 'Community roll', detG: m => `God roll for ${m}`, detP: 'Partial roll', detN: 'No recommended roll matches', detNo: 'The list has no recommendation for this weapon.', legend: 'Green mark on perks recommended by the list.', note: 'List note', leg: [['g', '✓ God roll', 'has every perk of one recommendation'], ['p', '½ Partial', 'has at least half of them'], ['n', '✕ Nothing good', 'has less than half of any recommendation']], lcT: 'Nothing good (community list)', lcN: 'Suggestions: confirm one by one. Favorites and “keep” never go in.' } };
+const RLT = { pt: { t: 'God rolls da comunidade', src: 'Lista pública que o DIM usa (voltron)', upd: d => `atualizada em ${d}`, load: 'Baixando a lista da comunidade…', err: 'Não deu para baixar a lista agora.', mode: { pve: 'PvE', pvp: 'PvP', both: 'Os dois' }, ap: 'Avaliar rolls', apNew: 'Novo', g: 'Com god roll', p: 'Parcial', n: 'Nada de bom', fG: 'God roll', fN: 'Nada de bom', det: 'Roll da comunidade', detG: m => `God roll para ${m}`, detP: 'Roll parcial', detN: 'Nenhum roll recomendado bate', detNo: 'A lista não tem recomendação para esta arma.', legend: 'Selo verde nas vantagens recomendadas pela lista.', note: 'Nota da lista', leg: [['g', '✓ God roll', 'tem todas as vantagens de uma das recomendações'], ['p', '½ Parcial', 'tem pelo menos metade delas'], ['n', '✕ Nada de bom', 'tem menos da metade de qualquer recomendação']], lcT: 'Sem nada de bom (lista da comunidade)', lcN: 'Sugestões: confirme uma a uma. Favoritas e “manter” nunca entram.' },
+  en: { t: 'Community god rolls', src: 'Public list used by DIM (voltron)', upd: d => `updated ${d}`, load: 'Downloading the community list…', err: "Couldn't download the list right now.", mode: { pve: 'PvE', pvp: 'PvP', both: 'Both' }, ap: 'Appraise rolls', apNew: 'New', g: 'God roll', p: 'Partial', n: 'Nothing good', fG: 'God roll', fN: 'Nothing good', det: 'Community roll', detG: m => `God roll for ${m}`, detP: 'Partial roll', detN: 'No recommended roll matches', detNo: 'The list has no recommendation for this weapon.', legend: 'Green mark on perks recommended by the list.', note: 'List note', leg: [['g', '✓ God roll', 'has every perk of one recommendation'], ['p', '½ Partial', 'has at least half of them'], ['n', '✕ Nothing good', 'has less than half of any recommendation']], lcT: 'Nothing good (community list)', lcN: 'Suggestions: confirm one by one. Favorites and “keep” never go in.' } };
 const rlt = () => RLT[lang === 'pt' ? 'pt' : 'en'];
 const RL = { st: null, m: null, at: 0, mode: LS.get('dc-rlmode', 'both') };
 const RL_URL = 'https://raw.githubusercontent.com/48klocs/dim-wish-list-sources/master/voltron.txt';
 async function rlLoad() {
   if (RL.st) return; RL.st = 'load';
   try {
-    let c = await idbGet('rl1');
+    let c = await idbGet('rl2');
     if (!c || Date.now() - c.at > 5 * 864e5) {
       const txt = await fetch(RL_URL).then(r => { if (!r.ok) throw 0; return r.text(); }); const m = {}; let note = '';
       for (const line of txt.split('\n')) {
@@ -5500,13 +5500,13 @@ async function rlLoad() {
         const q = line.slice(12), hi = q.indexOf('#notes:'), body = hi >= 0 ? q.slice(0, hi) : q, nt = hi >= 0 ? q.slice(hi + 7) : note;
         const pr = new URLSearchParams(body), it = pr.get('item'), perks = (pr.get('perks') || '').split(',').map(Number).filter(Boolean); if (!it || it.startsWith('-') || !perks.length) continue;
         const low = nt.toLowerCase(), tg = /pvp|crucible|trials/.test(low) && !/pve/.test(low) ? 'v' : /pve/.test(low) && !/pvp/.test(low) ? 'e' : '';
-        const arr = m[it] = m[it] || []; if (arr.length < 40) arr.push([perks, tg, nt.slice(0, 220)]);
+        const arr = m[it] = m[it] || []; if (arr.length < 150) arr.push([perks, tg, arr.some(x => x[2] === nt.slice(0, 220)) ? '' : nt.slice(0, 220)]);
       }
-      c = { at: Date.now(), m }; idbSet('rl1', c);
+      c = { at: Date.now(), m }; idbSet('rl2', c);
     }
     RL.m = c.m; RL.at = c.at;
     // vantagens encaixadas de todas as armas (o perfil comum só traz as dos itens equipados)
-    if (member) { const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=102,201,305`).catch(() => null); RL.so = r?.itemComponents?.sockets?.data || {}; }
+    if (member) { const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=102,201,304,305`).catch(() => null); RL.so = r?.itemComponents?.sockets?.data || {}; RL.sts = r?.itemComponents?.stats?.data || {}; }
     RL.st = 'ok';
   } catch (e) { console.warn('rolls', e); RL.st = 'err'; }
   if (tab === 'inv' || tab === 'vlt' || $('ivdlg')?.open || $('lcdlg')?.open) { render(); if ($('ivdlg')?.open) ivDraw(); if ($('lcdlg')?.open) lcDraw(); }
@@ -5555,9 +5555,124 @@ document.addEventListener('change', e => { if (e.target.id === 'keeplock') LS.se
 function rlBar(list) {
   const T = rlt(); if (RL.st !== 'ok') { if (!RL.st) setTimeout(rlLoad); return RL.st === 'err' ? `<div class="rl-bar"><small>${esc(T.err)}</small></div>` : `<div class="rl-bar"><small class="wait">${esc(T.load)}</small></div>`; }
   const w = list.filter(x => x.slot < 3), gs = w.map(x => rlGrade(x.iid, x.h)), c = k => gs.filter(g => g === k).length;
-  return `<div class="rl-bar"><span><b>${esc(T.t)}</b><small>${esc(T.src)} · ${esc(T.upd(new Date(RL.at).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR')))}</small></span><div class="vl-seg rl-mode">${Object.entries(T.mode).map(([k, t]) => `<button type="button" data-rlmode="${k}" aria-pressed="${RL.mode === k}">${esc(t)}</button>`).join('')}</div><div class="rl-k" role="group" aria-label="${esc(lang === 'pt' ? 'Filtrar por roll' : 'Filter by roll')}">${[['g', T.g, 0], ['p', T.p, 1], ['n', T.n, 2]].map(([k, t, i]) => `<button type="button" class="${k}" data-ivf="r${k}" data-rltog aria-pressed="${INV.f === 'r' + k}" title="${esc(T.leg[i][1] + ': ' + T.leg[i][2])}"><small>${esc(t)}</small><b>${c(k)}</b></button>`).join('')}</div>${(() => { const n = lkbList().length; return n && !LKB.st ? `<button type="button" class="lbd-btn rl-lk" data-lkb>${esc(lkt().bulk(n))}</button>` : ''; })()}</div>${lkbHTML()}`;
+  return `<div class="rl-bar"><span><b>${esc(T.t)}</b><small>${esc(T.src)} · ${esc(T.upd(new Date(RL.at).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR')))}</small></span><div class="vl-seg rl-mode">${Object.entries(T.mode).map(([k, t]) => `<button type="button" data-rlmode="${k}" aria-pressed="${RL.mode === k}">${esc(t)}</button>`).join('')}</div><div class="rl-k" role="group" aria-label="${esc(lang === 'pt' ? 'Filtrar por roll' : 'Filter by roll')}">${[['g', T.g, 0], ['p', T.p, 1], ['n', T.n, 2]].map(([k, t, i]) => `<button type="button" class="${k}" data-ivf="r${k}" data-rltog aria-pressed="${INV.f === 'r' + k}" title="${esc(T.leg[i][1] + ': ' + T.leg[i][2])}"><small>${esc(t)}</small><b>${c(k)}</b></button>`).join('')}<button type="button" class="rl-ap" data-rap><small>${esc(T.apNew)}</small><b>⚖ ${esc(T.ap)}</b></button></div>${(() => { const n = lkbList().length; return n && !LKB.st ? `<button type="button" class="lbd-btn rl-lk" data-lkb>${esc(lkt().bulk(n))}</button>` : ''; })()}</div>${lkbHTML()}`;
 }
 document.addEventListener('click', e => { const b = e.target.closest('[data-rlmode]'); if (!b) return; RL.mode = b.dataset.rlmode; LS.set('dc-rlmode', RL.mode); render(); if ($('ivdlg')?.open) ivDraw(); });
+
+/* ---------- Avaliar rolls (como o Roll Appraiser do light.gg): nota S/A/B/C pelo roll recomendado mais próximo da lista voltron,
+   % de cada perk nos rolls recomendados, simulação de atributos e o que o clã usa equipado (servidor lê 1x por dia) ---------- */
+const RAPT = { pt: { t: 'Avaliar rolls', n: n => `${n} armas · cópias juntas`, all: 'Todas', dup: 'Só com cópias', sa: 'Nota S·A', c: 'Nota C', type: 'Tipo', anyT: 'Todos os tipos', q: 'Buscar arma ou perk', rec: p => `${p}% recomendado`, none: 'Sem roll recomendado na lista', legend: 'S = todas as colunas do roll recomendado mais próximo · A = falta 1 · B = faltam 2 · C = nada recomendado. A barra mostra quanto do roll bate com os recomendados.', copy: (i, n) => `${i} de ${n} cópias`, closest: 'Mais próximo de:', cols: (a, b) => `${a} de ${b} colunas`, perksT: 'Perks · % = quanto aparece nos rolls recomendados desta arma', tapSim: 'Toque num perk para simular', mine: 'o que está na sua arma', recL: 'recomendado pela lista', clanL: n => `popular no clã (${n} usam)`, sim: (a, b) => `Simulando: ${a} no lugar de ${b}`, statsT: 'Atributos · sua arma × simulação', note: 'Nota da lista:', best: '★ Escolher os perks mais recomendados', reset: 'Voltar aos perks da arma', similar: n => `Achar parecidos no inventário (${n})`, copies: n => `Comparar as ${n} cópias`, close: 'Fechar', loading: 'Carregando perks e atributos…', pick: 'Escolha uma arma na lista.', clanNo: 'O clã ainda não tem dados (o servidor lê as armas equipadas 1x por dia).', clanH: (n, k) => `${n} membro${n === 1 ? '' : 's'} do clã ${n === 1 ? 'usou' : 'usaram'} esta arma nos últimos 14 dias${k ? ` · ${k}` : ''}`, simil: 'Parecidos (mesmos perks principais)', back: '← todas as armas', approx: 'aproximado: perks com bônus condicional não entram' },
+  en: { t: 'Appraise rolls', n: n => `${n} weapons · copies grouped`, all: 'All', dup: 'Only duplicates', sa: 'Grade S·A', c: 'Grade C', type: 'Type', anyT: 'All types', q: 'Search weapon or perk', rec: p => `${p}% recommended`, none: 'No recommended roll in the list', legend: 'S = every column of the closest recommended roll · A = 1 missing · B = 2 missing · C = nothing recommended. The bar shows how much of the roll matches.', copy: (i, n) => `${i} of ${n} copies`, closest: 'Closest to:', cols: (a, b) => `${a} of ${b} columns`, perksT: 'Perks · % = how often it appears in this weapon\'s recommended rolls', tapSim: 'Tap a perk to simulate', mine: 'on your weapon', recL: 'recommended by the list', clanL: n => `popular in clan (${n} use it)`, sim: (a, b) => `Simulating: ${a} instead of ${b}`, statsT: 'Stats · your weapon × simulation', note: 'List note:', best: '★ Pick the most recommended perks', reset: 'Back to the weapon\'s perks', similar: n => `Find similar in inventory (${n})`, copies: n => `Compare the ${n} copies`, close: 'Close', loading: 'Loading perks and stats…', pick: 'Pick a weapon from the list.', clanNo: 'No clan data yet (the server reads equipped weapons once a day).', clanH: (n, k) => `${n} clan member${n === 1 ? '' : 's'} used this weapon in the last 14 days${k ? ` · ${k}` : ''}`, simil: 'Similar (same main perks)', back: '← all weapons', approx: 'approximate: conditional perk bonuses are not counted' } };
+const rapt = () => RAPT[lang === 'pt' ? 'pt' : 'en'];
+const RAP = { sel: '', f: 'all', ty: '', q: '', sim: {}, sh: '', cl: null };
+const RG_C = { S: '#7fe08f', A: '#a9e34b', B: '#f2d36b', C: '#ff8a7a' };
+const WSTAT = [4043523819, 1240592695, 155624089, 943549884, 4188031367, 1345609583, 2714457168, 3555269338, 3614673599, 2523465841, 2961396640, 2837207746, 3022301683, 209426660];
+// nota de uma cópia: o roll recomendado (PvE/PvP conforme o filtro) com mais perks iguais; S/A/B/C pelas colunas que faltam
+function rapGrade(x) {
+  if (RL.st !== 'ok') return null; const L0 = RL.m[x.h]; if (!L0) return null;
+  const L = L0.filter(e => RL.mode === 'both' || !e[1] || e[1] === (RL.mode === 'pve' ? 'e' : 'v')); if (!L.length) return null;
+  const have = new Set(ivPerks(x)); if (!have.size) return null;
+  let best = null; for (const e of L) { const m = e[0].filter(p => have.has(p)).length, sc = m / e[0].length; if (!best || sc > best.sc || (sc === best.sc && e[0].length > best.e[0].length)) best = { e, m, sc }; }
+  const miss = best.e[0].length - best.m, g = !best.m ? 'C' : miss === 0 ? 'S' : miss === 1 ? 'A' : miss === 2 ? 'B' : 'C';
+  return { g, pct: Math.round(best.sc * 100), e: best.e, m: best.m, n: best.e[0].length, L };
+}
+// colunas de perks da arma com todas as versões (comum e aprimorada) de cada perk
+const RCOLS = {}, RCP = new Map();
+function rapCols(h) {
+  if (RCOLS[h]) return RCOLS[h]; if (RCP.has(h)) return null;
+  RCP.set(h, (async () => {
+    const d = await bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${h}/`, false), so = d.sockets || {};
+    const idx = (so.socketCategories || []).find(c => c.socketCategoryHash === 4241085061)?.socketIndexes || [];
+    const raw = await Promise.all(idx.map(async k => { const e = so.socketEntries?.[k] || {}, ps = e.randomizedPlugSetHash || e.reusablePlugSetHash;
+      if (ps) { try { const p = await bungie(`/Destiny2/Manifest/DestinyPlugSetDefinition/${ps}/`, false); return [...new Set((p.reusablePlugItems || []).map(x => x.plugItemHash))]; } catch { return []; } }
+      return [...new Set((e.reusablePlugItems || []).map(x => x.plugItemHash).concat(e.singleInitialItemHash ? [e.singleInitialItemHash] : []))]; }));
+    const en = await entities('DestinyInventoryItemDefinition', raw.flat(), lang === 'pt' ? 'pt' : 'en', true);
+    RCOLS[h] = raw.map(c => { const by = new Map(); for (const ph of c) { const e = en[ph]; if (!e?.n || WSKIP_PC.test(e.pc || '')) continue; const k = e.ic || e.n; if (!by.has(k)) by.set(k, { h: ph, n: e.n, ic: e.ic, hs: [ph] }); else by.get(k).hs.push(ph); } return [...by.values()]; }).filter(c => c.length);
+    if ($('rapdlg')?.open) rapDraw();
+  })().catch(() => { RCOLS[h] = []; if ($('rapdlg')?.open) rapDraw(); }));
+  return null;
+}
+// atributos que cada perk dá (definição completa, guardada no aparelho)
+const PINV = LS.get('dc-pinv', {}), PINVQ = new Set();
+function pinvLoad(hs) {
+  const need = hs.filter(h => !PINV[h] && !PINVQ.has(h)); if (!need.length) return; need.forEach(h => PINVQ.add(h));
+  let i = 0; Promise.all(Array.from({ length: 5 }, async () => { while (i < need.length) { const h = need[i++]; try { const d = await bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${h}/`, false); PINV[h] = Object.fromEntries((d.investmentStats || []).filter(s => !s.isConditionallyActive && s.value).map(s => [s.statTypeHash, s.value])); } catch { PINV[h] = {}; } } }))
+    .then(() => { try { LS.set('dc-pinv', PINV); } catch {} if ($('rapdlg')?.open) rapDraw(); });
+}
+let STATN = null;
+function rapClan() {
+  if (RAP.cl !== null || RAP.clBusy || !member) return; RAP.clBusy = true;
+  (async () => { let g = LS.get('dc-cgid', null); if (!g || Date.now() - g.at > 7 * 864e5) { const r = await bungie(`/GroupV2/User/${member.type}/${member.id}/0/1/`).catch(() => null); g = { id: r?.results?.[0]?.group?.groupId || '', at: Date.now() }; LS.set('dc-cgid', g); }
+    RAP.cl = g.id && APIW ? (await fetch(APIW + '/clan/rolls?g=' + g.id).then(r => r.json()).catch(() => ({}))).w || {} : {}; })().finally(() => { RAP.clBusy = false; if ($('rapdlg')?.open) rapDraw(); });
+}
+const rapList = () => { const all = invAll().filter(x => x.slot < 3), cnt = {}; all.forEach(x => cnt[x.h] = (cnt[x.h] || 0) + 1); return all.map(x => ({ x, r: rapGrade(x), k: cnt[x.h] })); };
+function rapOpen(iid) {
+  let d = $('rapdlg'); if (!d) { d = document.createElement('dialog'); d.id = 'rapdlg'; d.className = 'rap'; document.body.append(d);
+    d.addEventListener('click', rapClick); d.addEventListener('input', e => { if (e.target.id === 'rapq') { RAP.q = e.target.value; const p = e.target.selectionStart; rapDraw(); const q = $('rapq'); q.focus(); q.setSelectionRange(p, p); } });
+    d.addEventListener('change', e => { if (e.target.id === 'rapty') { RAP.ty = e.target.value; rapDraw(); } }); }
+  if (RL.st !== 'ok') rlLoad(); rapClan(); pkLoad();
+  if (iid) RAP.sel = iid; RAP.sim = {}; RAP.sh = ''; if (!d.open) d.showModal(); rapDraw();
+}
+function rapClick(e) {
+  const b = e.target.closest('button,[data-rapsel]'); if (!b) return; const d = b.dataset;
+  if (d.rapx != null) { $('rapdlg').close(); return; }
+  if (d.rapf) { RAP.f = d.rapf; RAP.sh = ''; } else if (d.rapsel) { RAP.sel = d.rapsel; RAP.sim = {}; } else if (d.rapmode) { RL.mode = d.rapmode; LS.set('dc-rlmode', RL.mode); RAP.sim = {}; }
+  else if (d.rapp) { const [k, h] = d.rapp.split(':'); if (RAP.sim[k] === +h) delete RAP.sim[k]; else RAP.sim[k] = +h; }
+  else if (d.rapbest != null) RAP.sim = { ...RAP.bestSim }; else if (d.rapreset != null) RAP.sim = {};
+  else if (d.rapsim != null) RAP.f = 'sim'; else if (d.rapcopies) { RAP.sh = d.rapcopies; RAP.f = 'all'; } else if (d.rapback != null) { RAP.sh = ''; if (RAP.f === 'sim') RAP.f = 'all'; }
+  else return; rapDraw(); if (d.rapsel && matchMedia('(max-width:900px)').matches) document.querySelector('.rap-ins')?.scrollIntoView({ behavior: 'smooth' });
+}
+function rapDraw() {
+  const d = $('rapdlg'); if (!d) return; const T = rapt(), RT = rlt(), P = lang === 'pt';
+  if (RL.st !== 'ok') { d.innerHTML = `<div class="rap-top"><b>⚖ ${esc(T.t)}</b><button type="button" class="lbd-btn" data-rapx>✕ ${esc(T.close)}</button></div><p class="wait rap-pad">${esc(RL.st === 'err' ? RT.err : RT.load)}</p>`; return; }
+  const all = rapList(); let sel = all.find(y => y.x.iid === RAP.sel) || all.filter(y => y.r).sort((a, b) => 'SABC'.indexOf(a.r.g) - 'SABC'.indexOf(b.r.g))[0]; if (sel) RAP.sel = sel.x.iid;
+  const nm = x => ivName(x) || '…', tl = x => INVD[x.h]?.tl || '';
+  // inspetor
+  let ins = `<p class="rap-pad lbd-n">${esc(T.pick)}</p>`, simil = [];
+  if (sel) {
+    const x = sel.x, r = sel.r, cols = rapCols(x.h), have = new Set(ivPerks(x)), cps = all.filter(y => y.x.h === x.h), ci = cps.findIndex(y => y.x.iid === x.iid) + 1;
+    const cl = RAP.cl?.[x.h], g = r?.g || '—', gc = RG_C[r?.g] || 'var(--muted)';
+    let body = `<p class="rap-pad wait">${esc(T.loading)}</p>`;
+    if (cols) {
+      const L = r?.L || [], freq = (k, o) => { const req = L.filter(e => e[0].some(p => cols[k].some(c => c.hs.includes(p)))); return req.length ? Math.round(100 * req.filter(e => e[0].some(p => o.hs.includes(p))).length / req.length) : 0; };
+      const cur = cols.map(c => c.find(o => o.hs.some(h => have.has(h)))), simN = [];
+      RAP.bestSim = {}; cols.forEach((c, k) => { let b = null, bf = 0; for (const o of c) { const f = freq(k, o); if (f > bf) { bf = f; b = o; } } if (b && b !== cur[k]) RAP.bestSim[k] = b.h; });
+      const colH = cols.map((c, k) => `<div class="rap-col"><small>${cols.length >= 4 && k === 0 ? (P ? 'CANO' : 'BARREL') : cols.length >= 4 && k === 1 ? (P ? 'CARREGADOR' : 'MAGAZINE') : (P ? 'COLUNA ' : 'COLUMN ') + (k + 1)}</small>${c.slice().sort((a, b) => (b === cur[k]) - (a === cur[k]) || freq(k, b) - freq(k, a)).slice(0, 7).map(o => { const f = freq(k, o), mine = o === cur[k], sim = RAP.sim[k] === o.h, cn = cl ? o.hs.reduce((s, h) => s + (cl.p[h] || 0), 0) : 0;
+        return `<button type="button" class="rap-pk${mine ? ' mine' : ''}${sim ? ' sim' : ''}" data-rapp="${k}:${o.h}" aria-pressed="${sim}" title="${esc(o.n)}"><span class="rap-ic">${o.ic ? `<img src="${BNET}${o.ic}" alt="" loading="lazy">` : ''}${f ? '<i>✓</i>' : ''}</span><span class="rap-pn">${esc(o.n)}${cn ? `<em>${esc(P ? `clã ${cn}/${cl.n}` : `clan ${cn}/${cl.n}`)}</em>` : ''}</span><small class="${f ? 'on' : ''}">${f}%</small></button>`; }).join('')}</div>`).join('');
+      Object.entries(RAP.sim).forEach(([k, h]) => { const o = cols[k]?.find(y => y.h === h); if (o && cur[k]) simN.push([o.n, cur[k].n]); });
+      // atributos
+      const base = RL.sts?.[x.iid]?.stats || {}, delta = {}; const ph = []; Object.entries(RAP.sim).forEach(([k, h]) => { const o = cols[k]?.find(y => y.h === h); if (!o) return; ph.push(o.h); if (cur[k]) ph.push(cur[k].h); });
+      pinvLoad(ph); Object.entries(RAP.sim).forEach(([k, h]) => { const a = PINV[h] || {}, b = cur[k] ? PINV[cur[k].h] || {} : {}; for (const s of new Set([...Object.keys(a), ...Object.keys(b)])) delta[s] = (delta[s] || 0) + (a[s] || 0) - (b[s] || 0); });
+      const shs = WSTAT.filter(h => base[h]); if (!STATN && shs.length) { STATN = {}; entities('DestinyStatDefinition', WSTAT, lang).then(m => { STATN = m; if ($('rapdlg')?.open) rapDraw(); }).catch(() => {}); }
+      const stH = shs.map(h => { const v = base[h].value, dl = delta[h] || 0, nv = Math.max(0, Math.min(100, v + dl)); return `<div class="rap-st"><span>${esc(STATN?.[h]?.n || '')}</span><i><u style="width:${Math.min(v, nv)}%"></u><u class="${dl > 0 ? 'up' : 'dn'}" style="width:${Math.abs(nv - v)}%"></u></i><b>${nv}</b><small class="${dl > 0 ? 'up' : dl < 0 ? 'dn' : ''}">${dl ? (dl > 0 ? '+' : '') + dl : '—'}</small></div>`; }).join('');
+      // parecidos: outras armas com os mesmos perks das colunas 3 e 4 (os principais)
+      const main = cur.slice(2, 4).filter(Boolean); simil = main.length ? all.filter(y => y.x.iid !== x.iid && main.every(o => ivPerks(y.x).some(h => o.hs.includes(h)))) : [];
+      const best = r ? r.e[0].map(p => cols.flat().find(o => o.hs.includes(p))?.n).filter(Boolean) : [];
+      body = `<div class="rap-pad rap-b"><div class="rap-ph"><span class="k">${esc(T.perksT)}</span><span class="lbd-n">${esc(T.tapSim)}</span></div>
+        <div class="rap-cols" style="--rc:${cols.length}">${colH}</div>
+        <div class="rap-lg"><span><i class="m"></i> ${esc(T.mine)}</span><span><i class="r"></i> ${esc(T.recL)}</span>${cl ? `<span><em>clã</em> ${esc(T.clanL(cl.n))}</span>` : ''}${simN.length ? `<span class="rap-simn">${esc(simN.map(([a, b]) => T.sim(a, b)).join(' · '))}</span>` : ''}</div>
+        <div class="rap-low"><div class="rap-sts"><span class="k">${esc(T.statsT)}</span>${stH || `<small class="lbd-n">—</small>`}<small class="lbd-n">${esc(T.approx)}</small></div>
+        <div class="rap-act">${r?.e[2] ? `<div class="rap-note"><b>${esc(T.note)}</b> ${esc(r.e[2])}</div>` : ''}<div class="rap-clan">${cl ? esc(T.clanH(cl.n, '')) : RAP.cl ? esc(T.clanNo) : ''}</div>
+        <button type="button" class="rap-pri" data-rapbest ${Object.keys(RAP.bestSim).length ? '' : 'disabled'}>${esc(T.best)}</button>${Object.keys(RAP.sim).length ? `<button type="button" class="rap-sec" data-rapreset>${esc(T.reset)}</button>` : ''}
+        <button type="button" class="rap-sec" data-rapsim ${simil.length ? '' : 'disabled'}>${esc(T.similar(simil.length))}</button>${cps.length > 1 ? `<button type="button" class="rap-sec" data-rapcopies="${x.h}">${esc(T.copies(cps.length))}</button>` : ''}</div></div></div>`;
+      RAP.closest = best;
+    } else simil = [];
+    ins = `<header class="rap-ih">${INVD[x.h]?.ic ? `<img src="${BNET}${INVD[x.h].ic}" alt="">` : '<span></span>'}<span><small>${esc([tl(x), cps.length > 1 ? T.copy(ci, cps.length) : '', x.pw ? '✦ ' + x.pw : ''].filter(Boolean).join(' · ').toUpperCase())}</small><b>${esc(nm(x))}</b>${r && RAP.closest?.length ? `<span>${esc(T.closest)} <b>${esc(RAP.closest.join(' + '))}</b>${r.e[1] ? ` (${r.e[1] === 'e' ? 'PvE' : 'PvP'})` : ''}</span>` : `<span>${esc(r ? '' : T.none)}</span>`}</span><span class="rap-g" style="color:${gc}"><b>${g}</b><small>${r ? esc(T.cols(r.m, r.n)) : ''}</small></span></header>${body}`;
+  }
+  // lista
+  const q = palNorm((RAP.q || '').trim()), tys = [...new Set(all.map(y => tl(y.x)).filter(Boolean))].sort();
+  let L = RAP.f === 'sim' ? simil.map(x => all.find(y => y.x.iid === x.x.iid)) : all;
+  if (RAP.sh) L = L.filter(y => String(y.x.h) === RAP.sh);
+  L = L.filter(y => (RAP.f !== 'dup' || y.k > 1) && (RAP.f !== 'sa' || /[SA]/.test(y.r?.g || '')) && (RAP.f !== 'c' || y.r?.g === 'C') && (!RAP.ty || tl(y.x) === RAP.ty) && (!q || palNorm(nm(y.x) + ' ' + pkNames(y.x)).includes(q)));
+  L.sort((a, b) => nm(a.x).localeCompare(nm(b.x)) || 'SABC'.indexOf(a.r?.g || 'Z') - 'SABC'.indexOf(b.r?.g || 'Z') || b.x.pw - a.x.pw);
+  const row = y => { const r = y.r, c = RG_C[r?.g] || 'var(--line)'; return `<button type="button" class="rap-r${y.x.iid === RAP.sel ? ' on' : ''}" data-rapsel="${y.x.iid}">${INVD[y.x.h]?.ic ? `<img src="${BNET}${INVD[y.x.h].ic}" alt="" loading="lazy">` : '<span></span>'}<span class="rap-rn"><b>${esc(nm(y.x))}</b><small>${esc([tl(y.x), y.x.pw ? '✦ ' + y.x.pw : '', y.k > 1 ? `×${y.k}` : ''].filter(Boolean).join(' · '))}</small></span><span class="rap-rb"><small>${r ? esc(T.rec(r.pct)) : '—'}</small><i><u style="width:${r ? r.pct : 0}%;background:${c}"></u></i></span><b class="rap-rg" style="color:${c};border-color:${c}">${r?.g || '–'}</b></button>`; };
+  d.innerHTML = `<div class="rap-top"><span class="rap-tt"><b>⚖ ${esc(T.t)}</b><small>${esc(RT.src)} · ${esc(RT.upd(new Date(RL.at).toLocaleDateString(P ? 'pt-BR' : 'en-US')))}</small></span><div class="soc-seg rap-seg">${Object.entries(RT.mode).map(([k, t]) => `<button type="button" data-rapmode="${k}" aria-pressed="${RL.mode === k}">${esc(t)}</button>`).join('')}</div><button type="button" class="lbd-btn" data-rapx>✕ ${esc(T.close)}</button></div>
+    <div class="rap-main"><section class="rap-list"><div class="rap-lh"><b>${esc(T.t)}</b><small>${esc(RAP.f === 'sim' ? T.simil : T.n(L.length))}</small>${RAP.sh || RAP.f === 'sim' ? `<button type="button" class="linkb" data-rapback>${esc(T.back)}</button>` : ''}</div>
+      <div class="rap-fl">${[['all', T.all], ['dup', T.dup], ['sa', T.sa], ['c', T.c]].map(([k, t]) => `<button type="button" data-rapf="${k}" aria-pressed="${RAP.f === k}">${esc(t)}</button>`).join('')}<select id="rapty" aria-label="${esc(T.type)}"><option value="">${esc(T.anyT)}</option>${tys.map(t => `<option${t === RAP.ty ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select><input id="rapq" type="search" value="${esc(RAP.q)}" placeholder="🔍 ${esc(T.q)}" autocomplete="off" spellcheck="false"></div>
+      <div class="rap-rows">${L.map(row).join('') || '<p class="lbd-n">—</p>'}</div><p class="rap-leg">${esc(T.legend)}</p></section>
+    <section class="rap-ins">${ins}</section></div>`;
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-rap]'); if (!b) return; e.preventDefault(); rapOpen(INV.sel && $('ivdlg')?.open ? INV.sel : ''); });
 
 /* ---------- Celular: as 5 abas numa barra fixa embaixo ---------- */
 const BOT_IC = { obj: '<circle cx="10" cy="10" r="3.2"/><path d="M10 2.5v2M10 15.5v2M2.5 10h2M15.5 10h2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M4.7 15.3l1.4-1.4M13.9 6.1l1.4-1.4"/>', act: '<path d="M4 16V10M10 16V4M16 16v-6"/>', drops: '<rect x="3" y="7" width="14" height="9" rx="1.5"/><path d="M7.5 7V4.5h5V7"/>', gd: '<path d="M10 2.8l6 2.6v4.2c0 3.6-2.6 6.2-6 7.4-3.4-1.2-6-3.8-6-7.4V5.4z"/>', clan: '<circle cx="7" cy="7" r="2.6"/><circle cx="14" cy="8" r="2"/><path d="M2.5 16.5c.6-2.7 2.3-4.2 4.5-4.2s3.9 1.5 4.5 4.2M12.2 12.6c2.4-.5 4.4.8 5.3 3.4"/>' };

@@ -281,6 +281,30 @@ async function socialBackfill(req, env, url) {
 
 // Quem joga com quem: uma vez por dia, pelo histórico de partidas de cada membro (só atividades; Torre e órbita não contam).
 // Roda no cron de hora em hora, um clã por vez, entre 05h e 23h (Brasília); cada clã guarda até onde já foi lido (socw).
+// "Popular no clã": uma vez por dia, lê as armas equipadas (e os perks encaixados) de cada membro de um clã que usa o site
+async function clanRollsDaily(env) {
+  const key = (await env.DB.prepare("SELECT v FROM meta WHERE k = 'bkey'").first().catch(() => null))?.v; if (!key) return;
+  const now = Date.now(), rows = (await env.DB.prepare("SELECT uid, v FROM kv WHERE k = 'hours' AND uid LIKE 'clan:%' LIMIT 200").all().catch(() => ({ results: [] }))).results || [];
+  for (const r of rows) {
+    let v; try { v = JSON.parse(r.v); } catch { continue; } if (!v.ua || now - v.ua > 30 * 864e5) continue;
+    const g = r.uid.slice(5); if (!/^\d{1,20}$/.test(g)) continue;
+    const wr = await env.DB.prepare("SELECT v FROM kv WHERE uid = ? AND k = 'crollw'").bind(r.uid).first().catch(() => null);
+    let w = 0; try { w = JSON.parse(wr.v).w; } catch {} if (now - w < 20 * 36e5) continue; // este clã já foi lido hoje
+    const fake = { headers: new Headers({ 'X-API-Key': key }) }, m = await bungie(fake, `/GroupV2/${g}/Members/?currentpage=1`).catch(() => null); if (!m) return;
+    const mem = (m.results || []).map(x => x.destinyUserInfo).filter(u => u?.membershipId), st = [], W = new Set([1498876634, 2465295065, 953998645]); // cinética, energia, pesada
+    let i = 0; await Promise.all(Array.from({ length: 6 }, async () => { while (i < mem.length) { const u = mem[i++];
+      const pr = await bungie(fake, `/Destiny2/${u.membershipType}/Profile/${u.membershipId}/?components=205,305`).catch(() => null); if (!pr) continue;
+      const so = pr.itemComponents?.sockets?.data || {};
+      for (const c of Object.values(pr.characterEquipment?.data || {})) for (const it of c.items || []) {
+        if (!W.has(it.bucketHash) || !it.itemInstanceId) continue; const pk = (so[it.itemInstanceId]?.sockets || []).map(x => x.plugHash).filter(Boolean); if (!pk.length) continue;
+        st.push(env.DB.prepare('INSERT INTO croll (g, mid, h, p, t) VALUES (?, ?, ?, ?, ?) ON CONFLICT(g, mid, h) DO UPDATE SET p = excluded.p, t = excluded.t').bind(g, u.membershipId, it.itemHash, pk.join(','), now));
+      } } }));
+    st.push(env.DB.prepare('DELETE FROM croll WHERE g = ? AND t < ?').bind(g, now - 14 * 864e5));
+    st.push(env.DB.prepare('INSERT INTO kv (uid, k, v, t) VALUES (?, ?, ?, ?) ON CONFLICT(uid, k) DO UPDATE SET v = excluded.v, t = excluded.t').bind(r.uid, 'crollw', JSON.stringify({ w: now }), now));
+    for (let k = 0; k < st.length; k += 100) await env.DB.batch(st.slice(k, k + 100));
+    return; // um clã por rodada
+  }
+}
 async function socialDaily(env) {
   const key = (await env.DB.prepare("SELECT v FROM meta WHERE k = 'bkey'").first().catch(() => null))?.v; if (!key) return;
   const now = Date.now(), dayStart = Date.parse(spDay(now) + 'T03:00:00Z'); // 00h de hoje em Brasília
@@ -484,6 +508,7 @@ export default {
     await env.DB.prepare("INSERT OR REPLACE INTO meta (k, v) VALUES ('brake', ?)").bind(JSON.stringify(m)).run().catch(() => {});
     if (!(await brake(env))) await clanHoursCron(env).catch(() => {});
     if (!(await brake(env)) && new Date().getUTCHours() >= 8) await socialDaily(env).catch(() => {}); // a partir das 5h (Brasília): lê o dia anterior
+    if (!(await brake(env)) && new Date().getUTCHours() >= 12) await clanRollsDaily(env).catch(() => {}); // a partir das 9h (Brasília): armas equipadas do clã
     if (new Date().getUTCHours() === 6) await env.DB.prepare('DELETE FROM visit WHERE d < ?').bind(spDay(Date.now() - 400 * 864e5)).run().catch(() => {}); // guarda ~13 meses
   },
   async fetch(req, env) {
@@ -496,6 +521,12 @@ export default {
       if (path === '/clan/notice' || path === '/clan/hours') return await clanRoute(req, env, path, new URL(req.url));
       if (path === '/clan/social' && req.method === 'GET') return await socialRoute(req, env, new URL(req.url));
       if (path === '/clan/social/backfill' && req.method === 'POST') return await socialBackfill(req, env, new URL(req.url));
+      if (path === '/clan/rolls' && req.method === 'GET') { // "Popular no clã": por arma, quantos membros usaram e quantos com cada perk
+        const g = new URL(req.url).searchParams.get('g') || ''; if (!/^\d{1,20}$/.test(g)) return json(req, { error: 'g' }, 400);
+        const r = await env.DB.prepare('SELECT h, p FROM croll WHERE g = ?').bind(g).all().catch(() => ({ results: [] })), w = {};
+        for (const x of r.results) { const o = w[x.h] ||= { n: 0, p: {} }; o.n++; for (const k of x.p.split(',')) o.p[k] = (o.p[k] || 0) + 1; }
+        return new Response(JSON.stringify({ w, at: Date.now() }), { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=1800', ...cors(req) } });
+      }
       if (path === '/hit' && req.method === 'POST') return await hit(req, env);
       if (path === '/pub' && req.method === 'POST') return await pubPost(req, env);
       if (path === '/videos' && req.method === 'GET') { // vídeos de guia do CMS (página /videos do dono), lidos por todos
