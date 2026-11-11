@@ -61,7 +61,7 @@ export async function currentUser(env, token) {
   if (!primary) throw new BungieApiError('Sua conta Bungie não tem perfil de Destiny 2.');
   const code = primary.bungieGlobalDisplayNameCode;
   const name = primary.bungieGlobalDisplayName ? `${primary.bungieGlobalDisplayName}#${String(code ?? 0).padStart(4, '0')}` : (primary.displayName || '');
-  return { uid: String(r.bungieNetUser?.membershipId || ''), ids: list.map(m => String(m.membershipId)), membership: { membershipId: String(primary.membershipId), membershipType: primary.membershipType, bungieName: name } };
+  return { uid: String(r.bungieNetUser?.membershipId || ''), ids: list.map(m => String(m.membershipId)), all: list.map(m => ({ id: String(m.membershipId), type: m.membershipType })), membership: { membershipId: String(primary.membershipId), membershipType: primary.membershipType, bungieName: name } };
 }
 
 // ids dos clãs da conta (GroupV2); usado para liberar a interface só para o clã Orla Emaranhada
@@ -69,8 +69,8 @@ export async function userGroupIds(env, uid, token) {
   return (await userGroups(env, uid, token)).map(g => g.id);
 }
 // clãs da conta com o cargo (memberType: 1 iniciante, 2 membro, 3 admin, 4 fundador interino, 5 fundador)
-export async function userGroups(env, uid, token) {
-  const r = await request(env, 'GET', `/GroupV2/User/254/${uid}/0/1/`, { token });
+export async function userGroups(env, uid, token, type = 254) {
+  const r = await request(env, 'GET', `/GroupV2/User/${type}/${uid}/0/1/`, { token });
   return (r.results || []).map(x => ({ id: String(x.group?.groupId || ''), role: Number(x.member?.memberType) || 0 })).filter(g => g.id);
 }
 

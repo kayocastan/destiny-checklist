@@ -51,7 +51,10 @@ const clanCache = new Map();
 async function inClan(env, me) {
   const hit = clanCache.get(me.uid + env.CLAN_ID);
   if (hit && hit.exp > Date.now()) { me.role = hit.role; return hit.ok; }
-  const g = (await userGroups(env, me.uid, me.token)).find(x => x.id === String(env.CLAN_ID)), ok = !!g;
+  let g = (await userGroups(env, me.uid, me.token).catch(() => [])).find(x => x.id === String(env.CLAN_ID));
+  // algumas contas não aparecem no clã pela conta Bungie.net: confere também pelas contas de Destiny (Steam, PlayStation, Xbox…)
+  for (const m of g ? [] : me.all || []) { g = (await userGroups(env, m.id, me.token, m.type).catch(() => [])).find(x => x.id === String(env.CLAN_ID)); if (g) break; }
+  const ok = !!g;
   me.role = g?.role || 0;
   clanCache.set(me.uid + env.CLAN_ID, { ok, role: me.role, exp: Date.now() + (ok ? 300_000 : 30_000) });
   return ok;

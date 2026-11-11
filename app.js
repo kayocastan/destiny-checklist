@@ -226,9 +226,14 @@ function login() {
   location.href = `https://www.bungie.net/${lang === 'pt' ? 'pt-br' : 'en'}/OAuth/Authorize?client_id=${encodeURIComponent(cfg.clientId)}&response_type=code&state=${st}`;
 }
 function logout() { resetChar(); PLUGS = null; plugsP = null; buildOpen = false; if (member) idbDel('profile-' + member.id); LS.del('dc-auth'); LS.del('dc-member'); LS.del('dc-hdr'); LS.del('dc-orla'); LS.del('dc-synct'); SY.t = {}; SY.dirty.clear(); clearInterval(LIVE.timer); LIVE.timer = null; LIVE.on = false; LIVE.mem = []; LS.del('dc-el'); auth = null; profile = null; member = null; render(); }
+let tokRefresh = null; // um só pedido de renovação por vez: vários pedidos juntos reaproveitam o mesmo (o token de renovação não pode ser usado duas vezes)
 async function token() {
   if (!auth) throw new Error('auth');
   if (auth.access_expires - Date.now() > 60000) return auth.access_token;
+  return tokRefresh ||= tokenRefresh().finally(() => { tokRefresh = null; });
+}
+async function tokenRefresh() {
+  if (!auth) throw new Error('auth');
   if (!auth.refresh_token || (auth.refresh_expires && auth.refresh_expires < Date.now())) { logout(); throw new Error('auth'); }
   const r = await fetch('/api/refresh', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: auth.refresh_token }) });
   if (!r.ok) { logout(); throw new Error('auth'); }
@@ -3148,7 +3153,11 @@ function orlaHTML() {
 }
 // Membros (aba Clã): a mesma Agenda do clã do /grade; precisa saber se a pessoa registrou o Discord (botões Entrar/Reserva/Sair)
 function obMemLoad() { if (OB.meBusy) return; OB.meBusy = true; obApi('/me').then(m => { OB.me = m; }).catch(() => { OB.me = null; }).finally(() => { OB.meBusy = false; if (tab === 'gcl') render(); }); }
-async function obAgLoad(force) { if (OB.agBusy || (!force && OB.ag !== undefined)) return; OB.agBusy = true; try { OB.ag = (await obApi('/grades')).grades || []; } catch { OB.ag = OB.ag || null; } OB.agBusy = false; if (GRADE || tab === 'gcl') render(); }
+async function obAgLoad(force) {
+  if (OB.agBusy || (!force && OB.ag !== undefined)) return; OB.agBusy = true;
+  for (let t = 0; t < 2; t++) { try { OB.ag = (await obApi('/grades')).grades || []; OB.agErr = null; break; } catch (e) { OB.agErr = e; if (e.status === 403 || e.message === 'auth') break; if (!t) await new Promise(r => setTimeout(r, 2500)); } }
+  if (OB.agErr) OB.ag = OB.ag || null; OB.agBusy = false; if (GRADE || tab === 'gcl') render();
+}
 function obFirstHTML(f) { // linha discreta: quem do clã nunca fez a atividade escolhida e quem pode guiar (10+ conclusões)
   if (!f.act) return '';
   const ac = obActOf({ name: f.act }); if (!ac?.a?.m) return '';
@@ -3185,17 +3194,18 @@ function obDesc(t) {
   const long = t.length > 180 || (t.match(/\n/g) || []).length > 3;
   return long ? `<details class="ob-desc"><summary><span>${h}</span></summary></details>` : `<p class="ob-desc">${h}</p>`;
 }
+document.addEventListener('click', e => { if (e.target.closest('[data-obagr]')) { OB.ag = undefined; obAgLoad(true); } });
 function obAgHTML(T) { // ilha "Agenda do clã": grades marcadas, por dia
   if (OB.ag === undefined) { setTimeout(obAgLoad); return `<section class="ad-s ad-wide ob-ag"><h2>${esc(T.agT)}</h2><p class="wait">${esc(T.loading)}</p></section>`; }
-  const loc = lang === 'en' ? 'en-US' : 'pt-BR', D = s => new Date(String(s).replace(' ', 'T')), today = obLoc(new Date()).slice(0, 10), tmw = obLoc(new Date(Date.now() + 864e5)).slice(0, 10);
+  const loc = lang === 'en' ? 'en-US' : 'pt-BR', D = s => { const d = new Date(String(s).replace(' ', 'T')); return isNaN(d) ? new Date(String(s)) : d; }, today = obLoc(new Date()).slice(0, 10), tmw = obLoc(new Date(Date.now() + 864e5)).slice(0, 10);
   const dayLbl = d => { const k = obLoc(d).slice(0, 10); return k === today ? T.today : k === tmw ? T.tomorrow : d.toLocaleDateString(loc, { weekday: 'long', day: '2-digit', month: '2-digit' }); };
-  const groups = []; for (const g of OB.ag || []) { const d = D(g.s), k = obLoc(d).slice(0, 10); let x = groups.find(y => y.k === k); if (!x) groups.push(x = { k, l: dayLbl(d), list: [] }); x.list.push(g); }
+  const groups = []; for (const g of OB.ag || []) { const d = D(g.s); if (isNaN(d)) continue; const k = obLoc(d).slice(0, 10); let x = groups.find(y => y.k === k); if (!x) groups.push(x = { k, l: dayLbl(d), list: [] }); x.list.push(g); }
   const card = g => { const tit = g.p.filter(p => p.c === 'titular'), res = g.p.length - tit.length, t = D(g.s).toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' });
     const ac = obActOf(g), extra = ac ? actYt(ac.kind, ac.a.k) : '';
     return `<div class="ob-gc${ac?.a.img ? ' ob-img' : ''}"${ac?.a.img ? ` style="--ob-img:url('${BNET}${esc(ac.a.img)}')"` : ''}><span class="ob-gt">${esc(t)}</span><div class="ob-gb"><b>${esc(g.name)}</b><small class="lbd-n">${g.by ? esc(T.agBy(String(g.by).replace(/#\d+$/, ''))) : ''}</small>${g.desc ? obDesc(g.desc) : ''}${extra ? `<div class="sec-meta ob-guide">${extra}</div>` : ''}<div class="dp-chips">${tit.map(p => `<span class="dp-chip${p.r ? ' rk' : ''}">${esc(p.n)}</span>`).join('')}${res ? `<small class="lbd-n">${esc(T.agRes(res))}</small>` : ''}</div></div>
       <div class="ob-gr"><b class="m${tit.length >= g.cap ? ' full' : ''}">${tit.length}/${g.cap}</b>${tit.length >= g.cap ? `<small>${esc(T.agFull)}</small>` : ''}${g.url ? `<a class="lbd-btn" href="${esc(g.url)}" target="_blank" rel="noopener">${esc(T.agOpen)}</a>` : ''}</div>
       <div class="ob-sg">${g.mine ? `<span class="ob-you ${esc(g.mine)}">${esc(T.you[g.mine] || g.mine)}</span>` : ''}${OB.sgBusy === g.id ? `<small class="lbd-n wait">${esc(T.loading)}</small>` : [['join', '＋', T.sgJoin, g.mine === 'titular'], ['reserve', '?', T.sgRes, g.mine === 'reserva'], ['leave', '−', T.sgLeave, !g.mine]].map(([k, ic, l, off]) => `<button type="button" class="lbd-btn ob-sgb ${k}" data-obsg="${g.id}:${k}"${off ? ' disabled' : ''}><b>${ic}</b> ${esc(l)}</button>`).join('')}${g.mine ? obCalBtns(g) : ''}${g.creator && GRADE ? `<button type="button" class="lbd-btn ob-edb" data-obedit="${g.id}">✏️ ${esc(T.editB)}</button>` : ''}${OB.sgMsg?.id === g.id ? `<small class="ob-sgm${OB.sgMsg.bad ? ' bad' : ''}">${esc(OB.sgMsg.t)}</small>` : ''}</div></div>`; };
-  return `<section class="ad-s ad-wide ob-ag"><h2>${esc(T.agT)}</h2><small class="lbd-n">${esc(T.agN)}</small>${OB.ag === null ? `<p class="iv-msg bad">${esc(T.down)}</p>` : groups.length ? groups.map(x => `<h3 class="ob-agd">${esc(x.l)}</h3>${x.list.map(card).join('')}`).join('') : `<p class="lbd-n">${esc(T.agNone)}</p>`}</section>`;
+  return `<section class="ad-s ad-wide ob-ag"><h2>${esc(T.agT)}</h2><small class="lbd-n">${esc(T.agN)}</small>${OB.ag === null ? `<p class="iv-msg bad">${esc(OB.agErr?.status === 403 ? (lang === 'pt' ? 'A Bungie não confirmou que esta conta é do clã. Se você é membro, saia e entre de novo no site.' : 'Bungie did not confirm this account is in the clan. If you are a member, sign out and in again.') : OB.agErr?.message === 'auth' || OB.agErr?.status === 401 ? (lang === 'pt' ? 'Seu login expirou. Entre de novo no site para ver a agenda.' : 'Your login expired. Sign in again to see the schedule.') : T.down)} <button type="button" class="linkb" data-obagr>${lang === 'pt' ? 'Tentar de novo' : 'Try again'}</button></p>` : groups.length ? groups.map(x => `<h3 class="ob-agd">${esc(x.l)}</h3>${x.list.map(card).join('')}`).join('') : `<p class="lbd-n">${esc(T.agNone)}</p>`}</section>`;
 }
 function obRegDlg() {
   const T = obt(); let d = $('obdlg'); if (!d) { d = document.createElement('dialog'); d.id = 'obdlg'; d.className = 'fd'; document.body.appendChild(d); }
