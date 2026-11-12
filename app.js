@@ -4986,6 +4986,7 @@ function ivBar() {
 }
 function invHTML() {
   const T = ivt(), W = u(); if (!have.c) return `<div class="panel"><p class="empty-msg wait">${esc(T.wait)}</p></div>`;
+  if (BETA && AP.on) return apHTML(invAll());
   const all = invAll(), chars = ivChars(), narrow = matchMedia('(max-width: 760px)').matches;
   if (!INV.mc || !(INV.mc === 'v' || chars.some(c => c.characterId === INV.mc))) INV.mc = chars[0]?.characterId;
   const cols = narrow ? (INV.mc === 'v' ? [] : chars.filter(c => c.characterId === INV.mc)) : chars, showV = !narrow || INV.mc === 'v';
@@ -5004,6 +5005,7 @@ function invHTML() {
 // Cofre organizado: categorias, agrupar e ordenar, vários de uma vez
 function vltHTML() {
   const T = ivt(), W = u(); if (!have.c) return `<div class="panel"><p class="empty-msg wait">${esc(T.wait)}</p></div>`;
+  if (BETA && AP.on) return apHTML(invAll());
   const all = invAll(), V = all.filter(x => x.where === 'v'), vUsed = (profile.profileInventory?.data?.items || []).filter(i => i.bucketHash === VAULT_BUCKET).length;
   const wN = V.filter(x => x.slot < 3).length, aN = V.filter(x => x.slot >= 3).length, oN = Math.max(0, vUsed - wN - aN);
   const catDef = [['w', T.wAll, x => x.slot < 3, 0], ['w0', T.slots[0], x => x.slot === 0, 1], ['w1', T.slots[1], x => x.slot === 1, 1], ['w2', T.slots[2], x => x.slot === 2, 1], ['a', T.aAll, x => x.slot >= 3, 0], ...[0, 1, 2].map(c => ['a' + c, W.classes[c], x => x.slot >= 3 && x.cls === c, 1])];
@@ -5173,7 +5175,7 @@ function ivDraw() {
   else {
     const isW = x.slot < 3, cols = det.so.map((s, i) => ({ s, i, d: det.en[s.plugHash] })).filter(o => o.d && (isW ? LC_PERK.test(o.d.pc || '') : /^enhancements\.(?!ghosts)|intrinsics/.test(o.d.pc || '') && o.s.plugHash));
     const wl = wishList().find(y => y.h === x.h || (y.n && wishKey(y.n) === wishKey(D.n))), wcols = wl ? (wl.r ? wl.r.filter(c => c?.length) : (wl.p || []).map(p => [p])) : [];
-    const rlL = RL.st === 'ok' ? (RL.m[x.h] || []).filter(e => RL.mode === 'both' || !e[1] || e[1] === (RL.mode === 'pve' ? 'e' : 'v')) : [], rec = new Set(rlL.flatMap(e => e[0]));
+    const rlL = RL.st === 'ok' ? (rlFor(x.h) || []).filter(e => RL.mode === 'both' || !e[1] || e[1] === (RL.mode === 'pve' ? 'e' : 'v')) : [], rec = new Set(rlL.flatMap(e => e[0]));
     const isWish = pd => wcols.some(c => c.some(o => (o.ic && pd?.ic === o.ic) || (o.n && wishKey(pd?.n || '') === wishKey(o.n))));
     if (wcols.length) { const m = wcols.filter(c => cols.some(o => c.some(w => (w.ic && o.d.ic === w.ic) || (w.n && wishKey(o.d.n) === wishKey(w.n))))).length; wishC = `<span class="wish-m${m === wcols.length ? ' full' : ''}">☆ ${esc(T.wish(m, wcols.length))}</span>`; }
     perks = cols.length ? `<span class="sea-k">${esc(T.perks)} · ${esc(T.perksN)}</span><div class="ivd-perks">${cols.map(o => { const opts = [...new Set([o.s.plugHash, ...(det.rp[o.i] || []).map(p => p.plugItemHash)])].filter(h => det.en[h]); return `<div class="ivd-pc">${opts.map(h => { const pd = det.en[h], on = h === o.s.plugHash; return `<button type="button" class="ivd-p${on ? ' on' : ''}${isWish(pd) ? ' w' : ''}${on && INV.sock === o.i ? ' sel' : ''}" data-ivperk="${h}"${on ? ` data-ivsock="${o.i}"` : ''} title="${esc(pd.n)}" aria-label="${esc(pd.n)}">${pd.ic ? `<img src="${BNET}${pd.ic}" alt="">` : ''}${rec.has(h) ? '<i class="ivd-r" aria-hidden="true">✓</i>' : ''}</button>`; }).join('')}</div>`; }).join('')}</div>${(() => { const sel = INV.perk && det.en[INV.perk] ? [INV.perk] : [], miss = sel.filter(h => !(h in PDESC.m)); if (miss.length) setTimeout(() => pdescLoad(miss)); const cnt = {}; sel.forEach(h => cnt[h] = (cnt[h] || 0) + 1); return `<div class="ivd-pds">${[...new Set(sel)].map(h => { const pd = det.en[h], P = PDESC.m[h], tx = pdText(h, pd); return `<div class="ivd-pd on">${pd.ic ? `<img src="${BNET}${pd.ic}" alt="">` : '<i></i>'}<div><b>${esc(pd.n)}${cnt[h] > 1 ? ` ×${cnt[h]}` : ''}${P?.e ? ` <small class="ivd-en">${P.e}⚡</small>` : ''}</b>${P?.t ? `<small>${esc(P.t)}</small>` : ''}<span>${tx ? esc(tx) : !(h in PDESC.m) ? '…' : ''}</span>${isWish(pd) ? `<span class="w">☆ ${esc(wl ? T.wish(1, 1).replace(/ 1\/1$/, '') : '')}</span>` : ''}${!isW && INV.sock != null && h === det.so[INV.sock]?.plugHash && /^enhancements\.(?!ghosts)/.test(pd.pc || '') && !INV.mp ? `<button type="button" class="lbd-btn pri ivd-mb" data-ivmod>${esc(mpt().swap)}</button>` : ''}</div></div>`; }).join('')}</div>${INV.mp ? mpHTML(x, det) : ''}`; })()}` : '';
@@ -5555,7 +5557,7 @@ async function rlLoad() {
 }
 // nota do item: 'g' bom, 'p' parcial, 'n' nada de bom, '' sem recomendação; usa as vantagens encaixadas (ou as opções, quando o detalhe foi aberto)
 function rlGrade(iid, h, extra) {
-  if (RL.st !== 'ok') return ''; const L0 = RL.m[h]; if (!L0) return '';
+  if (RL.st !== 'ok') return ''; const L0 = rlFor(h); if (!L0) return '';
   const L1 = L0.filter(e => RL.mode === 'both' || !e[1] || e[1] === (RL.mode === 'pve' ? 'e' : 'v')); if (!L1.length) return '';
   const so = RL.so?.[iid]?.sockets || profile?.itemComponents?.sockets?.data?.[iid]?.sockets; if (!so && !extra) return '';
   const have = new Set([...(so || []).map(s => s.plugHash), ...(extra || [])]);
@@ -5597,7 +5599,7 @@ document.addEventListener('change', e => { if (e.target.id === 'keeplock') LS.se
 function rlBar(list) {
   const T = rlt(); if (RL.st !== 'ok') { if (!RL.st) setTimeout(rlLoad); return RL.st === 'err' ? `<div class="rl-bar"><small>${esc(T.err)}</small></div>` : `<div class="rl-bar"><small class="wait">${esc(T.load)}</small></div>`; }
   const w = list.filter(x => x.slot < 3), gs = w.map(x => rlGrade(x.iid, x.h)), c = k => gs.filter(g => g === k).length;
-  return `<div class="rl-bar"><span><b>${esc(T.t)}</b><small>${esc(T.src)} · ${esc(T.upd(new Date(RL.at).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR')))}</small></span><div class="vl-seg rl-mode">${Object.entries(T.mode).map(([k, t]) => `<button type="button" data-rlmode="${k}" aria-pressed="${RL.mode === k}">${esc(t)}</button>`).join('')}</div><div class="rl-k" role="group" aria-label="${esc(lang === 'pt' ? 'Filtrar por roll' : 'Filter by roll')}">${[['g', T.g, 0], ['p', T.p, 1], ['n', T.n, 2]].map(([k, t, i]) => `<button type="button" class="${k}" data-ivf="r${k}" data-rltog aria-pressed="${INV.f === 'r' + k}" title="${esc(T.leg[i][1] + ': ' + T.leg[i][2])}"><small>${esc(t)}</small><b>${c(k)}</b></button>`).join('')}<button type="button" class="rl-ap" data-rap><small>${esc(T.apNew)}</small><b>⚖ ${esc(T.ap)}</b></button></div>${(() => { const n = lkbList().length; return n && !LKB.st ? `<button type="button" class="lbd-btn rl-lk" data-lkb>${esc(lkt().bulk(n))}</button>` : ''; })()}</div>${lkbHTML()}`;
+  return `<div class="rl-bar"><span><b>${esc(T.t)}</b><small>${esc(T.src)} · ${esc(T.upd(new Date(RL.at).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR')))}</small></span><div class="vl-seg rl-mode">${Object.entries(T.mode).map(([k, t]) => `<button type="button" data-rlmode="${k}" aria-pressed="${RL.mode === k}">${esc(t)}</button>`).join('')}</div><div class="rl-k" role="group" aria-label="${esc(lang === 'pt' ? 'Filtrar por roll' : 'Filter by roll')}">${BETA && AP.on ? apChips(w) : [['g', T.g, 0], ['p', T.p, 1], ['n', T.n, 2]].map(([k, t, i]) => `<button type="button" class="${k}" data-ivf="r${k}" data-rltog aria-pressed="${INV.f === 'r' + k}" title="${esc(T.leg[i][1] + ': ' + T.leg[i][2])}"><small>${esc(t)}</small><b>${c(k)}</b></button>`).join('')}<button type="button" class="rl-ap${BETA && AP.on ? ' on' : ''}" data-rap${BETA ? ` aria-pressed="${!!AP.on}"` : ''}><small>${esc(T.apNew)}</small><b>⚖ ${esc(T.ap)}</b></button></div>${(() => { const n = lkbList().length; return n && !LKB.st ? `<button type="button" class="lbd-btn rl-lk" data-lkb>${esc(lkt().bulk(n))}</button>` : ''; })()}</div>${lkbHTML()}`;
 }
 document.addEventListener('click', e => { const b = e.target.closest('[data-rlmode]'); if (!b) return; RL.mode = b.dataset.rlmode; LS.set('dc-rlmode', RL.mode); render(); if ($('ivdlg')?.open) ivDraw(); });
 
@@ -5611,7 +5613,7 @@ const RG_C = { S: '#7fe08f', A: '#a9e34b', B: '#f2d36b', C: '#ff8a7a' };
 const WSTAT = [4043523819, 1240592695, 155624089, 943549884, 4188031367, 1345609583, 2714457168, 3555269338, 3614673599, 2523465841, 2961396640, 2837207746, 3022301683, 209426660];
 // nota de uma cópia: o roll recomendado (PvE/PvP conforme o filtro) com mais perks iguais; S/A/B/C pelas colunas que faltam
 function rapGrade(x) {
-  if (RL.st !== 'ok') return null; const L0 = RL.m[x.h]; if (!L0) return null;
+  if (RL.st !== 'ok') return null; const L0 = rlFor(x.h); if (!L0) return null;
   const L = L0.filter(e => RL.mode === 'both' || !e[1] || e[1] === (RL.mode === 'pve' ? 'e' : 'v')); if (!L.length) return null;
   const have = new Set(ivPerks(x)); if (!have.size) return null;
   let best = null; for (const e of L) { const m = e[0].filter(p => have.has(p)).length, sc = m / e[0].length; if (!best || sc > best.sc || (sc === best.sc && e[0].length > best.e[0].length)) best = { e, m, sc }; }
@@ -5631,8 +5633,8 @@ function rapCols(h) {
     raw.forEach((c, i) => { c.si = idx[i]; });
     const en = await entities('DestinyInventoryItemDefinition', raw.flat(), lang === 'pt' ? 'pt' : 'en', true);
     RCOLS[h] = raw.map(c => { const by = new Map(); for (const ph of c) { const e = en[ph]; if (!e?.n || WSKIP_PC.test(e.pc || '')) continue; const k = e.ic || e.n; if (!by.has(k)) by.set(k, { h: ph, n: e.n, ic: e.ic, hs: [ph] }); else by.get(k).hs.push(ph); } const o = [...by.values()]; o.si = c.si; return o; }).filter(c => c.length);
-    if ($('rapdlg')?.open) rapDraw();
-  })().catch(() => { RCOLS[h] = []; if ($('rapdlg')?.open) rapDraw(); }));
+    rapRedraw();
+  })().catch(() => { RCOLS[h] = []; rapRedraw(); }));
   return null;
 }
 // atributos que cada perk dá (definição completa, guardada no aparelho)
@@ -5640,26 +5642,26 @@ const PINV = LS.get('dc-pinv', {}), PINVQ = new Set();
 function pinvLoad(hs) {
   const need = hs.filter(h => !PINV[h] && !PINVQ.has(h)); if (!need.length) return; need.forEach(h => PINVQ.add(h));
   let i = 0; Promise.all(Array.from({ length: 5 }, async () => { while (i < need.length) { const h = need[i++]; try { const d = await bungie(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${h}/`, false); PINV[h] = Object.fromEntries((d.investmentStats || []).filter(s => !s.isConditionallyActive && s.value).map(s => [s.statTypeHash, s.value])); } catch { PINV[h] = {}; } } }))
-    .then(() => { try { LS.set('dc-pinv', PINV); } catch {} if ($('rapdlg')?.open) rapDraw(); });
+    .then(() => { try { LS.set('dc-pinv', PINV); } catch {} rapRedraw(); });
 }
 let STATN = null;
 function rapClan() {
   if (RAP.cl !== null || RAP.clBusy || !member) return; RAP.clBusy = true;
   (async () => { let g = LS.get('dc-cgid', null); if (!g || Date.now() - g.at > 7 * 864e5) { const r = await bungie(`/GroupV2/User/${member.type}/${member.id}/0/1/`).catch(() => null); g = { id: r?.results?.[0]?.group?.groupId || '', at: Date.now() }; LS.set('dc-cgid', g); }
-    RAP.cl = g.id && APIW ? (await fetch(APIW + '/clan/rolls?g=' + g.id).then(r => r.json()).catch(() => ({}))).w || {} : {}; })().finally(() => { RAP.clBusy = false; if ($('rapdlg')?.open) rapDraw(); });
+    RAP.cl = g.id && APIW ? (await fetch(APIW + '/clan/rolls?g=' + g.id).then(r => r.json()).catch(() => ({}))).w || {} : {}; })().finally(() => { RAP.clBusy = false; rapRedraw(); });
 }
 const RAPP = {}; // perks que cada cópia tem em cada encaixe (dá para trocar entre eles pela API)
 function rapAvail(iid) {
   if (RAPP[iid] !== undefined) return RAPP[iid]; RAPP[iid] = null;
   bungie(`/Destiny2/${member.type}/Profile/${member.id}/Item/${iid}/?components=305,310`).then(r => { const rp = r.reusablePlugs?.data?.plugs || {}; RAPP[iid] = Object.fromEntries(Object.entries(rp).map(([k, v]) => [k, v.filter(p => p.canInsert !== false && p.enabled !== false).map(p => p.plugItemHash)])); if (r.sockets?.data) (RL.so ||= {})[iid] = r.sockets.data; })
-    .catch(() => { RAPP[iid] = {}; }).finally(() => { if ($('rapdlg')?.open) rapDraw(); });
+    .catch(() => { RAPP[iid] = {}; }).finally(() => { rapRedraw(); });
   return null;
 }
 // troca os perks pela API e confere no jogo (a Bungie demora a refletir: até 4 tentativas, 2,5 s entre elas)
 async function rapApply(x, plan) {
   const T = rapt(), ch = x.where !== 'v' ? x.where : Object.keys(profile.characters?.data || {})[0]; let ok = 0, i = 0, err = null;
   for (const [si, h] of plan) {
-    RAP.msg = { t: T.going(++i, plan.length) }; rapDraw();
+    RAP.msg = { t: T.going(++i, plan.length) }; rapRedraw();
     try { await wPost('/Destiny2/Actions/Items/InsertSocketPlugFree/', { plug: { socketIndex: +si, socketArrayType: 0, plugItemHash: h }, itemId: x.iid, characterId: ch }); }
     catch (e) { err = e; continue; }
     let seen = false;
@@ -5678,7 +5680,7 @@ function rapSave(x, cols, fin) {
 const rapList = () => { const all = invAll().filter(x => x.slot < 3), cnt = {}; all.forEach(x => cnt[x.h] = (cnt[x.h] || 0) + 1); return all.map(x => ({ x, r: rapGrade(x), k: cnt[x.h] })); };
 function rapOpen(iid) {
   let d = $('rapdlg'); if (!d) { d = document.createElement('dialog'); d.id = 'rapdlg'; d.className = 'rap'; document.body.append(d);
-    d.addEventListener('click', rapClick); d.addEventListener('input', e => { if (e.target.id === 'rapq') { RAP.q = e.target.value; const p = e.target.selectionStart; rapDraw(); const q = $('rapq'); q.focus(); q.setSelectionRange(p, p); } });
+    d.addEventListener('click', rapClick); d.addEventListener('input', e => { if (e.target.id === 'rapq') { RAP.q = e.target.value; const p = e.target.selectionStart; rapRedraw(); const q = $('rapq'); q.focus(); q.setSelectionRange(p, p); } });
     d.addEventListener('change', e => { if (e.target.id === 'rapty') { RAP.ty = e.target.value; rapDraw(); } }); }
   if (RL.st !== 'ok') rlLoad(); rapClan(); pkLoad();
   if (iid) RAP.sel = iid; RAP.sim = {}; RAP.sh = ''; if (!d.open) d.showModal(); rapDraw();
@@ -5692,23 +5694,19 @@ function rapClick(e) {
   else if (d.rapsave != null) { const c = RAP.ctx; if (!c) return; const fin = c.cur.map((o, k) => RAP.sim[k] != null ? c.cols[k].find(y => y.h === RAP.sim[k]) : o); rapSave(c.x, c.cols, fin); RAP.msg = { ok: true, t: rapt().saved }; }
   else if (d.rapauto != null || d.rapapply != null) { rapGo(d.rapauto != null); return; }
   else if (d.rapsim != null) RAP.f = 'sim'; else if (d.rapcopies) { RAP.sh = d.rapcopies; RAP.f = 'all'; } else if (d.rapback != null) { RAP.sh = ''; if (RAP.f === 'sim') RAP.f = 'all'; }
-  else return; rapDraw(); if (d.rapsel && matchMedia('(max-width:900px)').matches) document.querySelector('.rap-ins')?.scrollIntoView({ behavior: 'smooth' });
+  else return; rapRedraw(); if (d.rapsel && matchMedia('(max-width:900px)').matches) document.querySelector('.rap-ins')?.scrollIntoView({ behavior: 'smooth' });
 }
 async function rapGo(auto) {
   const T = rapt(), c = RAP.ctx; if (!c || RAP.busy) return; let plan, lack = 0;
-  if (auto) { plan = RAP.autoPlan || []; if (!plan.length) { RAP.msg = { t: T.autoN }; rapDraw(); return; } }
+  if (auto) { plan = RAP.autoPlan || []; if (!plan.length) { RAP.msg = { t: T.autoN }; rapRedraw(); return; } }
   else { plan = []; for (const [k, h] of Object.entries(RAP.sim)) { const o = c.cols[k]?.find(y => y.h === h); if (!o) continue; const ph = (RAPP[c.x.iid]?.[c.cols[k].si] || []).find(y => o.hs.includes(y)); if (ph) plan.push([c.cols[k].si, ph]); else lack++; }
-    if (!plan.length) { RAP.msg = { bad: true, t: T.noneAv }; rapDraw(); return; } }
+    if (!plan.length) { RAP.msg = { bad: true, t: T.noneAv }; rapRedraw(); return; } }
   RAP.busy = true; const r = await rapApply(c.x, plan); RAP.busy = false; RAP.sim = {};
   RAP.msg = r.err && !r.ok ? { bad: true, t: wMsg(r.err) } : lack || r.err ? { t: T.partial(r.ok, lack + (plan.length - r.ok)) } : { ok: true, t: T.okAll(r.ok) };
-  rapDraw(); if (tab === 'inv' || tab === 'vlt') render();
+  rapRedraw(); if (tab === 'inv' || tab === 'vlt') render();
 }
-function rapDraw() {
-  const d = $('rapdlg'); if (!d) return; const T = rapt(), RT = rlt(), P = lang === 'pt';
-  if (RL.st !== 'ok') { d.innerHTML = `<div class="rap-top"><b>⚖ ${esc(T.t)}</b><button type="button" class="lbd-btn" data-rapx>✕ ${esc(T.close)}</button></div><p class="wait rap-pad">${esc(RL.st === 'err' ? RT.err : RT.load)}</p>`; return; }
-  const all = rapList(); let sel = all.find(y => y.x.iid === RAP.sel) || all.filter(y => y.r).sort((a, b) => 'SABC'.indexOf(a.r.g) - 'SABC'.indexOf(b.r.g))[0]; if (sel) RAP.sel = sel.x.iid;
-  const nm = x => ivName(x) || '…', tl = x => INVD[x.h]?.tl || '';
-  // inspetor
+function rapInsHTML(sel, all, inline) {
+  const T = rapt(), P = lang === 'pt', nm = x => ivName(x) || '…', tl = x => INVD[x.h]?.tl || '';
   let ins = `<p class="rap-pad lbd-n">${esc(T.pick)}</p>`, simil = [];
   if (sel) {
     const x = sel.x, r = sel.r, cols = rapCols(x.h), have = new Set(ivPerks(x)), cps = all.filter(y => y.x.h === x.h), ci = cps.findIndex(y => y.x.iid === x.iid) + 1;
@@ -5727,7 +5725,7 @@ function rapDraw() {
       // atributos
       const base = RL.sts?.[x.iid]?.stats || {}, delta = {}; const ph = []; Object.entries(RAP.sim).forEach(([k, h]) => { const o = cols[k]?.find(y => y.h === h); if (!o) return; ph.push(o.h); if (cur[k]) ph.push(cur[k].h); });
       pinvLoad(ph); Object.entries(RAP.sim).forEach(([k, h]) => { const a = PINV[h] || {}, b = cur[k] ? PINV[cur[k].h] || {} : {}; for (const s of new Set([...Object.keys(a), ...Object.keys(b)])) delta[s] = (delta[s] || 0) + (a[s] || 0) - (b[s] || 0); });
-      const shs = WSTAT.filter(h => base[h]); if (!STATN && shs.length) { STATN = {}; entities('DestinyStatDefinition', WSTAT, lang).then(m => { STATN = m; if ($('rapdlg')?.open) rapDraw(); }).catch(() => {}); }
+      const shs = WSTAT.filter(h => base[h]); if (!STATN && shs.length) { STATN = {}; entities('DestinyStatDefinition', WSTAT, lang).then(m => { STATN = m; rapRedraw(); }).catch(() => {}); }
       const stH = shs.map(h => { const v = base[h].value, dl = delta[h] || 0, nv = Math.max(0, Math.min(100, v + dl)); return `<div class="rap-st"><span>${esc(STATN?.[h]?.n || '')}</span><i><u style="width:${Math.min(v, nv)}%"></u><u class="${dl > 0 ? 'up' : 'dn'}" style="width:${Math.abs(nv - v)}%"></u></i><b>${nv}</b><small class="${dl > 0 ? 'up' : dl < 0 ? 'dn' : ''}">${dl ? (dl > 0 ? '+' : '') + dl : '—'}</small></div>`; }).join('');
       // parecidos: outras armas com os mesmos perks das colunas 3 e 4 (os principais)
       const main = cur.slice(2, 4).filter(Boolean); simil = main.length ? all.filter(y => y.x.iid !== x.iid && main.every(o => ivPerks(y.x).some(h => o.hs.includes(h)))) : [];
@@ -5740,11 +5738,20 @@ function rapDraw() {
         <button type="button" class="rap-pri" data-rapauto ${RAP.busy || !av ? 'disabled' : ''}>${esc(T.auto)}</button>
         <button type="button" class="rap-sec" data-rapbest ${Object.keys(RAP.bestSim).length ? '' : 'disabled'}>${esc(T.best)}</button>${Object.keys(RAP.sim).length ? `<button type="button" class="rap-sec rap-go" data-rapapply ${RAP.busy ? 'disabled' : ''}>${esc(T.applySim)}</button><button type="button" class="rap-sec" data-rapsave>${esc(T.save)}</button><button type="button" class="rap-sec" data-rapreset>${esc(T.reset)}</button>` : ''}
         ${RAP.msg ? `<p class="rap-msg${RAP.msg.bad ? ' bad' : RAP.msg.ok ? ' ok' : ''}">${esc(RAP.msg.t)}</p>` : ''}
-        <button type="button" class="rap-sec" data-rapsim ${simil.length ? '' : 'disabled'}>${esc(T.similar(simil.length))}</button>${cps.length > 1 ? `<button type="button" class="rap-sec" data-rapcopies="${x.h}">${esc(T.copies(cps.length))}</button>` : ''}</div></div></div>`;
+        ${inline ? '' : `<button type="button" class="rap-sec" data-rapsim ${simil.length ? '' : 'disabled'}>${esc(T.similar(simil.length))}</button>${cps.length > 1 ? `<button type="button" class="rap-sec" data-rapcopies="${x.h}">${esc(T.copies(cps.length))}</button>` : ''}`}</div></div></div>`;
       RAP.closest = best;
     } else simil = [];
     ins = `<header class="rap-ih">${INVD[x.h]?.ic ? `<img src="${BNET}${INVD[x.h].ic}" alt="">` : '<span></span>'}<span><small>${esc([tl(x), cps.length > 1 ? T.copy(ci, cps.length) : '', x.pw ? '✦ ' + x.pw : ''].filter(Boolean).join(' · ').toUpperCase())}</small><b>${esc(nm(x))}</b>${r && RAP.closest?.length ? `<span>${esc(T.closest)} <b>${esc(RAP.closest.join(' + '))}</b>${r.e[1] ? ` (${r.e[1] === 'e' ? 'PvE' : 'PvP'})` : ''}</span>` : `<span>${esc(r ? '' : T.none)}</span>`}</span><span class="rap-g" style="color:${gc}"><b>${g}</b><small>${r ? esc(T.cols(r.m, r.n)) : ''}</small></span></header>${body}`;
   }
+  return { ins, simil };
+}
+function rapRedraw() { if ($('rapdlg')?.open) rapDraw(); else if (BETA && AP.on && (tab === 'inv' || tab === 'vlt')) { if (RAP.sel) apClear(RAP.sel); clearTimeout(AP.rt); AP.rt = setTimeout(render, 60); } }
+function rapDraw() {
+  const d = $('rapdlg'); if (!d) return; const T = rapt(), RT = rlt(), P = lang === 'pt';
+  if (RL.st !== 'ok') { d.innerHTML = `<div class="rap-top"><b>⚖ ${esc(T.t)}</b><button type="button" class="lbd-btn" data-rapx>✕ ${esc(T.close)}</button></div><p class="wait rap-pad">${esc(RL.st === 'err' ? RT.err : RT.load)}</p>`; return; }
+  const all = rapList(); let sel = all.find(y => y.x.iid === RAP.sel) || all.filter(y => y.r).sort((a, b) => 'SABC'.indexOf(a.r.g) - 'SABC'.indexOf(b.r.g))[0]; if (sel) RAP.sel = sel.x.iid;
+  const nm = x => ivName(x) || '…', tl = x => INVD[x.h]?.tl || '';
+  const { ins, simil } = rapInsHTML(sel, all);
   // lista
   const q = palNorm((RAP.q || '').trim()), tys = [...new Set(all.map(y => tl(y.x)).filter(Boolean))].sort();
   let L = RAP.f === 'sim' ? simil.map(x => all.find(y => y.x.iid === x.x.iid)) : all;
@@ -5758,7 +5765,144 @@ function rapDraw() {
       <div class="rap-rows">${L.map(row).join('') || '<p class="lbd-n">—</p>'}</div><p class="rap-leg">${esc(T.legend)}</p></section>
     <section class="rap-ins">${ins}</section></div>`;
 }
-document.addEventListener('click', e => { const b = e.target.closest('[data-rap]'); if (!b) return; e.preventDefault(); rapOpen(INV.sel && $('ivdlg')?.open ? INV.sel : ''); });
+/* ---------- Avaliar rolls na própria tela (só /beta por enquanto): o botão vira chave, o inventário vira lista por personagem/cofre → tipo → nota.
+   Nota = a maior que a cópia alcança com os perks que vieram nela (encaixes com mais de uma opção e perks liberados). ---------- */
+const APC = new Map();
+const AP = { on: BETA && LS.get('dc-rapon', false), f: '', ty: '', q: '', open: '', av: '', tw: null, twB: false, pk: false, msg: {}, bulk: null, busy: '' };
+const APT = { pt: { all: 'Todas', fix: '↻ Dá para melhorar', type: 'Tipo', anyT: 'Todos os tipos', q: 'Buscar arma ou perk…', vault: 'Cofre', none: 'Sem nota', noneN: n => `${n} armas`, why: { ex: 'Exótica: o Voltron não lista rolls de exóticas.', nol: 'Sem roll recomendado no Voltron para esta arma.', nos: 'A Bungie não mandou os perks desta cópia.' },
+    load: 'Lendo os perks de cada cópia…', loadE: 'Não deu para ler os perks das cópias. Toque para tentar de novo.', retry: 'Tentar de novo', fixT: 'Trocar perk: dá para chegar nesta nota sem pegar outra cópia', opt: 'Otimizar', optT: 'Troca para os perks da nota máxima (só perks: masterwork, mod e origin trait ficam)', optAll: n => `Otimizar todas (${n})`, best: 'melhor cópia', twin: 'rolls da outra versão',
+    askT: n => `Otimizar ${n} armas?`, askN: 'Troca só perks que a cópia já tem. Cada troca é conferida no jogo e pode levar alguns segundos; com muitas armas, alguns minutos.', go: n => `Confirmar e otimizar ${n}`, cancel: 'Cancelar', run: (a, b) => `Otimizando ${a}/${b}…`, stop: 'Parar', done: (a, f) => `${a} otimizadas${f ? ` · ${f} falharam` : ''}.`, perm: 'Parei: a Bungie recusou a permissão. Saia e entre de novo e tente outra vez.', ok: 'Pronto.', chg: n => `${n} troca${n > 1 ? 's' : ''}`, items: n => `${n} armas`, close: 'Fechar' },
+  en: { all: 'All', fix: '↻ Can improve', type: 'Type', anyT: 'All types', q: 'Search weapon or perk…', vault: 'Vault', none: 'No grade', noneN: n => `${n} weapons`, why: { ex: 'Exotic: Voltron has no rolls for exotics.', nol: 'No recommended roll in Voltron for this weapon.', nos: 'Bungie did not send this copy\'s perks.' },
+    load: 'Reading each copy\'s perks…', loadE: 'Could not read the copies\' perks.', retry: 'Try again', fixT: 'Swap perk: this grade is reachable without another copy', opt: 'Optimize', optT: 'Switches to the perks of the top grade (perks only: masterwork, mod and origin trait stay)', optAll: n => `Optimize all (${n})`, best: 'best copy', twin: 'rolls from the other version',
+    askT: n => `Optimize ${n} weapons?`, askN: 'Only swaps perks the copy already has. Each swap is checked in game and can take a few seconds; with many weapons, a few minutes.', go: n => `Confirm and optimize ${n}`, cancel: 'Cancel', run: (a, b) => `Optimizing ${a}/${b}…`, stop: 'Stop', done: (a, f) => `${a} optimized${f ? ` · ${f} failed` : ''}.`, perm: 'Stopped: Bungie refused the permission. Sign out and in again and retry.', ok: 'Done.', chg: n => `${n} swap${n > 1 ? 's' : ''}`, items: n => `${n} weapons`, close: 'Close' } };
+const apt = () => APT[lang === 'pt' ? 'pt' : 'en'];
+function apChips(w) {
+  const T = apt(), ok = AP.av === 'ok', c = {}; if (ok) for (const x of w) { const e = apEval(x); if (e.g) c[e.g] = (c[e.g] || 0) + 1; if (e.plan?.length) c.fix = (c.fix || 0) + 1; }
+  return [['S', 'S'], ['A', 'A'], ['B', 'B'], ['C', 'C'], ['fix', T.fix]].map(([k, t]) => `<button type="button" class="ap-c" style="--g:${RG_C[k] || 'var(--acc, #6fd3ff)'}" data-apf="${k}" aria-pressed="${AP.f === k}"><small${k === 'fix' ? '' : ` title="${lang === 'pt' ? 'Nota ' : 'Grade '}${t}"`}>${esc(k === 'fix' ? t : (lang === 'pt' ? 'Nota ' : '') + t)}</small><b>${ok ? c[k] || 0 : '…'}</b></button>`).join('');
+}
+// armas com o mesmo nome (relançadas, Adept): usa os rolls da outra versão quando o hash não está no Voltron
+const TWN = new Map(); let TWC = {};
+function twLoad() {
+  if (AP.tw || AP.twB || !APIW) return; AP.twB = true;
+  const c = LS.get('dc-twins', null); if (c && Date.now() - c.at < 864e5) { AP.tw = c.g; twIdx(); AP.twB = false; return; }
+  fetch(APIW + '/twins').then(r => r.json()).then(j => { AP.tw = j.g || []; try { LS.set('dc-twins', { at: Date.now(), g: AP.tw }); } catch {} twIdx(); rapRedraw(); if (tab === 'inv' || tab === 'vlt') render(); }).catch(() => { AP.tw = []; }).finally(() => { AP.twB = false; });
+}
+function twIdx() { TWN.clear(); TWC = {}; APC.clear(); for (const g of AP.tw || []) for (const h of g) TWN.set(String(h), g); }
+function rlFor(h) {
+  if (!RL.m) return null; if (RL.m[h]) return RL.m[h]; if (!AP.tw) twLoad(); const g = TWN.get(String(h)); if (!g) return null;
+  if (TWC[h] !== undefined) return TWC[h]; const L = []; for (const o of g) if (RL.m[o]) for (const e of RL.m[o]) if (L.length < 150) L.push(e);
+  return (TWC[h] = L.length ? Object.assign(L, { tw: true }) : null);
+}
+// perks de todas as cópias numa chamada só (componente 310), guardados como no detalhe
+function apAvLoad(force) {
+  if (!member || (AP.av && !force && AP.av !== 'err')) return; if (AP.av === 'load') return; AP.av = 'load';
+  bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=305,310`).then(r => {
+    const rp = r.itemComponents?.reusablePlugs?.data || {}, so = r.itemComponents?.sockets?.data || {};
+    for (const [iid, v] of Object.entries(rp)) RAPP[iid] = Object.fromEntries(Object.entries(v.plugs || {}).map(([k, l]) => [k, l.filter(p => p.canInsert !== false && p.enabled !== false).map(p => p.plugItemHash)]));
+    for (const [iid, v] of Object.entries(so)) { (RL.so ||= {})[iid] = v; if (!RAPP[iid]) RAPP[iid] = {}; }
+    AP.av = 'ok'; AP.pk = false; APC.clear();
+  }).catch(() => { AP.av = 'err'; }).finally(() => { if (tab === 'inv' || tab === 'vlt') render(); });
+}
+// mesma "cara" de perk para a versão comum e a aprimorada (mesmo ícone)
+const apKey = h => { const e = entCache[lang]?.['DestinyInventoryItemDefinition:' + h]; return e?.ic || e?.n || 'h' + h; };
+function apPerkLoad(ws) {
+  if (AP.pk || AP.av !== 'ok') return; AP.pk = true; const hs = new Set();
+  for (const x of ws) { const so = RL.so?.[x.iid]?.sockets || []; so.forEach(s => s.plugHash && hs.add(s.plugHash)); Object.values(RAPP[x.iid] || {}).forEach(l => l.forEach(h => hs.add(h))); (rlFor(x.h) || []).forEach(e => e[0].forEach(h => hs.add(h))); }
+  entities('DestinyInventoryItemDefinition', [...hs], lang).catch(() => {}).finally(() => { AP.pkOk = true; APC.clear(); if (tab === 'inv' || tab === 'vlt') render(); });
+}
+// avaliação de uma cópia: nota atual, nota máxima com os perks dela e o que trocar para chegar lá
+const APG = (m, n) => !m ? 'C' : n - m === 0 ? 'S' : n - m === 1 ? 'A' : n - m === 2 ? 'B' : 'C';
+function apEval(x) {
+  const ck = x.iid + '|' + RL.mode; if (APC.has(ck)) return APC.get(ck);
+  let out;
+  const L0 = rlFor(x.h), so = RL.so?.[x.iid]?.sockets || profile?.itemComponents?.sockets?.data?.[x.iid]?.sockets;
+  if (x.ex) out = { why: 'ex' }; else if (!L0) out = { why: 'nol' }; else if (!so) out = { why: 'nos' };
+  else {
+    const L = L0.filter(e => RL.mode === 'both' || !e[1] || e[1] === (RL.mode === 'pve' ? 'e' : 'v'));
+    if (!L.length) out = { why: 'nol' };
+    else {
+      const av = RAPP[x.iid] || {}, cur = new Set(so.map(s => s.plugHash && apKey(s.plugHash)).filter(Boolean)), at = new Map(), freq = new Map();
+      so.forEach((s, si) => { for (const h of new Set([s.plugHash, ...(av[si] || [])])) { if (!h) continue; const k = apKey(h); if (!at.has(k)) at.set(k, []); at.get(k).push([si, h]); } });
+      for (const e of L) for (const p of e[0]) { const k = apKey(p); freq.set(k, (freq.get(k) || 0) + 1); }
+      let best = null, now = null;
+      for (const e of L) {
+        const n = e[0].length; let m = 0, mc = 0; const used = new Set(), plan = [];
+        for (const p of e[0]) { const k = apKey(p); if (cur.has(k)) { m++; mc++; const c = at.get(k)?.find(c => so[c[0]]?.plugHash && apKey(so[c[0]].plugHash) === k); if (c) used.add(c[0]); continue; }
+          const c = (at.get(k) || []).find(c => !used.has(c[0])); if (c) { m++; used.add(c[0]); plan.push(c); } }
+        const sc = m / n, fq = e[0].reduce((a, p) => a + (freq.get(apKey(p)) || 0), 0);
+        if (!best || sc > best.sc || (sc === best.sc && (plan.length < best.plan.length || (plan.length === best.plan.length && (n > best.n || (n === best.n && fq > best.fq)))))) best = { e, m, n, sc, plan, fq };
+        if (!now || mc / n > now.sc) now = { sc: mc / n, m: mc, n };
+      }
+      const g = APG(best.m, best.n), gc = APG(now.m, now.n);
+      out = { g, gc, pct: Math.round(best.sc * 100), e: best.e, m: best.m, n: best.n, plan: 'SABC'.indexOf(gc) > 'SABC'.indexOf(g) ? best.plan : [], tw: !!L0.tw, L };
+    }
+  }
+  APC.set(ck, out); return out;
+}
+const apClear = iid => { for (const k of [...APC.keys()]) if (!iid || k.startsWith(iid + '|')) APC.delete(k); };
+const apStop = e => e?.code === 2108 || e?.code === 12 || e?.code === 99 || e?.message === 'auth';
+async function apOpt(x, ev) {
+  const T = apt(); if (!ev?.plan?.length || AP.busy) return { ok: 0 }; AP.busy = x.iid; AP.msg[x.iid] = { t: '…' }; render();
+  const r = await rapApply(x, ev.plan.map(([si, h]) => [si, h])); AP.busy = ''; apClear(x.iid); RAP.msg = null;
+  AP.msg[x.iid] = r.err && !r.ok ? { bad: true, t: wMsg(r.err) } : r.err ? { t: rapt().partial(r.ok, ev.plan.length - r.ok) } : { ok: true, t: T.ok };
+  render(); return r;
+}
+function apRow(x, ev, k, bestIid) {
+  const T = apt(), d = INVD[x.h] || {}, g = ev.g, c = RG_C[g], so = RL.so?.[x.iid]?.sockets || [], av = RAPP[x.iid] || {}, rec = new Set(ev.e[0].map(apKey));
+  const sis = [...new Set([...ev.plan.map(p => p[0]), ...so.map((s, si) => [s, si]).filter(([s, si]) => s.plugHash && (rec.has(apKey(s.plugHash)) || (av[si] || []).length > 1 && ev.L.some(e => e[0].some(p => (av[si] || []).some(h => apKey(h) === apKey(p)))))).map(([, si]) => si)])].sort((a, b) => a - b);
+  const ent = h => entCache[lang]?.['DestinyInventoryItemDefinition:' + h] || {};
+  const cols = sis.map(si => { const curH = so[si]?.plugHash, opts = [...new Set([curH, ...(av[si] || [])])].filter(Boolean), to = ev.plan.find(p => p[0] === si)?.[1];
+    return `<span class="ap-col">${opts.slice(0, 6).map(h => { const e = ent(h), on = h === curH, r = rec.has(apKey(h)); return `<i class="ap-pk${on ? ' on' : ''}${r ? ' r' : ''}${h === to ? ' to' : ''}" title="${esc((e.n || '') + (r ? ' · ✓' : ''))}">${e.ic ? `<img src="${BNET}${e.ic}" alt="" loading="lazy">` : ''}</i>`; }).join('')}</span>`; }).join('');
+  const open = AP.open === x.iid, m = AP.msg[x.iid];
+  return `<div class="ap-r${open ? ' open' : ''}" style="--g:${c}"><button type="button" class="ap-h" data-apopen="${x.iid}" aria-expanded="${open}">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy">` : '<span></span>'}<span class="ap-n"><b>${esc(d.n || '…')}</b><small>${esc([x.pw ? '✦ ' + x.pw : '', k > 1 ? `×${k}` : '', k > 1 && x.iid === bestIid ? '★ ' + T.best : '', ev.tw ? T.twin : ''].filter(Boolean).join(' · '))}</small></span><span class="ap-cols">${cols}</span><b class="ap-g" title="${esc(rapt().cols(ev.m, ev.n))}">${g}</b></button>${ev.plan.length ? `<span class="ap-fix" title="${esc(T.fixT)}">↻ ${esc(ev.gc)}→${esc(g)}<button type="button" class="ap-opt" data-apopt="${x.iid}" title="${esc(T.optT)}" ${AP.busy ? 'disabled' : ''}>${esc(AP.busy === x.iid ? '…' : T.opt)}</button></span>` : ''}${m ? `<small class="ap-m${m.bad ? ' bad' : m.ok ? ' ok' : ''}">${esc(m.t)}</small>` : ''}${open ? `<div class="ap-x">${rapInsHTML({ x, r: rapGrade(x) }, rapList(), true).ins}</div>` : ''}</div>`;
+}
+function apHTML(all) {
+  const T = apt(), W = u(), P = lang === 'pt'; if (RL.st !== 'ok') { if (!RL.st) setTimeout(rlLoad); return `<div class="panel iv-wrap">${rlBar(all)}</div>`; }
+  apAvLoad(); twLoad(); rapClan(); if (!PKN.done) pkLoad();
+  const ws = all.filter(x => x.slot < 3); if (AP.av === 'ok') apPerkLoad(ws);
+  if (AP.av !== 'ok') return `<div class="panel iv-wrap">${rlBar(all)}<p class="${AP.av === 'err' ? 'iv-msg bad' : 'wait empty-msg'}">${esc(AP.av === 'err' ? T.loadE : T.load)}${AP.av === 'err' ? ` <button type="button" class="linkb" data-apretry>${esc(T.retry)}</button>` : ''}</p></div>`;
+  const q = palNorm(AP.q.trim()), tl = x => INVD[x.h]?.tl || '…', cnt = {}; ws.forEach(x => cnt[x.h] = (cnt[x.h] || 0) + 1);
+  const E = new Map(ws.map(x => [x.iid, apEval(x)])), rank = g => 'SABC'.indexOf(g);
+  const bestOf = {}; for (const x of ws) { const e = E.get(x.iid); if (!e.g) continue; const b = bestOf[x.h]; if (!b || rank(e.g) < rank(E.get(b.iid).g) || (rank(e.g) === rank(E.get(b.iid).g) && x.pw > b.pw)) bestOf[x.h] = x; }
+  const vis = x => (!AP.ty || tl(x) === AP.ty) && (!q || palNorm(ivName(x) + ' ' + pkNames(x)).includes(q));
+  const ok = x => { const e = E.get(x.iid); return e.g && vis(x) && (!AP.f || (AP.f === 'fix' ? e.plan.length : e.g === AP.f)); };
+  const chars = ivChars(), locs = [...chars.map(c => [c.characterId, `${W.classes[c.classType] || ''}`, c.light, c.emblemBackgroundPath]), ['v', T.vault, 0, '']];
+  const fixAll = ws.filter(x => vis(x) && E.get(x.iid).plan?.length);
+  const secs = locs.map(([w, n, li, emb]) => {
+    const xs = ws.filter(x => x.where === w && ok(x)); if (!xs.length) return '';
+    const by = {}; for (const x of xs) (by[tl(x)] ||= []).push(x);
+    const blocks = Object.keys(by).sort((a, b) => a.localeCompare(b)).map(t => { const L = by[t], bg = h => rank(E.get(bestOf[h]?.iid)?.g || 'C');
+      L.sort((a, b) => bg(a.h) - bg(b.h) || ivName(a).localeCompare(ivName(b)) || rank(E.get(a.iid).g) - rank(E.get(b.iid).g) || b.pw - a.pw);
+      return `<div class="ap-blk"><h4>${esc(t)} <small>${L.length}</small></h4>${L.map(x => apRow(x, E.get(x.iid), cnt[x.h], bestOf[x.h]?.iid)).join('')}</div>`; }).join('');
+    return `<section class="ap-sec"><header class="ap-sh"${emb ? ` style="--emb:url('${BNET}${emb}')"` : ''}><b>${esc(n)}</b>${li ? `<span>✦ ${li}</span>` : ''}<small>${esc(T.items(xs.length))}</small></header>${blocks}</section>`;
+  }).join('');
+  const no = ws.filter(x => !E.get(x.iid).g && vis(x));
+  const noH = no.length ? `<details class="ap-no"><summary><b>${esc(T.none)}</b> <small>${esc(T.noneN(no.length))}</small></summary>${no.sort((a, b) => ivName(a).localeCompare(ivName(b))).map(x => { const d = INVD[x.h] || {}, loc = x.where === 'v' ? T.vault : W.classes[profile.characters?.data?.[x.where]?.classType] || ''; return `<div class="ap-nr">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy">` : '<span></span>'}<span><b>${esc(d.n || '…')}</b><small>${esc([tl(x), loc, x.pw ? '✦ ' + x.pw : ''].filter(Boolean).join(' · '))}</small></span><small>${esc(T.why[E.get(x.iid).why])}</small></div>`; }).join('')}</details>` : '';
+  const tys = [...new Set(ws.map(tl))].sort();
+  const B = AP.bulk, bulk = !B ? '' : B.st === 'ask' ? `<div class="lkb"><b>${esc(T.askT(B.ids.length))}</b><small>${esc(T.askN)}</small><div class="lkb-l">${B.ids.map(id => ws.find(x => x.iid === id)).filter(Boolean).map(x => { const e = E.get(x.iid); return `<span>${esc(ivName(x))} <small>${esc(e.gc)}→${esc(e.g)} · ${esc(T.chg(e.plan.length))}</small></span>`; }).join('')}</div><div class="lkb-a"><button type="button" class="lb-run" data-apgo>${esc(T.go(B.ids.length))}</button><button type="button" class="linkb" data-apbx>${esc(T.cancel)}</button></div></div>`
+    : B.st === 'run' ? `<div class="lkb" aria-live="polite"><b class="wait">${esc(T.run(B.n + B.f + 1 > B.ids.length ? B.ids.length : B.n + B.f + 1, B.ids.length))}</b><button type="button" class="linkb" data-apbstop>${esc(T.stop)}</button></div>`
+    : `<div class="lkb" aria-live="polite"><b>${esc(B.perm ? T.perm : T.done(B.n, B.f))}</b><button type="button" class="linkb" data-apbx>OK</button></div>`;
+  const bar = `<div class="ap-bar"><label class="iv-q"><input type="search" id="apq" value="${esc(AP.q)}" placeholder="${esc(T.q)}" aria-label="${esc(T.q)}" autocomplete="off" spellcheck="false"></label><select id="apty" aria-label="${esc(T.type)}"><option value="">${esc(T.anyT)}</option>${tys.map(t => `<option${t === AP.ty ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select>${fixAll.length ? `<button type="button" class="lb-run ap-all" data-apall ${AP.busy || B?.st === 'run' ? 'disabled' : ''}>${esc(T.optAll(fixAll.length))}</button>` : ''}</div>`;
+  return `<div class="panel iv-wrap ap">${rlBar(all)}${bar}${bulk}${secs || `<p class="empty-msg">—</p>`}${noH}<p class="rap-leg">${esc(rapt().legend)}</p></div>`;
+}
+document.addEventListener('click', async e => {
+  const t = e.target;
+  if (t.closest('[data-rap]')) { e.preventDefault(); if (!BETA) { rapOpen(INV.sel && $('ivdlg')?.open ? INV.sel : ''); return; } $('ivdlg')?.open && $('ivdlg').close(); AP.on = !AP.on; LS.set('dc-rapon', AP.on); if (AP.on && tab !== 'inv' && tab !== 'vlt') go('inv'); else render(); return; }
+  if (!AP.on) return;
+  const ap = t.closest('[data-apf]'); if (ap) { AP.f = AP.f === ap.dataset.apf ? '' : ap.dataset.apf; render(); return; }
+  if (t.closest('[data-apretry]')) { AP.av = ''; apAvLoad(true); render(); return; }
+  const o = t.closest('[data-apopen]'); if (o) { const id = o.dataset.apopen; AP.open = AP.open === id ? '' : id; RAP.sel = id; RAP.sim = {}; RAP.msg = null; render(); return; }
+  const op = t.closest('[data-apopt]'); if (op) { const x = invAll().find(y => y.iid === op.dataset.apopt); if (x) apOpt(x, apEval(x)); return; }
+  if (t.closest('.ap-x')) { rapClick(e); return; }
+  if (t.closest('[data-apall]')) { const ws = invAll().filter(x => x.slot < 3); AP.bulk = { st: 'ask', ids: ws.filter(x => apEval(x).plan?.length && (!AP.ty || INVD[x.h]?.tl === AP.ty) && (!AP.q.trim() || palNorm(ivName(x) + ' ' + pkNames(x)).includes(palNorm(AP.q.trim())))).map(x => x.iid), n: 0, f: 0 }; render(); return; }
+  if (t.closest('[data-apbx]')) { AP.bulk = null; render(); return; }
+  if (t.closest('[data-apbstop]') && AP.bulk) { AP.bulk.stop = true; return; }
+  if (t.closest('[data-apgo]') && AP.bulk?.st === 'ask') { const B = AP.bulk; B.st = 'run'; render();
+    for (const id of B.ids) { if (B.stop) break; const x = invAll().find(y => y.iid === id); const ev = x && apEval(x); if (!ev?.plan?.length) { B.n++; continue; } const r = await apOpt(x, ev); if (r.err && apStop(r.err)) { B.perm = true; B.f++; break; } if (r.err || !r.ok) B.f++; else B.n++; render(); }
+    B.st = 'done'; render(); }
+});
+document.addEventListener('input', e => { if (e.target.id !== 'apq') return; AP.q = e.target.value; clearTimeout(AP.qt); AP.qt = setTimeout(() => { const pos = e.target.selectionStart; render(); const q = $('apq'); if (q) { q.focus(); try { q.setSelectionRange(pos, pos); } catch {} } }, 180); });
+document.addEventListener('change', e => { if (e.target.id === 'apty') { AP.ty = e.target.value; render(); } });
 
 /* ---------- Celular: as 5 abas numa barra fixa embaixo ---------- */
 const BOT_IC = { obj: '<circle cx="10" cy="10" r="3.2"/><path d="M10 2.5v2M10 15.5v2M2.5 10h2M15.5 10h2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M4.7 15.3l1.4-1.4M13.9 6.1l1.4-1.4"/>', act: '<path d="M4 16V10M10 16V4M16 16v-6"/>', drops: '<rect x="3" y="7" width="14" height="9" rx="1.5"/><path d="M7.5 7V4.5h5V7"/>', gd: '<path d="M10 2.8l6 2.6v4.2c0 3.6-2.6 6.2-6 7.4-3.4-1.2-6-3.8-6-7.4V5.4z"/>', clan: '<circle cx="7" cy="7" r="2.6"/><circle cx="14" cy="8" r="2"/><path d="M2.5 16.5c.6-2.7 2.3-4.2 4.5-4.2s3.9 1.5 4.5 4.2M12.2 12.6c2.4-.5 4.4.8 5.3 3.4"/>' };

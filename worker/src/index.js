@@ -528,6 +528,10 @@ export default {
         for (const x of r.results) { const o = w[x.h] ||= { n: 0, p: {} }; o.n++; for (const k of x.p.split(',')) o.p[k] = (o.p[k] || 0) + 1; }
         return new Response(JSON.stringify({ w, at: Date.now() }), { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=1800', ...cors(req) } });
       }
+      if (path === '/twins' && req.method === 'GET') { // armas lendárias com o mesmo nome e hashes diferentes (relançadas, Adept), gerado pelo script do manifesto
+        const v = (await env.DB.prepare("SELECT v FROM meta WHERE k = 'twins'").first().catch(() => null))?.v || '{"g":[]}';
+        return new Response(v, { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=21600', ...cors(req) } });
+      }
       if (path === '/err' && req.method === 'POST') { // erro de JavaScript de um visitante (sem dados da conta)
         const b = await req.json().catch(() => null); if (!b?.m) return json(req, { ok: false }, 400);
         const ip = req.headers.get('CF-Connecting-IP') || '', k = 'e' + ip, n = (errHits.get(k) || 0) + 1; errHits.set(k, n); if (n > 20) return json(req, { ok: false }, 429);

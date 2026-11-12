@@ -37,7 +37,13 @@ async function main() {
   if (mr.ErrorCode !== 1) throw new Error('manifesto: ' + mr.Message);
   const M = mr.Response, version = M.version;
   const prev = JSON.parse((await q("SELECT v FROM meta WHERE k = 'manifest'")).results?.[0]?.v || 'null');
-  if (prev?.version === version && prev?.done && !process.env.FORCE) { log('manifesto já carregado:', version); return; }
+  const getDefs = async (lc, type) => { const path = M.jsonWorldComponentContentPaths?.[LC[lc]]?.[type]; const r = await fetch('https://www.bungie.net' + path); if (!r.ok) throw new Error(`${type} ${lc}: HTTP ${r.status}`); return r.json(); };
+  // gêmeos por nome (Roll Appraiser: arma relançada ou Adept usa os rolls recomendados da outra versão)
+  const tw = JSON.parse((await q("SELECT v FROM meta WHERE k = 'twins'")).results?.[0]?.v || 'null');
+  const saveTwins = async defs => { const by = {}; for (const [h, d] of Object.entries(defs)) { if (d.itemType !== 3 || d.inventory?.tierType !== 5 || !d.displayProperties?.name || d.redacted) continue; (by[d.displayProperties.name] ||= []).push(+h >>> 0); }
+    const g = Object.values(by).filter(x => x.length > 1); await q("INSERT OR REPLACE INTO meta (k, v) VALUES ('twins', ?)", [JSON.stringify({ v: version, g })]); log('gêmeos por nome:', g.length, 'grupos'); };
+  const twinsOld = tw?.v !== version;
+  if (prev?.version === version && prev?.done && !process.env.FORCE) { log('manifesto já carregado:', version); if (twinsOld) await saveTwins(await getDefs('en', 'DestinyInventoryItemDefinition')); return; }
   log('manifesto', version, prev ? `(anterior: ${prev.version}, completo: ${prev.done})` : '(primeira carga)');
 
   // o que já está no banco (para gravar só o que mudou)
@@ -73,6 +79,7 @@ async function main() {
   };
   for (const [type, lc] of jobs) {
     const defs = await get(lc, type);
+    if (type === 'DestinyInventoryItemDefinition' && lc === 'en' && twinsOld) await saveTwins(defs);
     const perks = type === 'DestinyEquipableItemSetDefinition' ? await get(lc, 'DestinySandboxPerkDefinition') : null;
     const rows = [];
     for (const [h, d] of Object.entries(defs)) {
