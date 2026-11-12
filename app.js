@@ -1594,7 +1594,22 @@ document.addEventListener('click', e => {
   const jw = e.target.closest('[data-alwi]'); if (jw) { const j = jw; const sn = LS.get('dc-wish-seen', []); sn.push(j.dataset.alwi); LS.set('dc-wish-seen', sn.slice(-300)); INV.q = j.dataset.alwq; INV.f = 'all'; go('inv'); setTimeout(() => ivOpen(j.dataset.alwi), 300); return; }
   const j = e.target.closest('[data-alj]'); if (j) { const [t, id] = j.dataset.alj.split(':'); if (id === 'post') openSecs.add('post'); jumpTo(t, id); }
 });
+// erros de JavaScript: avisa o servidor (sem dados da conta) para achar telas em branco; no máximo 5 por visita
+const ERRS = { n: 0, seen: new Set() };
+function errReport(m, where) {
+  try { const k = String(m).slice(0, 200); if (ERRS.n >= 5 || ERRS.seen.has(k)) return; ERRS.seen.add(k); ERRS.n++;
+    const v = `${location.pathname}#${typeof tab === 'string' ? tab : ''} ${where || ''} ${document.querySelector('script[src*="app.js"]')?.src.split('?')[1] || ''}`.trim();
+    if (typeof APIW === 'string' && APIW) fetch(APIW + '/err', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ m, v }), keepalive: true }).catch(() => {}); } catch {}
+}
+addEventListener('error', e => errReport(`${e.message} @${(e.filename || '').split('/').pop()}:${e.lineno}:${e.colno}`, 'global'));
+addEventListener('unhandledrejection', e => { const r = e.reason; if (r?.message === 'auth' || r?.message === 'moving') return; errReport(`${r?.message || r} ${String(r?.stack || '').split('\n').slice(1, 4).join(' | ')}`, 'promise'); });
 function render() {
+  try { renderInner(); } catch (e) {
+    errReport(`${e.message} ${String(e.stack || '').split('\n').slice(1, 5).join(' | ')}`, 'render');
+    const l = $('list'); if (l && !l.innerHTML.trim()) l.innerHTML = `<div class="panel"><section class="ad-s ad-wide"><p class="iv-msg bad">${lang === 'pt' ? 'Algo deu errado ao montar esta tela. O erro já foi enviado para correção.' : 'Something went wrong building this screen. The error was reported.'} <button type="button" class="linkb" onclick="location.reload()">${lang === 'pt' ? 'Recarregar' : 'Reload'}</button></p><small class="lbd-n">${String(e.message).replace(/[<>&]/g, '')}</small></section></div>`;
+  }
+}
+function renderInner() {
   applyUI();
   if (GRADE && !(auth && profile)) { gradeRender(); return; }
   const logged = !!(auth && profile);

@@ -282,6 +282,7 @@ async function socialBackfill(req, env, url) {
 // Quem joga com quem: uma vez por dia, pelo histórico de partidas de cada membro (só atividades; Torre e órbita não contam).
 // Roda no cron de hora em hora, um clã por vez, entre 05h e 23h (Brasília); cada clã guarda até onde já foi lido (socw).
 // "Popular no clã": uma vez por dia, lê as armas equipadas (e os perks encaixados) de cada membro de um clã que usa o site
+const errHits = new Map(); // limite simples por IP (por instância do worker)
 async function clanRollsDaily(env) {
   const key = (await env.DB.prepare("SELECT v FROM meta WHERE k = 'bkey'").first().catch(() => null))?.v; if (!key) return;
   const now = Date.now(), rows = (await env.DB.prepare("SELECT uid, v FROM kv WHERE k = 'hours' AND uid LIKE 'clan:%' LIMIT 200").all().catch(() => ({ results: [] }))).results || [];
@@ -526,6 +527,17 @@ export default {
         const r = await env.DB.prepare('SELECT h, p FROM croll WHERE g = ?').bind(g).all().catch(() => ({ results: [] })), w = {};
         for (const x of r.results) { const o = w[x.h] ||= { n: 0, p: {} }; o.n++; for (const k of x.p.split(',')) o.p[k] = (o.p[k] || 0) + 1; }
         return new Response(JSON.stringify({ w, at: Date.now() }), { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=1800', ...cors(req) } });
+      }
+      if (path === '/err' && req.method === 'POST') { // erro de JavaScript de um visitante (sem dados da conta)
+        const b = await req.json().catch(() => null); if (!b?.m) return json(req, { ok: false }, 400);
+        const ip = req.headers.get('CF-Connecting-IP') || '', k = 'e' + ip, n = (errHits.get(k) || 0) + 1; errHits.set(k, n); if (n > 20) return json(req, { ok: false }, 429);
+        await env.DB.batch([env.DB.prepare('INSERT INTO errs (t, m, v, ua) VALUES (?, ?, ?, ?)').bind(Date.now(), String(b.m).slice(0, 1200), String(b.v || '').slice(0, 120), String(req.headers.get('User-Agent') || '').slice(0, 160)),
+          env.DB.prepare('DELETE FROM errs WHERE id NOT IN (SELECT id FROM errs ORDER BY id DESC LIMIT 300)')]).catch(() => {});
+        return json(req, { ok: true });
+      }
+      if (path === '/err' && req.method === 'GET') { // só o dono: últimos erros
+        const uid = await who(req, env); if (!uid || uid !== String(env.OWNER)) return json(req, { error: 'forbidden' }, 403);
+        const r = await env.DB.prepare('SELECT t, m, v, ua FROM errs ORDER BY id DESC LIMIT 100').all().catch(() => ({ results: [] })); return json(req, { list: r.results });
       }
       if (path === '/hit' && req.method === 'POST') return await hit(req, env);
       if (path === '/pub' && req.method === 'POST') return await pubPost(req, env);
