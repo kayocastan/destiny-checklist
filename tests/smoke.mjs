@@ -32,7 +32,7 @@ function profile() {
 }
 const GRADES = [{ id: 1, name: 'Queda do Rei: Normal', g: null, ci: null, desc: '**Atenção**\n\nSó quem já fez.', cap: 6, rk: 0, s: iso(now + 864e5), by: 'Peter', url: null, mine: null, creator: false, p: [{ n: 'Peter', c: 'titular', r: 0 }] }];
 
-async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin = false, xsave = false, expectSub = null, expired = false, mobile = false, clicks = true }) {
+async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin = false, xsave = false, expectSub = null, expired = false, mobile = false, clicks = true, owner = false, vc = '', noSub = null, expectBar = false }) {
   const b = await chromium.launch(), ctx = await b.newContext(mobile ? { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true } : { viewport: { width: 1366, height: 900 } });
   const page = await ctx.newPage(), errs = [], seen = { refresh: 0 };
   page.on('pageerror', e => errs.push('pageerror: ' + e.message));
@@ -56,7 +56,7 @@ async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin =
     }
     if (u.hostname === 'dni-api.dni-site.workers.dev') {
       if (u.pathname === '/defs') return j({});
-      if (u.pathname === '/videos') return j({ list: [] }); if (u.pathname === '/guias') return j({ m: {} }); if (u.pathname === '/whoami') return j({ owner: false });
+      if (u.pathname === '/videos') return j({ list: [] }); if (u.pathname === '/guias') return j({ m: {} }); if (u.pathname === '/whoami') return j({ owner, uid: owner ? 'u1' : undefined });
       return j({});
     }
     if (u.hostname === 'orla-bot.dni-site.workers.dev') {
@@ -71,16 +71,16 @@ async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin =
     return r.fulfill({ status: 200, body: '' });
   });
   const A = { access_token: 'a', access_expires: expired ? now - 1000 : now + 36e5, refresh_token: 'r', refresh_expires: now + 90 * 864e5, membership_id: '99' };
-  await page.addInitScript(([a, ls]) => { try { if (a) localStorage.setItem('dc-auth', JSON.stringify(a)); localStorage.setItem('dc-authv', '2'); for (const [k, v] of Object.entries(ls)) localStorage.setItem(k, JSON.stringify(v)); } catch {} }, [auth ? A : null, ls]);
+  await page.addInitScript(([a, ls, vc]) => { try { if (a) localStorage.setItem('dc-auth', JSON.stringify(a)); localStorage.setItem('dc-authv', '2'); for (const [k, v] of Object.entries(ls)) localStorage.setItem(k, JSON.stringify(v)); if (vc) sessionStorage.setItem('dc-vc', vc); } catch {} }, [auth ? A : null, ls, vc]);
   const fail = [];
   await page.goto(ORIGIN + path); await page.waitForTimeout(2500);
   const blank = async where => {
-    for (let t = 0; t < 12; t++) { if ((await page.evaluate(() => (document.getElementById('list')?.innerText || '').trim().length)) >= 5) break; await page.waitForTimeout(500); }
+    for (let t = 0; t < 24; t++) { if ((await page.evaluate(() => (document.getElementById('list')?.innerText || '').trim().length)) >= 5) break; await page.waitForTimeout(500); }
     const st = await page.evaluate(() => { const l = document.getElementById('list'), w = document.querySelector('.wrap'); return { n: (l?.innerText || '').trim().length, hidden: w ? getComputedStyle(w).visibility === 'hidden' : false, html: (l?.innerHTML || '').slice(0, 200) }; });
     if (st.n < 5 || st.hidden) fail.push(`${where}: tela em branco${process.env.DBG ? ' · ' + st.html : ''}`);
   };
   await blank(path);
-  if (clicks && auth && path === '/') {
+  if (clicks && auth && (path === '/' || path === '/beta')) {
     const groups = await page.$$eval('#tabs .tab', t => t.map(x => x.dataset.group));
     for (const g of groups) {
       await page.evaluate(g => document.querySelector(`#tabs .tab[data-group="${g}"]`)?.click(), g); await page.waitForTimeout(600); await blank('aba ' + g);
@@ -89,6 +89,9 @@ async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin =
     }
   }
   if (expectSub) { const [g, sub] = expectSub; await page.evaluate(g => document.querySelector(`#tabs .tab[data-group="${g}"]`)?.click(), g); for (let t = 0; t < 10; t++) { if (await page.$(`#subtabs .sub[data-sub="${sub}"]`)) break; await page.waitForTimeout(500); } if (!(await page.$(`#subtabs .sub[data-sub="${sub}"]`))) fail.push(`subaba ${sub} não apareceu`); }
+  if (noSub) { const [g, sub] = noSub; await page.evaluate(g => document.querySelector(`#tabs .tab[data-group="${g}"]`)?.click(), g); await page.waitForTimeout(1500); if (await page.$(`#subtabs .sub[data-sub="${sub}"]`)) fail.push(`subaba ${sub} apareceu e não devia`); }
+  if (expectBar && !(await page.$('#vcbar'))) fail.push('barra "ver como" não apareceu');
+  if (!owner && await page.$('#vcbar')) fail.push('barra "ver como" apareceu para quem não é dono');
   if (expired && seen.refresh !== 1) fail.push(`login vencido: renovou ${seen.refresh} vezes (devia ser 1)`);
   await b.close();
   const all = [...fail, ...errs];
@@ -107,6 +110,9 @@ R.push(await run('aba de admin guardada, sem ser admin', { ls: { 'dc-tab': 'gcla
 R.push(await run('aba que não existe mais', { ls: { 'dc-tab': 'xyz' }, clicks: false }));
 R.push(await run('/grade: membro do clã', { path: '/grade', clicks: false }));
 R.push(await run('/grade: inglês', { path: '/grade', ls: { 'dc-lang': 'en' }, clicks: false }));
+R.push(await run('/beta ver como: membro comum (admin real)', { path: '/beta', owner: true, admin: true, vc: 'm', ls: { 'dc-ownchk': { o: true, t: Date.now() } }, noSub: ['clan', 'gcla'], expectBar: true }));
+R.push(await run('/beta ver como: sem clã', { path: '/beta', owner: true, vc: 'n', ls: { 'dc-ownchk': { o: true, t: Date.now() } }, expectBar: true }));
+R.push(await run('/beta ver como: agenda recusada', { path: '/beta', owner: true, vc: 'a', ls: { 'dc-ownchk': { o: true, t: Date.now() }, 'dc-tab': 'gcl' }, clicks: false, expectBar: true }));
 R.push(await run('/grade: sem login', { path: '/grade', auth: false, clicks: false }));
 const bad = R.filter(x => !x).length;
 console.log(bad ? `\n${bad} teste(s) falharam.` : '\nTudo certo.');

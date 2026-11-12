@@ -162,6 +162,10 @@ const isGd = () => tab === 'gd' || tab === 'gcl' || tab === 'gclb' || tab === 'g
 // Página de teste (/beta): só para o dono do site; recursos novos aparecem aqui antes de ir para todos
 const VAULT_MAX = 1300; // espaços do cofre (1300 desde o Update 9.7.0)
 const BETA = location.pathname.replace(/\/+$/, '') === '/beta'; // página de testes do dono (/beta)
+/* "ver como" (só no /beta, só o dono): simula outro perfil sem trocar de conta. m = membro comum, n = sem clã, a = agenda recusada (403), e = agenda fora do ar */
+const VC = (() => { if (!BETA) return ''; try { return sessionStorage.getItem('dc-vc') || ''; } catch { return ''; } })();
+const ownerReal = () => !!LS.get('dc-ownchk', {}).o, isOwner = () => ownerReal() && !VC;
+const vcGd = o => VC === 'n' && o ? { ...o, clan: { none: true } } : o;
 const FX = true; // recursos que passaram pelo /beta e agora valem para todos
 if (FX) GROUPS[0].subs = ['obj', 'prog', 'cal'];
 if (BETA) GROUPS[3].subs = ['gd', 'gar', 'grep', 'gst']; // Armaduras (tier list dos conjuntos): só no /beta por enquanto
@@ -1402,10 +1406,10 @@ async function loadGuardian(my) {
     (async () => { const c = profile.profileCommendations?.data; if (!c) return; out.comm = c; const ks = Object.keys(c.commendationNodePercentagesByHash || {}).map(Number); if (ks.length) out.commNames = await entities('DestinySocialCommendationNodeDefinition', ks, lang); })(),
   ];
   // cada parte aparece assim que chega (o esquadrão recente, por exemplo, demora mais)
-  let t = null; const show = () => { if (t) return; t = setTimeout(() => { t = null; if (charId === out.cid) { GD = out; if (isGd()) render(); } }, 150); };
+  let t = null; const show = () => { if (t) return; t = setTimeout(() => { t = null; if (charId === out.cid) { GD = vcGd(out); if (isGd()) render(); } }, 150); };
   out.cid = charId; out.at = Date.now();
   await Promise.allSettled(tasks.map(x => x.then(show, show)));
-  gdLoading = false; out.partial = false; clearTimeout(t); GD = out; if (isGd()) render();
+  gdLoading = false; out.partial = false; clearTimeout(t); GD = vcGd(out); if (isGd()) render();
 }
 function gdHTML() {
   const W = u().w, G = GD, p = profile, cp = p.characterProgressions?.data?.[charId];
@@ -1604,7 +1608,16 @@ function errReport(m, where) {
 }
 addEventListener('error', e => errReport(`${e.message} @${(e.filename || '').split('/').pop()}:${e.lineno}:${e.colno}`, 'global'));
 addEventListener('unhandledrejection', e => { const r = e.reason; if (r?.message === 'auth' || r?.message === 'moving') return; errReport(`${r?.message || r} ${String(r?.stack || '').split('\n').slice(1, 4).join(' | ')}`, 'promise'); });
+function vcBar() { // barra do "ver como": aparece só para o dono no /beta
+  let b = $('vcbar'); if (!ownerReal() || !member) { if (b) b.remove(); return; } if (b) return;
+  const O = [['', 'Eu (dono)'], ['m', 'Membro comum'], ['n', 'Sem clã'], ['a', 'Agenda recusada'], ['e', 'Agenda fora do ar']];
+  b = document.createElement('div'); b.id = 'vcbar'; b.className = 'vcbar' + (VC ? ' on' : '');
+  b.innerHTML = `<label for="vcsel">${VC ? '👁 Vendo como' : 'Ver como'}</label><select id="vcsel">${O.map(([v, t]) => `<option value="${v}"${v === VC ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
+  b.querySelector('select').addEventListener('change', e => { try { sessionStorage.setItem('dc-vc', e.target.value); } catch {} location.reload(); });
+  document.body.appendChild(b);
+}
 function render() {
+  if (BETA) vcBar();
   try { renderInner(); } catch (e) {
     errReport(`${e.message} ${String(e.stack || '').split('\n').slice(1, 5).join(' | ')}`, 'render');
     const l = $('list'); if (l && !l.innerHTML.trim()) l.innerHTML = `<div class="panel"><section class="ad-s ad-wide"><p class="iv-msg bad">${lang === 'pt' ? 'Algo deu errado ao montar esta tela. O erro já foi enviado para correção.' : 'Something went wrong building this screen. The error was reported.'} <button type="button" class="linkb" onclick="location.reload()">${lang === 'pt' ? 'Recarregar' : 'Reload'}</button></p><small class="lbd-n">${String(e.message).replace(/[<>&]/g, '')}</small></section></div>`;
@@ -1643,7 +1656,7 @@ function renderInner() {
   $('tabs').innerHTML = GROUPS.map(g => `<button class="tab" type="button" data-group="${g.id}" aria-current="${groupOf(tab)?.id === g.id}">${esc(U.tabs[g.id])}</button>`).join('');
   botNav();
   // atalho do Orla Bot no topo (só membros da Orla): confere o clã uma vez por dia, mesmo sem abrir a aba Clã
-  { const vb = $('vidbtn'); if (vb) vb.hidden = !member || !LS.get('dc-ownchk', {}).o; } // atalho da página /guias: só o dono do site
+  { const vb = $('vidbtn'); if (vb) vb.hidden = !member || !isOwner(); } // atalho da página /guias: só o dono do site
   { const gb = $('gradebtn'); if (gb) { if (GD?.clan?.gid) LS.set('dc-orla', { ok: GD.clan.gid === ORLA_CLAN, at: Date.now() }); const o = LS.get('dc-orla', null);
     if (member && (!o || Date.now() - o.at > 864e5) && !orlaChk) { orlaChk = true; bungie(`/GroupV2/User/${member.type}/${member.id}/0/1/`).then(r => { LS.set('dc-orla', { ok: (r.results || []).some(x => String(x.group?.groupId) === ORLA_CLAN), at: Date.now() }); render(); }).catch(() => {}); }
     gb.hidden = !member || !(o?.ok || orlaOK() || GRADE); gb.classList.toggle('on', GRADE); gb.title = lang === 'pt' ? 'Orla Bot: criar ou ver grades do clã' : 'Orla Bot: create or see clan rosters'; } }
@@ -2926,7 +2939,7 @@ const ADT = { pt: { only: 'Só para fundador e admins', onlyN: 'Esta aba aparece
   en: { only: 'Founder and admins only', onlyN: 'This tab only shows for those roles in the clan (and the site owner). Actions ask for confirmation and are logged in the clan history at Bungie.', inT: 'Inactive review', vagas: (a, b) => `${a}/100 · ${b} open spots`, check: 'Check before removing.', checkN: '“Last seen” and “Joined” come from Bungie and sometimes do not match: accounts on another platform (cross-save) stay idle even while the person plays, and “Joined” is when the account joined the clan, not the last access. Open the profile and check when the characters played.', h: ['Member', 'Role', 'Last seen', 'Character', 'Joined', ''], played: t => `played ${t}`, nodata: 'no data', wPlayed: '⚠ a character played recently: check', wNone: '⚠ Bungie gives no data: check', profile: 'Profile', kick: 'Remove…', kickQ: 'Confirm removal', none: 'Nobody here.', reqT: 'Join requests', inv: n => `Invites sent and not accepted yet: ${n}`, approve: 'Approve', deny: 'Deny', build: 'See build', noReq: 'No requests right now.', relog: 'To see and answer requests, sign in again once (clan admin permission).', relogB: 'Sign in again', reqN: 'Who asked to join through Bungie. “See build” opens the profile before approving.', newN: 'Who joined in the last month and whether they did a raid or dungeon yet: good to invite to a group.', gN: 'Who took the most people to their first clear of this activity (Bungie’s “Carries”). The list only has activities where Bungie counts it: all raids and a few dungeons.', recT: 'Joining the clan', promoT: 'Suggested promotions', promoN: 'Beginners for 3+ weeks and active in the last 7 days.', promo: 'Promote to member', noPromo: 'No beginner to promote right now.', newT: 'Newcomers (30 days)', joined: t => `joined ${t}`, nRaid: 'never did a raid', nAny: 'never did a raid or dungeon', clears: n => `${n} clears`, noData: 'load the clan data', noNew: 'Nobody joined in the last 30 days.', gT: 'Guides by activity', act: 'Activity', guided: n => `guided ${n}`, noG: 'Nobody guided this yet (or data not loaded).', copyT: 'Copy for Discord', copyN: 'Copies the list already formatted, ready to paste.', cp: { old: 'Inactive 30+', nw: 'Newcomers', board: 'Weekly leaderboard' }, cpFirst: 'Copy first-timer group for Discord', cpFirstN: 'Who never did this activity (active in the last 30 days) and who can guide.', cpFirstT: 'First-timer group', copied: 'Copied!', done: 'Done!', err: m => `Bungie refused: ${m}`, loading: 'Loading…' } };
 const adt = () => ADT[lang === 'pt' ? 'pt' : 'en'];
 const AD = { d: 30, req: null, inv: null, busy: false, msg: null, kq: null, g: LS.get('dc-ad-g', '') };
-const clanAdminOK = () => !!member && (LS.get('dc-ownchk', {}).o || (GD?.clan?.me?.role || 0) >= 3);
+const clanAdminOK = () => !!member && (isOwner() || (VC !== 'm' && VC !== 'n' && (GD?.clan?.me?.role || 0) >= 3));
 async function gReq(path, body) {
   const r = await fetch(API + path, { method: body ? 'POST' : 'GET', headers: { 'X-API-Key': cfg.apiKey, Authorization: 'Bearer ' + await token(), ...(body ? { 'Content-Type': 'application/json' } : {}) }, ...(body ? { body: JSON.stringify(body) } : {}) });
   const j = await r.json().catch(() => null); if (!j) throw Object.assign(new Error('HTTP ' + r.status), { code: 'http' });
@@ -3174,7 +3187,7 @@ function orlaHTML() {
 function obMemLoad() { if (OB.meBusy) return; OB.meBusy = true; obApi('/me').then(m => { OB.me = m; }).catch(() => { OB.me = null; }).finally(() => { OB.meBusy = false; if (tab === 'gcl') render(); }); }
 async function obAgLoad(force) {
   if (OB.agBusy || (!force && OB.ag !== undefined)) return; OB.agBusy = true;
-  for (let t = 0; t < 2; t++) { try { OB.ag = (await obApi('/grades')).grades || []; OB.agErr = null; break; } catch (e) { OB.agErr = e; if (e.status === 403 || e.message === 'auth') break; if (!t) await new Promise(r => setTimeout(r, 2500)); } }
+  for (let t = 0; t < 2; t++) { try { if (VC === 'a' || VC === 'e') { await new Promise(r => setTimeout(r, 400)); throw Object.assign(new Error(VC === 'a' ? 'forbidden' : 'Failed to fetch'), { status: VC === 'a' ? 403 : 0 }); } OB.ag = (await obApi('/grades')).grades || []; OB.agErr = null; break; } catch (e) { OB.agErr = e; if (e.status === 403 || e.message === 'auth') break; if (!t) await new Promise(r => setTimeout(r, 2500)); } }
   if (OB.agErr) OB.ag = OB.ag || null; OB.agBusy = false; if (GRADE || tab === 'gcl') render();
 }
 function obFirstHTML(f) { // linha discreta: quem do clã nunca fez a atividade escolhida e quem pode guiar (10+ conclusões)
@@ -3315,7 +3328,7 @@ function adminHTML() {
   const gl = ga ? [...all, { n: (member.name || '').replace(/#\d+$/, ''), mid: member.id, on: true }].map(x => ({ x, v: GMET[x.mid]?.v === 2 ? actBadges(ga, h => GMET[x.mid].x?.[h]).g : 0 })).filter(r => r.v > 0).sort((a, b) => b.v - a.v).slice(0, 8) : [];
   const gT = `<section class="ad-s"><h2>${esc(T.gT)}</h2><small class="lbd-n">${esc(T.gN)}</small><label class="lbd-act"><span>${esc(T.act)}</span><select id="adg">${acts.map(([, a]) => `<option value="${a.k}"${ga === a ? ' selected' : ''}>${esc(L(a.n))}</option>`).join('')}</select></label>${gl.map(r => `<span class="ad-g"><span><b>${esc(r.x.n)}</b>${r.x.on ? ' <small class="ok">● online</small>' : ''}</span><b class="m acc">${esc(T.guided(r.v))}</b></span>`).join('') || `<p class="lbd-n">${esc(T.noG)}</p>`}${ga ? `<div class="ad-gcp"><button type="button" class="lbd-btn pri" data-adcp="first">📋 ${esc(T.cpFirst)}</button><small class="lbd-n">${esc(T.cpFirstN)}</small></div>` : ''}</section>`;
   const cpT = `<section class="ad-s ad-cp"><h2>${esc(T.copyT)}</h2><small class="lbd-n">${esc(T.copyN)}</small><div class="ad-cpb">${Object.entries(T.cp).map(([k, t]) => `<button type="button" class="lbd-btn" data-adcp="${k}">📋 ${esc(t)}</button>`).join('')}</div></section>`;
-  return `<div class="ad-only"><b>${esc(T.only)}</b><span>${esc(T.onlyN)}</span>${LS.get('dc-ownchk', {}).o ? `<a class="lbd-btn" href="/guias" style="margin-left:auto;text-decoration:none">📖 ${lang === 'pt' ? 'Guias' : 'Guides'}</a>` : ''}</div>${AD.msg ? `<p class="iv-msg${AD.msg.bad ? ' bad' : ''}">${esc(AD.msg.t)}</p>` : ''}${inT}${socHTML()}<section class="ad-s ad-wide ad-rec"><h2>${esc(T.recT)}</h2><div class="ad-rec-c">${reqT}${promoT}${newT}</div></section>${gT}`;
+  return `<div class="ad-only"><b>${esc(T.only)}</b><span>${esc(T.onlyN)}</span>${isOwner() ? `<a class="lbd-btn" href="/guias" style="margin-left:auto;text-decoration:none">📖 ${lang === 'pt' ? 'Guias' : 'Guides'}</a>` : ''}</div>${AD.msg ? `<p class="iv-msg${AD.msg.bad ? ' bad' : ''}">${esc(AD.msg.t)}</p>` : ''}${inT}${socHTML()}<section class="ad-s ad-wide ad-rec"><h2>${esc(T.recT)}</h2><div class="ad-rec-c">${reqT}${promoT}${newT}</div></section>${gT}`;
 }
 function adCopy(k) {
   const T = adt(), C = GD.clan, now = Date.now(), all = C.list, seen = x => x.t > 864e5 * 365, d = t => Math.round((now - t) / 864e5);
