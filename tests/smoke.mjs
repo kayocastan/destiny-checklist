@@ -74,7 +74,11 @@ async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin =
   await page.addInitScript(([a, ls]) => { try { if (a) localStorage.setItem('dc-auth', JSON.stringify(a)); localStorage.setItem('dc-authv', '2'); for (const [k, v] of Object.entries(ls)) localStorage.setItem(k, JSON.stringify(v)); } catch {} }, [auth ? A : null, ls]);
   const fail = [];
   await page.goto(ORIGIN + path); await page.waitForTimeout(2500);
-  const blank = async where => { for (let t = 0; t < 12; t++) { const st0 = await page.evaluate(() => (document.getElementById('list')?.innerText || '').trim().length); if (st0 >= 5) break; await page.waitForTimeout(500); } const st = await page.evaluate(() => { const l = document.getElementById('list'), w = document.querySelector('.wrap'); return { n: (l?.innerText || '').trim().length, hidden: w ? getComputedStyle(w).visibility === 'hidden' : false }; }); if (st.n < 5 || st.hidden) fail.push(`${where}: tela em branco` + (process.env.DBG ? ' ' + (await page.evaluate(() => ({ tab: typeof tab, list: document.getElementById('list')?.innerHTML.slice(0, 300), sub: document.getElementById('subtabs')?.innerText.slice(0,80), cur: document.querySelector('.tab[aria-current=true]')?.dataset.group }))).list + ' | ' + JSON.stringify(await page.evaluate(() => [document.querySelector('.tab[aria-current=true]')?.dataset.group, document.querySelector('.sub[aria-pressed=true]')?.dataset.sub]))) : '')); };
+  const blank = async where => {
+    for (let t = 0; t < 12; t++) { if ((await page.evaluate(() => (document.getElementById('list')?.innerText || '').trim().length)) >= 5) break; await page.waitForTimeout(500); }
+    const st = await page.evaluate(() => { const l = document.getElementById('list'), w = document.querySelector('.wrap'); return { n: (l?.innerText || '').trim().length, hidden: w ? getComputedStyle(w).visibility === 'hidden' : false, html: (l?.innerHTML || '').slice(0, 200) }; });
+    if (st.n < 5 || st.hidden) fail.push(`${where}: tela em branco${process.env.DBG ? ' · ' + st.html : ''}`);
+  };
   await blank(path);
   if (clicks && auth && path === '/') {
     const groups = await page.$$eval('#tabs .tab', t => t.map(x => x.dataset.group));
