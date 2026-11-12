@@ -2480,3 +2480,5 @@ dialog.rap::backdrop{background:var(--bg)}
 .ap-nr img,.ap-nr>span:first-child{width:32px;height:32px;border-radius:4px;background:var(--chip)}
 .ap-nr>span{display:flex;flex-direction:column;min-width:0}.ap-nr small{color:var(--muted)}
 @media (max-width:760px){.ap-h{grid-template-columns:36px minmax(0,1fr) 34px}.ap-cols{grid-column:2/4;grid-row:2}.ap-pk:not(.on){display:none}.ap-fix,.ap-m{margin-left:10px}.ap-nr{grid-template-columns:32px minmax(0,1fr)}.ap-nr>small{grid-column:2}}
+.ap-g.est{border:1.5px dashed currentColor;border-radius:8px;padding:2px 0;font-size:22px}
+.rap-src{margin:0;padding:6px 20px;font-size:12.5px;color:var(--muted);border-bottom:1px solid var(--line)}

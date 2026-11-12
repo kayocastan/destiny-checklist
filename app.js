@@ -5612,13 +5612,8 @@ const RAP = { sel: '', f: 'all', ty: '', q: '', sim: {}, sh: '', cl: null };
 const RG_C = { S: '#7fe08f', A: '#a9e34b', B: '#f2d36b', C: '#ff8a7a' };
 const WSTAT = [4043523819, 1240592695, 155624089, 943549884, 4188031367, 1345609583, 2714457168, 3555269338, 3614673599, 2523465841, 2961396640, 2837207746, 3022301683, 209426660];
 // nota de uma cópia: o roll recomendado (PvE/PvP conforme o filtro) com mais perks iguais; S/A/B/C pelas colunas que faltam
-function rapGrade(x) {
-  if (RL.st !== 'ok') return null; const L0 = rlFor(x.h); if (!L0) return null;
-  const L = L0.filter(e => RL.mode === 'both' || !e[1] || e[1] === (RL.mode === 'pve' ? 'e' : 'v')); if (!L.length) return null;
-  const have = new Set(ivPerks(x)); if (!have.size) return null;
-  let best = null; for (const e of L) { const m = e[0].filter(p => have.has(p)).length, sc = m / e[0].length; if (!best || sc > best.sc || (sc === best.sc && e[0].length > best.e[0].length)) best = { e, m, sc }; }
-  const miss = best.e[0].length - best.m, g = !best.m ? 'C' : miss === 0 ? 'S' : miss === 1 ? 'A' : miss === 2 ? 'B' : 'C';
-  return { g, pct: Math.round(best.sc * 100), e: best.e, m: best.m, n: best.e[0].length, L };
+function rapGrade(x) { // mesma conta da tela de avaliação: nota máxima com os perks da cópia (perk comum e aprimorado contam igual)
+  if (RL.st !== 'ok') return null; const ev = apEval(x); return ev.g ? ev : null;
 }
 // colunas de perks da arma com todas as versões (comum e aprimorada) de cada perk
 const RCOLS = {}, RCP = new Map();
@@ -5654,7 +5649,7 @@ const RAPP = {}; // perks que cada cópia tem em cada encaixe (dá para trocar e
 function rapAvail(iid) {
   if (RAPP[iid] !== undefined) return RAPP[iid]; RAPP[iid] = null;
   bungie(`/Destiny2/${member.type}/Profile/${member.id}/Item/${iid}/?components=305,310`).then(r => { const rp = r.reusablePlugs?.data?.plugs || {}; RAPP[iid] = Object.fromEntries(Object.entries(rp).map(([k, v]) => [k, v.filter(p => p.canInsert !== false && p.enabled !== false).map(p => p.plugItemHash)])); if (r.sockets?.data) (RL.so ||= {})[iid] = r.sockets.data; })
-    .catch(() => { RAPP[iid] = {}; }).finally(() => { rapRedraw(); });
+    .catch(() => { RAPP[iid] = {}; }).finally(() => { apClear(iid); rapRedraw(); });
   return null;
 }
 // troca os perks pela API e confere no jogo (a Bungie demora a refletir: até 4 tentativas, 2,5 s entre elas)
@@ -5713,12 +5708,12 @@ function rapInsHTML(sel, all, inline) {
     const cl = RAP.cl?.[x.h], g = r?.g || '—', gc = RG_C[r?.g] || 'var(--muted)';
     let body = `<p class="rap-pad wait">${esc(T.loading)}</p>`;
     if (cols) {
-      const L = r?.L || [], freq = (k, o) => { const req = L.filter(e => e[0].some(p => cols[k].some(c => c.hs.includes(p)))); return req.length ? Math.round(100 * req.filter(e => e[0].some(p => o.hs.includes(p))).length / req.length) : 0; };
+      const L = r?.L || [], ck = cols.map(c => new Set(c.flatMap(o => o.hs.map(apKey)))), ok = o => new Set(o.hs.map(apKey)), freq = (k, o) => { const req = L.filter(e => e[0].some(p => ck[k].has(apKey(p)))); if (!req.length) return 0; const s = ok(o); return Math.round(100 * req.filter(e => e[0].some(p => s.has(apKey(p)))).length / req.length); };
       const cur = cols.map(c => c.find(o => o.hs.some(h => have.has(h)))), simN = [], av = rapAvail(x.iid), onCopy = (k, o) => !!av && (av[cols[k].si] || []).some(h => o.hs.includes(h));
       RAP.autoPlan = []; if (av) cols.forEach((c, k) => { let b = null, bf = -1; for (const o of c) { if (!onCopy(k, o)) continue; const f = freq(k, o); if (f > bf) { bf = f; b = o; } } if (b && b !== cur[k] && bf > (cur[k] ? freq(k, cur[k]) : -1)) RAP.autoPlan.push([cols[k].si, (av[cols[k].si] || []).find(h => b.hs.includes(h))]); });
       RAP.ctx = { x, cols, cur };
       RAP.bestSim = {}; cols.forEach((c, k) => { let b = null, bf = 0; for (const o of c) { const f = freq(k, o); if (f > bf) { bf = f; b = o; } } if (b && b !== cur[k]) RAP.bestSim[k] = b.h; });
-      const colH = cols.map((c, k) => `<div class="rap-col"><small>${cols.length >= 4 && k === 0 ? (P ? 'CANO' : 'BARREL') : cols.length >= 4 && k === 1 ? (P ? 'CARREGADOR' : 'MAGAZINE') : (P ? 'COLUNA ' : 'COLUMN ') + (k + 1)}</small>${c.slice().sort((a, b) => (b === cur[k]) - (a === cur[k]) || freq(k, b) - freq(k, a)).slice(0, 7).map(o => { const f = freq(k, o), mine = o === cur[k], sim = RAP.sim[k] === o.h, cn = cl ? o.hs.reduce((s, h) => s + (cl.p[h] || 0), 0) : 0;
+      const colH = cols.map((c, k) => `<div class="rap-col"><small>${cols.length >= 4 && k === 0 ? (P ? 'CANO' : 'BARREL') : cols.length >= 4 && k === 1 ? (P ? 'CARREGADOR' : 'MAGAZINE') : (P ? 'COLUNA ' : 'COLUMN ') + (k + 1)}</small>${c.filter(o => o === cur[k] || onCopy(k, o)).sort((a, b) => (b === cur[k]) - (a === cur[k]) || freq(k, b) - freq(k, a)).slice(0, 7).map(o => { const f = freq(k, o), mine = o === cur[k], sim = RAP.sim[k] === o.h, cn = cl ? o.hs.reduce((s, h) => s + (cl.p[h] || 0), 0) : 0;
         const oc = !mine && onCopy(k, o);
         return `<button type="button" class="rap-pk${mine ? ' mine' : ''}${sim ? ' sim' : ''}${oc ? ' oc' : ''}" data-rapp="${k}:${o.h}" aria-pressed="${sim}" title="${esc(o.n + (oc ? ' · ' + T.onW : ''))}"><span class="rap-ic">${o.ic ? `<img src="${BNET}${o.ic}" alt="" loading="lazy">` : ''}${f ? '<i>✓</i>' : ''}</span><span class="rap-pn">${esc(o.n)}${cn ? `<em>${esc(P ? `clã ${cn}/${cl.n}` : `clan ${cn}/${cl.n}`)}</em>` : ''}</span><small class="${f ? 'on' : ''}">${f}%</small></button>`; }).join('')}</div>`).join('');
       Object.entries(RAP.sim).forEach(([k, h]) => { const o = cols[k]?.find(y => y.h === h); if (o && cur[k]) simN.push([o.n, cur[k].n]); });
@@ -5729,7 +5724,7 @@ function rapInsHTML(sel, all, inline) {
       const stH = shs.map(h => { const v = base[h].value, dl = delta[h] || 0, nv = Math.max(0, Math.min(100, v + dl)); return `<div class="rap-st"><span>${esc(STATN?.[h]?.n || '')}</span><i><u style="width:${Math.min(v, nv)}%"></u><u class="${dl > 0 ? 'up' : 'dn'}" style="width:${Math.abs(nv - v)}%"></u></i><b>${nv}</b><small class="${dl > 0 ? 'up' : dl < 0 ? 'dn' : ''}">${dl ? (dl > 0 ? '+' : '') + dl : '—'}</small></div>`; }).join('');
       // parecidos: outras armas com os mesmos perks das colunas 3 e 4 (os principais)
       const main = cur.slice(2, 4).filter(Boolean); simil = main.length ? all.filter(y => y.x.iid !== x.iid && main.every(o => ivPerks(y.x).some(h => o.hs.includes(h)))) : [];
-      const best = r ? r.e[0].map(p => cols.flat().find(o => o.hs.includes(p))?.n).filter(Boolean) : [];
+      const best = r ? r.e[0].map(p => cols.flat().find(o => o.hs.some(h => apKey(h) === apKey(p)))?.n || entCache[lang]?.['DestinyInventoryItemDefinition:' + p]?.n).filter(Boolean) : [];
       body = `<div class="rap-pad rap-b"><div class="rap-ph"><span class="k">${esc(T.perksT)}</span><span class="lbd-n">${esc(T.tapSim)}</span></div>
         <div class="rap-cols" style="--rc:${cols.length}">${colH}</div>
         <div class="rap-lg"><span><i class="m"></i> ${esc(T.mine)}</span><span><i class="o"></i> ${esc(T.onWL)}</span><span><i class="r"></i> ${esc(T.recL)}</span>${cl ? `<span><em>clã</em> ${esc(T.clanL(cl.n))}</span>` : ''}${simN.length ? `<span class="rap-simn">${esc(simN.map(([a, b]) => T.sim(a, b)).join(' · '))}</span>` : ''}</div>
@@ -5741,7 +5736,7 @@ function rapInsHTML(sel, all, inline) {
         ${inline ? '' : `<button type="button" class="rap-sec" data-rapsim ${simil.length ? '' : 'disabled'}>${esc(T.similar(simil.length))}</button>${cps.length > 1 ? `<button type="button" class="rap-sec" data-rapcopies="${x.h}">${esc(T.copies(cps.length))}</button>` : ''}`}</div></div></div>`;
       RAP.closest = best;
     } else simil = [];
-    ins = `<header class="rap-ih">${INVD[x.h]?.ic ? `<img src="${BNET}${INVD[x.h].ic}" alt="">` : '<span></span>'}<span><small>${esc([tl(x), cps.length > 1 ? T.copy(ci, cps.length) : '', x.pw ? '✦ ' + x.pw : ''].filter(Boolean).join(' · ').toUpperCase())}</small><b>${esc(nm(x))}</b>${r && RAP.closest?.length ? `<span>${esc(T.closest)} <b>${esc(RAP.closest.join(' + '))}</b>${r.e[1] ? ` (${r.e[1] === 'e' ? 'PvE' : 'PvP'})` : ''}</span>` : `<span>${esc(r ? '' : T.none)}</span>`}</span><span class="rap-g" style="color:${gc}"><b>${g}</b><small>${r ? esc(T.cols(r.m, r.n)) : ''}</small></span></header>${body}`;
+    ins = `<header class="rap-ih">${INVD[x.h]?.ic ? `<img src="${BNET}${INVD[x.h].ic}" alt="">` : '<span></span>'}<span><small>${esc([tl(x), cps.length > 1 ? T.copy(ci, cps.length) : '', x.pw ? '✦ ' + x.pw : ''].filter(Boolean).join(' · ').toUpperCase())}</small><b>${esc(nm(x))}</b>${r && RAP.closest?.length ? `<span>${esc(T.closest)} <b>${esc(RAP.closest.join(' + '))}</b>${r.e[1] ? ` (${r.e[1] === 'e' ? 'PvE' : 'PvP'})` : ''}</span>` : `<span>${esc(r ? '' : T.none)}</span>`}</span><span class="rap-g" style="color:${gc}" title="${esc(apt().max)}"><b>${r?.est ? '≈' : ''}${g}</b><small>${r ? esc(apt().now(r.gc, r.mc, r.nc)) : ''}</small></span></header>${r ? `<p class="rap-src">${esc(r.src === 'fam' ? apt().src.fam(entCache[lang]?.['DestinyInventoryItemDefinition:' + r.est]?.n || '') : apt().src[r.src])}</p>` : ''}${body}`;
   }
   return { ins, simil };
 }
@@ -5771,10 +5766,10 @@ const APC = new Map();
 const AP = { on: BETA && LS.get('dc-rapon', false), f: '', ty: '', q: '', open: '', av: '', tw: null, twB: false, pk: false, msg: {}, bulk: null, busy: '' };
 const APT = { pt: { all: 'Todas', fix: '↻ Dá para melhorar', type: 'Tipo', anyT: 'Todos os tipos', q: 'Buscar arma ou perk…', vault: 'Cofre', none: 'Sem nota', noneN: n => `${n} armas`, why: { ex: 'Exótica: o Voltron não lista rolls de exóticas.', nol: 'Sem roll recomendado no Voltron para esta arma.', nos: 'A Bungie não mandou os perks desta cópia.' },
     load: 'Lendo os perks de cada cópia…', loadE: 'Não deu para ler os perks das cópias. Toque para tentar de novo.', retry: 'Tentar de novo', fixT: 'Trocar perk: dá para chegar nesta nota sem pegar outra cópia', opt: 'Otimizar', optT: 'Troca para os perks da nota máxima (só perks: masterwork, mod e origin trait ficam)', optAll: n => `Otimizar todas (${n})`, best: 'melhor cópia', twin: 'rolls da outra versão',
-    askT: n => `Otimizar ${n} armas?`, askN: 'Troca só perks que a cópia já tem. Cada troca é conferida no jogo e pode levar alguns segundos; com muitas armas, alguns minutos.', go: n => `Confirmar e otimizar ${n}`, cancel: 'Cancelar', run: (a, b) => `Otimizando ${a}/${b}…`, stop: 'Parar', done: (a, f) => `${a} otimizadas${f ? ` · ${f} falharam` : ''}.`, perm: 'Parei: a Bungie recusou a permissão. Saia e entre de novo e tente outra vez.', ok: 'Pronto.', chg: n => `${n} troca${n > 1 ? 's' : ''}`, items: n => `${n} armas`, close: 'Fechar' },
+    askT: n => `Otimizar ${n} armas?`, askN: 'Troca só perks que a cópia já tem. Cada troca é conferida no jogo e pode levar alguns segundos; com muitas armas, alguns minutos.', go: n => `Confirmar e otimizar ${n}`, cancel: 'Cancelar', run: (a, b) => `Otimizando ${a}/${b}…`, stop: 'Parar', done: (a, f) => `${a} otimizadas${f ? ` · ${f} falharam` : ''}.`, perm: 'Parei: a Bungie recusou a permissão. Saia e entre de novo e tente outra vez.', ok: 'Pronto.', chg: n => `${n} troca${n > 1 ? 's' : ''}`, items: n => `${n} armas`, close: 'Fechar', now: (g, a, b) => `agora: ${g} · ${a} de ${b} colunas`, max: 'nota máxima com os perks desta cópia', src: { v: 'Fonte: Voltron', tw: 'Fonte: Voltron · rolls da outra versão desta arma', fam: f => `Fonte: estimada pelas armas do mesmo tipo e frame${f ? ` (${f})` : ''}` }, estT: f => `Nota estimada pelas armas do mesmo tipo e frame${f ? ` (${f})` : ''}`, skip: n => `${n} com nota estimada ficaram de fora (otimize uma por uma, se quiser).` },
   en: { all: 'All', fix: '↻ Can improve', type: 'Type', anyT: 'All types', q: 'Search weapon or perk…', vault: 'Vault', none: 'No grade', noneN: n => `${n} weapons`, why: { ex: 'Exotic: Voltron has no rolls for exotics.', nol: 'No recommended roll in Voltron for this weapon.', nos: 'Bungie did not send this copy\'s perks.' },
     load: 'Reading each copy\'s perks…', loadE: 'Could not read the copies\' perks.', retry: 'Try again', fixT: 'Swap perk: this grade is reachable without another copy', opt: 'Optimize', optT: 'Switches to the perks of the top grade (perks only: masterwork, mod and origin trait stay)', optAll: n => `Optimize all (${n})`, best: 'best copy', twin: 'rolls from the other version',
-    askT: n => `Optimize ${n} weapons?`, askN: 'Only swaps perks the copy already has. Each swap is checked in game and can take a few seconds; with many weapons, a few minutes.', go: n => `Confirm and optimize ${n}`, cancel: 'Cancel', run: (a, b) => `Optimizing ${a}/${b}…`, stop: 'Stop', done: (a, f) => `${a} optimized${f ? ` · ${f} failed` : ''}.`, perm: 'Stopped: Bungie refused the permission. Sign out and in again and retry.', ok: 'Done.', chg: n => `${n} swap${n > 1 ? 's' : ''}`, items: n => `${n} weapons`, close: 'Close' } };
+    askT: n => `Optimize ${n} weapons?`, askN: 'Only swaps perks the copy already has. Each swap is checked in game and can take a few seconds; with many weapons, a few minutes.', go: n => `Confirm and optimize ${n}`, cancel: 'Cancel', run: (a, b) => `Optimizing ${a}/${b}…`, stop: 'Stop', done: (a, f) => `${a} optimized${f ? ` · ${f} failed` : ''}.`, perm: 'Stopped: Bungie refused the permission. Sign out and in again and retry.', ok: 'Done.', chg: n => `${n} swap${n > 1 ? 's' : ''}`, items: n => `${n} weapons`, close: 'Close', now: (g, a, b) => `now: ${g} · ${a} of ${b} columns`, max: 'top grade with this copy\'s perks', src: { v: 'Source: Voltron', tw: 'Source: Voltron · rolls from this weapon\'s other version', fam: f => `Source: estimated from weapons of the same type and frame${f ? ` (${f})` : ''}` }, estT: f => `Grade estimated from weapons of the same type and frame${f ? ` (${f})` : ''}`, skip: n => `${n} with an estimated grade were left out (optimize them one by one if you want).` } };
 const apt = () => APT[lang === 'pt' ? 'pt' : 'en'];
 function apChips(w) {
   const T = apt(), ok = AP.av === 'ok', c = {}; if (ok) for (const x of w) { const e = apEval(x); if (e.g) c[e.g] = (c[e.g] || 0) + 1; if (e.plan?.length) c.fix = (c.fix || 0) + 1; }
@@ -5784,10 +5779,17 @@ function apChips(w) {
 const TWN = new Map(); let TWC = {};
 function twLoad() {
   if (AP.tw || AP.twB || !APIW) return; AP.twB = true;
-  const c = LS.get('dc-twins', null); if (c && Date.now() - c.at < 864e5) { AP.tw = c.g; twIdx(); AP.twB = false; return; }
-  fetch(APIW + '/twins').then(r => r.json()).then(j => { AP.tw = j.g || []; try { LS.set('dc-twins', { at: Date.now(), g: AP.tw }); } catch {} twIdx(); rapRedraw(); if (tab === 'inv' || tab === 'vlt') render(); }).catch(() => { AP.tw = []; }).finally(() => { AP.twB = false; });
+  const c = LS.get('dc-twins2', null); if (c && Date.now() - c.at < 864e5) { AP.tw = c.g; AP.fam = c.f || {}; twIdx(); AP.twB = false; return; }
+  fetch(APIW + '/twins').then(r => r.json()).then(j => { AP.tw = j.g || []; AP.fam = j.f || {}; try { LS.set('dc-twins2', { at: Date.now(), g: AP.tw, f: AP.fam }); } catch {} twIdx(); rapRedraw(); if (tab === 'inv' || tab === 'vlt') render(); }).catch(() => { AP.tw = []; }).finally(() => { AP.twB = false; });
 }
-function twIdx() { TWN.clear(); TWC = {}; APC.clear(); for (const g of AP.tw || []) for (const h of g) TWN.set(String(h), g); }
+function twIdx() { TWN.clear(); TWC = {}; FMN.clear(); FMC = {}; APC.clear(); for (const g of AP.tw || []) for (const h of g) TWN.set(String(h), g); for (const [k, l] of Object.entries(AP.fam || {})) for (const h of l) FMN.set(String(h), k); }
+// nota estimada: arma sem roll (nem pela outra versão) usa os rolls das armas do mesmo tipo e frame
+const FMN = new Map(); let FMC = {};
+function famFor(h) {
+  if (!RL.m || !AP.fam) return null; const k = FMN.get(String(h)); if (!k) return null; if (FMC[k] !== undefined) return FMC[k];
+  const L = []; for (const o of AP.fam[k]) if (String(o) !== String(h)) for (const e of RL.m[o] || []) if (L.length < 300) L.push(e);
+  return (FMC[k] = L.length ? Object.assign(L, { est: k.split(':')[1] }) : null);
+}
 function rlFor(h) {
   if (!RL.m) return null; if (RL.m[h]) return RL.m[h]; if (!AP.tw) twLoad(); const g = TWN.get(String(h)); if (!g) return null;
   if (TWC[h] !== undefined) return TWC[h]; const L = []; for (const o of g) if (RL.m[o]) for (const e of RL.m[o]) if (L.length < 150) L.push(e);
@@ -5804,7 +5806,7 @@ function apAvLoad(force) {
   }).catch(() => { AP.av = 'err'; }).finally(() => { if (tab === 'inv' || tab === 'vlt') render(); });
 }
 // mesma "cara" de perk para a versão comum e a aprimorada (mesmo ícone)
-const apKey = h => { const e = entCache[lang]?.['DestinyInventoryItemDefinition:' + h]; return e?.ic || e?.n || 'h' + h; };
+const apKeyF = h => { const e = entCache[lang]?.['DestinyInventoryItemDefinition:' + h]; return e?.ic || e?.n || 'h' + h; }, apKey = apKeyF;
 function apPerkLoad(ws) {
   if (AP.pk || AP.av !== 'ok') return; AP.pk = true; const hs = new Set();
   for (const x of ws) { const so = RL.so?.[x.iid]?.sockets || []; so.forEach(s => s.plugHash && hs.add(s.plugHash)); Object.values(RAPP[x.iid] || {}).forEach(l => l.forEach(h => hs.add(h))); (rlFor(x.h) || []).forEach(e => e[0].forEach(h => hs.add(h))); }
@@ -5814,14 +5816,18 @@ function apPerkLoad(ws) {
 const APG = (m, n) => !m ? 'C' : n - m === 0 ? 'S' : n - m === 1 ? 'A' : n - m === 2 ? 'B' : 'C';
 function apEval(x) {
   const ck = x.iid + '|' + RL.mode; if (APC.has(ck)) return APC.get(ck);
-  let out;
-  const L0 = rlFor(x.h), so = RL.so?.[x.iid]?.sockets || profile?.itemComponents?.sockets?.data?.[x.iid]?.sockets;
+  let out, partial = false;
+  const so = RL.so?.[x.iid]?.sockets || profile?.itemComponents?.sockets?.data?.[x.iid]?.sockets, L0 = rlFor(x.h) || (so ? famFor(x.h, so) : null);
   if (x.ex) out = { why: 'ex' }; else if (!L0) out = { why: 'nol' }; else if (!so) out = { why: 'nos' };
   else {
     const L = L0.filter(e => RL.mode === 'both' || !e[1] || e[1] === (RL.mode === 'pve' ? 'e' : 'v'));
     if (!L.length) out = { why: 'nol' };
     else {
-      const av = RAPP[x.iid] || {}, cur = new Set(so.map(s => s.plugHash && apKey(s.plugHash)).filter(Boolean)), at = new Map(), freq = new Map();
+      const av = RAPP[x.iid] || {}, need = new Set(); so.forEach((s, si) => { if (s.plugHash) need.add(s.plugHash); (av[si] || []).forEach(h => need.add(h)); }); L.forEach(e => e[0].forEach(h => need.add(h)));
+      // perk comum e aprimorado só batem pelo ícone; enquanto os nomes não chegam, compara pelo código (sem misturar os dois jeitos)
+      const miss = [...need].filter(h => !entCache[lang]?.['DestinyInventoryItemDefinition:' + h]); if (miss.length) apEntLoad(miss);
+      const apKey = miss.length ? h => 'h' + h : apKeyF; partial = miss.length > 0;
+      const cur = new Set(so.map(s => s.plugHash && apKey(s.plugHash)).filter(Boolean)), at = new Map(), freq = new Map();
       so.forEach((s, si) => { for (const h of new Set([s.plugHash, ...(av[si] || [])])) { if (!h) continue; const k = apKey(h); if (!at.has(k)) at.set(k, []); at.get(k).push([si, h]); } });
       for (const e of L) for (const p of e[0]) { const k = apKey(p); freq.set(k, (freq.get(k) || 0) + 1); }
       let best = null, now = null;
@@ -5834,11 +5840,13 @@ function apEval(x) {
         if (!now || mc / n > now.sc) now = { sc: mc / n, m: mc, n };
       }
       const g = APG(best.m, best.n), gc = APG(now.m, now.n);
-      out = { g, gc, pct: Math.round(best.sc * 100), e: best.e, m: best.m, n: best.n, plan: 'SABC'.indexOf(gc) > 'SABC'.indexOf(g) ? best.plan : [], tw: !!L0.tw, L };
+      out = { g, gc, pct: Math.round(best.sc * 100), e: best.e, m: best.m, n: best.n, mc: now.m, nc: now.n, plan: 'SABC'.indexOf(gc) > 'SABC'.indexOf(g) ? best.plan : [], tw: !!L0.tw, est: L0.est || '', src: L0.est ? 'fam' : L0.tw ? 'tw' : 'v', L };
     }
   }
-  APC.set(ck, out); return out;
+  if (!partial) APC.set(ck, out); return out;
 }
+const APE = new Set(); let apeT = 0;
+function apEntLoad(hs) { const n = hs.filter(h => !APE.has(h)); if (!n.length) return; n.forEach(h => APE.add(h)); clearTimeout(apeT); apeT = setTimeout(() => entities('DestinyInventoryItemDefinition', [...APE].filter(h => !entCache[lang]?.['DestinyInventoryItemDefinition:' + h]), lang).catch(() => {}).finally(() => { APC.clear(); rapRedraw(); if (BETA && AP.on && (tab === 'inv' || tab === 'vlt')) render(); else if (tab === 'inv' || tab === 'vlt') render(); }), 120); }
 const apClear = iid => { for (const k of [...APC.keys()]) if (!iid || k.startsWith(iid + '|')) APC.delete(k); };
 const apStop = e => e?.code === 2108 || e?.code === 12 || e?.code === 99 || e?.message === 'auth';
 async function apOpt(x, ev) {
@@ -5854,7 +5862,7 @@ function apRow(x, ev, k, bestIid) {
   const cols = sis.map(si => { const curH = so[si]?.plugHash, opts = [...new Set([curH, ...(av[si] || [])])].filter(Boolean), to = ev.plan.find(p => p[0] === si)?.[1];
     return `<span class="ap-col">${opts.slice(0, 6).map(h => { const e = ent(h), on = h === curH, r = rec.has(apKey(h)); return `<i class="ap-pk${on ? ' on' : ''}${r ? ' r' : ''}${h === to ? ' to' : ''}" title="${esc((e.n || '') + (r ? ' · ✓' : ''))}">${e.ic ? `<img src="${BNET}${e.ic}" alt="" loading="lazy">` : ''}</i>`; }).join('')}</span>`; }).join('');
   const open = AP.open === x.iid, m = AP.msg[x.iid];
-  return `<div class="ap-r${open ? ' open' : ''}" style="--g:${c}"><button type="button" class="ap-h" data-apopen="${x.iid}" aria-expanded="${open}">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy">` : '<span></span>'}<span class="ap-n"><b>${esc(d.n || '…')}</b><small>${esc([x.pw ? '✦ ' + x.pw : '', k > 1 ? `×${k}` : '', k > 1 && x.iid === bestIid ? '★ ' + T.best : '', ev.tw ? T.twin : ''].filter(Boolean).join(' · '))}</small></span><span class="ap-cols">${cols}</span><b class="ap-g" title="${esc(rapt().cols(ev.m, ev.n))}">${g}</b></button>${ev.plan.length ? `<span class="ap-fix" title="${esc(T.fixT)}">↻ ${esc(ev.gc)}→${esc(g)}<button type="button" class="ap-opt" data-apopt="${x.iid}" title="${esc(T.optT)}" ${AP.busy ? 'disabled' : ''}>${esc(AP.busy === x.iid ? '…' : T.opt)}</button></span>` : ''}${m ? `<small class="ap-m${m.bad ? ' bad' : m.ok ? ' ok' : ''}">${esc(m.t)}</small>` : ''}${open ? `<div class="ap-x">${rapInsHTML({ x, r: rapGrade(x) }, rapList(), true).ins}</div>` : ''}</div>`;
+  return `<div class="ap-r${open ? ' open' : ''}" style="--g:${c}"><button type="button" class="ap-h" data-apopen="${x.iid}" aria-expanded="${open}">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy">` : '<span></span>'}<span class="ap-n"><b>${esc(d.n || '…')}</b><small>${esc([x.pw ? '✦ ' + x.pw : '', k > 1 ? `×${k}` : '', k > 1 && x.iid === bestIid ? '★ ' + T.best : '', ev.tw ? T.twin : ''].filter(Boolean).join(' · '))}</small></span><span class="ap-cols">${cols}</span><b class="ap-g${ev.est ? ' est' : ''}" title="${esc(ev.est ? apt().estT(entCache[lang]?.['DestinyInventoryItemDefinition:' + ev.est]?.n || '') : rapt().cols(ev.m, ev.n))}">${ev.est ? '≈' : ''}${g}</b></button>${ev.plan.length ? `<span class="ap-fix" title="${esc(T.fixT)}">↻ ${esc(ev.gc)}→${esc(g)}<button type="button" class="ap-opt" data-apopt="${x.iid}" title="${esc(T.optT)}" ${AP.busy ? 'disabled' : ''}>${esc(AP.busy === x.iid ? '…' : T.opt)}</button></span>` : ''}${m ? `<small class="ap-m${m.bad ? ' bad' : m.ok ? ' ok' : ''}">${esc(m.t)}</small>` : ''}${open ? `<div class="ap-x">${rapInsHTML({ x, r: rapGrade(x) }, rapList(), true).ins}</div>` : ''}</div>`;
 }
 function apHTML(all) {
   const T = apt(), W = u(), P = lang === 'pt'; if (RL.st !== 'ok') { if (!RL.st) setTimeout(rlLoad); return `<div class="panel iv-wrap">${rlBar(all)}</div>`; }
@@ -5867,7 +5875,7 @@ function apHTML(all) {
   const vis = x => (!AP.ty || tl(x) === AP.ty) && (!q || palNorm(ivName(x) + ' ' + pkNames(x)).includes(q));
   const ok = x => { const e = E.get(x.iid); return e.g && vis(x) && (!AP.f || (AP.f === 'fix' ? e.plan.length : e.g === AP.f)); };
   const chars = ivChars(), locs = [...chars.map(c => [c.characterId, `${W.classes[c.classType] || ''}`, c.light, c.emblemBackgroundPath]), ['v', T.vault, 0, '']];
-  const fixAll = ws.filter(x => vis(x) && E.get(x.iid).plan?.length);
+  const fixAll = ws.filter(x => vis(x) && E.get(x.iid).plan?.length && !E.get(x.iid).est);
   const secs = locs.map(([w, n, li, emb]) => {
     const xs = ws.filter(x => x.where === w && ok(x)); if (!xs.length) return '';
     const by = {}; for (const x of xs) (by[tl(x)] ||= []).push(x);
@@ -5879,7 +5887,7 @@ function apHTML(all) {
   const no = ws.filter(x => !E.get(x.iid).g && vis(x));
   const noH = no.length ? `<details class="ap-no"><summary><b>${esc(T.none)}</b> <small>${esc(T.noneN(no.length))}</small></summary>${no.sort((a, b) => ivName(a).localeCompare(ivName(b))).map(x => { const d = INVD[x.h] || {}, loc = x.where === 'v' ? T.vault : W.classes[profile.characters?.data?.[x.where]?.classType] || ''; return `<div class="ap-nr">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy">` : '<span></span>'}<span><b>${esc(d.n || '…')}</b><small>${esc([tl(x), loc, x.pw ? '✦ ' + x.pw : ''].filter(Boolean).join(' · '))}</small></span><small>${esc(T.why[E.get(x.iid).why])}</small></div>`; }).join('')}</details>` : '';
   const tys = [...new Set(ws.map(tl))].sort();
-  const B = AP.bulk, bulk = !B ? '' : B.st === 'ask' ? `<div class="lkb"><b>${esc(T.askT(B.ids.length))}</b><small>${esc(T.askN)}</small><div class="lkb-l">${B.ids.map(id => ws.find(x => x.iid === id)).filter(Boolean).map(x => { const e = E.get(x.iid); return `<span>${esc(ivName(x))} <small>${esc(e.gc)}→${esc(e.g)} · ${esc(T.chg(e.plan.length))}</small></span>`; }).join('')}</div><div class="lkb-a"><button type="button" class="lb-run" data-apgo>${esc(T.go(B.ids.length))}</button><button type="button" class="linkb" data-apbx>${esc(T.cancel)}</button></div></div>`
+  const B = AP.bulk, bulk = !B ? '' : B.st === 'ask' ? `<div class="lkb"><b>${esc(T.askT(B.ids.length))}</b><small>${esc(T.askN)}</small>${B.sk ? `<small>${esc(T.skip(B.sk))}</small>` : ''}<div class="lkb-l">${B.ids.map(id => ws.find(x => x.iid === id)).filter(Boolean).map(x => { const e = E.get(x.iid); return `<span>${esc(ivName(x))} <small>${esc(e.gc)}→${esc(e.g)} · ${esc(T.chg(e.plan.length))}</small></span>`; }).join('')}</div><div class="lkb-a"><button type="button" class="lb-run" data-apgo>${esc(T.go(B.ids.length))}</button><button type="button" class="linkb" data-apbx>${esc(T.cancel)}</button></div></div>`
     : B.st === 'run' ? `<div class="lkb" aria-live="polite"><b class="wait">${esc(T.run(B.n + B.f + 1 > B.ids.length ? B.ids.length : B.n + B.f + 1, B.ids.length))}</b><button type="button" class="linkb" data-apbstop>${esc(T.stop)}</button></div>`
     : `<div class="lkb" aria-live="polite"><b>${esc(B.perm ? T.perm : T.done(B.n, B.f))}</b><button type="button" class="linkb" data-apbx>OK</button></div>`;
   const bar = `<div class="ap-bar"><label class="iv-q"><input type="search" id="apq" value="${esc(AP.q)}" placeholder="${esc(T.q)}" aria-label="${esc(T.q)}" autocomplete="off" spellcheck="false"></label><select id="apty" aria-label="${esc(T.type)}"><option value="">${esc(T.anyT)}</option>${tys.map(t => `<option${t === AP.ty ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select>${fixAll.length ? `<button type="button" class="lb-run ap-all" data-apall ${AP.busy || B?.st === 'run' ? 'disabled' : ''}>${esc(T.optAll(fixAll.length))}</button>` : ''}</div>`;
@@ -5894,7 +5902,7 @@ document.addEventListener('click', async e => {
   const o = t.closest('[data-apopen]'); if (o) { const id = o.dataset.apopen; AP.open = AP.open === id ? '' : id; RAP.sel = id; RAP.sim = {}; RAP.msg = null; render(); return; }
   const op = t.closest('[data-apopt]'); if (op) { const x = invAll().find(y => y.iid === op.dataset.apopt); if (x) apOpt(x, apEval(x)); return; }
   if (t.closest('.ap-x')) { rapClick(e); return; }
-  if (t.closest('[data-apall]')) { const ws = invAll().filter(x => x.slot < 3); AP.bulk = { st: 'ask', ids: ws.filter(x => apEval(x).plan?.length && (!AP.ty || INVD[x.h]?.tl === AP.ty) && (!AP.q.trim() || palNorm(ivName(x) + ' ' + pkNames(x)).includes(palNorm(AP.q.trim())))).map(x => x.iid), n: 0, f: 0 }; render(); return; }
+  if (t.closest('[data-apall]')) { const ws = invAll().filter(x => x.slot < 3); const sk = ws.filter(x => apEval(x).plan?.length && apEval(x).est).length; AP.bulk = { st: 'ask', sk, ids: ws.filter(x => apEval(x).plan?.length && !apEval(x).est && (!AP.ty || INVD[x.h]?.tl === AP.ty) && (!AP.q.trim() || palNorm(ivName(x) + ' ' + pkNames(x)).includes(palNorm(AP.q.trim())))).map(x => x.iid), n: 0, f: 0 }; render(); return; }
   if (t.closest('[data-apbx]')) { AP.bulk = null; render(); return; }
   if (t.closest('[data-apbstop]') && AP.bulk) { AP.bulk.stop = true; return; }
   if (t.closest('[data-apgo]') && AP.bulk?.st === 'ask') { const B = AP.bulk; B.st = 'run'; render();

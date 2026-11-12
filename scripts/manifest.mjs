@@ -41,8 +41,11 @@ async function main() {
   // gêmeos por nome (Roll Appraiser: arma relançada ou Adept usa os rolls recomendados da outra versão)
   const tw = JSON.parse((await q("SELECT v FROM meta WHERE k = 'twins'")).results?.[0]?.v || 'null');
   const saveTwins = async defs => { const by = {}; for (const [h, d] of Object.entries(defs)) { if (d.itemType !== 3 || d.inventory?.tierType !== 5 || !d.displayProperties?.name || d.redacted) continue; (by[d.displayProperties.name] ||= []).push(+h >>> 0); }
-    const g = Object.values(by).filter(x => x.length > 1); await q("INSERT OR REPLACE INTO meta (k, v) VALUES ('twins', ?)", [JSON.stringify({ v: version, g })]); log('gêmeos por nome:', g.length, 'grupos'); };
-  const twinsOld = tw?.v !== version;
+    // famílias: mesmo tipo de arma e mesmo frame (perk intrínseco), para estimar a nota de arma sem roll no Voltron
+    const fam = {}; for (const [h, d] of Object.entries(defs)) { if (d.itemType !== 3 || d.inventory?.tierType !== 5 || d.redacted) continue; const fr = d.sockets?.socketEntries?.[0]?.singleInitialItemHash; if (!fr) continue; (fam[`${d.itemSubType}:${fr >>> 0}`] ||= []).push(+h >>> 0); }
+    const f = Object.fromEntries(Object.entries(fam).filter(([, l]) => l.length > 1));
+    const g = Object.values(by).filter(x => x.length > 1); await q("INSERT OR REPLACE INTO meta (k, v) VALUES ('twins', ?)", [JSON.stringify({ v: version, g, f })]); log('gêmeos por nome:', g.length, 'grupos · famílias:', Object.keys(f).length); };
+  const twinsOld = tw?.v !== version || !tw?.f;
   if (prev?.version === version && prev?.done && !process.env.FORCE) { log('manifesto já carregado:', version); if (twinsOld) await saveTwins(await getDefs('en', 'DestinyInventoryItemDefinition')); return; }
   log('manifesto', version, prev ? `(anterior: ${prev.version}, completo: ${prev.done})` : '(primeira carga)');
 

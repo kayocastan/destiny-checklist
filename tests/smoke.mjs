@@ -14,14 +14,14 @@ const now = Date.now(), iso = t => new Date(t).toISOString();
 // perfil de mentira: 3 personagens, sem itens (o site precisa aguentar conta "vazia")
 const C = ['2305843009000000001', '2305843009000000002', '2305843009000000003'];
 // armas para o Avaliar rolls: A está no Voltron (atual B, dá para chegar a A), T é gêmea por nome de A (sem rolls próprios), X é exótica
-const WPN = { A: 877384, T: 2290416, X: 14194600 };
+const WPN = { A: 877384, T: 2290416, X: 14194600, F: 2307365 };
 const VOLT = `title:x\ndimwishlist:item=${WPN.A}&perks=1001,1002,1003,1004#notes:pve\n`;
 function arsenal(pr) {
   const it = (h, i) => ({ itemHash: h, itemInstanceId: '69' + i, bucketHash: 138197802, quantity: 1, state: 0 });
-  pr.profileInventory.data.items = [it(WPN.A, 1), it(WPN.T, 2), it(WPN.X, 3)];
+  pr.profileInventory.data.items = [it(WPN.A, 1), it(WPN.T, 2), it(WPN.X, 3), it(WPN.F, 4)];
   const sk = l => ({ sockets: l.map(h => ({ plugHash: h, isEnabled: true, isVisible: true })) });
-  pr.itemComponents.sockets.data = { 691: sk([2000, 1001, 1002, 2003, 2004]), 692: sk([2000, 1001, 1002, 1003, 1004]), 693: sk([2000, 3001]) };
-  pr.itemComponents.instances.data = { 691: { primaryStat: { value: 2000 } }, 692: { primaryStat: { value: 2001 } }, 693: { primaryStat: { value: 2002 } } };
+  pr.itemComponents.sockets.data = { 691: sk([2000, 1001, 1002, 2003, 2004]), 692: sk([2000, 1001, 1002, 1003, 1004]), 693: sk([2000, 3001]), 694: sk([5000, 1001, 1002, 1003, 9999]) };
+  pr.itemComponents.instances.data = { 691: { primaryStat: { value: 2000 } }, 692: { primaryStat: { value: 2001 } }, 693: { primaryStat: { value: 2002 } }, 694: { primaryStat: { value: 2003 } } };
   pr.itemComponents.reusablePlugs = { data: { 691: { plugs: { 3: [{ plugItemHash: 2003, canInsert: true, enabled: true }, { plugItemHash: 1003, canInsert: true, enabled: true }], 4: [{ plugItemHash: 2004, canInsert: true, enabled: true }] } } } };
   return pr;
 }
@@ -68,7 +68,7 @@ async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin =
     }
     if (u.hostname === 'dni-api.dni-site.workers.dev') {
       if (u.pathname === '/defs') return j({});
-      if (u.pathname === '/twins') return j({ g: [[WPN.A, WPN.T]] });
+      if (u.pathname === '/twins') return j({ g: [[WPN.A, WPN.T]], f: { '13:5000': [WPN.A, WPN.F] } });
       if (u.pathname === '/videos') return j({ list: [] }); if (u.pathname === '/guias') return j({ m: {} }); if (u.pathname === '/whoami') return j({ owner, uid: owner ? 'u1' : undefined });
       return j({});
     }
@@ -109,7 +109,8 @@ async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin =
     await page.evaluate(() => { localStorage.setItem('dc-tab', JSON.stringify('inv')); }); await page.evaluate(() => document.querySelector('[data-rap]')?.click());
     for (let t = 0; t < 20; t++) { if (await page.$('.ap-r')) break; await page.waitForTimeout(500); }
     const st = await page.evaluate(() => ({ rows: [...document.querySelectorAll('.ap-r')].map(r => r.querySelector('.ap-g')?.textContent + '|' + (r.querySelector('.ap-fix')?.textContent || '')), no: document.querySelector('.ap-no summary')?.textContent || '', all: !!document.querySelector('[data-apall]') }));
-    if (st.rows.length !== 2) fail.push('avaliar: esperava 2 linhas com nota, veio ' + JSON.stringify(st.rows));
+    if (!st.rows.some(r => r.startsWith('≈A'))) fail.push('avaliar: família devia dar ≈A · ' + JSON.stringify(st.rows));
+    if (st.rows.length !== 3) fail.push('avaliar: esperava 3 linhas com nota, veio ' + JSON.stringify(st.rows));
     if (!st.rows.some(r => r.startsWith('A|') && r.includes('B→A'))) fail.push('avaliar: arma A devia mostrar A com ↻ B→A · ' + JSON.stringify(st.rows));
     if (!st.rows.some(r => r.startsWith('S|'))) fail.push('avaliar: gêmea por nome devia ter nota S · ' + JSON.stringify(st.rows));
     if (!/1/.test(st.no)) fail.push('avaliar: exótica devia ir para "Sem nota"');
