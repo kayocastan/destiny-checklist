@@ -1646,7 +1646,10 @@ function renderInner() {
   { const gb = $('gradebtn'); if (gb) { if (GD?.clan?.gid) LS.set('dc-orla', { ok: GD.clan.gid === ORLA_CLAN, at: Date.now() }); const o = LS.get('dc-orla', null);
     if (member && (!o || Date.now() - o.at > 864e5) && !orlaChk) { orlaChk = true; bungie(`/GroupV2/User/${member.type}/${member.id}/0/1/`).then(r => { LS.set('dc-orla', { ok: (r.results || []).some(x => String(x.group?.groupId) === ORLA_CLAN), at: Date.now() }); render(); }).catch(() => {}); }
     gb.hidden = !member || !(o?.ok || orlaOK() || GRADE); gb.classList.toggle('on', GRADE); gb.title = lang === 'pt' ? 'Orla Bot: criar ou ver grades do clã' : 'Orla Bot: create or see clan rosters'; } }
-  GROUPS[4].subs = [...(clanAdminOK() ? ['gcl', 'gclb', 'gclg', 'gcla', 'gcld'] : ['gcl', 'gclb', 'gclg'])]; if ((tab === 'gcla' || tab === 'gcld') && !clanAdminOK() && GD?.clan) { tab = 'gcl'; }
+  // abas de admin do clã: enquanto os dados do clã não chegam, mantém a aba aberta (antes ficava tudo em branco); sem permissão, volta para Membros
+  const admTab = tab === 'gcla' || tab === 'gcld';
+  GROUPS[4].subs = [...(clanAdminOK() || (admTab && !GD?.clan) ? ['gcl', 'gclb', 'gclg', 'gcla', 'gcld'] : ['gcl', 'gclb', 'gclg'])]; if (admTab && !clanAdminOK() && GD?.clan) { tab = 'gcl'; }
+  if (!groupOf(tab)) { tab = 'obj'; LS.set('dc-tab', 'obj'); } // aba guardada que não existe mais (ou de outra versão): volta para Hoje
   const g = groupOf(tab), st = $('subtabs'), pa = parentOf(tab), kids = KIDS[pa];
   if (g && (g.subs.length > 1 || kids)) { st.hidden = false; st.innerHTML = `${g.subs.length > 1 ? `<div class="subs-row">${g.subs.map(id => `<button class="sub" type="button" data-sub="${id}" aria-pressed="${id === pa}">${esc(U.subs[id])}</button>`).join('')}</div>` : ''}${kids ? `<div class="kids-row" role="group" aria-label="${esc(U.subs[pa])}"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 5h14M6 10h8M8.5 15h3"/></svg>${kids.map(k => `<button type="button" class="kid" data-kid="${k}" aria-pressed="${k === tab}">${esc(U.subs[k])}</button>`).join('')}</div>` : ''}`; }
   else { st.hidden = true; st.innerHTML = ''; }
