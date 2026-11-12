@@ -146,7 +146,7 @@ R.push(await run('/grade: inglês', { path: '/grade', ls: { 'dc-lang': 'en' }, c
 R.push(await run('/beta ver como: membro comum (admin real)', { path: '/beta', owner: true, admin: true, vc: 'm', ls: { 'dc-ownchk': { o: true, t: Date.now() } }, noSub: ['clan', 'gcla'], expectBar: true }));
 R.push(await run('/beta ver como: sem clã', { path: '/beta', owner: true, vc: 'n', ls: { 'dc-ownchk': { o: true, t: Date.now() } }, expectBar: true }));
 R.push(await run('/beta ver como: agenda recusada', { path: '/beta', owner: true, vc: 'a', ls: { 'dc-ownchk': { o: true, t: Date.now() }, 'dc-tab': 'gcl' }, clicks: false, expectBar: true }));
-R.push(await run('/beta avaliar rolls (nota, gêmea, exótica, otimizar)', { path: '/beta', arm: true, clicks: false, ls: { 'dc-tab': 'inv' } }));
+R.push(await run('avaliar rolls (nota, gêmea, família, exótica, otimizar)', { path: '/', arm: true, clicks: false, ls: { 'dc-tab': 'inv' } }));
 R.push(await run('/grade: sem login', { path: '/grade', auth: false, clicks: false }));
 const bad = R.filter(x => !x).length;
 console.log(bad ? `\n${bad} teste(s) falharam.` : '\nTudo certo.');

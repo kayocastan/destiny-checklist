@@ -368,7 +368,7 @@ async function loadAccount() {
     merge(live, r); got[k] = true;
     // Com a cópia da última visita na tela: o cabeçalho, a aba aberta e a build já trocam pelos dados novos; o resto troca de uma vez no fim
     if (usingCache) { if ((k === 'id' || k === need || k === 'g') && profile) { merge(profile, r); if (pickChar()) { if (k === 'id') { build(); render(); loadGear(gen); } else if (k === 'g') loadBuild(gen); else { build(); render(); } } } return; }
-    profile = live; have = { ...got };
+    profile = live; have = { ...got }; apFresh();
     if (!got.id || !pickChar()) return;
     loadedAt = new Date();
     if (got.q && got[need] && !hydrated) { hydrated = true; hydrate(); return; }
@@ -387,7 +387,7 @@ async function loadAccount() {
   }
   if (!hydrated && got.id && got.q && !usingCache && pickChar()) { hydrated = true; hydrate(); }
   if (!Object.values(got).every(Boolean)) { if (!usingCache) throw failed?.reason || new Error('profile'); status(u().apiError(failed?.reason?.message || '')); return; }
-  profile = live; have = { id: true, q: true, a: true, b: true, c: true, g: true };
+  profile = live; have = { id: true, q: true, a: true, b: true, c: true, g: true }; apFresh();
   if (!pickChar()) { showMessage(`<p class="notice">${esc(u().noChars)}</p>`); return; }
   loadedAt = new Date();
   idbSet('profile-' + member.id, { t: Date.now(), p: live });
@@ -4986,7 +4986,7 @@ function ivBar() {
 }
 function invHTML() {
   const T = ivt(), W = u(); if (!have.c) return `<div class="panel"><p class="empty-msg wait">${esc(T.wait)}</p></div>`;
-  if (BETA && AP.on) return apHTML(invAll());
+  if (AP.on) return apHTML(invAll());
   const all = invAll(), chars = ivChars(), narrow = matchMedia('(max-width: 760px)').matches;
   if (!INV.mc || !(INV.mc === 'v' || chars.some(c => c.characterId === INV.mc))) INV.mc = chars[0]?.characterId;
   const cols = narrow ? (INV.mc === 'v' ? [] : chars.filter(c => c.characterId === INV.mc)) : chars, showV = !narrow || INV.mc === 'v';
@@ -5005,7 +5005,7 @@ function invHTML() {
 // Cofre organizado: categorias, agrupar e ordenar, vários de uma vez
 function vltHTML() {
   const T = ivt(), W = u(); if (!have.c) return `<div class="panel"><p class="empty-msg wait">${esc(T.wait)}</p></div>`;
-  if (BETA && AP.on) return apHTML(invAll());
+  if (AP.on) return apHTML(invAll());
   const all = invAll(), V = all.filter(x => x.where === 'v'), vUsed = (profile.profileInventory?.data?.items || []).filter(i => i.bucketHash === VAULT_BUCKET).length;
   const wN = V.filter(x => x.slot < 3).length, aN = V.filter(x => x.slot >= 3).length, oN = Math.max(0, vUsed - wN - aN);
   const catDef = [['w', T.wAll, x => x.slot < 3, 0], ['w0', T.slots[0], x => x.slot === 0, 1], ['w1', T.slots[1], x => x.slot === 1, 1], ['w2', T.slots[2], x => x.slot === 2, 1], ['a', T.aAll, x => x.slot >= 3, 0], ...[0, 1, 2].map(c => ['a' + c, W.classes[c], x => x.slot >= 3 && x.cls === c, 1])];
@@ -5599,7 +5599,7 @@ document.addEventListener('change', e => { if (e.target.id === 'keeplock') LS.se
 function rlBar(list) {
   const T = rlt(); if (RL.st !== 'ok') { if (!RL.st) setTimeout(rlLoad); return RL.st === 'err' ? `<div class="rl-bar"><small>${esc(T.err)}</small></div>` : `<div class="rl-bar"><small class="wait">${esc(T.load)}</small></div>`; }
   const w = list.filter(x => x.slot < 3), gs = w.map(x => rlGrade(x.iid, x.h)), c = k => gs.filter(g => g === k).length;
-  return `<div class="rl-bar"><span><b>${esc(T.t)}</b><small>${esc(T.src)} · ${esc(T.upd(new Date(RL.at).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR')))}</small></span><div class="vl-seg rl-mode">${Object.entries(T.mode).map(([k, t]) => `<button type="button" data-rlmode="${k}" aria-pressed="${RL.mode === k}">${esc(t)}</button>`).join('')}</div><div class="rl-k" role="group" aria-label="${esc(lang === 'pt' ? 'Filtrar por roll' : 'Filter by roll')}">${BETA && AP.on ? apChips(w) : [['g', T.g, 0], ['p', T.p, 1], ['n', T.n, 2]].map(([k, t, i]) => `<button type="button" class="${k}" data-ivf="r${k}" data-rltog aria-pressed="${INV.f === 'r' + k}" title="${esc(T.leg[i][1] + ': ' + T.leg[i][2])}"><small>${esc(t)}</small><b>${c(k)}</b></button>`).join('')}<button type="button" class="rl-ap${BETA && AP.on ? ' on' : ''}" data-rap${BETA ? ` aria-pressed="${!!AP.on}"` : ''}><small>${esc(T.apNew)}</small><b>⚖ ${esc(T.ap)}</b></button></div>${(() => { const n = lkbList().length; return n && !LKB.st ? `<button type="button" class="lbd-btn rl-lk" data-lkb>${esc(lkt().bulk(n))}</button>` : ''; })()}</div>${lkbHTML()}`;
+  return `<div class="rl-bar"><span><b>${esc(T.t)}</b><small>${esc(T.src)} · ${esc(T.upd(new Date(RL.at).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR')))}</small></span><div class="vl-seg rl-mode">${Object.entries(T.mode).map(([k, t]) => `<button type="button" data-rlmode="${k}" aria-pressed="${RL.mode === k}">${esc(t)}</button>`).join('')}</div><div class="rl-k" role="group" aria-label="${esc(lang === 'pt' ? 'Filtrar por roll' : 'Filter by roll')}">${AP.on ? apChips(w) : [['g', T.g, 0], ['p', T.p, 1], ['n', T.n, 2]].map(([k, t, i]) => `<button type="button" class="${k}" data-ivf="r${k}" data-rltog aria-pressed="${INV.f === 'r' + k}" title="${esc(T.leg[i][1] + ': ' + T.leg[i][2])}"><small>${esc(t)}</small><b>${c(k)}</b></button>`).join('')}<button type="button" class="rl-ap${AP.on ? ' on' : ''}" data-rap aria-pressed="${!!AP.on}"><small>${esc(T.apNew)}</small><b>⚖ ${esc(T.ap)}</b></button></div>${(() => { const n = lkbList().length; return n && !LKB.st ? `<button type="button" class="lbd-btn rl-lk" data-lkb>${esc(lkt().bulk(n))}</button>` : ''; })()}</div>${lkbHTML()}`;
 }
 document.addEventListener('click', e => { const b = e.target.closest('[data-rlmode]'); if (!b) return; RL.mode = b.dataset.rlmode; LS.set('dc-rlmode', RL.mode); render(); if ($('ivdlg')?.open) ivDraw(); });
 
@@ -5740,7 +5740,7 @@ function rapInsHTML(sel, all, inline) {
   }
   return { ins, simil };
 }
-function rapRedraw() { if ($('rapdlg')?.open) rapDraw(); else if (BETA && AP.on && (tab === 'inv' || tab === 'vlt')) { if (RAP.sel) apClear(RAP.sel); clearTimeout(AP.rt); AP.rt = setTimeout(render, 60); } }
+function rapRedraw() { if ($('rapdlg')?.open) rapDraw(); else if (AP.on && (tab === 'inv' || tab === 'vlt')) { if (RAP.sel) apClear(RAP.sel); clearTimeout(AP.rt); AP.rt = setTimeout(render, 60); } }
 function rapDraw() {
   const d = $('rapdlg'); if (!d) return; const T = rapt(), RT = rlt(), P = lang === 'pt';
   if (RL.st !== 'ok') { d.innerHTML = `<div class="rap-top"><b>⚖ ${esc(T.t)}</b><button type="button" class="lbd-btn" data-rapx>✕ ${esc(T.close)}</button></div><p class="wait rap-pad">${esc(RL.st === 'err' ? RT.err : RT.load)}</p>`; return; }
@@ -5763,7 +5763,7 @@ function rapDraw() {
 /* ---------- Avaliar rolls na própria tela (só /beta por enquanto): o botão vira chave, o inventário vira lista por personagem/cofre → tipo → nota.
    Nota = a maior que a cópia alcança com os perks que vieram nela (encaixes com mais de uma opção e perks liberados). ---------- */
 const APC = new Map();
-const AP = { on: BETA && LS.get('dc-rapon', false), f: '', ty: '', q: '', open: '', av: '', tw: null, twB: false, pk: false, msg: {}, bulk: null, busy: '' };
+const AP = { on: (BETA || FX) && LS.get('dc-rapon', false), f: '', ty: '', q: '', open: '', av: '', tw: null, twB: false, pk: false, msg: {}, bulk: null, busy: '' };
 const APT = { pt: { all: 'Todas', fix: '↻ Dá para melhorar', type: 'Tipo', anyT: 'Todos os tipos', q: 'Buscar arma ou perk…', vault: 'Cofre', none: 'Sem nota', noneN: n => `${n} armas`, why: { ex: 'Exótica: o Voltron não lista rolls de exóticas.', nol: 'Sem roll recomendado no Voltron para esta arma.', nos: 'A Bungie não mandou os perks desta cópia.' },
     load: 'Lendo os perks de cada cópia…', loadE: 'Não deu para ler os perks das cópias. Toque para tentar de novo.', retry: 'Tentar de novo', fixT: 'Trocar perk: dá para chegar nesta nota sem pegar outra cópia', opt: 'Otimizar', optT: 'Troca para os perks da nota máxima (só perks: masterwork, mod e origin trait ficam)', optAll: n => `Otimizar todas (${n})`, best: 'melhor cópia', twin: 'rolls da outra versão',
     askT: n => `Otimizar ${n} armas?`, askN: 'Troca só perks que a cópia já tem. Cada troca é conferida no jogo e pode levar alguns segundos; com muitas armas, alguns minutos.', go: n => `Confirmar e otimizar ${n}`, cancel: 'Cancelar', run: (a, b) => `Otimizando ${a}/${b}…`, stop: 'Parar', done: (a, f) => `${a} otimizadas${f ? ` · ${f} falharam` : ''}.`, perm: 'Parei: a Bungie recusou a permissão. Saia e entre de novo e tente outra vez.', ok: 'Pronto.', chg: n => `${n} troca${n > 1 ? 's' : ''}`, items: n => `${n} armas`, close: 'Fechar', now: (g, a, b) => `agora: ${g} · ${a} de ${b} colunas`, max: 'nota máxima com os perks desta cópia', src: { v: 'Fonte: Voltron', tw: 'Fonte: Voltron · rolls da outra versão desta arma', fam: f => `Fonte: estimada pelas armas do mesmo tipo e frame${f ? ` (${f})` : ''}` }, estT: f => `Nota estimada pelas armas do mesmo tipo e frame${f ? ` (${f})` : ''}`, skip: n => `${n} com nota estimada ficaram de fora (otimize uma por uma, se quiser).` },
@@ -5771,6 +5771,8 @@ const APT = { pt: { all: 'Todas', fix: '↻ Dá para melhorar', type: 'Tipo', an
     load: 'Reading each copy\'s perks…', loadE: 'Could not read the copies\' perks.', retry: 'Try again', fixT: 'Swap perk: this grade is reachable without another copy', opt: 'Optimize', optT: 'Switches to the perks of the top grade (perks only: masterwork, mod and origin trait stay)', optAll: n => `Optimize all (${n})`, best: 'best copy', twin: 'rolls from the other version',
     askT: n => `Optimize ${n} weapons?`, askN: 'Only swaps perks the copy already has. Each swap is checked in game and can take a few seconds; with many weapons, a few minutes.', go: n => `Confirm and optimize ${n}`, cancel: 'Cancel', run: (a, b) => `Optimizing ${a}/${b}…`, stop: 'Stop', done: (a, f) => `${a} optimized${f ? ` · ${f} failed` : ''}.`, perm: 'Stopped: Bungie refused the permission. Sign out and in again and retry.', ok: 'Done.', chg: n => `${n} swap${n > 1 ? 's' : ''}`, items: n => `${n} weapons`, close: 'Close', now: (g, a, b) => `now: ${g} · ${a} of ${b} columns`, max: 'top grade with this copy\'s perks', src: { v: 'Source: Voltron', tw: 'Source: Voltron · rolls from this weapon\'s other version', fam: f => `Source: estimated from weapons of the same type and frame${f ? ` (${f})` : ''}` }, estT: f => `Grade estimated from weapons of the same type and frame${f ? ` (${f})` : ''}`, skip: n => `${n} with an estimated grade were left out (optimize them one by one if you want).` } };
 const apt = () => APT[lang === 'pt' ? 'pt' : 'en'];
+// perfil recarregado (botão Atualizar, volta à aba depois de 5 min, fim de atividade): perks trocados no jogo entram na nota
+function apFresh() { if (RL.so) RL.so = {}; for (const k in RAPP) delete RAPP[k]; if (AP.av === 'ok' || AP.av === 'err') AP.av = ''; APC.clear(); }
 function apChips(w) {
   const T = apt(), ok = AP.av === 'ok', c = {}; if (ok) for (const x of w) { const e = apEval(x); if (e.g) c[e.g] = (c[e.g] || 0) + 1; if (e.plan?.length) c.fix = (c.fix || 0) + 1; }
   return [['S', 'S'], ['A', 'A'], ['B', 'B'], ['C', 'C'], ['fix', T.fix]].map(([k, t]) => `<button type="button" class="ap-c" style="--g:${RG_C[k] || 'var(--acc, #6fd3ff)'}" data-apf="${k}" aria-pressed="${AP.f === k}"><small${k === 'fix' ? '' : ` title="${lang === 'pt' ? 'Nota ' : 'Grade '}${t}"`}>${esc(k === 'fix' ? t : (lang === 'pt' ? 'Nota ' : '') + t)}</small><b>${ok ? c[k] || 0 : '…'}</b></button>`).join('');
@@ -5846,7 +5848,7 @@ function apEval(x) {
   if (!partial) APC.set(ck, out); return out;
 }
 const APE = new Set(); let apeT = 0;
-function apEntLoad(hs) { const n = hs.filter(h => !APE.has(h)); if (!n.length) return; n.forEach(h => APE.add(h)); clearTimeout(apeT); apeT = setTimeout(() => entities('DestinyInventoryItemDefinition', [...APE].filter(h => !entCache[lang]?.['DestinyInventoryItemDefinition:' + h]), lang).catch(() => {}).finally(() => { APC.clear(); rapRedraw(); if (BETA && AP.on && (tab === 'inv' || tab === 'vlt')) render(); else if (tab === 'inv' || tab === 'vlt') render(); }), 120); }
+function apEntLoad(hs) { const n = hs.filter(h => !APE.has(h)); if (!n.length) return; n.forEach(h => APE.add(h)); clearTimeout(apeT); apeT = setTimeout(() => entities('DestinyInventoryItemDefinition', [...APE].filter(h => !entCache[lang]?.['DestinyInventoryItemDefinition:' + h]), lang).catch(() => {}).finally(() => { APC.clear(); rapRedraw(); if (tab === 'inv' || tab === 'vlt') render(); }), 120); }
 const apClear = iid => { for (const k of [...APC.keys()]) if (!iid || k.startsWith(iid + '|')) APC.delete(k); };
 const apStop = e => e?.code === 2108 || e?.code === 12 || e?.code === 99 || e?.message === 'auth';
 async function apOpt(x, ev) {
@@ -5895,7 +5897,7 @@ function apHTML(all) {
 }
 document.addEventListener('click', async e => {
   const t = e.target;
-  if (t.closest('[data-rap]')) { e.preventDefault(); if (!BETA) { rapOpen(INV.sel && $('ivdlg')?.open ? INV.sel : ''); return; } $('ivdlg')?.open && $('ivdlg').close(); AP.on = !AP.on; LS.set('dc-rapon', AP.on); if (AP.on && tab !== 'inv' && tab !== 'vlt') go('inv'); else render(); return; }
+  if (t.closest('[data-rap]')) { e.preventDefault(); $('ivdlg')?.open && $('ivdlg').close(); AP.on = !AP.on; LS.set('dc-rapon', AP.on); if (AP.on && tab !== 'inv' && tab !== 'vlt') go('inv'); else render(); return; }
   if (!AP.on) return;
   const ap = t.closest('[data-apf]'); if (ap) { AP.f = AP.f === ap.dataset.apf ? '' : ap.dataset.apf; render(); return; }
   if (t.closest('[data-apretry]')) { AP.av = ''; apAvLoad(true); render(); return; }
