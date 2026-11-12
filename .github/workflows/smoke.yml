@@ -1,0 +1,21 @@
+name: Testes do site (fumaça)
+# Abre o site num navegador sem internet (Bungie, servidor e Orla Bot simulados) com vários perfis
+# e falha se alguma tela ficar em branco ou der erro de JavaScript. Roda a cada envio.
+on:
+  push:
+    branches: [main]
+    paths: ['app.js', 'index.html', 'site.css', 'styles.css', 'guias.html', 'tests/**', 'data/defs.json', 'data/items.json', '.github/workflows/smoke.yml']
+  pull_request:
+  workflow_dispatch:
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm i --no-save --no-package-lock playwright@1.48.2
+      - run: npx playwright install --with-deps chromium
+      - run: node --check app.js
+      - run: node tests/smoke.mjs

@@ -129,3 +129,9 @@ Tudo bem abaixo do incluído no plano pago do Cloudflare. A Vercel não muda. A 
 - Inventário, cofre e clã (inclui Administração, Quem joga com quem, Discord): `FD7wih2bZymXgnxGPz68KV`
 - Navegação, colecionáveis e desafios: `BfqPeEinyGaAod2XKBCEUE`
 - O que fazer hoje, rolos e evolução (inclui o painel único de Hoje): `DrFBgrjVWcJFXx1yrW4LWp`
+
+## Testes antes de publicar
+- `node tests/smoke.mjs` abre o site com perfis simulados (sem login, membro, admin, admin por outra plataforma, celular, login vencido, aba antiga guardada, /grade) e falha se alguma tela ficar em branco ou der erro de JavaScript.
+- Rodar SEMPRE antes de `git push` quando mexer em app.js, index.html, site.css ou guias.html. O GitHub também roda a cada envio (workflow "Testes do site").
+- Erros reais dos visitantes: `GET /err` no servidor do DPI (só o dono), últimos 300.
+- Se um bug novo escapar, acrescente um cenário em tests/smoke.mjs que reproduza o bug antes de corrigir.
