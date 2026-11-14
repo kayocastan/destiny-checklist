@@ -105,6 +105,7 @@ async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin =
   if (noSub) { const [g, sub] = noSub; await page.evaluate(g => document.querySelector(`#tabs .tab[data-group="${g}"]`)?.click(), g); await page.waitForTimeout(1500); if (await page.$(`#subtabs .sub[data-sub="${sub}"]`)) fail.push(`subaba ${sub} apareceu e não devia`); }
   if (expectBar && !(await page.$('#vcbar'))) fail.push('barra "ver como" não apareceu');
   if (!owner && await page.$('#vcbar')) fail.push('barra "ver como" apareceu para quem não é dono');
+  if (process.env.SHOTS) { await page.waitForTimeout(3000); await page.screenshot({ path: `${process.env.SHOTDIR}/${process.env.SHOTS}.png`, fullPage: true }); }
   if (arm) {
     await page.evaluate(() => { localStorage.setItem('dc-tab', JSON.stringify('inv')); }); await page.evaluate(() => document.querySelector('[data-rap]')?.click());
     for (let t = 0; t < 20; t++) { if (await page.$('.ap-r')) break; await page.waitForTimeout(500); }
@@ -132,7 +133,7 @@ async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin =
 }
 
 const R = [];
-if (process.env.ONLY) { R.push(await run(process.env.ONLY, { path: '/beta', arm: true, clicks: false, ls: { 'dc-tab': 'inv' } })); console.log(R.every(Boolean) ? 'ok' : 'falhou'); process.exit(R.every(Boolean) ? 0 : 1); }
+if (process.env.ONLY) { R.push(await run(process.env.ONLY, { path: process.env.OPATH || '/beta', arm: !process.env.SHOTS, clicks: false, ls: { 'dc-tab': process.env.SHOTS || 'inv', ...(process.env.SHOTLS ? JSON.parse(process.env.SHOTLS) : {}) } })); console.log(R.every(Boolean) ? 'ok' : 'falhou'); process.exit(R.every(Boolean) ? 0 : 1); }
 R.push(await run('sem login: página inicial', { auth: false }));
 R.push(await run('membro comum: todas as abas', {}));
 R.push(await run('admin do clã: todas as abas', { admin: true }));

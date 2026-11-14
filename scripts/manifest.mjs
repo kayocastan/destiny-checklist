@@ -46,6 +46,15 @@ async function main() {
     const f = Object.fromEntries(Object.entries(fam).filter(([, l]) => l.length > 1));
     const g = Object.values(by).filter(x => x.length > 1); await q("INSERT OR REPLACE INTO meta (k, v) VALUES ('twins', ?)", [JSON.stringify({ v: version, g, f })]); log('gêmeos por nome:', g.length, 'grupos · famílias:', Object.keys(f).length); };
   const twinsOld = tw?.v !== version || !tw?.f;
+  // colecionáveis: listas de coleta já enxutas por idioma (o site baixava ~MBs da Bungie a cada atualização do jogo)
+  for (const lc of Object.keys(LC)) {
+    const old = (await q("SELECT substr(v, 1, 80) AS v FROM meta WHERE k = ?", ['chk:' + lc])).results?.[0]?.v || '';
+    if (old.includes(JSON.stringify(version)) && !process.env.FORCE) continue;
+    const [CD, DD] = await Promise.all([getDefs(lc, 'DestinyChecklistDefinition'), getDefs(lc, 'DestinyDestinationDefinition')]);
+    const dn = {}; for (const [h, d] of Object.entries(DD)) { const n = d.displayProperties?.name; if (n) dn[h] = { n, b: Object.fromEntries((d.bubbles || []).map(b => [b.hash, b.displayProperties?.name || '']).filter(x => x[1])) }; }
+    const cl = Object.entries(CD).map(([h, d]) => ({ h, n: d.displayProperties?.name || '', s: d.scope || 0, e: (d.entries || []).map(e => ({ h: e.hash, n: e.displayProperties?.name || e.displayProperties?.description || '', d: e.destinationHash || 0, b: e.bubbleHash || 0, a: e.activityHash || 0 })) })).filter(x => x.n && x.e.length);
+    const v = JSON.stringify({ v: version, cl, dn }); await q("INSERT OR REPLACE INTO meta (k, v) VALUES (?, ?)", ['chk:' + lc, v]); log('colecionáveis', lc, Math.round(v.length / 1024), 'KB');
+  }
   if (prev?.version === version && prev?.done && !process.env.FORCE) { log('manifesto já carregado:', version); if (twinsOld) await saveTwins(await getDefs('en', 'DestinyInventoryItemDefinition')); return; }
   log('manifesto', version, prev ? `(anterior: ${prev.version}, completo: ${prev.done})` : '(primeira carga)');
 

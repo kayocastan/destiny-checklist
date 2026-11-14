@@ -528,6 +528,11 @@ export default {
         for (const x of r.results) { const o = w[x.h] ||= { n: 0, p: {} }; o.n++; for (const k of x.p.split(',')) o.p[k] = (o.p[k] || 0) + 1; }
         return new Response(JSON.stringify({ w, at: Date.now() }), { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=1800', ...cors(req) } });
       }
+      if (path === '/chk' && req.method === 'GET') { // listas de coleta enxutas (Colecionáveis), geradas pelo script do manifesto
+        const lc = new URL(req.url).searchParams.get('l') === 'pt' ? 'pt' : 'en', v = (await env.DB.prepare('SELECT v FROM meta WHERE k = ?').bind('chk:' + lc).first().catch(() => null))?.v;
+        if (!v) return new Response('{}', { status: 404, headers: { 'Content-Type': 'application/json', ...cors(req) } });
+        return new Response(v, { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=21600', ...cors(req) } });
+      }
       if (path === '/twins' && req.method === 'GET') { // armas lendárias com o mesmo nome e hashes diferentes (relançadas, Adept), gerado pelo script do manifesto
         const v = (await env.DB.prepare("SELECT v FROM meta WHERE k = 'twins'").first().catch(() => null))?.v || '{"g":[]}';
         return new Response(v, { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=21600', ...cors(req) } });
