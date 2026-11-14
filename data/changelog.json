@@ -1,5 +1,53 @@
 [
  {
+  "id": "2026-11-14",
+  "de": "2026-11-08",
+  "ate": "2026-11-14",
+  "titulo": "Avaliar rolls, Esta semana renovado e calendário em grade",
+  "itens": [
+   [
+    "🎲",
+    "Avaliar rolls",
+    "Novo botão no Arsenal dá nota S/A/B/C a cada cópia comparando com os rolls recomendados, mostra o % de cada perk, simula os atributos e o que é popular no clã. Dá para trocar para os perks que a cópia já tem (ou aplicar os melhores com um clique) e salvar como roll desejado."
+   ],
+   [
+    "☀️",
+    "Esta semana",
+    "O Hoje sugere o que fazer pelo seu progresso (masmorra ou missão exótica onde falta o exótico), mostra sua semana em números (desafios, patente, exóticos e títulos) e põe o Também para você na coluna da direita. Os Desafios viraram mini painéis com ☆."
+   ],
+   [
+    "🗓️",
+    "Calendário",
+    "Agora em grade de duas semanas, com faixas para Xûr, Osíris e eventos, marcas de reset e contagem regressiva do reset diário, semanal e do Xûr."
+   ],
+   [
+    "🛒",
+    "Xûr",
+    "Cada item mostra o preço em moedas e quantas moedas você tem."
+   ],
+   [
+    "📈",
+    "Sua evolução",
+    "Acompanhe Poder, Patente, triunfos e horas jogadas por semana, mês ou 6 meses (o histórico cresce a cada dia que você entra)."
+   ],
+   [
+    "🎒",
+    "Inventário",
+    "Lista de desejos no inventário (selo ☆, filtro Desejados e aviso quando cai), Comparar dois itens lado a lado, busca Ctrl+K que acha itens do inventário e do cofre, cofre com 1300 espaços e Comparar guardiões refeito."
+   ],
+   [
+    "👥",
+    "Agenda do clã",
+    "As grades mostram a descrição de quem criou (com negrito e itálico do Discord), e o login da agenda ficou estável, com botão Tentar de novo se algo falhar."
+   ],
+   [
+    "🧭",
+    "Visual",
+    "Nada de tela em branco: se algo der errado aparece um aviso com Recarregar. Navegação melhor no celular e no teclado (toque, foco, pular para o conteúdo e menos movimento)."
+   ]
+  ]
+ },
+ {
   "id": "2026-11-07",
   "de": "2026-11-01",
   "ate": "2026-11-07",
