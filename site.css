@@ -2526,3 +2526,4 @@ button.cg-chip{cursor:pointer}button.cg-chip:hover{background:color-mix(in srgb,
 .t4-m small{color:var(--muted);font-size:12px}.t4-m b{font:700 20px var(--display);font-variant-numeric:tabular-nums}.t4-m em{font-style:normal;font-size:11.5px;color:var(--muted)}
 #list>.panel>.cg,#list>.panel>.qp{grid-column:1/-1}
 .qp-b{padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--surface) 70%,transparent)}.qp-b>.lbd-n{margin:4px 0 0}
+.t4-side{display:grid;gap:6px;margin-bottom:6px}.t4-side .t3-rh b{white-space:normal}

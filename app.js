@@ -798,7 +798,7 @@ function calHTML2() {
 }
 function calHTML() {
   if (!CAL.ms) { setTimeout(calLoad); return `<p class="empty-msg wait">${esc(u().loadingDefs)}</p>`; }
-  if (BETA) return calHTML2();
+  if (BETA || FX) return calHTML2(); // passou pelo /beta
   const P = lang === 'pt', now = Date.now(), loc = P ? 'pt-BR' : 'en-US', when = t => new Date(t).toLocaleString(loc, { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
   const day = (() => { const d = new Date(); d.setUTCHours(17, 0, 0, 0); if (d <= now) d.setUTCDate(d.getUTCDate() + 1); return d.getTime(); })(), wk = nextReset();
   const xurOut = xurLeaves(), xurIn = now < xurOut;
@@ -1710,7 +1710,7 @@ function renderInner() {
   else { st.hidden = true; st.innerHTML = ''; }
   $('ldbtn').setAttribute('aria-pressed', tab === 'ld'); $('ldbtn').textContent = tab === 'ld' ? U.checklist : U.loadouts;
   document.body.classList.toggle('on-ld', tab === 'ld'); document.body.classList.toggle('no-clears', !OPTS.clears);
-  $('overall').hidden = isGd() || tab === 'gclo' || tab === 'vend' || tab === 'tri' || tab === 'inv' || tab === 'vlt' || tab === 'colx' || tab === 'cal' || tab === 'gar' || (BETA && (tab === 'prog' || tab === 'obj'));
+  $('overall').hidden = isGd() || tab === 'gclo' || tab === 'vend' || tab === 'tri' || tab === 'inv' || tab === 'vlt' || tab === 'colx' || tab === 'cal' || tab === 'gar' || ((BETA || FX) && (tab === 'prog' || tab === 'obj'));
   if (tab === 'gar') { $('list').innerHTML = armHTML(); return; }
   if (tab === 'tri') { $('list').innerHTML = triHTML(); return; }
   if (tab === 'colx') { $('list').innerHTML = colHTML(); return; }
@@ -1724,7 +1724,7 @@ function renderInner() {
     $('ovcount').textContent = U.ld(LOADOUTS.length); $('ovbar').style.width = '0';
     return;
   }
-  const secs = SECTIONS.filter(x => x.tab === tab && secAvail(x) && !(BETA && tab === 'prog'));
+  const secs = SECTIONS.filter(x => x.tab === tab && secAvail(x) && !((BETA || FX) && tab === 'prog'));
   // O que já foi concluído fica no fim da lista, minimizado.
   const secDone = x => x.items.length > 0 && x.items.every(isDone);
   if (SORT_TABS.includes(tab)) {
@@ -1740,7 +1740,7 @@ function renderInner() {
   if (tab === 'obj' && have.a && member && LIVE.checked && !LIVE.on) loadSession();
   if ((tab === 'raid' || tab === 'dg' || tab === 'xm') && have.a && member) loadActHist();
   if (tab === 'xm') loadXmRec();
-  $('list').innerHTML = `<div class="panel">${tab === 'obj' ? newsHTML() + todoHTML() : ''}${tab === 'prog' ? chalHTML() + (BETA ? qpHTML() : '') : ''}${tab === 'cal' ? calHTML() : ''}${tab === 'obj' ? sessHTML() : ''}${wkBar}${tsBar}${secs.map(sec => {
+  $('list').innerHTML = `<div class="panel">${tab === 'obj' ? newsHTML() + todoHTML() : ''}${tab === 'prog' ? chalHTML() + (BETA || FX ? qpHTML() : '') : ''}${tab === 'cal' ? calHTML() : ''}${tab === 'obj' ? sessHTML() : ''}${wkBar}${tsBar}${secs.map(sec => {
     if (sec.html) return sec.id === 'vendors' ? vendorsHTML() : sec.id === 'xmissions' ? xmHTML() : sec.id === 'goals' ? goalsHTML() : sec.id === 'post' ? postHTML() : sec.id === 'wishobj' ? wishObjHTML() : sec.id === 'focus' ? focusHTML() : sec.id === 'grank' ? grObjHTML() : '';
     if (FX && sec.id === 'week' && sec.items.length) return weekHTML(sec);
     if (sec.empty) return `<p class="empty-msg${/…$/.test(sec.note || '') ? ' wait' : ''}">${esc(sec.note)}</p>`;
@@ -5531,8 +5531,8 @@ function todoHTML3() {
   let heroK = TD.m === 'g6' ? T2.raids : TD.m === 'g3' ? (P ? 'Masmorras e missões em destaque' : 'Featured dungeons and missions') : T2.mis;
   // BETA: sem masmorra em destaque, sugere pelo seu progresso: 1) masmorra sem o exótico, 2) missão exótica sem o exótico; títulos e o resto vêm em "Também para você"
   const noEx = kind => SECTIONS.filter(x => x.id.startsWith(kind + '-') && x.items.some(i => i.isEx && !isDone(i))).map(x => ({ k: x.id.slice(kind.length + 1), r: x.items.filter(isDone).length / Math.max(1, x.items.length) })).filter(x => actDefOf(kind, x.k)).sort((a, b) => b.r - a.r);
-  const dgN = BETA ? noEx('dg') : [], xmN = BETA ? noEx('xm') : [], rdN = BETA ? noEx('raid') : [], sug = P ? 'SUGESTÃO · FALTA O EXÓTICO' : 'SUGGESTION · MISSING THE EXOTIC';
-  if (BETA) {
+  const NW = BETA || FX, dgN = NW ? noEx('dg') : [], xmN = NW ? noEx('xm') : [], rdN = NW ? noEx('raid') : [], sug = P ? 'SUGESTÃO · FALTA O EXÓTICO' : 'SUGGESTION · MISSING THE EXOTIC';
+  if (NW) {
     const xmH = xmN.slice(0, TD.m === 'solo' ? 2 : 1).map(x => big('xm', x.k, P ? 'MISSÃO EXÓTICA · FALTA O EXÓTICO' : 'EXOTIC MISSION · MISSING THE EXOTIC')).join('');
     if (TD.m === 'solo') { hero = mis + xmH; heroK = P ? 'Missões da semana e missões exóticas' : 'Weekly and exotic missions'; }
     else if (TD.m === 'g3') { hero = (F.dg.size ? dgs : dgN.slice(0, 2).map(x => big('dg', x.k, sug)).join('')) + xmH + mis; heroK = F.dg.size ? (P ? 'Masmorras em destaque' : 'Featured dungeons') : (P ? 'Sem masmorra em destaque: sugestões pelo seu progresso' : 'No featured dungeon: picks from your progress'); }
@@ -5550,14 +5550,14 @@ function todoHTML3() {
   const strip = nx ? `<a class="t3-strip" href="/grade"><span>📅 ${esc(P ? 'Próxima grade do clã' : 'Next clan roster')}</span><b>${esc(nx.name)}</b><small>${esc(new Date(String(nx.s).replace(' ', 'T')).toLocaleString(P ? 'pt-BR' : 'en-US', { weekday: 'short', hour: '2-digit', minute: '2-digit' }))} · ${nx.p.filter(p => p.c === 'titular').length}/${nx.cap}</small><span class="t3-go">${esc(P ? 'Ver agenda →' : 'See schedule →')}</span></a>`
     : wt ? `<button type="button" class="t3-strip" data-jump="obj:week"><span>🏆 ${esc(T2.ch)}</span><b>${wd}/${wt}</b><i class="sea-bar"><u style="width:${wd / wt * 100}%"></u></i><span class="t3-go">${esc(T2.see)}</span></button>` : '';
   const seg = Object.entries(T2.m).map(([k, t]) => `<button type="button" data-tdm="${k}" aria-pressed="${TD.m === k}">${esc(t)}</button>`).join('');
-  const side = `<aside class="t2-side"><span class="sea-k">${esc(T2.rot)}</span>${[['raid', T2.raids, T2.raidsN], ['dg', T2.dgs, T2.dgsN]].filter(([kind]) => !(kind === 'raid' && TD.m === 'g6') && !(kind === 'dg' && TD.m !== 'solo')).map(([kind, h, n]) => F[kind].size ? `<div class="t2-b"><div class="t2-h"><b>${esc(h)}</b><small>${esc(n)}</small></div>${[...F[kind]].map(k => { const a = (kind === 'raid' ? defs.raids : defs.dungeons).find(x => x.k === k); return a ? `<div class="t2-r"><span class="t2-i"${a.img ? ` style="background-image:url('${BNET}${a.img}')"` : ''}></span><span class="t2-n"><b>${esc(L(a.n))}</b></span><span class="t2-a">${orla ? `<a class="t3-gr" href="/grade?a=${encodeURIComponent(a.n?.[1] || L(a.n))}">📅 ${esc(P ? 'Grade' : 'Roster')}</a>` : ''}</span></div>` : ''; }).join('')}</div>` : '').join('')}${F.other.length && TD.m === 'g6' ? `<div class="t2-b t3-misb"><div class="t2-h"><b>${esc(T2.mis)}</b><small>${esc(P ? 'até 3 · no Sozinho aparecem em destaque' : 'up to 3 · shown big in Solo')}</small></div>${F.other.map(o => `<div class="t2-r"><span class="t2-i t3-pin">📍</span><span class="t2-n"><b>${esc(o.n)}</b><small><span class="t3-loc">${esc(o.where || '—')}</span> · ${esc(o.lv.join(' / '))}</small></span></div>`).join('')}</div>` : ''}${!F.dg.size ? `<p class="lbd-n t2-nodg">${esc(T2.noDg)}</p>` : ''}${wt ? `<div class="t2-b"><div class="t2-h"><b>${esc(T2.ch)}</b><b class="m">${wd}/${wt}</b></div><i class="sea-bar"><u style="width:${wd / wt * 100}%"></u></i><button type="button" class="linkb t2-see" data-jump="obj:week">${esc(T2.see)}</button></div>` : ''}</aside>`;
+  const side = `<aside class="t2-side">${NW && rest.length ? `<span class="sea-k">${esc(P ? 'TAMBÉM PARA VOCÊ' : 'ALSO FOR YOU')}</span><div class="t3-rest t4-side">${rest.map(row).join('')}</div>` : ''}<span class="sea-k">${esc(T2.rot)}</span>${[['raid', T2.raids, T2.raidsN], ['dg', T2.dgs, T2.dgsN]].filter(([kind]) => !(kind === 'raid' && TD.m === 'g6') && !(kind === 'dg' && TD.m !== 'solo')).map(([kind, h, n]) => F[kind].size ? `<div class="t2-b"><div class="t2-h"><b>${esc(h)}</b><small>${esc(n)}</small></div>${[...F[kind]].map(k => { const a = (kind === 'raid' ? defs.raids : defs.dungeons).find(x => x.k === k); return a ? `<div class="t2-r"><span class="t2-i"${a.img ? ` style="background-image:url('${BNET}${a.img}')"` : ''}></span><span class="t2-n"><b>${esc(L(a.n))}</b></span><span class="t2-a">${orla ? `<a class="t3-gr" href="/grade?a=${encodeURIComponent(a.n?.[1] || L(a.n))}">📅 ${esc(P ? 'Grade' : 'Roster')}</a>` : ''}</span></div>` : ''; }).join('')}</div>` : '').join('')}${F.other.length && TD.m === 'g6' ? `<div class="t2-b t3-misb"><div class="t2-h"><b>${esc(T2.mis)}</b><small>${esc(P ? 'até 3 · no Sozinho aparecem em destaque' : 'up to 3 · shown big in Solo')}</small></div>${F.other.map(o => `<div class="t2-r"><span class="t2-i t3-pin">📍</span><span class="t2-n"><b>${esc(o.n)}</b><small><span class="t3-loc">${esc(o.where || '—')}</span> · ${esc(o.lv.join(' / '))}</small></span></div>`).join('')}</div>` : ''}${!F.dg.size ? `<p class="lbd-n t2-nodg">${esc(T2.noDg)}</p>` : ''}${wt && !NW ? `<div class="t2-b"><div class="t2-h"><b>${esc(T2.ch)}</b><b class="m">${wd}/${wt}</b></div><i class="sea-bar"><u style="width:${wd / wt * 100}%"></u></i><button type="button" class="linkb t2-see" data-jump="obj:week">${esc(T2.see)}</button></div>` : ''}</aside>`;
   return `<section class="td t2 t3 keep" data-sec="todo"><div class="td-hd"><span class="td-ic" aria-hidden="true"><svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7.5"/><path d="M13 7l-1.8 4.2L7 13l1.8-4.2z"/></svg></span><h2>${esc(T2.t)}</h2><span>${esc(T2.sub(left(nextReset())))}</span>${(() => { const G = grInfo(); return G && !G.max ? `<button type="button" class="td-gr" data-jump="gst:">${esc((P ? 'Patente ' : 'Rank ') + G.cur + ' → ' + G.nextN + (G.next ? ' · ' + grt().left(G.left).replace(/:.*/, '') : ''))} →</button>` : ''; })()}</div>
-    <div class="t3-top">${strip}<div class="t2-how"><span>${esc(T2.how)}</span><div class="vl-seg t2-seg">${seg}</div></div></div>${BETA ? (() => { // sua semana em números: o que dá senso de progresso
+    <div class="t3-top">${strip}<div class="t2-how"><span>${esc(T2.how)}</span><div class="vl-seg t2-seg">${seg}</div></div></div>${NW ? (() => { // sua semana em números: o que dá senso de progresso
       const G = grInfo(), exT = dgN.length + xmN.length + rdN.length, ss = have.b ? defs.seals.filter(se => se.tier < 5) : [], sd = ss.filter(se => { const st = recState(se.cr); return st && recDone(st); }).length;
       const m = (t, v, w, j, sub) => `<button type="button" class="t4-m" ${j ? `data-jump="${j}"` : 'disabled'}><small>${esc(t)}</small><b>${esc(v)}</b>${w != null ? `<i class="sea-bar"><u style="width:${Math.round(w * 100)}%"></u></i>` : ''}${sub ? `<em>${esc(sub)}</em>` : ''}</button>`;
       return `<div class="t4-ms">${wt ? m(P ? 'Desafios da semana' : 'Weekly challenges', `${wd}/${wt}`, wd / wt, 'prog:') : ''}${G && !G.max ? m(P ? 'Patente' : 'Guardian Rank', `${G.cur} → ${G.nextN}`, G.tot ? (G.tot - G.left) / G.tot : null, 'gst:', G.left ? (P ? `faltam ${G.left}` : `${G.left} left`) : '') : ''}${have.b ? m(P ? 'Exóticos de atividade' : 'Activity exotics', exT ? (P ? `faltam ${exT}` : `${exT} missing`) : '✓', null, exT ? (xmN.length ? 'xm:' : 'dg:') : '', P ? 'masmorras, incursões e missões exóticas' : 'dungeons, raids and exotic missions') : ''}${ss.length ? m(P ? 'Títulos' : 'Titles', `${sd}/${ss.length}`, sd / ss.length, 'tit:') : ''}</div>`; })() : ''}
     <div class="t2-cols"><div class="t2-main"><span class="sea-k">${esc(T2.now(TD.m))}</span>${hero ? `<div class="t3-hero"><small class="t3-hk">${esc(heroK)}</small>${hero}</div>` : `<p class="lbd-n">${esc(TD.m === 'g3' ? T2.noDg : T2.none)}</p>`}
-      ${rest.length ? `<div class="t3-rest"><small class="t3-hk">${esc(P ? 'Também para você' : 'Also for you')}</small>${rest.map(row).join('')}</div>` : ''}${nh && !TD.show ? `<button type="button" class="linkb" data-tdshow>${esc(T.hidden(nh))}</button>` : ''}</div>${side}</div></section>`;
+      ${rest.length && !NW ? `<div class="t3-rest"><small class="t3-hk">${esc(P ? 'Também para você' : 'Also for you')}</small>${rest.map(row).join('')}</div>` : ''}${nh && !TD.show ? `<button type="button" class="linkb" data-tdshow>${esc(T.hidden(nh))}</button>` : ''}</div>${side}</div></section>`;
 }
 async function obApiSafe(p) { try { return await obApi(p); } catch { return null; } }
 document.addEventListener('click', e => { const x = e.target.closest('[data-tdex]'); if (!x) return; const id = x.dataset.tdex; TD.ex.has(id) ? TD.ex.delete(id) : TD.ex.add(id); LS.set('dc-td-ex', [...TD.ex].slice(-20)); render(); });
