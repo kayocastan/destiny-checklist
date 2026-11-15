@@ -18,4 +18,6 @@ jobs:
       - run: npm i --no-save --no-package-lock playwright@1.48.2
       - run: npx playwright install --with-deps chromium
       - run: node --check app.js
+      - name: Nada usado sem existir (no-undef)
+        run: npx -y eslint@8.57.0 --no-eslintrc --env browser,es2024 --parser-options ecmaVersion:latest --rule '{"no-undef":"error"}' app.js
       - run: node tests/smoke.mjs
