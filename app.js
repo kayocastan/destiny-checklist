@@ -3226,6 +3226,14 @@ function orlaHTML() {
 }
 // Membros (aba Clã): a mesma Agenda do clã do /grade; precisa saber se a pessoa registrou o Discord (botões Entrar/Reserva/Sair)
 function obMemLoad() { if (OB.meBusy) return; OB.meBusy = true; obApi('/me').then(m => { OB.me = m; }).catch(() => { OB.me = null; }).finally(() => { OB.meBusy = false; if (tab === 'gcl') render(); }); }
+// "Adicionar à agenda" (Google e .ics) para quem está numa grade; faltava desde 07/11 e quebrava a Agenda de quem se inscreveu
+function obCalBtns(g, big) {
+  const P = lang === 'pt', t0 = (() => { const d = new Date(String(g.s).replace(' ', 'T')); return isNaN(d) ? new Date(String(g.s)) : d; })(); if (isNaN(t0)) return '';
+  const t1 = new Date(t0.getTime() + 2 * 36e5), z = d => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''), name = 'Destiny 2: ' + (g.name || 'Grade'), det = (g.url ? g.url + '\n' : '') + (g.desc || '').slice(0, 900);
+  const gUrl = 'https://calendar.google.com/calendar/render?' + new URLSearchParams({ action: 'TEMPLATE', text: name, dates: `${z(t0)}/${z(t1)}`, details: det }).toString();
+  const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//DPI//Grade//PT', 'BEGIN:VEVENT', `UID:grade-${g.id}@dpi`, `DTSTAMP:${z(new Date())}`, `DTSTART:${z(t0)}`, `DTEND:${z(t1)}`, `SUMMARY:${name.replace(/[,;]/g, ' ')}`, `DESCRIPTION:${det.replace(/\r?\n/g, '\\n').replace(/[,;]/g, ' ')}`, 'BEGIN:VALARM', 'TRIGGER:-PT30M', 'ACTION:DISPLAY', 'DESCRIPTION:Grade', 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+  return `<span class="ob-cal${big ? ' big' : ''}"><a class="lbd-btn" href="${esc(gUrl)}" target="_blank" rel="noopener">📅 ${P ? 'Google Agenda' : 'Google Calendar'}</a><a class="lbd-btn" href="data:text/calendar;charset=utf-8,${encodeURIComponent(ics)}" download="grade-${esc(String(g.id))}.ics">${P ? '.ics (outras agendas)' : '.ics (other calendars)'}</a></span>`;
+}
 async function obAgLoad(force) {
   if (OB.agBusy || (!force && OB.ag !== undefined)) return; OB.agBusy = true;
   for (let t = 0; t < 2; t++) { try { if (VC === 'a' || VC === 'e') { await new Promise(r => setTimeout(r, 400)); throw Object.assign(new Error(VC === 'a' ? 'forbidden' : 'Failed to fetch'), { status: VC === 'a' ? 403 : 0 }); } OB.ag = (await obApi('/grades')).grades || []; OB.agErr = null; break; } catch (e) { OB.agErr = e; if (e.status === 403 || e.message === 'auth') break; if (!t) await new Promise(r => setTimeout(r, 2500)); } }

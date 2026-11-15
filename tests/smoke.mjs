@@ -42,7 +42,7 @@ function profile() {
     itemComponents: { instances: { data: {} }, sockets: { data: {} }, stats: { data: {} }, objectives: { data: {} }, perks: { data: {} } },
   };
 }
-const GRADES = [{ id: 1, name: 'Queda do Rei: Normal', g: null, ci: null, desc: '**Atenção**\n\nSó quem já fez.', cap: 6, rk: 0, s: iso(now + 864e5), by: 'Peter', url: null, mine: null, creator: false, p: [{ n: 'Peter', c: 'titular', r: 0 }] }];
+const GRADES = [{ id: 1, name: 'Queda do Rei: Normal', g: null, ci: null, desc: '**Atenção**\n\nSó quem já fez.', cap: 6, rk: 0, s: iso(now + 864e5), by: 'Peter', url: null, mine: null, creator: false, p: [{ n: 'Peter', c: 'titular', r: 0 }] }, { id: 2, name: 'Fim de Crota: Normal', g: null, ci: null, desc: 'Inscrita', cap: 6, rk: 0, s: iso(now + 2 * 864e5).replace('T', ' ').slice(0, 19), by: 'Nipanga', url: 'https://discord.com/channels/1/2/3', mine: 'titular', creator: true, p: [{ n: 'Nipanga', c: 'titular', r: 0 }] }];
 
 async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin = false, xsave = false, expectSub = null, expired = false, mobile = false, clicks = true, arm = false, owner = false, vc = '', noSub = null, expectBar = false }) {
   const b = await chromium.launch(), ctx = await b.newContext(mobile ? { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true } : { viewport: { width: 1366, height: 900 } });
@@ -67,6 +67,7 @@ async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin =
       return j({ ErrorCode: 1, Response: {} });
     }
     if (u.hostname === 'dni-api.dni-site.workers.dev') {
+      if (u.pathname === '/err' && r.request().method() === 'POST') { seen.rep = (seen.rep || []).concat(String(r.request().postData() || '').slice(0, 200)); return j({ ok: true }); }
       if (u.pathname === '/defs') return j({});
       if (u.pathname === '/twins') return j({ g: [[WPN.A, WPN.T]], f: { '13:5000': [WPN.A, WPN.F] } });
       if (u.pathname === '/videos') return j({ list: [] }); if (u.pathname === '/guias') return j({ m: {} }); if (u.pathname === '/whoami') return j({ owner, uid: owner ? 'u1' : undefined });
@@ -125,6 +126,7 @@ async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin =
     await page.evaluate(() => document.querySelector('[data-rap]')?.click()); await page.waitForTimeout(500); if (await page.$('.ap')) fail.push('avaliar: botão não desligou a tela');
     await blank('avaliar desligado');
   }
+  if (seen.rep?.length) fail.push('o site relatou erro ao montar a tela: ' + seen.rep[0]);
   if (expired && seen.refresh !== 1) fail.push(`login vencido: renovou ${seen.refresh} vezes (devia ser 1)`);
   await b.close();
   const all = [...fail, ...errs];
