@@ -217,7 +217,9 @@ function readHash() {
   if (!a) return null;
   try {
     const t = JSON.parse(atob(a.replace(/-/g, '+').replace(/_/g, '/')));
-    const expected = sessionStorage.getItem('dc-state');
+    // a Bungie às vezes devolve o login em outra aba/janela (sessionStorage vazio): aceita também a cópia guardada no localStorage por 20 min
+    let ls = null; try { ls = JSON.parse(localStorage.getItem('dc-state2') || 'null'); localStorage.removeItem('dc-state2'); } catch {}
+    const expected = sessionStorage.getItem('dc-state') || (ls && Date.now() - ls.t < 20 * 6e4 ? ls.s : null);
     sessionStorage.removeItem('dc-state');
     if (!expected || t.state !== expected) return { error: 'state' };
     delete t.state;
@@ -226,9 +228,10 @@ function readHash() {
 }
 function login() {
   const st = Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('');
-  try { sessionStorage.setItem('dc-state', st); } catch {}
+  try { sessionStorage.setItem('dc-state', st); localStorage.setItem('dc-state2', JSON.stringify({ s: st, t: Date.now() })); } catch {}
   location.href = `https://www.bungie.net/${lang === 'pt' ? 'pt-br' : 'en'}/OAuth/Authorize?client_id=${encodeURIComponent(cfg.clientId)}&response_type=code&state=${st}`;
 }
+document.addEventListener('click', e => { if (e.target.closest('[data-login]')) login(); });
 function logout() { resetChar(); PLUGS = null; plugsP = null; buildOpen = false; if (member) idbDel('profile-' + member.id); LS.del('dc-auth'); LS.del('dc-member'); LS.del('dc-hdr'); LS.del('dc-orla'); LS.del('dc-synct'); SY.t = {}; SY.dirty.clear(); clearInterval(LIVE.timer); LIVE.timer = null; LIVE.on = false; LIVE.mem = []; LS.del('dc-el'); auth = null; profile = null; member = null; render(); }
 let tokRefresh = null; // um só pedido de renovação por vez: vários pedidos juntos reaproveitam o mesmo (o token de renovação não pode ser usado duas vezes)
 async function token() {
@@ -4970,7 +4973,8 @@ if ('serviceWorker' in navigator) addEventListener('load', () => navigator.servi
   try {
     [cfg, defs, ITEMS, APIW] = await Promise.all([fetch('/api/config').then(r => r.json()), fetch('/data/defs.json', { cache: 'no-cache' }).then(r => r.json()), fetch('/data/items.json', { cache: 'no-cache' }).then(r => r.json()).catch(() => ({})), fetch('/data/api.json', { cache: 'no-cache' }).then(r => r.json()).then(j => j.api || null).catch(() => null)]);
   } catch { cfg = { configured: false }; showMessage(`<p class="notice">${esc(u().notConfigured)}</p>`); return; }
-  if (h?.error) { render(); $('list').insertAdjacentHTML('afterbegin', `<p class="notice">${esc(u().authError(h.error))}</p>`); return; }
+  // login que não deu certo: se já havia uma sessão salva, segue com ela em vez de travar a página
+  if (h?.error && !LS.get('dc-auth', null)) { render(); $('list').insertAdjacentHTML('afterbegin', `<p class="notice">${esc(u().authError(h.error))} <button type="button" class="linkb" data-login>${lang === 'pt' ? 'Entrar de novo' : 'Sign in again'}</button></p>`); return; }
   if (h?.auth) { auth = h.auth; LS.set('dc-auth', auth); try { if (sessionStorage.getItem('dc-ret') === '/grade' && !GRADE) { sessionStorage.removeItem('dc-ret'); LS.set('dc-authv', 2); location.replace('/grade'); return; } } catch {} }
   // versão do acesso: quando o site passa a pedir uma permissão nova da Bungie, quem entrou antes precisa entrar de novo (uma vez)
   const AUTH_V = 2; // 2: mover e equipar itens (nov/2026)
