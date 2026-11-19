@@ -193,6 +193,15 @@ const groupOf = t => GROUPS.find(g => g.subs.includes(parentOf(t)));
 // aba salva que não existe mais (ex.: Padrões, que foi retirada) volta para Objetivos
 if (!groupOf(tab)) { tab = 'obj'; LS.set('dc-tab', 'obj'); }
 { const t0 = routeTab(); if (t0) tab = t0; } // o endereço manda na aba; "/" retoma a última
+// transição nativa do navegador (troca de aba = fade curto; destaque da aba desliza). Sem suporte ou com "reduzir movimento": troca direto
+const RM = matchMedia('(prefers-reduced-motion: reduce)');
+function vt(fn, kind = 'tab') {
+  if (!document.startViewTransition || RM.matches || document.visibilityState !== 'visible') { fn(); return Promise.resolve(); }
+  document.documentElement.dataset.vt = kind;
+  const t = document.startViewTransition(fn); t.finished.finally(() => { delete document.documentElement.dataset.vt; }).catch(() => {});
+  return t.updateCallbackDone.catch(() => {});
+}
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; // a rolagem de cada aba é devolvida por nós no Voltar
 function setGrade(v) { if (GRADE === v) return; GRADE = v; const r = document.documentElement; r.classList.toggle('grade', v); if (!v) r.classList.remove('grade-ok'); }
 // mantém o endereço igual à aba (troca por correção de permissão também); push = nova entrada no histórico
 function routeSync(push) {
@@ -1843,9 +1852,17 @@ function filter() {
 }
 
 /* ---------- eventos ---------- */
-function go(t, o = {}) { t = resolveTab(t); const prev = tab, url0 = location.pathname; setGrade(t === 'gclo'); tab = t; const g = groupOf(t), pa = parentOf(t); if (pa !== t) { lastKid[pa] = t; LS.set('dc-kids', lastKid); } if (g) { lastSub[g.id] = t; LS.set('dc-subs', lastSub); } if (!GRADE) LS.set('dc-tab', t); if (!o.pop && (prev !== t || routeTab(url0) !== t)) routeSync(o.grp ? 'grp' : (!o.grp && history.state?.g && history.state.g === groupOf(t)?.id) ? 'rep' : true); /* aba do grupo e logo a subaba: uma entrada só no histórico */ render(); if (!o.pop && prev !== t) { const y = $('tabs').getBoundingClientRect().top + scrollY - 8; if (scrollY > y) scrollTo(0, Math.max(0, y)); } }
+function go(t, o = {}) { t = resolveTab(t); const prev = tab, url0 = location.pathname; setGrade(t === 'gclo'); tab = t; const g = groupOf(t), pa = parentOf(t); if (pa !== t) { lastKid[pa] = t; LS.set('dc-kids', lastKid); } if (g) { lastSub[g.id] = t; LS.set('dc-subs', lastSub); } if (!GRADE) LS.set('dc-tab', t); if (!o.pop && (prev !== t || routeTab(url0) !== t)) routeSync(o.grp ? 'grp' : (!o.grp && history.state?.g && history.state.g === groupOf(t)?.id) ? 'rep' : true); /* aba do grupo e logo a subaba: uma entrada só no histórico */
+  if (prev === t) { render(); return; }
+  vt(render).then(() => {
+    if (o.pop) { const y = o.y || 0; requestAnimationFrame(() => scrollTo(0, y)); }
+    else { const y = $('tabs').getBoundingClientRect().top + scrollY - 8; if (scrollY > y) scrollTo(0, Math.max(0, y)); } // aba nova começa no topo da lista
+    status(''); const nm = u().subs?.[t] || u().tabs?.[groupOf(t)?.id] || ''; if (nm) { const st = $('status'); if (st) { st.textContent = nm; setTimeout(() => { if (st.textContent === nm) st.textContent = ''; }, 1500); } } // leitor de tela ouve a aba nova
+    if (o.kb) { const l = $('list'); l.tabIndex = -1; l.focus({ preventScroll: true }); } // pelo teclado: foco vai para o conteúdo
+  });
+}
 // Voltar/Avançar do navegador: troca de aba sem recarregar e devolve a rolagem
-addEventListener('popstate', e => { const t = routeTab(); if (t === undefined) return; go(t || LS.get('dc-tab', 'obj'), { pop: true }); const y = e.state?.y || 0; requestAnimationFrame(() => scrollTo(0, y)); });
+addEventListener('popstate', e => { const t = routeTab(); if (t === undefined) return; const y = e.state?.y || 0; if ((t || LS.get('dc-tab', 'obj')) === tab) { requestAnimationFrame(() => scrollTo(0, y)); return; } go(t || LS.get('dc-tab', 'obj'), { pop: true, y }); });
 // links internos para abas (botão Grade, "Marcar grade"…): sem recarregar a página
 document.addEventListener('click', e => {
   if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
@@ -1856,8 +1873,8 @@ document.addEventListener('click', e => {
   e.preventDefault(); go(t);
   if (url.search) { history.replaceState(history.state, '', url.pathname + url.search); if (t === 'gclo') { OB.pre = undefined; render(); } }
 });
-$('tabs').addEventListener('click', e => { const b = e.target.closest('.tab'); if (!b) return; const g = GROUPS.find(x => x.id === b.dataset.group); go(groupOf(lastSub[g.id])?.id === g.id ? lastSub[g.id] : g.subs[0], { grp: true }); });
-$('subtabs').addEventListener('click', e => { const b = e.target.closest('.sub'); if (b?.dataset.sub === 'gclo') { go('gclo'); return; } if (b) go(b.dataset.sub); const k = e.target.closest('[data-kid]'); if (k) go(k.dataset.kid); });
+$('tabs').addEventListener('click', e => { const b = e.target.closest('.tab'); if (!b) return; const g = GROUPS.find(x => x.id === b.dataset.group); go(groupOf(lastSub[g.id])?.id === g.id ? lastSub[g.id] : g.subs[0], { grp: true, kb: e.detail === 0 }); });
+$('subtabs').addEventListener('click', e => { const b = e.target.closest('.sub'); if (b?.dataset.sub === 'gclo') { go('gclo', { kb: e.detail === 0 }); return; } if (b) go(b.dataset.sub, { kb: e.detail === 0 }); const k = e.target.closest('[data-kid]'); if (k) go(k.dataset.kid); });
 $('chars').addEventListener('click', e => { if (e.target.closest('#findbtn')) { openFind(); return; } const b = e.target.closest('.char'); if (!b || b.dataset.char === charId) return; charId = b.dataset.char; LS.set('dc-char-' + member.id, charId); resetChar(); buildOpen && renderBuild(); hydrate(); });
 $('ldbtn').addEventListener('click', () => { if (tab === 'ld') go(prevTab || 'obj'); else { prevTab = tab; go('ld'); } });
 $('themebtn').addEventListener('click', () => { const t = curTheme() === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = t; LS.set('dc-theme', t); applyTheme(); });
@@ -5614,9 +5631,9 @@ function todoHTML3() {
       ${rest.length && !NW ? `<div class="t3-rest"><small class="t3-hk">${esc(P ? 'Também para você' : 'Also for you')}</small>${rest.map(row).join('')}</div>` : ''}${nh && !TD.show ? `<button type="button" class="linkb" data-tdshow>${esc(T.hidden(nh))}</button>` : ''}</div>${side}</div></section>`;
 }
 async function obApiSafe(p) { try { return await obApi(p); } catch { return null; } }
-document.addEventListener('click', e => { const x = e.target.closest('[data-tdex]'); if (!x) return; const id = x.dataset.tdex; TD.ex.has(id) ? TD.ex.delete(id) : TD.ex.add(id); LS.set('dc-td-ex', [...TD.ex].slice(-20)); render(); });
+document.addEventListener('click', e => { const x = e.target.closest('[data-tdex]'); if (!x) return; const id = x.dataset.tdex; TD.ex.has(id) ? TD.ex.delete(id) : TD.ex.add(id); LS.set('dc-td-ex', [...TD.ex].slice(-20)); vt(render, 'open'); });
 document.addEventListener('click', e => {
-  const m = e.target.closest('[data-tdm]'); if (m) { TD.m = m.dataset.tdm; LS.set('dc-td-mode', TD.m); render(); return; }
+  const m = e.target.closest('[data-tdm]'); if (m) { TD.m = m.dataset.tdm; LS.set('dc-td-mode', TD.m); vt(render); return; }
   const f = e.target.closest('[data-tdfirst]'); if (f) { FIRST.k = f.dataset.tdfirst; LS.set('dc-first', FIRST.k); go('gclg'); scrollTo({ top: 0 }); }
 });
 function todoHTML() {
@@ -6039,7 +6056,7 @@ document.addEventListener('click', async e => {
   if (!AP.on) return;
   const ap = t.closest('[data-apf]'); if (ap) { AP.f = AP.f === ap.dataset.apf ? '' : ap.dataset.apf; render(); return; }
   if (t.closest('[data-apretry]')) { AP.av = ''; apAvLoad(true); render(); return; }
-  const o = t.closest('[data-apopen]'); if (o) { const id = o.dataset.apopen; AP.open = AP.open === id ? '' : id; RAP.sel = id; RAP.sim = {}; RAP.msg = null; render(); return; }
+  const o = t.closest('[data-apopen]'); if (o) { const id = o.dataset.apopen; AP.open = AP.open === id ? '' : id; RAP.sel = id; RAP.sim = {}; RAP.msg = null; vt(render, 'open'); return; }
   const op = t.closest('[data-apopt]'); if (op) { const x = invAll().find(y => y.iid === op.dataset.apopt); if (x) apOpt(x, apEval(x)); return; }
   if (t.closest('.ap-x')) { rapClick(e); return; }
   if (t.closest('[data-apall]')) { const ws = invAll().filter(x => x.slot < 3); const sk = ws.filter(x => apEval(x).plan?.length && apEval(x).est).length; AP.bulk = { st: 'ask', sk, ids: ws.filter(x => apEval(x).plan?.length && !apEval(x).est && (!AP.ty || INVD[x.h]?.tl === AP.ty) && (!AP.q.trim() || palNorm(ivName(x) + ' ' + pkNames(x)).includes(palNorm(AP.q.trim())))).map(x => x.iid), n: 0, f: 0 }; render(); return; }

@@ -164,7 +164,7 @@ R.push(await run('/grade ver como: fora do clã', { path: '/grade', owner: true,
 // ---------- navegação por endereço (abas com endereço próprio, Voltar/Avançar, /grade sem recarregar, permissões) ----------
 const url = p => p.evaluate(() => location.pathname + location.search), act = p => p.evaluate(() => document.querySelector('#subtabs .sub.on, #subtabs .sub[aria-selected="true"], #subtabs .sub[aria-current]')?.dataset.sub || document.querySelector('#subtabs .on')?.dataset.sub || '');
 const same = async (p, fail, w) => { if (!(await p.evaluate(() => window.__noReload === 1))) fail.push(`${w}: a página recarregou (devia trocar sem recarregar)`); };
-const clickSub = (p, g, sub) => p.evaluate(([g, sub]) => { if (!document.querySelector(`#subtabs .sub[data-sub="${sub}"]`)) document.querySelector(`#tabs .tab[data-group="${g}"]`)?.click(); document.querySelector(`#subtabs .sub[data-sub="${sub}"]`)?.click(); }, [g, sub]);
+const clickSub = async (p, g, sub) => { if (!(await p.$(`#subtabs .sub[data-sub="${sub}"]`))) { await p.evaluate(g => document.querySelector(`#tabs .tab[data-group="${g}"]`)?.click(), g); await p.waitForTimeout(400); } await p.evaluate(sub => document.querySelector(`#subtabs .sub[data-sub="${sub}"]`)?.click(), sub); };
 const kidClick = (p, k) => p.evaluate(k => document.querySelector(`[data-kid="${k}"]`)?.click(), k);
 R.push(await run('endereço: /cofre abre o Cofre', { path: '/cofre', clicks: false, steps: async (p, fail) => { await p.waitForTimeout(1500); if (!(await p.$('.vl-wrap, .iv-wrap'))) fail.push('/cofre não abriu o cofre'); if (await url(p) !== '/cofre') fail.push('endereço mudou: ' + await url(p)); } }));
 R.push(await run('endereço: "/" retoma a última aba e mostra o endereço dela', { path: '/', clicks: false, ls: { 'dc-tab': 'vend' }, steps: async (p, fail) => { await p.waitForTimeout(800); if (await url(p) !== '/vendedores') fail.push('esperava /vendedores, veio ' + await url(p)); } }));
@@ -191,6 +191,13 @@ R.push(await run('endereço: Hoje → Grade → Arsenal → Voltar (sem recarreg
   await same(p, fail, 'Grade ida e volta'); } }));
 R.push(await run('endereço: /grade → clicar em aba vai sem recarregar', { path: '/grade', clicks: false, steps: async (p, fail) => {
   await clickSub(p, 'gd', 'gd'); await p.waitForTimeout(1000); if (await url(p) !== '/builds') fail.push('da grade para Builds: ' + await url(p)); await same(p, fail, 'grade → builds'); } }));
+R.push(await run('rolagem: Voltar devolve a posição; aba nova sobe para a lista', { path: '/hoje', clicks: false, steps: async (p, fail) => {
+  await p.evaluate(() => { document.body.style.minHeight = '5000px'; scrollTo(0, 1500); }); await p.waitForTimeout(300);
+  await clickSub(p, 'obj', 'cal'); await p.waitForTimeout(900); const y1 = await p.evaluate(() => scrollY); if (y1 > 1200) fail.push('aba nova não subiu (' + y1 + ')');
+  await p.goBack(); await p.waitForTimeout(1200); const y2 = await p.evaluate(() => scrollY); if (Math.abs(y2 - 1500) > 60) fail.push('Voltar não devolveu a rolagem (' + y2 + ')'); } }));
+R.push(await run('teclado: trocar de aba pelo teclado leva o foco ao conteúdo', { path: '/hoje', clicks: false, steps: async (p, fail) => {
+  await p.focus('#tabs .tab[data-group="drops"]'); await p.keyboard.press('Enter'); await p.waitForTimeout(900);
+  if (!(await p.evaluate(() => document.activeElement?.id === 'list'))) fail.push('foco não foi para o conteúdo: ' + await p.evaluate(() => document.activeElement?.className || document.activeElement?.tagName)); } }));
 R.push(await run('permissão: /administracao sem ser admin cai em Membros', { path: '/administracao', clicks: false, steps: async (p, fail) => {
   await p.waitForTimeout(1500); if (await url(p) !== '/membros') fail.push('esperava /membros, veio ' + await url(p)); if (await p.$('#subtabs .sub[data-sub="gcla"]')) fail.push('aba Administração apareceu para não-admin'); } }));
 R.push(await run('permissão: /administracao como admin abre', { path: '/administracao', admin: true, clicks: false, steps: async (p, fail) => {

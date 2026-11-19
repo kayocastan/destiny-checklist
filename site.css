@@ -2528,3 +2528,12 @@ button.cg-chip{cursor:pointer}button.cg-chip:hover{background:color-mix(in srgb,
 .qp-b{padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--surface) 70%,transparent)}.qp-b>.lbd-n{margin:4px 0 0}
 .t4-side{display:grid;gap:6px;margin-bottom:6px}.t4-side .t3-rh b{white-space:normal}
 .ob-cal{display:inline-flex;flex-wrap:wrap;gap:6px}.ob-cal.big{margin-top:6px}
+/* Transições entre telas (View Transitions nativas): troca de aba = fade curto; destaque da aba desliza; abrir/fechar = suave */
+::view-transition-old(root),::view-transition-new(root){animation-duration:160ms;animation-timing-function:ease-out}
+html[data-vt="open"]::view-transition-old(root),html[data-vt="open"]::view-transition-new(root){animation-duration:200ms}
+#tabs .tab[aria-current="true"]{view-transition-name:dpi-tab-on}
+#subtabs .sub[aria-pressed="true"]{view-transition-name:dpi-sub-on}
+::view-transition-group(dpi-tab-on),::view-transition-group(dpi-sub-on){animation-duration:220ms;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
+::view-transition-old(dpi-sub-on),::view-transition-new(dpi-sub-on),::view-transition-old(dpi-tab-on),::view-transition-new(dpi-tab-on){height:100%}
+#list:focus{outline:none}#list:focus-visible{outline:2px solid var(--acc);outline-offset:4px}
+@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
