@@ -3191,7 +3191,7 @@ const obSet = (day, h, m) => { const p = n => String(n).padStart(2, '0'), v = `$
 async function obApi(path, opts = {}) {
   if (!ORLA) ORLA = await fetch('/data/orla.json', { cache: 'no-cache' }).then(r => r.json()).then(j => j.api || null).catch(() => null);
   if (!ORLA) throw new Error('down');
-  const r = await fetch(ORLA + path, { ...opts, headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + await token() } }), j = await r.json().catch(() => ({}));
+  const r = await fetch(ORLA + path, { signal: AbortSignal.timeout?.(20000), ...opts, headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + await token() } }), j = await r.json().catch(() => ({})); // 20 s: sem resposta vira "bot fora" com Tentar de novo, nunca tela parada
   if (!r.ok) { const e = new Error(j.error || 'err'); e.status = r.status; throw e; }
   return j;
 }
