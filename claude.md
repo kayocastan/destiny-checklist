@@ -135,3 +135,9 @@ Tudo bem abaixo do incluído no plano pago do Cloudflare. A Vercel não muda. A 
 - Rodar SEMPRE antes de `git push` quando mexer em app.js, index.html, site.css ou guias.html. O GitHub também roda a cada envio (workflow "Testes do site").
 - Erros reais dos visitantes: `GET /err` no servidor do DPI (só o dono), últimos 300.
 - Se um bug novo escapar, acrescente um cenário em tests/smoke.mjs que reproduza o bug antes de corrigir.
+
+## Endereço por aba (desde 19/11/2026)
+- Cada aba tem endereço próprio (`ROUTES` no app.js: /hoje, /cofre, /grade…); "/" retoma a última aba. `/beta/<aba>` no /beta.
+- Aba nova: acrescentar em `ROUTES` **e** um rewrite em `vercel.json` (os testes leem o vercel.json).
+- /grade é uma aba (`gclo`) do mesmo site: `setGrade()` liga/desliga o visual; nada de `location.href` para trocar de aba.
+- Testes de navegação/permissão em tests/smoke.mjs ("endereço:" e "permissão:"); `F=trecho node tests/smoke.mjs` roda só alguns.

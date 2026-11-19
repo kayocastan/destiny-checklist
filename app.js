@@ -161,9 +161,15 @@ const resolveTab = t => KIDS[t] ? (KIDS[t].includes(lastKid[t]) ? lastKid[t] : K
 const isGd = () => tab === 'gd' || tab === 'gcl' || tab === 'gclb' || tab === 'gclg' || tab === 'gcla' || tab === 'gcld' || tab === 'gst' || tab === 'grep'; // Guardião: builds/favoritos/clã e estatísticas
 // Página de teste (/beta): só para o dono do site; recursos novos aparecem aqui antes de ir para todos
 const VAULT_MAX = 1300; // espaços do cofre (1300 desde o Update 9.7.0)
-const BETA = location.pathname.replace(/\/+$/, '') === '/beta'; // página de testes do dono (/beta)
+const BETA = /^\/beta(\/|$)/.test(location.pathname); // página de testes do dono (/beta e /beta/<aba>)
+/* ---------- endereço por aba: cada tela tem o seu (Voltar/Avançar funcionam, dá para mandar o link); "/" retoma a última aba ---------- */
+const ROUTES = { obj: 'hoje', prog: 'desafios', cal: 'calendario', raid: 'incursoes', dg: 'masmorras', camp: 'campanhas', xm: 'missoes-exoticas', tit: 'titulos', tri: 'triunfos', colx: 'colecionaveis', inv: 'personagens', vlt: 'cofre', exo: 'exoticos', cat: 'catalisadores', vend: 'vendedores', ld: 'loadouts', gd: 'builds', gar: 'armaduras', grep: 'relatorios', gst: 'estatisticas', gcl: 'membros', gclb: 'placar', gclg: 'grupos', gcla: 'administracao', gcld: 'discord', gclo: 'grade' };
+const RSLUG = Object.fromEntries(Object.entries(ROUTES).map(([k, v]) => [v, k])), RBASE = BETA ? '/beta' : '';
+// null = raiz (retoma a última aba); undefined = endereço que não é de aba (/g/, /b/…): o roteador não mexe
+const routeTab = (path = location.pathname) => { let p = path.replace(/\/+$/, ''); if (BETA) p = p.replace(/^\/beta/, ''); p = p.replace(/^\//, ''); return p === '' ? null : RSLUG[p]; };
+const routePath = t => `${RBASE}/${ROUTES[t] || ''}`;
 /* "ver como" (só no /beta, só o dono): simula outro perfil sem trocar de conta. m = membro comum, n = sem clã, a = agenda recusada (403), e = agenda fora do ar */
-const VC = (() => { if (!BETA && location.pathname.replace(/\/+$/, '') !== '/grade') return ''; /* /beta e /grade (página separada) */ try { return sessionStorage.getItem('dc-vc') || ''; } catch { return ''; } })();
+const VC = (() => { try { return sessionStorage.getItem('dc-vc') || ''; } catch { return ''; } })();
 const ownerReal = () => !!LS.get('dc-ownchk', {}).o, isOwner = () => ownerReal() && !VC;
 const vcGd = o => VC === 'n' && o ? { ...o, clan: { none: true } } : o;
 const FX = true; // recursos que passaram pelo /beta e agora valem para todos
@@ -179,14 +185,22 @@ if (FX) {
   document.querySelectorAll('h1, .gh-id').forEach(x => x.setAttribute('translate', 'no'));
 }
 const idle = f => window.requestIdleCallback ? requestIdleCallback(f, { timeout: 1500 }) : setTimeout(f); // tarefas que podem esperar o navegador ficar livre
-const GRADE = location.pathname.replace(/\/+$/, '') === '/grade'; // interface do Orla Bot (só membros do clã Orla Emaranhada; os demais veem a página em branco)
+let GRADE = routeTab() === 'gclo'; // /grade: interface do Orla Bot (agora uma aba do mesmo site; muda sem recarregar)
 const ORLA_CLAN = '5280120', orlaOK = () => GD?.clan?.gid === ORLA_CLAN;
 let orlaChk = false;
 if (GRADE) document.documentElement.classList.add('grade');
 const groupOf = t => GROUPS.find(g => g.subs.includes(parentOf(t)));
 // aba salva que não existe mais (ex.: Padrões, que foi retirada) volta para Objetivos
 if (!groupOf(tab)) { tab = 'obj'; LS.set('dc-tab', 'obj'); }
-if (GRADE) tab = 'gclo'; // /grade: página própria (botão Grade do topo), com o cabeçalho e o rodapé do DPI; sem subaba
+{ const t0 = routeTab(); if (t0) tab = t0; } // o endereço manda na aba; "/" retoma a última
+function setGrade(v) { if (GRADE === v) return; GRADE = v; const r = document.documentElement; r.classList.toggle('grade', v); if (!v) r.classList.remove('grade-ok'); }
+// mantém o endereço igual à aba (troca por correção de permissão também); push = nova entrada no histórico
+function routeSync(push) {
+  if (routeTab() === undefined && !push) return; const want = routePath(tab); if (location.pathname.replace(/\/+$/, '') === want.replace(/\/+$/, '') && !push) return;
+  if (push === 'rep') { history.replaceState({ t: tab, y: 0 }, '', want); return; }
+  if (push) { try { history.replaceState({ ...(history.state || {}), y: scrollY }, ''); } catch {} history.pushState({ t: tab, y: 0, g: push === 'grp' ? groupOf(tab)?.id : undefined }, '', want); }
+  else history.replaceState({ ...(history.state || {}), t: tab }, '', want + location.search + location.hash);
+}
 for (const [k, v] of Object.entries(lastSub)) if (groupOf(v)?.id !== k) delete lastSub[k];
 
 /* ---------- status ---------- */
@@ -228,7 +242,7 @@ function readHash() {
 }
 function login() {
   const st = Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('');
-  try { sessionStorage.setItem('dc-state', st); localStorage.setItem('dc-state2', JSON.stringify({ s: st, t: Date.now() })); if (GRADE || sessionStorage.getItem('dc-ret') === '/grade') localStorage.setItem('dc-ret2', JSON.stringify({ r: '/grade', t: Date.now() })); else localStorage.removeItem('dc-ret2'); } catch {}
+  try { sessionStorage.setItem('dc-state', st); localStorage.setItem('dc-state2', JSON.stringify({ s: st, t: Date.now() })); { const r = sessionStorage.getItem('dc-ret') === '/grade' ? routePath('gclo') : location.pathname + location.search; if (r && r !== '/' && routeTab(r.split('?')[0]) !== undefined) localStorage.setItem('dc-ret2', JSON.stringify({ r, t: Date.now() })); else localStorage.removeItem('dc-ret2'); } /* volta para a aba de onde a pessoa entrou */ } catch {}
   location.href = `https://www.bungie.net/${lang === 'pt' ? 'pt-br' : 'en'}/OAuth/Authorize?client_id=${encodeURIComponent(cfg.clientId)}&response_type=code&state=${st}`;
 }
 document.addEventListener('click', e => { if (e.target.closest('[data-login]')) login(); });
@@ -1666,8 +1680,8 @@ function vcBar() { // barra do "ver como": aparece só para o dono no /beta
   document.body.appendChild(b);
 }
 function render() {
-  if (BETA || GRADE) vcBar();
-  try { renderInner(); } catch (e) {
+  if (BETA || GRADE || VC) vcBar();
+  try { renderInner(); routeSync(false); } catch (e) {
     errReport(`${e.message} ${String(e.stack || '').split('\n').slice(1, 5).join(' | ')}`, 'render');
     const l = $('list'); if (l && !l.innerHTML.trim()) l.innerHTML = `<div class="panel"><section class="ad-s ad-wide"><p class="iv-msg bad">${lang === 'pt' ? 'Algo deu errado ao montar esta tela. O erro já foi enviado para correção.' : 'Something went wrong building this screen. The error was reported.'} <button type="button" class="linkb" onclick="location.reload()">${lang === 'pt' ? 'Recarregar' : 'Reload'}</button></p><small class="lbd-n">${String(e.message).replace(/[<>&]/g, '')}</small></section></div>`;
   }
@@ -1829,9 +1843,21 @@ function filter() {
 }
 
 /* ---------- eventos ---------- */
-function go(t) { t = resolveTab(t); if (GRADE && t !== 'gclo') { LS.set('dc-tab', t); location.href = '/'; return; } tab = t; const g = groupOf(t), pa = parentOf(t); if (pa !== t) { lastKid[pa] = t; LS.set('dc-kids', lastKid); } if (g) { lastSub[g.id] = t; LS.set('dc-subs', lastSub); } if (!GRADE) LS.set('dc-tab', t); render(); }
-$('tabs').addEventListener('click', e => { const b = e.target.closest('.tab'); if (!b) return; const g = GROUPS.find(x => x.id === b.dataset.group); go(groupOf(lastSub[g.id])?.id === g.id ? lastSub[g.id] : g.subs[0]); });
-$('subtabs').addEventListener('click', e => { const b = e.target.closest('.sub'); if (b?.dataset.sub === 'gclo') { location.href = '/grade'; return; } if (b) go(b.dataset.sub); const k = e.target.closest('[data-kid]'); if (k) go(k.dataset.kid); });
+function go(t, o = {}) { t = resolveTab(t); const prev = tab, url0 = location.pathname; setGrade(t === 'gclo'); tab = t; const g = groupOf(t), pa = parentOf(t); if (pa !== t) { lastKid[pa] = t; LS.set('dc-kids', lastKid); } if (g) { lastSub[g.id] = t; LS.set('dc-subs', lastSub); } if (!GRADE) LS.set('dc-tab', t); if (!o.pop && (prev !== t || routeTab(url0) !== t)) routeSync(o.grp ? 'grp' : (!o.grp && history.state?.g && history.state.g === groupOf(t)?.id) ? 'rep' : true); /* aba do grupo e logo a subaba: uma entrada só no histórico */ render(); if (!o.pop && prev !== t) { const y = $('tabs').getBoundingClientRect().top + scrollY - 8; if (scrollY > y) scrollTo(0, Math.max(0, y)); } }
+// Voltar/Avançar do navegador: troca de aba sem recarregar e devolve a rolagem
+addEventListener('popstate', e => { const t = routeTab(); if (t === undefined) return; go(t || LS.get('dc-tab', 'obj'), { pop: true }); const y = e.state?.y || 0; requestAnimationFrame(() => scrollTo(0, y)); });
+// links internos para abas (botão Grade, "Marcar grade"…): sem recarregar a página
+document.addEventListener('click', e => {
+  if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  const a = e.target.closest('a[href]'); if (!a || a.target || a.hasAttribute('download')) return;
+  let url; try { url = new URL(a.href, location.href); } catch { return; } if (url.origin !== location.origin) return;
+  if (BETA !== /^\/beta(\/|$)/.test(url.pathname)) return; // /beta ↔ site: página diferente, recarrega
+  const t = routeTab(url.pathname); if (!t) return;
+  e.preventDefault(); go(t);
+  if (url.search) { history.replaceState(history.state, '', url.pathname + url.search); if (t === 'gclo') { OB.pre = undefined; render(); } }
+});
+$('tabs').addEventListener('click', e => { const b = e.target.closest('.tab'); if (!b) return; const g = GROUPS.find(x => x.id === b.dataset.group); go(groupOf(lastSub[g.id])?.id === g.id ? lastSub[g.id] : g.subs[0], { grp: true }); });
+$('subtabs').addEventListener('click', e => { const b = e.target.closest('.sub'); if (b?.dataset.sub === 'gclo') { go('gclo'); return; } if (b) go(b.dataset.sub); const k = e.target.closest('[data-kid]'); if (k) go(k.dataset.kid); });
 $('chars').addEventListener('click', e => { if (e.target.closest('#findbtn')) { openFind(); return; } const b = e.target.closest('.char'); if (!b || b.dataset.char === charId) return; charId = b.dataset.char; LS.set('dc-char-' + member.id, charId); resetChar(); buildOpen && renderBuild(); hydrate(); });
 $('ldbtn').addEventListener('click', () => { if (tab === 'ld') go(prevTab || 'obj'); else { prevTab = tab; go('ld'); } });
 $('themebtn').addEventListener('click', () => { const t = curTheme() === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = t; LS.set('dc-theme', t); applyTheme(); });
@@ -3226,7 +3252,7 @@ function orlaHTML() {
   const T = obt(); if (!member) return `<p class="empty-msg">${esc(T.login)}</p>`;
   if (OB.me === undefined) { setTimeout(obLoad); return `<p class="empty-msg wait">${esc(T.loading)}</p>`; }
   if (!OB.me) return `<p class="iv-msg bad">${esc(T.down)}</p>`;
-  if (OB.f == null && OB.pre === undefined) { OB.pre = new URLSearchParams(location.search).get('a') || null; if (OB.pre) { history.replaceState(null, '', '/grade'); obPre(OB.pre); } } // "Marcar grade" de Esta semana para você
+  if (OB.f == null && OB.pre === undefined) { OB.pre = new URLSearchParams(location.search).get('a') || null; if (OB.pre) { history.replaceState(history.state, '', routePath('gclo')); obPre(OB.pre); } } // "Marcar grade" de Esta semana para você
   const me = OB.me, f = OB.f ??= { act: OB.pre || '', cur: null, cap: 6, rk: 0, start: obNext(), desc: '' }; if (!f.edit && f.start < obNow()) f.start = obNext();
   const note = (OB.res ? `<p class="iv-msg${OB.res === 'ok' ? '' : ' bad'}">${esc(T.res[OB.res] || T.res.fail)}</p>` : '') + (OB.msg ? `<p class="iv-msg${OB.msg.bad ? ' bad' : ''}">${esc(OB.msg.t)}</p>${OB.msg.cal ? obCalBtns(OB.msg.cal, true) : ''}` : '');
   return `<section class="ad-s ad-wide ob-h"><div class="ad-h"><h2>${esc(T.t)}</h2></div><small class="lbd-n">${esc(T.sub)}</small>
@@ -4991,7 +5017,7 @@ if ('serviceWorker' in navigator) addEventListener('load', () => navigator.servi
   } catch { cfg = { configured: false }; showMessage(`<p class="notice">${esc(u().notConfigured)}</p>`); return; }
   // login que não deu certo: se já havia uma sessão salva, segue com ela em vez de travar a página
   if (h?.error && !LS.get('dc-auth', null)) { render(); $('list').insertAdjacentHTML('afterbegin', `<p class="notice">${esc(u().authError(h.error))} <button type="button" class="linkb" data-login>${lang === 'pt' ? 'Entrar de novo' : 'Sign in again'}</button></p>`); return; }
-  if (h?.auth) { auth = h.auth; LS.set('dc-auth', auth); try { let r2 = null; try { r2 = JSON.parse(localStorage.getItem('dc-ret2') || 'null'); localStorage.removeItem('dc-ret2'); } catch {} if ((sessionStorage.getItem('dc-ret') === '/grade' || (r2?.r === '/grade' && Date.now() - r2.t < 20 * 6e4)) && !GRADE) { sessionStorage.removeItem('dc-ret'); LS.set('dc-authv', 2); location.replace('/grade'); return; } } catch {} }
+  if (h?.auth) { auth = h.auth; LS.set('dc-auth', auth); try { let r2 = null; try { r2 = JSON.parse(localStorage.getItem('dc-ret2') || 'null'); localStorage.removeItem('dc-ret2'); } catch {} const dest = sessionStorage.getItem('dc-ret') === '/grade' ? routePath('gclo') : r2?.r && Date.now() - r2.t < 20 * 6e4 ? r2.r : null; sessionStorage.removeItem('dc-ret'); if (dest && dest.split('?')[0] !== location.pathname) { LS.set('dc-authv', 2); location.replace(dest); return; } } catch {} }
   // versão do acesso: quando o site passa a pedir uma permissão nova da Bungie, quem entrou antes precisa entrar de novo (uma vez)
   const AUTH_V = 2; // 2: mover e equipar itens (nov/2026)
   let relog = false;

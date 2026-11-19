@@ -7,7 +7,10 @@ import { join, extname } from 'node:path';
 
 const ROOT = new URL('..', import.meta.url).pathname, ORIGIN = 'http://dpi.test';
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json' };
-const REWRITE = { '/grade': '/index.html', '/beta': '/index.html', '/guias': '/guias.html', '/novidades': '/novidades.html', '/estado': '/estado.html', '/status': '/status.html', '/': '/index.html' };
+// mesmos atalhos de endereço da Vercel (vercel.json), para testar as abas com endereço próprio
+const VJ = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url)));
+const REWRITE = { '/': '/index.html', ...Object.fromEntries(VJ.rewrites.filter(r => r.destination.startsWith('/') && !r.source.includes(':')).map(r => [r.source, r.destination])) };
+const rewrite = p => REWRITE[p] || (/^\/beta\/[^/]+$/.test(p) ? '/index.html' : null);
 const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', 'base64');
 const now = Date.now(), iso = t => new Date(t).toISOString();
 
@@ -44,7 +47,8 @@ function profile() {
 }
 const GRADES = [{ id: 1, name: 'Queda do Rei: Normal', g: null, ci: null, desc: '**Atenção**\n\nSó quem já fez.', cap: 6, rk: 0, s: iso(now + 864e5), by: 'Peter', url: null, mine: null, creator: false, p: [{ n: 'Peter', c: 'titular', r: 0 }] }, { id: 2, name: 'Fim de Crota: Normal', g: null, ci: null, desc: 'Inscrita', cap: 6, rk: 0, s: iso(now + 2 * 864e5).replace('T', ' ').slice(0, 19), by: 'Nipanga', url: 'https://discord.com/channels/1/2/3', mine: 'titular', creator: true, p: [{ n: 'Nipanga', c: 'titular', r: 0 }] }];
 
-async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin = false, xsave = false, expectSub = null, expired = false, mobile = false, clicks = true, expectText = '', arm = false, owner = false, vc = '', noSub = null, expectBar = false }) {
+async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin = false, xsave = false, expectSub = null, expired = false, mobile = false, clicks = true, steps = null, expectText = '', arm = false, owner = false, vc = '', noSub = null, expectBar = false }) {
+  if (process.env.F && !name.includes(process.env.F)) return true; // F=trecho: roda só os testes com esse nome
   const b = await chromium.launch(), ctx = await b.newContext(mobile ? { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true } : { viewport: { width: 1366, height: 900 } });
   const page = await ctx.newPage(), errs = [], seen = { refresh: 0 };
   page.on('pageerror', e => errs.push('pageerror: ' + e.message));
@@ -54,7 +58,7 @@ async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin =
     if (u.origin === ORIGIN) {
       if (u.pathname === '/api/config') return j({ apiKey: 'k', clientId: '1', configured: true });
       if (u.pathname === '/api/refresh') { seen.refresh++; await new Promise(z => setTimeout(z, 300)); return j({ access_token: 'novo', access_expires: now + 36e5, refresh_token: 'r2', refresh_expires: now + 90 * 864e5 }); }
-      const f = REWRITE[u.pathname] || u.pathname, file = join(ROOT, f);
+      const f = rewrite(u.pathname) || u.pathname, file = join(ROOT, f);
       if (existsSync(file) && !f.endsWith('/')) return r.fulfill({ status: 200, contentType: MIME[extname(f)] || 'application/octet-stream', body: readFileSync(file) });
       return r.fulfill({ status: 404, body: 'nf' });
     }
@@ -126,6 +130,7 @@ async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin =
     await page.evaluate(() => document.querySelector('[data-rap]')?.click()); await page.waitForTimeout(500); if (await page.$('.ap')) fail.push('avaliar: botão não desligou a tela');
     await blank('avaliar desligado');
   }
+  if (steps) { await page.evaluate(() => { window.__noReload = 1; }); await steps(page, fail); }
   if (expectText) { let ok = false; for (let t = 0; t < 20 && !ok; t++) { ok = (await page.evaluate(() => document.getElementById('list')?.innerText || '')).includes(expectText); if (!ok) await page.waitForTimeout(500); } if (!ok) fail.push(`faltou o texto "${expectText}" na tela`); }
   if (seen.rep?.length) fail.push('o site relatou erro ao montar a tela: ' + seen.rep[0]);
   if (expired && seen.refresh !== 1) fail.push(`login vencido: renovou ${seen.refresh} vezes (devia ser 1)`);
@@ -155,6 +160,51 @@ R.push(await run('/grade: bot recusa a sessão (401) mostra aviso', { path: '/gr
 R.push(await run('/grade: fora do clã (403) mostra aviso', { path: '/grade', auth: true, orla: 403, clicks: false, ls: { 'dc-lang': 'pt' }, expectText: 'Orla Emaranhada' }));
 R.push(await run('/grade: bot fora do ar (503) mostra aviso', { path: '/grade', auth: true, orla: 503, clicks: false, ls: { 'dc-lang': 'pt' }, expectText: 'Tentar de novo' }));
 R.push(await run('/grade ver como: fora do clã', { path: '/grade', owner: true, vc: 'gc', clicks: false, ls: { 'dc-lang': 'pt', 'dc-ownchk': { o: true, t: Date.now() } }, expectText: 'Orla Emaranhada', expectBar: true }));
+
+// ---------- navegação por endereço (abas com endereço próprio, Voltar/Avançar, /grade sem recarregar, permissões) ----------
+const url = p => p.evaluate(() => location.pathname + location.search), act = p => p.evaluate(() => document.querySelector('#subtabs .sub.on, #subtabs .sub[aria-selected="true"], #subtabs .sub[aria-current]')?.dataset.sub || document.querySelector('#subtabs .on')?.dataset.sub || '');
+const same = async (p, fail, w) => { if (!(await p.evaluate(() => window.__noReload === 1))) fail.push(`${w}: a página recarregou (devia trocar sem recarregar)`); };
+const clickSub = (p, g, sub) => p.evaluate(([g, sub]) => { if (!document.querySelector(`#subtabs .sub[data-sub="${sub}"]`)) document.querySelector(`#tabs .tab[data-group="${g}"]`)?.click(); document.querySelector(`#subtabs .sub[data-sub="${sub}"]`)?.click(); }, [g, sub]);
+const kidClick = (p, k) => p.evaluate(k => document.querySelector(`[data-kid="${k}"]`)?.click(), k);
+R.push(await run('endereço: /cofre abre o Cofre', { path: '/cofre', clicks: false, steps: async (p, fail) => { await p.waitForTimeout(1500); if (!(await p.$('.vl-wrap, .iv-wrap'))) fail.push('/cofre não abriu o cofre'); if (await url(p) !== '/cofre') fail.push('endereço mudou: ' + await url(p)); } }));
+R.push(await run('endereço: "/" retoma a última aba e mostra o endereço dela', { path: '/', clicks: false, ls: { 'dc-tab': 'vend' }, steps: async (p, fail) => { await p.waitForTimeout(800); if (await url(p) !== '/vendedores') fail.push('esperava /vendedores, veio ' + await url(p)); } }));
+R.push(await run('endereço: trocar de aba muda o endereço e Voltar/Avançar funcionam', { path: '/hoje', clicks: false, steps: async (p, fail) => {
+  await clickSub(p, 'drops', 'vend'); await p.waitForTimeout(600); if (await url(p) !== '/vendedores') fail.push('clique em Vendedores: endereço ' + await url(p));
+  await clickSub(p, 'gd', 'gst'); await p.waitForTimeout(600); if (await url(p) !== '/estatisticas') fail.push('clique em Estatísticas: endereço ' + await url(p));
+  await p.goBack(); await p.waitForTimeout(800); if (await url(p) !== '/vendedores') fail.push('Voltar: esperava /vendedores, veio ' + await url(p));
+  if (!(await p.evaluate(() => (document.getElementById('list')?.textContent || '').trim().length > 5))) fail.push('Voltar: tela vazia');
+  await p.goBack(); await p.waitForTimeout(800); if (await url(p) !== '/hoje') fail.push('Voltar 2x: esperava /hoje, veio ' + await url(p));
+  await p.goForward(); await p.waitForTimeout(800); if (await url(p) !== '/vendedores') fail.push('Avançar: esperava /vendedores, veio ' + await url(p));
+  await same(p, fail, 'Voltar/Avançar'); } }));
+R.push(await run('endereço: Hoje → Grade → Arsenal → Voltar (sem recarregar)', { path: '/hoje', clicks: false, ls: { 'dc-lang': 'pt' }, steps: async (p, fail) => {
+  await p.evaluate(() => { const b = document.getElementById('gradebtn'); if (b) { b.hidden = false; b.click(); } }); await p.waitForTimeout(1500);
+  if (await url(p) !== '/grade') fail.push('botão Grade: endereço ' + await url(p));
+  if (!(await p.evaluate(() => document.documentElement.classList.contains('grade')))) fail.push('Grade: faltou o visual da página da grade');
+  if (!(await p.evaluate(() => /Grades do clã|Clan rosters/.test(document.title)))) fail.push('Grade: título da aba não mudou');
+  if (!(await p.evaluate(() => (document.getElementById('list')?.innerText || '').includes('Agenda')))) fail.push('Grade: agenda não apareceu');
+  await clickSub(p, 'drops', 'vend'); await p.waitForTimeout(800);
+  if (await url(p) !== '/vendedores') fail.push('saindo da Grade: endereço ' + await url(p));
+  if (await p.evaluate(() => document.documentElement.classList.contains('grade'))) fail.push('saindo da Grade: visual da grade ficou');
+  if (await p.evaluate(() => /Grades do clã/.test(document.title))) fail.push('saindo da Grade: título ficou "Grades do clã"');
+  await p.goBack(); await p.waitForTimeout(1200); if (await url(p) !== '/grade') fail.push('Voltar para a Grade: endereço ' + await url(p));
+  if (!(await p.evaluate(() => (document.getElementById('list')?.innerText || '').includes('Agenda')))) fail.push('Voltar para a Grade: agenda sumiu');
+  await same(p, fail, 'Grade ida e volta'); } }));
+R.push(await run('endereço: /grade → clicar em aba vai sem recarregar', { path: '/grade', clicks: false, steps: async (p, fail) => {
+  await clickSub(p, 'gd', 'gd'); await p.waitForTimeout(1000); if (await url(p) !== '/builds') fail.push('da grade para Builds: ' + await url(p)); await same(p, fail, 'grade → builds'); } }));
+R.push(await run('permissão: /administracao sem ser admin cai em Membros', { path: '/administracao', clicks: false, steps: async (p, fail) => {
+  await p.waitForTimeout(1500); if (await url(p) !== '/membros') fail.push('esperava /membros, veio ' + await url(p)); if (await p.$('#subtabs .sub[data-sub="gcla"]')) fail.push('aba Administração apareceu para não-admin'); } }));
+R.push(await run('permissão: /administracao como admin abre', { path: '/administracao', admin: true, clicks: false, steps: async (p, fail) => {
+  await p.waitForTimeout(1500); if (await url(p) !== '/administracao') fail.push('admin: esperava /administracao, veio ' + await url(p)); } }));
+R.push(await run('endereço: sem login em /cofre mostra a entrada e guarda a volta', { path: '/cofre', auth: false, clicks: false, steps: async (p, fail) => {
+  await p.waitForTimeout(800); if (await url(p) !== '/cofre') fail.push('sem login: endereço mudou para ' + await url(p));
+  await p.route('https://www.bungie.net/**/OAuth/**', r => r.abort());
+  await p.evaluate(() => document.getElementById('loginbtn')?.click()); await p.waitForTimeout(800);
+  const st = await p.context().storageState(), ls2 = st.origins.find(o => o.origin === 'http://dpi.test')?.localStorage || [], r = (() => { try { return JSON.parse(ls2.find(x => x.name === 'dc-ret2')?.value || 'null')?.r; } catch { return null; } })(); if (r !== '/cofre') fail.push('entrar: não guardou a volta para /cofre (' + r + ') botão=' + await p.evaluate(() => !!document.getElementById('loginbtn')) + ' url=' + await url(p)); } }));
+R.push(await run('endereço: /beta/cofre (dono) mantém o /beta', { path: '/beta/cofre', owner: true, clicks: false, ls: { 'dc-ownchk': { o: true, t: Date.now() } }, steps: async (p, fail) => {
+  await p.waitForTimeout(1200); if (await url(p) !== '/beta/cofre') fail.push('beta: endereço ' + await url(p)); await clickSub(p, 'drops', 'vend'); await p.waitForTimeout(600); if (await url(p) !== '/beta/vendedores') fail.push('beta: aba nova foi para ' + await url(p)); } }));
+R.push(await run('endereço: link "Marcar grade" (/grade?a=) abre a Grade sem recarregar', { path: '/hoje', clicks: false, steps: async (p, fail) => {
+  await p.evaluate(() => { const a = document.createElement('a'); a.href = '/grade?a=teste'; a.id = 'tlink'; document.body.append(a); a.click(); }); await p.waitForTimeout(1500);
+  if (!(await url(p)).startsWith('/grade')) fail.push('link Marcar grade: ' + await url(p)); await same(p, fail, 'Marcar grade'); } }));
 R.push(await run('/grade: sem login', { path: '/grade', auth: false, clicks: false }));
 const bad = R.filter(x => !x).length;
 console.log(bad ? `\n${bad} teste(s) falharam.` : '\nTudo certo.');

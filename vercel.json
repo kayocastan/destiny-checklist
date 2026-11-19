@@ -71,6 +71,110 @@
       "destination": "/index.html"
     },
     {
+      "source": "/hoje",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/desafios",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/calendario",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/incursoes",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/masmorras",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/campanhas",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/missoes-exoticas",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/titulos",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/triunfos",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/colecionaveis",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/personagens",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/cofre",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/exoticos",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/catalisadores",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/vendedores",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/loadouts",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/builds",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/armaduras",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/relatorios",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/estatisticas",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/membros",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/placar",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/grupos",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/administracao",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/discord",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/beta/:aba",
+      "destination": "/index.html"
+    },
+    {
       "source": "/b/:c",
       "destination": "https://dni-api.dni-site.workers.dev/page/:c"
     },
