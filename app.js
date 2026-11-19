@@ -163,7 +163,7 @@ const isGd = () => tab === 'gd' || tab === 'gcl' || tab === 'gclb' || tab === 'g
 const VAULT_MAX = 1300; // espaços do cofre (1300 desde o Update 9.7.0)
 const BETA = location.pathname.replace(/\/+$/, '') === '/beta'; // página de testes do dono (/beta)
 /* "ver como" (só no /beta, só o dono): simula outro perfil sem trocar de conta. m = membro comum, n = sem clã, a = agenda recusada (403), e = agenda fora do ar */
-const VC = (() => { if (!BETA) return ''; try { return sessionStorage.getItem('dc-vc') || ''; } catch { return ''; } })();
+const VC = (() => { if (!BETA && location.pathname.replace(/\/+$/, '') !== '/grade') return ''; /* /beta e /grade (página separada) */ try { return sessionStorage.getItem('dc-vc') || ''; } catch { return ''; } })();
 const ownerReal = () => !!LS.get('dc-ownchk', {}).o, isOwner = () => ownerReal() && !VC;
 const vcGd = o => VC === 'n' && o ? { ...o, clan: { none: true } } : o;
 const FX = true; // recursos que passaram pelo /beta e agora valem para todos
@@ -1659,14 +1659,14 @@ addEventListener('error', e => errReport(`${e.message} @${(e.filename || '').spl
 addEventListener('unhandledrejection', e => { const r = e.reason; if (r?.message === 'auth' || r?.message === 'moving') return; errReport(`${r?.message || r} ${String(r?.stack || '').split('\n').slice(1, 4).join(' | ')}`, 'promise'); });
 function vcBar() { // barra do "ver como": aparece só para o dono no /beta
   let b = $('vcbar'); if (!ownerReal() || !member) { if (b) b.remove(); return; } if (b) return;
-  const O = [['', 'Eu (dono)'], ['m', 'Membro comum'], ['n', 'Sem clã'], ['a', 'Agenda recusada'], ['e', 'Agenda fora do ar']];
+  const O = [['', 'Eu (dono)'], ['m', 'Membro comum'], ['n', 'Sem clã'], ['a', 'Agenda recusada'], ['e', 'Agenda fora do ar'], ...(GRADE ? [['gc', 'Grade: fora do clã'], ['gs', 'Grade: sessão recusada'], ['gd', 'Grade: bot fora do ar'], ['gl', 'Grade: conferindo (lento)']] : [])];
   b = document.createElement('div'); b.id = 'vcbar'; b.className = 'vcbar' + (VC ? ' on' : '');
   b.innerHTML = `<label for="vcsel">${VC ? '👁 Vendo como' : 'Ver como'}</label><select id="vcsel">${O.map(([v, t]) => `<option value="${v}"${v === VC ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
   b.querySelector('select').addEventListener('change', e => { try { sessionStorage.setItem('dc-vc', e.target.value); } catch {} location.reload(); });
   document.body.appendChild(b);
 }
 function render() {
-  if (BETA) vcBar();
+  if (BETA || GRADE) vcBar();
   try { renderInner(); } catch (e) {
     errReport(`${e.message} ${String(e.stack || '').split('\n').slice(1, 5).join(' | ')}`, 'render');
     const l = $('list'); if (l && !l.innerHTML.trim()) l.innerHTML = `<div class="panel"><section class="ad-s ad-wide"><p class="iv-msg bad">${lang === 'pt' ? 'Algo deu errado ao montar esta tela. O erro já foi enviado para correção.' : 'Something went wrong building this screen. The error was reported.'} <button type="button" class="linkb" onclick="location.reload()">${lang === 'pt' ? 'Recarregar' : 'Reload'}</button></p><small class="lbd-n">${String(e.message).replace(/[<>&]/g, '')}</small></section></div>`;
@@ -3203,6 +3203,7 @@ async function obApi(path, opts = {}) {
 async function obLoad() {
   if (OB.loading || OB.me !== undefined || !member) return; OB.loading = true;
   OB.deny = null;
+  if (VC === 'gc' || VC === 'gs' || VC === 'gd' || VC === 'gl') { await new Promise(r => setTimeout(r, VC === 'gl' ? 25000 : 600)); OB.me = null; OB.deny = VC === 'gc' ? 'clan' : VC === 'gs' ? 'auth' : null; OB.loading = false; render(); return; } // "ver como" do dono
   try { OB.me = await obApi('/me'); }
   catch (e) {
     if (e.status === 401 && auth) { try { auth.access_expires = 0; OB.me = await obApi('/me'); } catch (e2) { e = e2; } } // token recusado pelo bot: renova uma vez e tenta de novo

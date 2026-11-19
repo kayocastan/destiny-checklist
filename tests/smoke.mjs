@@ -154,6 +154,7 @@ R.push(await run('avaliar rolls (nota, gêmea, família, exótica, otimizar)', {
 R.push(await run('/grade: bot recusa a sessão (401) mostra aviso', { path: '/grade', auth: true, orla: 401, clicks: false, ls: { 'dc-lang': 'pt' }, expectText: 'Entrar de novo' }));
 R.push(await run('/grade: fora do clã (403) mostra aviso', { path: '/grade', auth: true, orla: 403, clicks: false, ls: { 'dc-lang': 'pt' }, expectText: 'Orla Emaranhada' }));
 R.push(await run('/grade: bot fora do ar (503) mostra aviso', { path: '/grade', auth: true, orla: 503, clicks: false, ls: { 'dc-lang': 'pt' }, expectText: 'Tentar de novo' }));
+R.push(await run('/grade ver como: fora do clã', { path: '/grade', owner: true, vc: 'gc', clicks: false, ls: { 'dc-lang': 'pt', 'dc-ownchk': { o: true, t: Date.now() } }, expectText: 'Orla Emaranhada', expectBar: true }));
 R.push(await run('/grade: sem login', { path: '/grade', auth: false, clicks: false }));
 const bad = R.filter(x => !x).length;
 console.log(bad ? `\n${bad} teste(s) falharam.` : '\nTudo certo.');
