@@ -44,7 +44,7 @@ function profile() {
 }
 const GRADES = [{ id: 1, name: 'Queda do Rei: Normal', g: null, ci: null, desc: '**Atenção**\n\nSó quem já fez.', cap: 6, rk: 0, s: iso(now + 864e5), by: 'Peter', url: null, mine: null, creator: false, p: [{ n: 'Peter', c: 'titular', r: 0 }] }, { id: 2, name: 'Fim de Crota: Normal', g: null, ci: null, desc: 'Inscrita', cap: 6, rk: 0, s: iso(now + 2 * 864e5).replace('T', ' ').slice(0, 19), by: 'Nipanga', url: 'https://discord.com/channels/1/2/3', mine: 'titular', creator: true, p: [{ n: 'Nipanga', c: 'titular', r: 0 }] }];
 
-async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin = false, xsave = false, expectSub = null, expired = false, mobile = false, clicks = true, arm = false, owner = false, vc = '', noSub = null, expectBar = false }) {
+async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin = false, xsave = false, expectSub = null, expired = false, mobile = false, clicks = true, expectText = '', arm = false, owner = false, vc = '', noSub = null, expectBar = false }) {
   const b = await chromium.launch(), ctx = await b.newContext(mobile ? { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true } : { viewport: { width: 1366, height: 900 } });
   const page = await ctx.newPage(), errs = [], seen = { refresh: 0 };
   page.on('pageerror', e => errs.push('pageerror: ' + e.message));
@@ -126,6 +126,7 @@ async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin =
     await page.evaluate(() => document.querySelector('[data-rap]')?.click()); await page.waitForTimeout(500); if (await page.$('.ap')) fail.push('avaliar: botão não desligou a tela');
     await blank('avaliar desligado');
   }
+  if (expectText) { let ok = false; for (let t = 0; t < 20 && !ok; t++) { ok = (await page.evaluate(() => document.getElementById('list')?.innerText || '')).includes(expectText); if (!ok) await page.waitForTimeout(500); } if (!ok) fail.push(`faltou o texto "${expectText}" na tela`); }
   if (seen.rep?.length) fail.push('o site relatou erro ao montar a tela: ' + seen.rep[0]);
   if (expired && seen.refresh !== 1) fail.push(`login vencido: renovou ${seen.refresh} vezes (devia ser 1)`);
   await b.close();
@@ -150,6 +151,9 @@ R.push(await run('/beta ver como: membro comum (admin real)', { path: '/beta', o
 R.push(await run('/beta ver como: sem clã', { path: '/beta', owner: true, vc: 'n', ls: { 'dc-ownchk': { o: true, t: Date.now() } }, expectBar: true }));
 R.push(await run('/beta ver como: agenda recusada', { path: '/beta', owner: true, vc: 'a', ls: { 'dc-ownchk': { o: true, t: Date.now() }, 'dc-tab': 'gcl' }, clicks: false, expectBar: true }));
 R.push(await run('avaliar rolls (nota, gêmea, família, exótica, otimizar)', { path: '/', arm: true, clicks: false, ls: { 'dc-tab': 'inv' } }));
+R.push(await run('/grade: bot recusa a sessão (401) mostra aviso', { path: '/grade', auth: true, orla: 401, clicks: false, ls: { 'dc-lang': 'pt' }, expectText: 'Entrar de novo' }));
+R.push(await run('/grade: fora do clã (403) mostra aviso', { path: '/grade', auth: true, orla: 403, clicks: false, ls: { 'dc-lang': 'pt' }, expectText: 'Orla Emaranhada' }));
+R.push(await run('/grade: bot fora do ar (503) mostra aviso', { path: '/grade', auth: true, orla: 503, clicks: false, ls: { 'dc-lang': 'pt' }, expectText: 'Tentar de novo' }));
 R.push(await run('/grade: sem login', { path: '/grade', auth: false, clicks: false }));
 const bad = R.filter(x => !x).length;
 console.log(bad ? `\n${bad} teste(s) falharam.` : '\nTudo certo.');

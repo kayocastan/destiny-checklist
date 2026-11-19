@@ -107,7 +107,7 @@ async function api(req, env, url) {
   const me = await who(req, env);
   if (!me) return json(req, { error: 'auth', why: req.authErr || null }, 401); // why: motivo vindo da Bungie (sem dados da conta), ajuda a diagnosticar
   try { if (!(await inClan(env, me))) return json(req, { error: 'clan' }, 403); }
-  catch (e) { if (e instanceof BungieApiError) return json(req, { error: 'clan' }, 403); throw e; }
+  catch (e) { if (e instanceof BungieApiError) return json(req, { error: 'bungie' }, 503); throw e; } // Bungie fora/instável não é "não é do clã"
   if (path === '/activities' && req.method === 'GET') {
     const rows = searchActivities(await catalog(env.DB), (url.searchParams.get('q') || '').slice(0, 80));
     return json(req, { activities: rows.map(({ id, name, type }) => ({ id, name, type })) });

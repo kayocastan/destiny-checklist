@@ -228,7 +228,7 @@ function readHash() {
 }
 function login() {
   const st = Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('');
-  try { sessionStorage.setItem('dc-state', st); localStorage.setItem('dc-state2', JSON.stringify({ s: st, t: Date.now() })); } catch {}
+  try { sessionStorage.setItem('dc-state', st); localStorage.setItem('dc-state2', JSON.stringify({ s: st, t: Date.now() })); if (GRADE || sessionStorage.getItem('dc-ret') === '/grade') localStorage.setItem('dc-ret2', JSON.stringify({ r: '/grade', t: Date.now() })); else localStorage.removeItem('dc-ret2'); } catch {}
   location.href = `https://www.bungie.net/${lang === 'pt' ? 'pt-br' : 'en'}/OAuth/Authorize?client_id=${encodeURIComponent(cfg.clientId)}&response_type=code&state=${st}`;
 }
 document.addEventListener('click', e => { if (e.target.closest('[data-login]')) login(); });
@@ -3197,15 +3197,23 @@ async function obApi(path, opts = {}) {
 }
 async function obLoad() {
   if (OB.loading || OB.me !== undefined || !member) return; OB.loading = true;
-  try { OB.me = await obApi('/me'); } catch (e) { OB.me = null; OB.deny = e.status === 403 || e.status === 401; }
+  OB.deny = null;
+  try { OB.me = await obApi('/me'); }
+  catch (e) {
+    if (e.status === 401 && auth) { try { auth.access_expires = 0; OB.me = await obApi('/me'); } catch (e2) { e = e2; } } // token recusado pelo bot: renova uma vez e tenta de novo
+    if (!OB.me) { OB.me = null; OB.deny = e.status === 401 ? 'auth' : e.status === 403 ? 'clan' : null; }
+  }
   OB.loading = false; render();
 }
 function gradeRender() { // /grade: página em branco até confirmar que a conta é do clã Orla Emaranhada
   const root = document.documentElement, list = $('list'); document.title = (lang === 'pt' ? 'Grades do clã' : 'Clan rosters') + ' · DPI';
   if (!auth) { root.classList.add('grade-ok'); list.innerHTML = `<div class="panel ob-p"><section class="ad-s ad-wide"><button type="button" class="lb-run" data-obin>${lang === 'pt' ? 'Entrar com Bungie' : 'Sign in with Bungie'}</button></section></div>`; return; }
-  if (!member) return;
-  if (OB.me === undefined) { obLoad(); return; }
-  if (OB.deny) { root.classList.remove('grade-ok'); list.innerHTML = ''; return; }
+  const P = lang === 'pt', box = h => { root.classList.add('grade-ok'); list.innerHTML = `<div class="panel ob-p"><section class="ad-s ad-wide">${h}</section></div>`; };
+  if (!member || OB.me === undefined) { if (member) obLoad(); box(`<p class="empty-msg wait">${P ? 'Conferindo sua conta no clã…' : 'Checking your clan membership…'}</p>`); return; }
+  // antes ficava em branco: agora diz o motivo e dá um caminho
+  if (OB.deny === 'auth') { box(`<p class="iv-msg bad">${P ? 'Sua sessão com a Bungie não foi aceita pelo bot. Entre de novo para continuar.' : 'The bot did not accept your Bungie session. Sign in again to continue.'}</p><button type="button" class="lb-run" data-obrelog>${P ? 'Entrar de novo' : 'Sign in again'}</button>`); return; }
+  if (OB.deny === 'clan') { box(`<p class="iv-msg bad">${P ? `A conta ${esc(member.name || '')} não aparece como membro do clã Orla Emaranhada na Bungie.` : `The account ${esc(member.name || '')} does not show as a member of the Orla Emaranhada clan on Bungie.`}</p><p class="lbd-n">${P ? 'Se você é do clã: confira se entrou com a mesma conta Bungie do clã (cross-save conta) e tente de novo. Se continuar, avise um admin.' : 'If you are in the clan: check you signed in with the same Bungie account as the clan and try again. If it persists, tell an admin.'}</p><button type="button" class="lb-run" data-obretry>${P ? 'Tentar de novo' : 'Try again'}</button> <button type="button" class="linkb" data-obrelog>${P ? 'Entrar com outra conta' : 'Sign in with another account'}</button>`); return; }
+  if (!OB.me) { box(`<p class="iv-msg bad">${esc(obt().down)}</p><button type="button" class="lb-run" data-obretry>${P ? 'Tentar de novo' : 'Try again'}</button>`); return; }
   root.classList.add('grade-ok'); list.innerHTML = `<div class="panel ad-p ob-p">${orlaHTML()}</div>`;
 }
 function orlaHTML() {
@@ -3325,6 +3333,8 @@ function obSug(q) { // autocomplete da atividade: catálogo do bot; texto livre 
   }, 160);
 }
 document.addEventListener('click', e => {
+  if (e.target.closest('[data-obretry]')) { OB.me = undefined; OB.deny = null; render(); return; }
+  if (e.target.closest('[data-obrelog]')) { try { sessionStorage.setItem('dc-ret', '/grade'); } catch {} logout(); login(); return; }
   if (e.target.closest('[data-obin]')) { try { sessionStorage.setItem('dc-ret', '/grade'); } catch {} login(); return; }
   if (e.target.closest('[data-obreg]')) { obRegDlg(); return; }
   if (e.target.closest('[data-obx]')) { $('obdlg')?.close(); return; }
@@ -4975,7 +4985,7 @@ if ('serviceWorker' in navigator) addEventListener('load', () => navigator.servi
   } catch { cfg = { configured: false }; showMessage(`<p class="notice">${esc(u().notConfigured)}</p>`); return; }
   // login que não deu certo: se já havia uma sessão salva, segue com ela em vez de travar a página
   if (h?.error && !LS.get('dc-auth', null)) { render(); $('list').insertAdjacentHTML('afterbegin', `<p class="notice">${esc(u().authError(h.error))} <button type="button" class="linkb" data-login>${lang === 'pt' ? 'Entrar de novo' : 'Sign in again'}</button></p>`); return; }
-  if (h?.auth) { auth = h.auth; LS.set('dc-auth', auth); try { if (sessionStorage.getItem('dc-ret') === '/grade' && !GRADE) { sessionStorage.removeItem('dc-ret'); LS.set('dc-authv', 2); location.replace('/grade'); return; } } catch {} }
+  if (h?.auth) { auth = h.auth; LS.set('dc-auth', auth); try { let r2 = null; try { r2 = JSON.parse(localStorage.getItem('dc-ret2') || 'null'); localStorage.removeItem('dc-ret2'); } catch {} if ((sessionStorage.getItem('dc-ret') === '/grade' || (r2?.r === '/grade' && Date.now() - r2.t < 20 * 6e4)) && !GRADE) { sessionStorage.removeItem('dc-ret'); LS.set('dc-authv', 2); location.replace('/grade'); return; } } catch {} }
   // versão do acesso: quando o site passa a pedir uma permissão nova da Bungie, quem entrou antes precisa entrar de novo (uma vez)
   const AUTH_V = 2; // 2: mover e equipar itens (nov/2026)
   let relog = false;
