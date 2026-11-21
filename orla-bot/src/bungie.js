@@ -15,6 +15,8 @@ export function splitBungieName(value) {
 }
 
 // A chave da Bungie só vale para o Origin cadastrado no portal; o servidor envia o do site.
+// leitura pública (sem login): vendedores públicos, definições e perfis abertos
+export const publicGet = (env, path) => request(env, 'GET', path);
 async function request(env, method, path, { body, token } = {}) {
   const headers = { 'X-API-Key': (env.BUNGIE_API_KEY || '').trim(), Origin: env.SITE_URL, 'User-Agent': 'OrlaBot/2.0' };
   if (!headers['X-API-Key']) throw new BungieApiError('A integração Bungie ainda não está configurada.');

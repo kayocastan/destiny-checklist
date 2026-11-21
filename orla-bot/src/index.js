@@ -10,6 +10,7 @@ import { ActivityInputError } from './rules.js';
 import { createGrade, CATALOG_PREFIX, applySignup, editGrade } from './grades.js';
 import { catalog, searchActivities, matchActivity } from './search.js';
 import { commands } from './commands.js';
+import { vapid, notify, gradeReminders, xurAlerts, pushCleanup } from './push.js';
 
 const ORIGINS = ['https://destinyparallel.vercel.app', 'https://destiny-checklist.vercel.app'];
 const cors = req => {
@@ -104,8 +105,28 @@ async function api(req, env, url) {
     return back('ok');
   }
 
+  // avisos no celular: chave pública e caixa de mensagens (o service worker do site busca aqui quando o aviso toca)
+  if (path === '/push/key' && req.method === 'GET') return json(req, { key: (await vapid(env)).pub });
+  if (path === '/push/inbox' && req.method === 'GET') {
+    const ep = String(url.searchParams.get('e') || ''); if (!ep.startsWith('https://')) return json(req, { list: [] });
+    const list = (await env.DB.prepare('SELECT id, title, body, url, tag FROM push_inbox WHERE endpoint = ? ORDER BY id LIMIT 5').bind(ep).all()).results;
+    if (list.length) await env.DB.prepare(`DELETE FROM push_inbox WHERE id IN (${list.map(() => '?').join(',')})`).bind(...list.map(x => x.id)).run();
+    return json(req, { list });
+  }
   const me = await who(req, env);
-  if (!me) return json(req, { error: 'auth', why: req.authErr || null }, 401); // why: motivo vindo da Bungie (sem dados da conta), ajuda a diagnosticar
+  if (!me) return json(req, { error: 'auth', why: req.authErr || null }, 401);
+  // inscrição dos avisos: qualquer conta Bungie (Xûr); aviso de grade só para quem registrou o Discord
+  if (path === '/push/sub' && (req.method === 'POST' || req.method === 'DELETE')) {
+    const b = await req.json().catch(() => ({})), ep = String(b?.endpoint || '');
+    if (!/^https:\/\/[^\s]{10,800}$/.test(ep)) return json(req, { error: 'Inscrição inválida.' }, 400);
+    if (req.method === 'DELETE') { await env.DB.prepare('DELETE FROM push_subs WHERE endpoint = ? AND uid = ?').bind(ep, me.uid).run(); return json(req, { ok: true }); }
+    const row = await registered(env, me.ids), pf = { grade: b.prefs?.grade ? 1 : 0, xur: b.prefs?.xur ? 1 : 0 }, t = new Date().toISOString();
+    await env.DB.prepare(`INSERT INTO push_subs (endpoint, uid, dmi, dmt, discord_user_id, prefs, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(endpoint) DO UPDATE SET uid = excluded.uid, dmi = excluded.dmi, dmt = excluded.dmt, discord_user_id = excluded.discord_user_id, prefs = excluded.prefs, updated_at = excluded.updated_at`)
+      .bind(ep, me.uid, me.membership.membershipId, me.membership.membershipType, row?.discord_user_id || null, JSON.stringify(pf), t, t).run();
+    if (b.test) await notify(env, ep, { title: 'Avisos do DPI ligados', body: 'É assim que os avisos vão aparecer.', url: '/hoje', tag: 'teste' });
+    return json(req, { ok: true, grade: !!row });
+  } // why: motivo vindo da Bungie (sem dados da conta), ajuda a diagnosticar
   try { if (!(await inClan(env, me))) return json(req, { error: 'clan' }, 403); }
   catch (e) { if (e instanceof BungieApiError) return json(req, { error: 'bungie' }, 503); throw e; } // Bungie fora/instável não é "não é do clã"
   if (path === '/activities' && req.method === 'GET') {
@@ -251,5 +272,5 @@ export default {
       return json(req, { error: 'erro interno' }, 502);
     }
   },
-  async scheduled(_ev, env, ctx) { ctx.waitUntil(cleanup(env).then(() => presence(env)).catch(e => console.error('cron', e?.stack || e))); },
+  async scheduled(_ev, env, ctx) { ctx.waitUntil(gradeReminders(env).catch(e => console.error('push grade', e?.stack || e)).then(() => cleanup(env)).then(() => presence(env)).then(() => xurAlerts(env).catch(e => console.error('push xur', e?.stack || e))).then(() => new Date().getUTCMinutes() === 7 ? pushCleanup(env) : null).catch(e => console.error('cron', e?.stack || e))); },
 };

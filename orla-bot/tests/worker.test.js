@@ -228,3 +228,58 @@ describe('API do DPI', () => {
     expect(j.histSince).toBeTruthy();
   });
 });
+
+describe('Avisos no celular (push)', () => {
+  const api = (path, init = {}) => worker.fetch(new Request('https://w' + path, { ...init, headers: { Origin: 'https://destinyparallel.vercel.app', Authorization: 'Bearer abc', 'Content-Type': 'application/json' } }), env, ctx);
+  const EP = 'https://fcm.googleapis.com/fcm/send/abc123xyz';
+  it('chave pública é criada uma vez e reaproveitada', async () => {
+    const a = await (await worker.fetch(new Request('https://w/push/key'), env, ctx)).json(), b = await (await worker.fetch(new Request('https://w/push/key'), env, ctx)).json();
+    expect(a.key).toMatch(/^[A-Za-z0-9_-]{80,}$/); expect(b.key).toBe(a.key);
+  });
+  it('inscrição exige login; teste manda o toque assinado e a mensagem fica na caixa até ser lida', async () => {
+    env.BUNGIE_API_KEY = 'k';
+    const no = await worker.fetch(new Request('https://w/push/sub', { method: 'POST', body: JSON.stringify({ endpoint: EP }) }), env, ctx); expect(no.status).toBe(401);
+    const r = await api('/push/sub', { method: 'POST', body: JSON.stringify({ endpoint: EP, prefs: { grade: 1, xur: 1 }, test: true }) }); expect(r.status).toBe(200);
+    const push = calls.find(c => c.url === EP); expect(push.method).toBe('POST');
+    const auth = vi.mocked(fetch).mock.calls.find(c => String(c[0]) === EP)[1].headers.Authorization; expect(auth).toMatch(/^vapid t=[\w-]+\.[\w-]+\.[\w-]+, k=[\w-]+$/);
+    const inbox = await (await worker.fetch(new Request('https://w/push/inbox?e=' + encodeURIComponent(EP)), env, ctx)).json(); expect(inbox.list[0].title).toMatch(/ligados/);
+    const again = await (await worker.fetch(new Request('https://w/push/inbox?e=' + encodeURIComponent(EP)), env, ctx)).json(); expect(again.list).toHaveLength(0);
+  });
+  it('30 min antes avisa só quem está na grade e ligou o aviso, uma vez', async () => {
+    env.BUNGIE_API_KEY = 'k'; await link('10');
+    await api('/push/sub', { method: 'POST', body: JSON.stringify({ endpoint: EP, prefs: { grade: 1, xur: 0 } }) });
+    const s = new Date(Date.now() + 28 * 60_000).toISOString();
+    const id = (await env.DB.prepare("INSERT INTO activities (name, capacity, starts_at, description, created_by_discord_id, created_at) VALUES ('Fim de Crota', 6, ?, '', '10', ?)").bind(s, s).run()).meta.last_row_id;
+    await env.DB.prepare("INSERT INTO activity_participants (activity_id, discord_user_id, category, created_at) VALUES (?, '10', 'titular', ?)").bind(id, s).run();
+    calls = []; await worker.scheduled({}, env, ctx); await flush();
+    expect(calls.filter(c => c.url === EP)).toHaveLength(1);
+    calls = []; await worker.scheduled({}, env, ctx); await flush();
+    expect(calls.filter(c => c.url === EP)).toHaveLength(0);
+    const inbox = await (await worker.fetch(new Request('https://w/push/inbox?e=' + encodeURIComponent(EP)), env, ctx)).json(); expect(inbox.list[0].title).toMatch(/Fim de Crota/);
+  });
+  it('inscrição que o navegador desfez (410) é apagada', async () => {
+    env.BUNGIE_API_KEY = 'k'; await api('/push/sub', { method: 'POST', body: JSON.stringify({ endpoint: EP, prefs: { grade: 1 } }) });
+    vi.mocked(fetch).mockImplementationOnce(async () => new Response('', { status: 410 }));
+    const { notify } = await import('../src/push.js'); await notify(env, EP, { title: 't', body: 'b' });
+    expect(await env.DB.prepare('SELECT 1 FROM push_subs WHERE endpoint = ?').bind(EP).first()).toBeNull();
+  });
+  it('sexta: Xûr avisa só o exótico que falta (perfil aberto), uma vez por semana', async () => {
+    env.BUNGIE_API_KEY = 'k'; await api('/push/sub', { method: 'POST', body: JSON.stringify({ endpoint: EP, prefs: { grade: 0, xur: 1 } }) });
+    vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(new Date('2026-11-27T18:05:00Z'));
+    const base = vi.mocked(fetch).getMockImplementation();
+    vi.mocked(fetch).mockImplementation(async (url, init) => {
+      const u = String(url);
+      if (u.includes('/Destiny2/Vendors/')) return new Response(JSON.stringify({ ErrorCode: 1, Response: { sales: { data: { 2190858386: { saleItems: { 1: { itemHash: 11 }, 2: { itemHash: 22 } } } } } } }));
+      if (u.includes('/DestinyInventoryItemDefinition/11/')) return new Response(JSON.stringify({ ErrorCode: 1, Response: { itemType: 3, collectibleHash: 111, inventory: { tierType: 6 }, displayProperties: { name: 'Gjallarhorn' } } }));
+      if (u.includes('/DestinyInventoryItemDefinition/22/')) return new Response(JSON.stringify({ ErrorCode: 1, Response: { itemType: 2, collectibleHash: 222, inventory: { tierType: 6 }, displayProperties: { name: 'Elmo Já Tenho' } } }));
+      if (u.includes('/Profile/4611/?components=800')) return new Response(JSON.stringify({ ErrorCode: 1, Response: { profileCollectibles: { data: { collectibles: { 111: { state: 1 } } } }, characterCollectibles: { data: { c1: { collectibles: { 222: { state: 0 } } } } } } }));
+      return base(url, init);
+    });
+    calls = []; await worker.scheduled({}, env, ctx); await flush();
+    expect(calls.filter(c => c.url === EP)).toHaveLength(1);
+    const inbox = await (await worker.fetch(new Request('https://w/push/inbox?e=' + encodeURIComponent(EP)), env, ctx)).json();
+    expect(inbox.list[0].body).toMatch(/Gjallarhorn/); expect(inbox.list[0].body).not.toMatch(/Elmo/);
+    calls = []; await worker.scheduled({}, env, ctx); await flush(); expect(calls.filter(c => c.url === EP)).toHaveLength(0);
+    vi.useRealTimers();
+  });
+});
