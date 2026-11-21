@@ -233,7 +233,7 @@ R.push(await run('permissão: /administracao como admin abre', { path: '/adminis
 R.push(await run('endereço: sem login em /cofre mostra a entrada e guarda a volta', { path: '/cofre', auth: false, clicks: false, steps: async (p, fail) => {
   await p.waitForTimeout(800); if (await url(p) !== '/cofre') fail.push('sem login: endereço mudou para ' + await url(p));
   await p.route('https://www.bungie.net/**/OAuth/**', r => r.abort());
-  await p.evaluate(() => document.getElementById('loginbtn')?.click()); await p.waitForTimeout(800);
+  await p.evaluate(() => { setTimeout(() => document.getElementById('loginbtn')?.click(), 0); }); await p.waitForTimeout(1200);
   const st = await p.context().storageState(), ls2 = st.origins.find(o => o.origin === 'http://dpi.test')?.localStorage || [], r = (() => { try { return JSON.parse(ls2.find(x => x.name === 'dc-ret2')?.value || 'null')?.r; } catch { return null; } })(); if (r !== '/cofre') fail.push('entrar: não guardou a volta para /cofre (' + r + ')'); } }));
 R.push(await run('endereço: /beta/cofre (dono) mantém o /beta', { path: '/beta/cofre', owner: true, clicks: false, ls: { 'dc-ownchk': { o: true, t: Date.now() } }, steps: async (p, fail) => {
   await p.waitForTimeout(1200); if (await url(p) !== '/beta/cofre') fail.push('beta: endereço ' + await url(p)); await clickSub(p, 'drops', 'vend'); await p.waitForTimeout(600); if (await url(p) !== '/beta/vendedores') fail.push('beta: aba nova foi para ' + await url(p)); } }));
