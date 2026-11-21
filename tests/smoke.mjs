@@ -205,6 +205,18 @@ R.push(await run('tempo: abrir de novo mostra a última visita antes da Bungie r
   console.log('    ⏱ dados novos da Bungie em', live, 'ms');
   console.log('    ⏱ conteúdo na tela em', ms, 'ms' + (process.env.LAT ? ' (com atrasos reais simulados: config 0,6 s, login 0,85 s, Bungie 2 s)' : ''));
   if (ms < 0 || (process.env.LAT && ms > 1500)) fail.push('conteúdo demorou: ' + ms + ' ms'); } }));
+// ---------- tabela de telas (SCREENS no app.js): toda tela tem endereço na Vercel e abre (ou é recusada) conforme "who" ----------
+const SCREENS = new Function('return ' + readFileSync(new URL('../app.js', import.meta.url), 'utf8').match(/const SCREENS = (\[[\s\S]*?\n\]);/)[1])();
+{ const miss = SCREENS.filter(x => !REWRITE['/' + x.r]); const ok = !miss.length; console.log((ok ? '✓' : '✗') + ' tabela de telas: todo endereço tem rewrite no vercel.json' + (ok ? '' : '\n    faltam: ' + miss.map(x => '/' + x.r).join(', '))); R.push(ok); }
+for (const x of SCREENS) {
+  const who = x.who || 'all', want = who === 'all' ? '/' + x.r : who === 'admin' ? '/membros' : '/hoje';
+  R.push(await run(`tela ${x.id} (/${x.r}) como membro comum`, { path: '/' + x.r, clicks: false, steps: async (p, fail) => {
+    await p.waitForTimeout(x.id === 'gclo' ? 2000 : 1200); const u = await url(p); if (u !== want) fail.push(`esperava ${want} (who=${who}), veio ${u}`);
+    if (who === 'all' && x.id !== 'gclo' && x.g && !(await p.evaluate(g => !!document.querySelector(`#tabs .tab[data-group="${g}"][aria-current="true"]`), x.g))) fail.push('aba do grupo ' + x.g + ' não ficou ativa');
+    const ovShown = await p.evaluate(() => !document.getElementById('overall')?.hidden); if (who === 'all' && x.id !== 'gclo' && ovShown !== !!x.ov) fail.push(`barra "x de y feitos": ${ovShown ? 'apareceu' : 'sumiu'} (tabela diz ov=${!!x.ov})`); } }));
+}
+for (const x of SCREENS.filter(x => x.who === 'admin')) R.push(await run(`tela ${x.id} (/${x.r}) como admin`, { path: '/' + x.r, admin: true, clicks: false, steps: async (p, fail) => { await p.waitForTimeout(1500); if (await url(p) !== '/' + x.r) fail.push('admin não abriu: ' + await url(p)); } }));
+for (const x of SCREENS.filter(x => x.who === 'beta')) R.push(await run(`tela ${x.id} (/beta/${x.r}) no /beta`, { path: '/beta/' + x.r, owner: true, clicks: false, ls: { 'dc-ownchk': { o: true, t: Date.now() } }, steps: async (p, fail) => { await p.waitForTimeout(1500); if (await url(p) !== '/beta/' + x.r) fail.push('/beta não abriu: ' + await url(p)); } }));
 R.push(await run('permissão: /administracao sem ser admin cai em Membros', { path: '/administracao', clicks: false, steps: async (p, fail) => {
   await p.waitForTimeout(1500); if (await url(p) !== '/membros') fail.push('esperava /membros, veio ' + await url(p)); if (await p.$('#subtabs .sub[data-sub="gcla"]')) fail.push('aba Administração apareceu para não-admin'); } }));
 R.push(await run('permissão: /administracao como admin abre', { path: '/administracao', admin: true, clicks: false, steps: async (p, fail) => {

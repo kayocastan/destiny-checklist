@@ -153,17 +153,32 @@ const lastSub = LS.get('dc-subs', {});
 let marks = new Set(), SECTIONS = [], LOADOUTS = [], loadedAt = null, QI = [];
 const openSecs = new Set(), openItems = new Set();
 // 5 abas; cada subaba pode juntar telas parecidas, que viram filtros dentro dela (ex.: Atividades = incursões, masmorras, campanhas, missões exóticas)
-const GROUPS = [{ id: 'obj', subs: ['obj'] }, { id: 'act', subs: ['acts', 'tt', 'colx'] }, { id: 'drops', subs: ['invp', 'coll', 'vend', 'ld'] }, { id: 'gd', subs: ['gd', 'grep', 'gst'] }, { id: 'clan', subs: ['gcl', 'gclb', 'gclg', 'gcla'] }];
-const KIDS = { acts: ['raid', 'dg', 'camp', 'xm'], tt: ['tit', 'tri'], invp: ['inv', 'vlt'], coll: ['exo', 'cat'] };
+/* ---------- TABELA ÚNICA DE TELAS: cada tela diz aqui, num lugar só, onde fica, quem vê, o endereço e o que mostra ----------
+   g: grupo (aba de cima) · k: agrupador da subaba (ex.: Atividades › Incursões) · r: endereço (/r) · who: quem vê ('all', 'admin' do clã, 'beta' só no /beta)
+   part: qual parte do perfil a tela precisa primeiro · ov: mostra a barra "x de y feitos" · gdArea: área Guardião (perfil do guardião carregado à parte)
+   Tela nova: uma linha aqui + o rewrite no vercel.json (os testes conferem os dois). */
+const SCREENS = [
+  { id: 'obj', g: 'obj', r: 'hoje', part: 'q' }, { id: 'prog', g: 'obj', r: 'desafios', part: 'b' }, { id: 'cal', g: 'obj', r: 'calendario' },
+  { id: 'raid', g: 'act', k: 'acts', r: 'incursoes', part: 'a', ov: 1 }, { id: 'dg', g: 'act', k: 'acts', r: 'masmorras', part: 'a', ov: 1 }, { id: 'camp', g: 'act', k: 'acts', r: 'campanhas', part: 'q', ov: 1 }, { id: 'xm', g: 'act', k: 'acts', r: 'missoes-exoticas', part: 'a', ov: 1 },
+  { id: 'tit', g: 'act', k: 'tt', r: 'titulos', part: 'b', ov: 1 }, { id: 'tri', g: 'act', k: 'tt', r: 'triunfos', part: 'b' }, { id: 'colx', g: 'act', r: 'colecionaveis', part: 'a' },
+  { id: 'inv', g: 'drops', k: 'invp', r: 'personagens', part: 'c' }, { id: 'vlt', g: 'drops', k: 'invp', r: 'cofre', part: 'c' }, { id: 'exo', g: 'drops', k: 'coll', r: 'exoticos', part: 'a', ov: 1 }, { id: 'cat', g: 'drops', k: 'coll', r: 'catalisadores', part: 'b', ov: 1 },
+  { id: 'vend', g: 'drops', r: 'vendedores', part: 'a' }, { id: 'ld', g: 'drops', r: 'loadouts', part: 'c', ov: 1 },
+  { id: 'gd', g: 'gd', r: 'builds', part: 'a', gdArea: 1 }, { id: 'gar', g: 'gd', r: 'armaduras', who: 'beta' }, { id: 'grep', g: 'gd', r: 'relatorios', gdArea: 1 }, { id: 'gst', g: 'gd', r: 'estatisticas', gdArea: 1 },
+  { id: 'gcl', g: 'clan', r: 'membros', gdArea: 1 }, { id: 'gclb', g: 'clan', r: 'placar', gdArea: 1 }, { id: 'gclg', g: 'clan', r: 'grupos', gdArea: 1 }, { id: 'gcla', g: 'clan', r: 'administracao', who: 'admin', gdArea: 1 }, { id: 'gcld', g: 'clan', r: 'discord', who: 'admin', gdArea: 1 },
+  { id: 'gclo', g: null, r: 'grade' } // Grade do Orla Bot: aba sem grupo (botão Grade no topo), visual próprio
+];
+const SCR = Object.fromEntries(SCREENS.map(x => [x.id, x]));
+const GROUPS = ['obj', 'act', 'drops', 'gd', 'clan'].map(id => ({ id, subs: [] }));
+const KIDS = {}; for (const x of SCREENS) if (x.k) (KIDS[x.k] ||= []).push(x.id);
 const parentOf = t => Object.keys(KIDS).find(k => KIDS[k].includes(t)) || t;
 const lastKid = LS.get('dc-kids', {});
 const resolveTab = t => KIDS[t] ? (KIDS[t].includes(lastKid[t]) ? lastKid[t] : KIDS[t][0]) : t;
-const isGd = () => tab === 'gd' || tab === 'gcl' || tab === 'gclb' || tab === 'gclg' || tab === 'gcla' || tab === 'gcld' || tab === 'gst' || tab === 'grep'; // Guardião: builds/favoritos/clã e estatísticas
+const isGd = () => !!SCR[tab]?.gdArea; // Guardião: builds/favoritos/clã e estatísticas
 // Página de teste (/beta): só para o dono do site; recursos novos aparecem aqui antes de ir para todos
 const VAULT_MAX = 1300; // espaços do cofre (1300 desde o Update 9.7.0)
 const BETA = /^\/beta(\/|$)/.test(location.pathname); // página de testes do dono (/beta e /beta/<aba>)
 /* ---------- endereço por aba: cada tela tem o seu (Voltar/Avançar funcionam, dá para mandar o link); "/" retoma a última aba ---------- */
-const ROUTES = { obj: 'hoje', prog: 'desafios', cal: 'calendario', raid: 'incursoes', dg: 'masmorras', camp: 'campanhas', xm: 'missoes-exoticas', tit: 'titulos', tri: 'triunfos', colx: 'colecionaveis', inv: 'personagens', vlt: 'cofre', exo: 'exoticos', cat: 'catalisadores', vend: 'vendedores', ld: 'loadouts', gd: 'builds', gar: 'armaduras', grep: 'relatorios', gst: 'estatisticas', gcl: 'membros', gclb: 'placar', gclg: 'grupos', gcla: 'administracao', gcld: 'discord', gclo: 'grade' };
+const ROUTES = Object.fromEntries(SCREENS.map(x => [x.id, x.r]));
 const RSLUG = Object.fromEntries(Object.entries(ROUTES).map(([k, v]) => [v, k])), RBASE = BETA ? '/beta' : '';
 // null = raiz (retoma a última aba); undefined = endereço que não é de aba (/g/, /b/…): o roteador não mexe
 const routeTab = (path = location.pathname) => { let p = path.replace(/\/+$/, ''); if (BETA) p = p.replace(/^\/beta/, ''); p = p.replace(/^\//, ''); return p === '' ? null : RSLUG[p]; };
@@ -173,8 +188,11 @@ const VC = (() => { try { return sessionStorage.getItem('dc-vc') || ''; } catch 
 const ownerReal = () => !!LS.get('dc-ownchk', {}).o, isOwner = () => ownerReal() && !VC;
 const vcGd = o => VC === 'n' && o ? { ...o, clan: { none: true } } : o;
 const FX = true; // recursos que passaram pelo /beta e agora valem para todos
-if (FX) GROUPS[0].subs = ['obj', 'prog', 'cal'];
-if (BETA) GROUPS[3].subs = ['gd', 'gar', 'grep', 'gst']; // Armaduras (tier list dos conjuntos): só no /beta por enquanto
+// quem vê cada tela (coluna "who" da tabela); 'admin' enquanto o clã ainda não carregou conta como visível para não piscar a aba
+function canSee(id, pendAdmin) { const w = SCR[id]?.who || 'all'; return w === 'all' || (w === 'beta' && BETA) || (w === 'admin' && (pendAdmin || clanAdminOK())); }
+// subabas de cada grupo saem da tabela, já filtradas por quem vê
+function syncGroups(pendAdmin) { for (const g of GROUPS) { const subs = []; for (const x of SCREENS) if (x.g === g.id && canSee(x.id, pendAdmin)) { const p = x.k || x.id; if (!subs.includes(p)) subs.push(p); } g.subs = subs; } }
+syncGroups(true); // primeira montagem (a conta do clã ainda não carregou); cada render refaz com a permissão real
 /* Diretrizes de interface (Vercel Web Interface Guidelines) e boas práticas de desempenho (passaram pelo /beta):
    classe html.bx liga os estilos (site.css, bloco "BX"); conexões antecipadas; link para pular ao conteúdo; status anunciado a leitores de tela */
 if (FX) {
@@ -350,7 +368,7 @@ async function idbDel(k) { try { const db = await idb(); db.transaction('kv', 'r
 // 201 também em c: a Bungie só manda instâncias (300) dos itens incluídos na mesma resposta
 const PARTS = { id: '200,205', q: '201,301', a: '100,202,800,1100,1400', b: '900', c: '102,201,205,206,300', g: '205,300,305' };
 // parte de que cada aba depende: ela é pedida logo depois do cabeçalho
-const TAB_PART = { xm: 'a', vend: 'a', obj: 'q', camp: 'q', raid: 'a', dg: 'a', exo: 'a', cat: 'b', tit: 'b', tri: 'b', inv: 'c', vlt: 'c', colx: 'a', prog: 'b', ld: 'c', gd: 'a' };
+const TAB_PART = Object.fromEntries(SCREENS.filter(x => x.part).map(x => [x.id, x.part]));
 let have = { id: false, q: false, a: false, b: false, c: false, g: false };
 function pickChar() {
   const chars = Object.values(profile.characters?.data || {});
@@ -1734,14 +1752,15 @@ function renderInner() {
     gb.hidden = !member || !(o?.ok || orlaOK() || GRADE); gb.classList.toggle('on', GRADE); gb.title = lang === 'pt' ? 'Orla Bot: criar ou ver grades do clã' : 'Orla Bot: create or see clan rosters'; } }
   // abas de admin do clã: enquanto os dados do clã não chegam, mantém a aba aberta (antes ficava tudo em branco); sem permissão, volta para Membros
   const admTab = tab === 'gcla' || tab === 'gcld';
-  GROUPS[4].subs = [...(clanAdminOK() || (admTab && !GD?.clan) ? ['gcl', 'gclb', 'gclg', 'gcla', 'gcld'] : ['gcl', 'gclb', 'gclg'])]; if (admTab && !clanAdminOK() && GD?.clan) { tab = 'gcl'; }
+  syncGroups(admTab && !GD?.clan); if (admTab && !clanAdminOK() && GD?.clan) { tab = 'gcl'; }
+  if (SCR[tab] && !canSee(tab, admTab && !GD?.clan)) tab = SCR[tab].g === 'clan' ? 'gcl' : 'obj'; // tela que a pessoa não pode ver: volta para uma que pode
   if (tab !== 'gclo' && !groupOf(tab)) { tab = 'obj'; LS.set('dc-tab', 'obj'); } // (gclo = página /grade, fora das abas) aba guardada que não existe mais (ou de outra versão): volta para Hoje
   const g = groupOf(tab), st = $('subtabs'), pa = parentOf(tab), kids = KIDS[pa];
   if (g && (g.subs.length > 1 || kids)) { st.hidden = false; st.innerHTML = `${g.subs.length > 1 ? `<div class="subs-row">${g.subs.map(id => `<button class="sub" type="button" data-sub="${id}" aria-pressed="${id === pa}">${esc(U.subs[id])}</button>`).join('')}</div>` : ''}${kids ? `<div class="kids-row" role="group" aria-label="${esc(U.subs[pa])}"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 5h14M6 10h8M8.5 15h3"/></svg>${kids.map(k => `<button type="button" class="kid" data-kid="${k}" aria-pressed="${k === tab}">${esc(U.subs[k])}</button>`).join('')}</div>` : ''}`; }
   else { st.hidden = true; st.innerHTML = ''; }
   $('ldbtn').setAttribute('aria-pressed', tab === 'ld'); $('ldbtn').textContent = tab === 'ld' ? U.checklist : U.loadouts;
   document.body.classList.toggle('on-ld', tab === 'ld'); document.body.classList.toggle('no-clears', !OPTS.clears);
-  $('overall').hidden = isGd() || tab === 'gclo' || tab === 'vend' || tab === 'tri' || tab === 'inv' || tab === 'vlt' || tab === 'colx' || tab === 'cal' || tab === 'gar' || ((BETA || FX) && (tab === 'prog' || tab === 'obj'));
+  $('overall').hidden = !SCR[tab]?.ov; // barra "x de y feitos": só nas telas marcadas com ov na tabela
   if (tab === 'gar') { $('list').innerHTML = armHTML(); return; }
   if (tab === 'tri') { $('list').innerHTML = triHTML(); return; }
   if (tab === 'colx') { $('list').innerHTML = colHTML(); return; }
@@ -1771,7 +1790,7 @@ function renderInner() {
   if (tab === 'obj' && have.a && member && LIVE.checked && !LIVE.on) loadSession();
   if ((tab === 'raid' || tab === 'dg' || tab === 'xm') && have.a && member) loadActHist();
   if (tab === 'xm') loadXmRec();
-  $('list').innerHTML = `<div class="panel">${tab === 'obj' ? newsHTML() + todoHTML() : ''}${tab === 'prog' ? chalHTML() + (BETA || FX ? qpHTML() : '') : ''}${tab === 'cal' ? calHTML() : ''}${tab === 'obj' ? sessHTML() : ''}${wkBar}${tsBar}${secs.map(sec => {
+  $('list').innerHTML = `<div class="panel">${tab === 'obj' ? newsHTML() + todoHTML() : ''}${tab === 'prog' ? chalHTML() + (BETA || FX ? qpHTML() : '') : ''}${tab === 'cal' ? calHTML() : ''}${tab === 'obj' ? sessHTML() : ''}${wkBar}${tsBar}${!secs.length && SCR[tab]?.ov ? `<p class="empty-msg">${lang === 'pt' ? 'Nada para mostrar aqui ainda. Os dados da Bungie desta parte não vieram ou ainda estão carregando; toque em Atualizar.' : 'Nothing to show here yet. Bungie did not send this part or it is still loading; tap Refresh.'}</p>` : ''}${secs.map(sec => {
     if (sec.html) return sec.id === 'vendors' ? vendorsHTML() : sec.id === 'goals' ? goalsHTML() : sec.id === 'post' ? postHTML() : sec.id === 'wishobj' ? wishObjHTML() : sec.id === 'focus' ? focusHTML() : sec.id === 'grank' ? grObjHTML() : '';
     if (FX && sec.id === 'week' && sec.items.length) return weekHTML(sec);
     if (sec.empty) return `<p class="empty-msg${/…$/.test(sec.note || '') ? ' wait' : ''}">${esc(sec.note)}</p>`;

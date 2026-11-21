@@ -138,6 +138,7 @@ Tudo bem abaixo do incluído no plano pago do Cloudflare. A Vercel não muda. A 
 
 ## Endereço por aba (desde 19/11/2026)
 - Cada aba tem endereço próprio (`ROUTES` no app.js: /hoje, /cofre, /grade…); "/" retoma a última aba. `/beta/<aba>` no /beta.
-- Aba nova: acrescentar em `ROUTES` **e** um rewrite em `vercel.json` (os testes leem o vercel.json).
+- Aba nova: **uma linha em `SCREENS`** (app.js: grupo, endereço, quem vê, barra de progresso, parte do perfil) **e** o rewrite em `vercel.json`. ROUTES, KIDS, subabas, TAB_PART, isGd e a barra "x de y" saem da tabela.
+- Os testes leem a tabela e abrem toda tela como membro comum, as de admin como admin e as de beta no /beta.
 - /grade é uma aba (`gclo`) do mesmo site: `setGrade()` liga/desliga o visual; nada de `location.href` para trocar de aba.
 - Testes de navegação/permissão em tests/smoke.mjs ("endereço:" e "permissão:"); `F=trecho node tests/smoke.mjs` roda só alguns.
