@@ -2537,3 +2537,8 @@ html[data-vt="open"]::view-transition-old(root),html[data-vt="open"]::view-trans
 ::view-transition-old(dpi-sub-on),::view-transition-new(dpi-sub-on),::view-transition-old(dpi-tab-on),::view-transition-new(dpi-tab-on){height:100%}
 #list:focus{outline:none}#list:focus-visible{outline:2px solid var(--acc);outline-offset:4px}
 @media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
+.ap-lkall{white-space:nowrap}
+.ap-lki{font-size:12px}
+.ap-acts{display:flex;gap:8px;padding:0 10px 8px 62px}
+.ap-junk{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:8px 0;padding:10px 14px;border:1px solid var(--line);border-left:3px solid #ff8a7a;border-radius:10px;background:var(--surface);font-size:13.5px}
+@media (max-width:760px){.ap-acts{padding-left:10px}}

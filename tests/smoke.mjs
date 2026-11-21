@@ -127,7 +127,16 @@ async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin =
     await page.evaluate(() => document.querySelector('[data-apall]')?.click()); await page.waitForTimeout(300); await page.evaluate(() => document.querySelector('[data-apgo]')?.click());
     for (let t = 0; t < 40; t++) { if (await page.$('[data-apbx]')) break; await page.waitForTimeout(500); }
     const dn = await page.evaluate(() => document.querySelector('.lkb')?.textContent || ''); if (!/1 (otimizada|optimized)/.test(dn)) fail.push('avaliar: otimizar todas não terminou · ' + dn.slice(0, 80));
-    await page.evaluate(() => document.querySelector('[data-rap]')?.click()); await page.waitForTimeout(500); if (await page.$('.ap')) fail.push('avaliar: botão não desligou a tela');
+    await page.evaluate(() => document.querySelector('[data-apbx]')?.click()); await page.waitForTimeout(300);
+    await page.evaluate(() => document.querySelector('[data-aplkall]')?.click()); await page.waitForTimeout(300);
+    if (!(await page.$('[data-aplkgo]'))) fail.push('trancar S e A: faltou a confirmação');
+    await page.evaluate(() => document.querySelector('[data-aplkgo]')?.click());
+    for (let t = 0; t < 30; t++) { if (await page.$('[data-aplkx]')) break; await page.waitForTimeout(300); }
+    const lk = await page.evaluate(() => document.querySelector('.lkb')?.textContent || ''); if (!/2 (trancadas|locked)/.test(lk)) fail.push('trancar S e A: ' + lk.slice(0, 80));
+    if ((await page.$$('.ap-lki')).length < 2) fail.push('trancar: cadeado não apareceu nas linhas');
+    await page.evaluate(() => document.querySelector('[data-aplkx]')?.click()); await page.evaluate(() => document.querySelector('[data-apf="junk"]')?.click()); await page.waitForTimeout(400);
+    if (!(await page.$('.ap-junk'))) fail.push('pode desmontar: faltou o aviso da lista');
+        await page.evaluate(() => document.querySelector('[data-rap]')?.click()); await page.waitForTimeout(500); if (await page.$('.ap')) fail.push('avaliar: botão não desligou a tela');
     await blank('avaliar desligado');
   }
   if (steps) { await page.evaluate(() => { window.__noReload = 1; }); await steps(page, fail); }
