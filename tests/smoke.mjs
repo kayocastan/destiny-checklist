@@ -139,7 +139,7 @@ async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin =
         await page.evaluate(() => document.querySelector('[data-rap]')?.click()); await page.waitForTimeout(500); if (await page.$('.ap')) fail.push('avaliar: botão não desligou a tela');
     await blank('avaliar desligado');
   }
-  if (steps) { await page.evaluate(() => { window.__noReload = 1; }); await steps(page, fail); }
+  if (steps) { await page.evaluate(() => { window.__noReload = 1; }); try { await steps(page, fail); } catch (e) { fail.push('passo do teste quebrou: ' + String(e.message || e).split('\n')[0]); } }
   if (expectText) { let ok = false; for (let t = 0; t < 20 && !ok; t++) { ok = (await page.evaluate(() => document.getElementById('list')?.innerText || '')).includes(expectText); if (!ok) await page.waitForTimeout(500); } if (!ok) fail.push(`faltou o texto "${expectText}" na tela`); }
   if (seen.rep?.length) fail.push('o site relatou erro ao montar a tela: ' + seen.rep[0]);
   if (expired && (seen.refresh < 1 || seen.refresh > (steps ? 2 : 1))) fail.push(`login vencido: renovou ${seen.refresh} vezes (devia ser 1)`);
@@ -234,7 +234,7 @@ R.push(await run('endereço: sem login em /cofre mostra a entrada e guarda a vol
   await p.waitForTimeout(800); if (await url(p) !== '/cofre') fail.push('sem login: endereço mudou para ' + await url(p));
   await p.route('https://www.bungie.net/**/OAuth/**', r => r.abort());
   await p.evaluate(() => document.getElementById('loginbtn')?.click()); await p.waitForTimeout(800);
-  const st = await p.context().storageState(), ls2 = st.origins.find(o => o.origin === 'http://dpi.test')?.localStorage || [], r = (() => { try { return JSON.parse(ls2.find(x => x.name === 'dc-ret2')?.value || 'null')?.r; } catch { return null; } })(); if (r !== '/cofre') fail.push('entrar: não guardou a volta para /cofre (' + r + ') botão=' + await p.evaluate(() => !!document.getElementById('loginbtn')) + ' url=' + await url(p)); } }));
+  const st = await p.context().storageState(), ls2 = st.origins.find(o => o.origin === 'http://dpi.test')?.localStorage || [], r = (() => { try { return JSON.parse(ls2.find(x => x.name === 'dc-ret2')?.value || 'null')?.r; } catch { return null; } })(); if (r !== '/cofre') fail.push('entrar: não guardou a volta para /cofre (' + r + ')'); } }));
 R.push(await run('endereço: /beta/cofre (dono) mantém o /beta', { path: '/beta/cofre', owner: true, clicks: false, ls: { 'dc-ownchk': { o: true, t: Date.now() } }, steps: async (p, fail) => {
   await p.waitForTimeout(1200); if (await url(p) !== '/beta/cofre') fail.push('beta: endereço ' + await url(p)); await clickSub(p, 'drops', 'vend'); await p.waitForTimeout(600); if (await url(p) !== '/beta/vendedores') fail.push('beta: aba nova foi para ' + await url(p)); } }));
 R.push(await run('endereço: link "Marcar grade" (/grade?a=) abre a Grade sem recarregar', { path: '/hoje', clicks: false, steps: async (p, fail) => {
