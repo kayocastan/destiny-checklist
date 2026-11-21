@@ -111,7 +111,7 @@ async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin =
   if (expectBar && !(await page.$('#vcbar'))) fail.push('barra "ver como" não apareceu');
   if (!owner && await page.$('#vcbar')) fail.push('barra "ver como" apareceu para quem não é dono');
   if (process.env.SHOTS) { await page.waitForTimeout(3000); await page.screenshot({ path: `${process.env.SHOTDIR}/${process.env.SHOTS}.png`, fullPage: true }); }
-  if (arm) {
+  if (arm && !steps) {
     await page.evaluate(() => { localStorage.setItem('dc-tab', JSON.stringify('inv')); }); await page.evaluate(() => document.querySelector('[data-rap]')?.click());
     for (let t = 0; t < 20; t++) { if (await page.$('.ap-r')) break; await page.waitForTimeout(500); }
     const st = await page.evaluate(() => ({ rows: [...document.querySelectorAll('.ap-r')].map(r => r.querySelector('.ap-g')?.textContent + '|' + (r.querySelector('.ap-fix')?.textContent || '')), no: document.querySelector('.ap-no summary')?.textContent || '', all: !!document.querySelector('[data-apall]') }));
@@ -240,6 +240,16 @@ R.push(await run('endereço: /beta/cofre (dono) mantém o /beta', { path: '/beta
 R.push(await run('endereço: link "Marcar grade" (/grade?a=) abre a Grade sem recarregar', { path: '/hoje', clicks: false, steps: async (p, fail) => {
   await p.evaluate(() => { const a = document.createElement('a'); a.href = '/grade?a=teste'; a.id = 'tlink'; document.body.append(a); a.click(); }); await p.waitForTimeout(1500);
   if (!(await url(p)).startsWith('/grade')) fail.push('link Marcar grade: ' + await url(p)); await same(p, fail, 'Marcar grade'); } }));
+R.push(await run('grade: sugestão de loadout no cartão em que estou inscrito', { path: '/grade', arm: true, clicks: false, ls: { 'dc-lang': 'pt' }, steps: async (p, fail) => {
+  for (let t = 0; t < 30; t++) { if (await p.$('.ls [data-lseq]')) break; await p.waitForTimeout(400); }
+  const st = await p.evaluate(() => ({ n: document.querySelectorAll('.ls').length, txt: document.querySelector('.ls')?.innerText || '', eq: !!document.querySelector('.ls [data-lseq]:not([disabled])') }));
+  if (st.n !== 1) fail.push('esperava 1 sugestão (só na grade em que estou), veio ' + st.n);
+  if (!/Sugestão de loadout/.test(st.txt) || !/Nada muda na sua conta/.test(st.txt)) fail.push('texto da sugestão: ' + st.txt.slice(0, 120));
+  if (!st.eq) fail.push('botão Equipar sugestão desligado');
+  if (process.env.SHOT2) { await p.evaluate(() => document.querySelector('.ls')?.scrollIntoView()); await (await p.$('.ls')).screenshot({ path: process.env.SHOT2 }); }
+  await p.evaluate(() => document.querySelector('.ls [data-lsalt]')?.click()); await p.waitForTimeout(500);
+  await p.evaluate(() => document.querySelector('.ls [data-lseq]')?.click()); await p.waitForTimeout(1500);
+  if (!(await p.evaluate(() => document.getElementById('wrdlg')?.open))) fail.push('Equipar não abriu a confirmação'); } }));
 R.push(await run('/grade: sem login', { path: '/grade', auth: false, clicks: false }));
 const bad = R.filter(x => !x).length;
 console.log(bad ? `\n${bad} teste(s) falharam.` : '\nTudo certo.');
