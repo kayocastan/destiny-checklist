@@ -213,8 +213,10 @@ if (!groupOf(tab)) { tab = 'obj'; LS.set('dc-tab', 'obj'); }
 { const t0 = routeTab(); if (t0) tab = t0; } // o endereço manda na aba; "/" retoma a última
 // transição nativa do navegador (troca de aba = fade curto; destaque da aba desliza). Sem suporte ou com "reduzir movimento": troca direto
 const RM = matchMedia('(prefers-reduced-motion: reduce)');
+/* Safari e todo navegador de iPhone (WebKit): a foto da tela antiga trava fora do lugar com a página rolada; troca direto */
+const VT_OFF = /AppleWebKit/.test(navigator.userAgent) && !/(Chrome|Chromium|Edg)\//.test(navigator.userAgent);
 function vt(fn, kind = 'tab') {
-  if (!document.startViewTransition || RM.matches || document.visibilityState !== 'visible') { fn(); return Promise.resolve(); }
+  if (!document.startViewTransition || VT_OFF || RM.matches || document.visibilityState !== 'visible') { fn(); return Promise.resolve(); }
   document.documentElement.dataset.vt = kind;
   const t = document.startViewTransition(fn); t.finished.finally(() => { delete document.documentElement.dataset.vt; }).catch(() => {});
   return t.updateCallbackDone.catch(() => {});
