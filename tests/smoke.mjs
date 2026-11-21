@@ -56,13 +56,13 @@ async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin =
   await ctx.route('**/*', async r => {
     const u = new URL(r.request().url()), j = (o, s = 200) => r.fulfill({ status: s, contentType: 'application/json', body: JSON.stringify(o) });
     if (u.origin === ORIGIN) {
-      if (u.pathname === '/api/config') return j({ apiKey: 'k', clientId: '1', configured: true });
-      if (u.pathname === '/api/refresh') { seen.refresh++; await new Promise(z => setTimeout(z, 300)); return j({ access_token: 'novo', access_expires: now + 36e5, refresh_token: 'r2', refresh_expires: now + 90 * 864e5 }); }
+      if (u.pathname === '/api/config') { if (process.env.LAT) await new Promise(z => setTimeout(z, 600)); seen.cfg = (seen.cfg || 0) + 1; } if (u.pathname === '/api/config') return j({ apiKey: 'k', clientId: '1', configured: true });
+      if (u.pathname === '/api/refresh') { seen.refresh++; await new Promise(z => setTimeout(z, process.env.LAT ? 850 : 300)); return j({ access_token: 'novo', access_expires: now + 36e5, refresh_token: 'r2', refresh_expires: now + 90 * 864e5 }); }
       const f = rewrite(u.pathname) || u.pathname, file = join(ROOT, f);
       if (existsSync(file) && !f.endsWith('/')) return r.fulfill({ status: 200, contentType: MIME[extname(f)] || 'application/octet-stream', body: readFileSync(file) });
       return r.fulfill({ status: 404, body: 'nf' });
     }
-    if (u.hostname === 'www.bungie.net' && u.pathname.startsWith('/Platform')) {
+    if (u.hostname === 'www.bungie.net' && u.pathname.startsWith('/Platform')) { if (process.env.LAT && /Profile/.test(u.pathname)) await new Promise(z => setTimeout(z, 2000));
       const p = u.pathname.replace('/Platform', '');
       if (p.startsWith('/User/GetMembershipsForCurrentUser')) return j({ ErrorCode: 1, Response: { destinyMemberships: [{ membershipId: '4611686018400000001', membershipType: 3, displayName: 'Teste', bungieGlobalDisplayName: 'Teste', bungieGlobalDisplayNameCode: 1234 }], primaryMembershipId: '4611686018400000001', bungieNetUser: { membershipId: '99', uniqueName: 'Teste#1234' } } });
       if (/\/Profile\/\d+\/\?/.test(p + '?') && !/Item\//.test(p)) return j({ ErrorCode: 1, Response: arm ? arsenal(profile()) : profile() });
@@ -133,7 +133,7 @@ async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin =
   if (steps) { await page.evaluate(() => { window.__noReload = 1; }); await steps(page, fail); }
   if (expectText) { let ok = false; for (let t = 0; t < 20 && !ok; t++) { ok = (await page.evaluate(() => document.getElementById('list')?.innerText || '')).includes(expectText); if (!ok) await page.waitForTimeout(500); } if (!ok) fail.push(`faltou o texto "${expectText}" na tela`); }
   if (seen.rep?.length) fail.push('o site relatou erro ao montar a tela: ' + seen.rep[0]);
-  if (expired && seen.refresh !== 1) fail.push(`login vencido: renovou ${seen.refresh} vezes (devia ser 1)`);
+  if (expired && (seen.refresh < 1 || seen.refresh > (steps ? 2 : 1))) fail.push(`login vencido: renovou ${seen.refresh} vezes (devia ser 1)`);
   await b.close();
   const all = [...fail, ...errs];
   console.log(`${all.length ? '✗' : '✓'} ${name}${all.length ? '\n    ' + [...new Set(all)].slice(0, 8).join('\n    ') : ''}`);
@@ -198,6 +198,13 @@ R.push(await run('rolagem: Voltar devolve a posição; aba nova sobe para a list
 R.push(await run('teclado: trocar de aba pelo teclado leva o foco ao conteúdo', { path: '/hoje', clicks: false, steps: async (p, fail) => {
   await p.focus('#tabs .tab[data-group="drops"]'); await p.keyboard.press('Enter'); await p.waitForTimeout(900);
   if (!(await p.evaluate(() => document.activeElement?.id === 'list'))) fail.push('foco não foi para o conteúdo: ' + await p.evaluate(() => document.activeElement?.className || document.activeElement?.tagName)); } }));
+R.push(await run('tempo: abrir de novo mostra a última visita antes da Bungie responder', { path: '/hoje', expired: true, clicks: false, steps: async (p, fail) => {
+  await p.waitForTimeout(process.env.LAT ? 6000 : 2500); await p.reload(); const t0 = Date.now();
+  let ms = -1; for (let t = 0; t < 120; t++) { if (await p.evaluate(() => (document.getElementById('list')?.textContent || '').length > 300 && !!document.querySelector('#tabs .tab'))) { ms = Date.now() - t0; break; } await p.waitForTimeout(50); }
+  let live = -1; for (let t = 0; t < 160; t++) { if (await p.evaluate(() => /Atualizado às|Updated at/.test(document.body.innerText) && !/cópia|copy|salv/i.test(document.getElementById('updated')?.textContent || ''))) { live = Date.now() - t0; break; } await p.waitForTimeout(50); }
+  console.log('    ⏱ dados novos da Bungie em', live, 'ms');
+  console.log('    ⏱ conteúdo na tela em', ms, 'ms' + (process.env.LAT ? ' (com atrasos reais simulados: config 0,6 s, login 0,85 s, Bungie 2 s)' : ''));
+  if (ms < 0 || (process.env.LAT && ms > 1500)) fail.push('conteúdo demorou: ' + ms + ' ms'); } }));
 R.push(await run('permissão: /administracao sem ser admin cai em Membros', { path: '/administracao', clicks: false, steps: async (p, fail) => {
   await p.waitForTimeout(1500); if (await url(p) !== '/membros') fail.push('esperava /membros, veio ' + await url(p)); if (await p.$('#subtabs .sub[data-sub="gcla"]')) fail.push('aba Administração apareceu para não-admin'); } }));
 R.push(await run('permissão: /administracao como admin abre', { path: '/administracao', admin: true, clicks: false, steps: async (p, fail) => {

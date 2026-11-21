@@ -258,7 +258,7 @@ document.addEventListener('click', e => { if (e.target.closest('[data-login]')) 
 // versão nova no ar: aba aberta há tempo recarrega sozinha quando a pessoa volta para ela (nunca no meio do uso)
 const VER = { e: null };
 const verGet = () => fetch('/app.js', { method: 'HEAD', cache: 'no-store' }).then(r => r.headers.get('etag') || r.headers.get('last-modified')).catch(() => null);
-verGet().then(e => { VER.e = e; });
+setTimeout(() => verGet().then(e => { VER.e = e; }), 8000); // não disputa a rede na abertura
 let verT = 0; document.addEventListener('visibilitychange', async () => { if (document.visibilityState !== 'visible' || !VER.e || Date.now() - verT < 6e4) return; verT = Date.now(); const e = await verGet(); if (e && e !== VER.e && !document.querySelector('dialog[open], textarea:focus, input:focus')) location.reload(); });
 function logout() { resetChar(); PLUGS = null; plugsP = null; buildOpen = false; if (member) idbDel('profile-' + member.id); LS.del('dc-auth'); LS.del('dc-member'); LS.del('dc-hdr'); LS.del('dc-orla'); LS.del('dc-synct'); SY.t = {}; SY.dirty.clear(); clearInterval(LIVE.timer); LIVE.timer = null; LIVE.on = false; LIVE.mem = []; LS.del('dc-el'); auth = null; profile = null; member = null; render(); }
 let tokRefresh = null; // um só pedido de renovação por vez: vários pedidos juntos reaproveitam o mesmo (o token de renovação não pode ser usado duas vezes)
@@ -5028,9 +5028,13 @@ if ('serviceWorker' in navigator) addEventListener('load', () => navigator.servi
   if (LS.get('dc-hide2', false)) { $('hide').checked = true; document.body.classList.add('hide-done'); }
   applyUI();
   const h = readHash();
+  if (!h && auth && auth.access_expires - Date.now() < 60000) token().catch(() => {}); // login vencido: renova já, junto com o resto (antes esperava a configuração)
   { const o = new URLSearchParams(location.search).get('orla'); if (o) { history.replaceState(null, '', location.pathname); if (GRADE) OB.res = o; } } // volta do login com o Discord
   try {
-    [cfg, defs, ITEMS, APIW] = await Promise.all([fetch('/api/config').then(r => r.json()), fetch('/data/defs.json', { cache: 'no-cache' }).then(r => r.json()), fetch('/data/items.json', { cache: 'no-cache' }).then(r => r.json()).catch(() => ({})), fetch('/data/api.json', { cache: 'no-cache' }).then(r => r.json()).then(j => j.api || null).catch(() => null)]);
+    // configuração: usa a da última visita na hora e confere a nova em segundo plano (economiza ~0,6 s por abertura)
+    const cfgNet = fetch('/api/config').then(r => r.json()).then(j => { if (j?.configured !== false && j?.apiKey) LS.set('dc-cfg', j); return j; }), cfgOld = LS.get('dc-cfg', null);
+    if (cfgOld) cfgNet.then(j => { if (j?.apiKey) cfg = j; }).catch(() => {});
+    [cfg, defs, ITEMS, APIW] = await Promise.all([cfgOld || cfgNet, fetch('/data/defs.json', { cache: 'no-cache' }).then(r => r.json()), fetch('/data/items.json', { cache: 'no-cache' }).then(r => r.json()).catch(() => ({})), fetch('/data/api.json', { cache: 'no-cache' }).then(r => r.json()).then(j => j.api || null).catch(() => null)]);
   } catch { cfg = { configured: false }; showMessage(`<p class="notice">${esc(u().notConfigured)}</p>`); return; }
   // login que não deu certo: se já havia uma sessão salva, segue com ela em vez de travar a página
   if (h?.error && !LS.get('dc-auth', null)) { render(); $('list').insertAdjacentHTML('afterbegin', `<p class="notice">${esc(u().authError(h.error))} <button type="button" class="linkb" data-login>${lang === 'pt' ? 'Entrar de novo' : 'Sign in again'}</button></p>`); return; }
