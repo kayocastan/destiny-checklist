@@ -1,5 +1,43 @@
 [
  {
+  "id": "2026-11-21",
+  "de": "2026-11-15",
+  "ate": "2026-11-21",
+  "titulo": "Avisos no celular, trancar rolls em lote e navegação com endereço por aba",
+  "itens": [
+   [
+    "🔔",
+    "Avisos no celular",
+    "Membros da Orla podem ligar avisos: 30 min antes das grades em que você está (em Clã › Membros) e quando o Xûr vende um exótico que você ainda não tem. No iPhone, instale o DPI na tela inicial para receber."
+   ],
+   [
+    "🎲",
+    "Avaliar rolls",
+    "Tranque de uma vez todas as cópias S e A (com confirmação e progresso) ou arma por arma, e use o novo filtro Pode desmontar: mostra notas C e cópias repetidas piores, com lista para copiar."
+   ],
+   [
+    "🧭",
+    "Navegação",
+    "Cada aba tem seu próprio endereço: Voltar e Avançar funcionam e dá para mandar link direto. A troca de abas ficou suave (respeita reduzir movimento) e o Voltar devolve a rolagem onde você estava."
+   ],
+   [
+    "⚡",
+    "Mais rápido",
+    "O site abre cerca de 0,6 s mais rápido, e uma aba deixada aberta se atualiza sozinha quando sai versão nova."
+   ],
+   [
+    "📅",
+    "Grade do clã",
+    "A Grade abre dentro do site, sem recarregar, e nunca mais fica em branco: aparece o motivo (login vencido, fora do clã ou bot fora) com botão para tentar de novo. Corrigido o erro que quebrava a Agenda de quem estava inscrito numa grade."
+   ],
+   [
+    "🔑",
+    "Login",
+    "O login da Bungie funciona mesmo quando volta em outra aba, e quem entra pela Grade volta direto para a Grade."
+   ]
+  ]
+ },
+ {
   "id": "2026-11-14",
   "de": "2026-11-08",
   "ate": "2026-11-14",
