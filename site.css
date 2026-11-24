@@ -2758,3 +2758,4 @@ kbd{font:600 12px var(--mono);min-width:22px;text-align:center;padding:2px 7px;b
 #kbdlg{margin:auto}.ivd-tier .rl-leg .rl-t{position:static;display:inline-grid}
 dialog.pf#kbdlg{width:min(460px,calc(100vw - 24px))}
 .panel.nv>*{grid-column:1/-1}.nv-r .iv-t{width:56px;flex:none}.nv-r{grid-template-columns:56px minmax(0,1fr) auto}
+.help-all{display:block;margin-top:12px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);color:var(--acc);text-decoration:none;font-weight:600;font-size:14px}.help-all:hover{border-color:var(--acc)}

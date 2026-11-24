@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guia de uso · DPI</title>
+<meta name="description" content="Como usar o DPI · Destiny Parallel Interface: Hoje, Progresso, Arsenal, Guardião e Clã, com imagens das telas.">
+<meta property="og:title" content="Guia de uso · DPI">
+<meta property="og:description" content="Como usar o DPI, tela por tela, com imagens.">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="/styles.css">
+<style>
+  *{box-sizing:border-box} [hidden]{display:none!important}
+  body{margin:0}
+  .aj{max-width:980px;margin:0 auto;padding:24px 16px 56px;display:grid;gap:26px}
+  .aj-top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .aj-top h1{margin:0;font-family:var(--display);font-size:40px;line-height:1}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .aj-top a{font-size:14px;color:var(--fg);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:9px 14px;background:var(--surface)}
+  .aj-top a:hover{border-color:var(--acc,#6fd3ff)}
+  .lead{margin:6px 0 0;color:var(--muted);font-size:16px;line-height:1.5;max-width:68ch}
+  .toc{display:flex;flex-wrap:wrap;gap:8px}
+  .toc a{font-size:13.5px;color:var(--fg);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:var(--surface)}
+  .toc a:hover{border-color:var(--acc,#6fd3ff)}
+  section{display:grid;gap:12px;scroll-margin-top:16px}
+  section>h2{margin:0;font-family:var(--display);font-size:28px;line-height:1.1}
+  section>h2 small{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin-left:8px;font-weight:500}
+  .card{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:18px;align-items:start;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
+  .card.solo{grid-template-columns:minmax(0,1fr)}
+  .card figure{margin:0;min-width:0}
+  .card img{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
+  .card img.small{max-width:340px}
+  .card figcaption{margin-top:6px;font-size:12.5px;color:var(--muted)}
+  .card h3{margin:0 0 6px;font-size:17px}
+  .card ul{margin:0;padding-left:18px;display:grid;gap:6px;font-size:14.5px;line-height:1.5}
+  .card ul b{color:var(--fg)}
+  kbd{font:600 12px var(--mono);padding:1px 6px;border-radius:5px;border:1px solid var(--line);border-bottom-width:2px;background:var(--bg)}
+  .faq{display:grid;gap:10px}
+  .faq details{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:12px 14px}
+  .faq summary{cursor:pointer;font-weight:600;font-size:15px}
+  .faq p{margin:8px 0 0;font-size:14.5px;line-height:1.55;color:var(--muted)}
+  footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px;line-height:1.5}
+  footer a{color:var(--fg)}
+  @media (max-width:760px){.card{grid-template-columns:minmax(0,1fr)} .aj-top h1{font-size:32px}}
+</style>
+<script>try{var t=localStorage.getItem('dc-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+</head>
+<body>
+<main class="aj">
+  <div class="aj-top">
+    <div>
+      <div class="eyebrow">DPI · Destiny Parallel Interface</div>
+      <h1>Guia de uso</h1>
+      <p class="lead">O DPI lê a sua conta pela API oficial da Bungie e junta num lugar só o que fazer hoje, o seu progresso, o arsenal e o clã. Este guia mostra cada parte com uma imagem da tela no computador. No celular é igual, só que em uma coluna.</p>
+    </div>
+    <a href="/">← Voltar ao DPI</a>
+  </div>
+
+  <nav class="toc" aria-label="Partes do guia">
+    <a href="#comecar">Começar</a><a href="#hoje">Hoje</a><a href="#progresso">Progresso</a><a href="#inventario">Inventário</a><a href="#item">Detalhe do item</a><a href="#comparar">Comparar</a><a href="#novos">Itens novos</a><a href="#cofre">Cofre</a><a href="#vendedores">Vendedores</a><a href="#padroes">Padrões</a><a href="#loadouts">Loadouts</a><a href="#cla">Clã</a><a href="#farm">Modo farm</a><a href="#atalhos">Atalhos</a><a href="#faq">Dúvidas</a>
+  </nav>
+
+  <section id="comecar">
+    <h2>Começar</h2>
+    <div class="card solo"><ul>
+      <li><b>Entrar com a Bungie:</b> o login é o da própria Bungie. O DPI nunca vê a sua senha.</li>
+      <li><b>Personagem:</b> os botões Titã, Caçador e Arcano embaixo do cabeçalho trocam o personagem de tudo no site.</li>
+      <li><b>Cinco abas:</b> Hoje, Progresso, Arsenal, Guardião e Clã. Cada aba tem subabas logo abaixo.</li>
+      <li><b>Ajuda na própria tela:</b> no menu (☰), “❔ Como usar esta tela” explica a tela aberta. “📌 Fixar atalhos” coloca no Hoje as telas que você mais usa.</li>
+      <li><b>Atualizar:</b> o site atualiza sozinho quando você volta para a aba. No Hoje ele confere a cada 30 s se você entrou em atividade.</li>
+    </ul></div>
+  </section>
+
+  <section id="hoje">
+    <h2>Hoje <small>aba Hoje › Principal</small></h2>
+    <div class="card">
+      <figure><img src="/ajuda/hoje.webp" alt="Tela Hoje com o resumo da semana, desafios, patente, exóticos e títulos" loading="lazy" width="800" height="506"></figure>
+      <div><h3>O que fazer agora</h3><ul>
+        <li><b>Esta semana para você:</b> desafios da semana, patente, exóticos de atividade que faltam e títulos.</li>
+        <li><b>Como você vai jogar?</b> Sozinho, até 3 ou grupo de 6: as sugestões mudam conforme a escolha.</li>
+        <li><b>Rotação da semana:</b> incursões e masmorras em destaque, com o botão para abrir uma Grade.</li>
+        <li>Mais abaixo aparecem arma com roll bom à venda e o título mais perto de terminar.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section id="progresso">
+    <h2>Progresso <small>Hoje › Desafios</small></h2>
+    <div class="card">
+      <figure><img src="/ajuda/desafios.webp" alt="Missões em andamento com barras de progresso e botão Seguir no jogo" loading="lazy" width="800" height="506"></figure>
+      <div><h3>Missões e desafios</h3><ul>
+        <li>Todas as missões que você já começou, com o progresso de cada objetivo.</li>
+        <li><b>☆</b> põe a missão na página principal.</li>
+        <li><b>Seguir no jogo</b> marca a missão para aparecer na tela do Destiny.</li>
+        <li>Na aba Progresso ficam incursões, masmorras, campanhas, títulos e triunfos.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section id="inventario">
+    <h2>Inventário <small>Arsenal › Inventário</small></h2>
+    <div class="card">
+      <figure><img src="/ajuda/inventario.webp" alt="Inventário com a barra de Tier S, A, B e C, busca e colunas dos personagens e do cofre" loading="lazy" width="800" height="500"></figure>
+      <div><h3>Mover, equipar e organizar</h3><ul>
+        <li><b>Toque</b> num item para ver os detalhes. No computador dá para <b>arrastar</b> para outro personagem ou para o cofre.</li>
+        <li><b>Tier S · A · B · C:</b> a nota do roll de cada arma comparada aos rolls recomendados pela comunidade. S tem tudo, A falta 1 coluna, B faltam 2, C pouco ou nada. Toque no tier para ver só essas armas.</li>
+        <li><b>Busca:</b> nome, tipo ou vantagem (<kbd>perk:frenesi</kbd>). Com uma busca ativa aparece “Com os N da busca” para <b>mover, etiquetar ou trancar tudo</b> de uma vez.</li>
+        <li><b>Abre espaço sozinho:</b> se o destino estiver cheio, o DPI manda para o cofre o item que menos importa e mostra o que foi, com <b>Desfazer</b>. Nunca tira item equipado nem Favorito.</li>
+        <li><b>Avaliar rolls:</b> mostra, arma por arma, quais vantagens trocar para subir de tier.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section id="item">
+    <h2>Detalhe do item</h2>
+    <div class="card">
+      <figure><img src="/ajuda/detalhe.webp" alt="Detalhe de uma arma com vantagens, tier do roll, atributos em barras e triagem" loading="lazy" width="800" height="506"></figure>
+      <div><h3>Tudo sobre uma arma ou armadura</h3><ul>
+        <li><b>Vantagens:</b> toque para ver as outras opções de cada coluna.</li>
+        <li><b>Tier do roll:</b> a nota atual e até onde chega trocando vantagens que a arma já tem.</li>
+        <li><b>Atributos:</b> a barra mostra quanto vem da base (branco), das vantagens (azul) e da obra-prima (dourado), e o que a arma perde (vermelho). Toque num atributo para ver quanto cada peça soma. Tocar numa vantagem que não está colocada mostra a prévia.</li>
+        <li><b>Triagem:</b> em quais loadouts do jogo o item está e as armas parecidas que você tem.</li>
+        <li><b>Combustível de infusão:</b> a cópia mais barata e a de mais poder, com o botão para trazer as duas para o personagem.</li>
+        <li><b>Etiqueta e anotação:</b> Favorito, Manter, Lixo e Infundir. Elas ficam guardadas neste aparelho e valem para a busca, o lote e o espaço automático.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section id="comparar">
+    <h2>Comparar</h2>
+    <div class="card">
+      <figure><img src="/ajuda/comparar.webp" alt="Tabela comparando três armas, com cores do melhor ao pior em cada atributo" loading="lazy" width="800" height="500"></figure>
+      <div><h3>Lado a lado, com cores</h3><ul>
+        <li>No detalhe do item, use “Comparar as N lado a lado” (cópias e armas parecidas) ou “Comparar com outro item”.</li>
+        <li><b>Azul</b> é o melhor de cada linha; de verde a vermelho, do bom ao pior. “—” quando a arma não tem aquele atributo.</li>
+        <li>Toque no nome da linha para ordenar; no nome do item para abrir.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section id="novos">
+    <h2>Itens novos <small>Arsenal › Itens novos</small></h2>
+    <div class="card">
+      <figure><img src="/ajuda/itens-novos.webp" alt="Lista de itens que chegaram desde a última visita, com botões de etiqueta" loading="lazy" width="800" height="345"></figure>
+      <div><h3>Decidir o que guardar</h3><ul>
+        <li>O que caiu desde a sua última visita, o mais novo primeiro.</li>
+        <li>Os botões ★ ✓ ✕ ⇪ dão a etiqueta ali mesmo, e o item sai da lista.</li>
+        <li>“Marcar todos como vistos” limpa a lista.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section id="cofre">
+    <h2>Cofre <small>Arsenal › Inventário › Cofre</small></h2>
+    <div class="card">
+      <figure><img src="/ajuda/cofre.webp" alt="Cofre agrupado por tipo de arma, com cópias repetidas juntas" loading="lazy" width="800" height="506"><figcaption>Grade: grupos que abrem e fecham, repetidas juntas (×2).</figcaption></figure>
+      <div><h3>Grade ou tabela</h3><ul>
+        <li>Toque no nome do tipo para <b>recolher ou abrir</b>; “Expandir tudo” e “Recolher tudo” no topo.</li>
+        <li><b>Juntar repetidas:</b> cópias do mesmo item ficam num bloco tracejado.</li>
+        <li><b>Tabela:</b> nome, tipo, poder, tier, vantagens, etiqueta e anotação, ordenando por qualquer coluna e marcando itens para mover.</li>
+        <li><b>⬇ CSV</b> baixa uma planilha que abre no Excel ou no Google Planilhas. <b>⬆ Importar</b> lê as colunas Id, Etiqueta e Anotação e mostra o que vai mudar antes de gravar.</li>
+        <li><b>Limpeza do cofre</b> aponta armaduras piores em tudo e armas repetidas.</li>
+      </ul></div>
+    </div>
+    <div class="card solo"><figure><img src="/ajuda/cofre-tabela.webp" alt="Cofre em tabela com colunas de nome, tipo, espaço, poder, tier e vantagens" loading="lazy" width="800" height="500"><figcaption>Tabela: toque no título da coluna para ordenar.</figcaption></figure></div>
+  </section>
+
+  <section id="vendedores">
+    <h2>Vendedores <small>Arsenal › Vendedores</small></h2>
+    <div class="card">
+      <figure><img src="/ajuda/vendedores.webp" alt="Vendedores com a opção Só o que falta coletar" loading="lazy" width="800" height="500"></figure>
+      <div><h3>O que comprar</h3><ul>
+        <li>Xûr, Banshee-44, Zavala e os outros, com quando o estoque muda.</li>
+        <li><b>Só o que falta coletar</b> esconde o que você já tem na coleção.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section id="padroes">
+    <h2>Padrões <small>Arsenal › Padrões</small></h2>
+    <div class="card">
+      <figure><img src="/ajuda/padroes.webp" alt="Lista de padrões de armas forjáveis com progresso" loading="lazy" width="800" height="506"></figure>
+      <div><h3>Armas forjáveis</h3><ul>
+        <li>Quanto falta de cada padrão e de onde vem a arma.</li>
+        <li>Filtros: Faltando, Em andamento, Completos e por tipo.</li>
+        <li>Arma com borda vermelha (Deepsight): extraia a ressonância para avançar o padrão.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section id="loadouts">
+    <h2>Loadouts <small>Arsenal › Loadouts</small></h2>
+    <div class="card">
+      <figure><img src="/ajuda/loadouts.webp" alt="Loadouts do jogo com avisos da análise e botões Equipar e Editar" loading="lazy" width="800" height="506"></figure>
+      <div><h3>Do jogo e do site</h3><ul>
+        <li><b>Equipar</b> aplica o loadout do jogo; <b>Editar</b> troca nome, cor e ícone ou limpa o espaço.</li>
+        <li><b>Análise:</b> no topo, filtros “com problema”, “com aviso”, “podem melhorar” e “tudo certo”. Cada loadout mostra o que encontrou: item sumido, fragmentos demais ou sobrando, dois exóticos, mods que não cabem, mod do artefato e armadura melhor disponível.</li>
+        <li><b>Montar loadout</b> abre o Build Editor; builds salvas no site podem ser aplicadas ou gravadas num loadout do jogo.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section id="cla">
+    <h2>Clã <small>Clã › Placar</small></h2>
+    <div class="card">
+      <figure><img src="/ajuda/placar.webp" alt="Totais do clã com abates em PvE, conclusões, horas e Crisol" loading="lazy" width="800" height="345"></figure>
+      <div><h3>O clã somado</h3><ul>
+        <li><b>Totais do clã:</b> abates em PvE, incursões e masmorras, horas jogadas e Crisol, mais uma tabela por atividade.</li>
+        <li>Mais abaixo, os placares de conclusões, impecáveis, guiados, patente e horas.</li>
+        <li><b>Membros</b> mostra quem está on-line e em que atividade; <b>Grupos</b> e a <b>Grade</b> organizam incursões com o clã.</li>
+        <li>Em <b>Guardião › Relatórios</b>, tocar numa partida mostra o cartão de cada jogador: armas mais usadas, abates por tipo e o link para a build.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section id="farm">
+    <h2>Modo farm <small>só para o clã</small></h2>
+    <div class="card">
+      <figure><img class="small" src="/ajuda/farm.webp" alt="Chave Farm ao lado dos personagens, com a explicação aberta" loading="lazy" width="330" height="115"></figure>
+      <div><h3>Nada cai no Postmaster</h3><ul>
+        <li>A chave <b>Farm</b> fica ao lado de Titã, Caçador, Arcano e Buscar; o <b>?</b> explica.</li>
+        <li>Ligado, a cada 2 min o DPI manda para o cofre o necessário para deixar 1 espaço livre de cada tipo no personagem atual.</li>
+        <li>Aparece uma ilha verde com o que foi movido, o Postmaster e o espaço do cofre, com o botão Parar.</li>
+        <li>Nunca move equipado, Favorito nem Manter. Desliga sozinho em 3 h ou ao fechar o site.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section id="atalhos">
+    <h2>Atalhos de teclado <small>no computador</small></h2>
+    <div class="card">
+      <figure><img class="small" src="/ajuda/atalhos.webp" alt="Lista de atalhos de teclado" loading="lazy" width="320" height="330"></figure>
+      <div><h3>Aperte ? em qualquer tela</h3><ul>
+        <li><kbd>F</kbd> busca no inventário · <kbd>R</kbd> atualiza · <kbd>Esc</kbd> fecha ou limpa a busca · <kbd>1</kbd>–<kbd>5</kbd> troca de aba.</li>
+        <li>Com um item aberto: <kbd>E</kbd> equipa · <kbd>P</kbd> puxa para o personagem · <kbd>V</kbd> manda para o cofre · <kbd>L</kbd> tranca · <kbd>C</kbd> compara · <kbd>I</kbd> combustível de infusão.</li>
+        <li><kbd>⇧1</kbd>–<kbd>⇧4</kbd>: Favorito, Manter, Lixo e Infundir.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <h2>Dúvidas</h2>
+    <div class="faq">
+      <details><summary>Não consigo equipar: “dentro de atividade”</summary><p>A Bungie só deixa equipar pelo site em órbita ou em área social (Torre, por exemplo). Mover para o cofre e entre personagens funciona em qualquer lugar.</p></details>
+      <details><summary>Mudei algo no jogo e o site ainda não mostra</summary><p>A Bungie demora alguns segundos para atualizar os dados. Volte para a aba do DPI ou aperte Atualizar (no computador, a tecla <kbd>R</kbd>).</p></details>
+      <details><summary>“Sem espaço no destino”</summary><p>O DPI tenta abrir espaço sozinho. Se ainda assim não der, é porque tudo no destino é equipado, Favorito ou Manter, ou o cofre está cheio de itens que ele não mexe. Libere um espaço e tente de novo.</p></details>
+      <details><summary>Alguém do clã não aparece no placar</summary><p>Quem tem o perfil privado na Bungie fica de fora das contas. Dá para liberar em bungie.net › Configurações › Privacidade.</p></details>
+      <details><summary>Por que algumas armas não têm tier?</summary><p>Exóticas não têm roll para comparar, e algumas armas não estão em nenhuma lista de rolls recomendados da comunidade.</p></details>
+      <details><summary>O Modo farm não aparece para mim</summary><p>Por enquanto ele é só para membros do clã.</p></details>
+      <details><summary>O DPI é oficial da Bungie?</summary><p>Não. O DPI usa a API oficial da Bungie, mas não é afiliado a ela. Os rolls recomendados vêm da lista pública da comunidade (Voltron), a mesma que o DIM usa.</p></details>
+    </div>
+  </section>
+
+  <footer>Dúvida que não está aqui ou sugestão? Mande em <a href="/novidades">Novidades e sugestões</a>. As imagens são de uma conta real com nomes trocados.</footer>
+</main>
+</body>
+</html>

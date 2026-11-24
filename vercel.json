@@ -51,6 +51,10 @@
       "destination": "/novidades.html"
     },
     {
+      "source": "/ajuda",
+      "destination": "/ajuda.html"
+    },
+    {
       "source": "/status",
       "destination": "/status.html"
     },
