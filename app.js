@@ -1883,6 +1883,7 @@ function filter() {
 /* ---------- eventos ---------- */
 function go(t, o = {}) { t = resolveTab(t); const prev = tab, url0 = location.pathname; setGrade(t === 'gclo'); tab = t; const g = groupOf(t), pa = parentOf(t); if (pa !== t) { lastKid[pa] = t; LS.set('dc-kids', lastKid); } if (g) { lastSub[g.id] = t; LS.set('dc-subs', lastSub); } if (!GRADE) LS.set('dc-tab', t); if (!o.pop && (prev !== t || routeTab(url0) !== t)) routeSync(o.grp ? 'grp' : (!o.grp && history.state?.g && history.state.g === groupOf(t)?.id) ? 'rep' : true); /* aba do grupo e logo a subaba: uma entrada só no histórico */
   if (prev === t) { render(); return; }
+  try { if (t === 'obj' && LIVE.timer && Date.now() - (LIVE.lp || 0) > 30000) livePoll(); if (t === 'gcl' && GD?.clan?.list) clvLoad(); } catch {} // voltou para o Hoje: confere na hora se entrou em atividade (try: pode rodar antes de LIVE existir)
   vt(render).then(() => {
     if (o.pop) { const y = o.y || 0; requestAnimationFrame(() => scrollTo(0, y)); }
     else { const y = $('tabs').getBoundingClientRect().top + scrollY - 8; if (scrollY > y) scrollTo(0, Math.max(0, y)); } // aba nova começa no topo da lista
@@ -2781,7 +2782,7 @@ function saveAvail(data) {
 const secAvail = sec => { if (!AVAIL) return true; const d = sec.kind ? actDefOf(sec.kind, sec.key) : sec.xm; return !d?.ah?.length || d.ah.some(h => AVAIL.has(h)); };
 async function livePoll() {
   if (LIVE.busy && Date.now() - LIVE.bt > 60000) LIVE.busy = false; // pedido travado: não deixa o Ao vivo preso
-  if (LIVE.busy || !auth || !member || document.hidden) return; LIVE.busy = true; LIVE.bt = Date.now(); const my = ++LIVE.seq;
+  if (LIVE.busy || !auth || !member || document.hidden) return; LIVE.busy = true; LIVE.bt = LIVE.lp = Date.now(); const my = ++LIVE.seq;
   try {
     const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=1000,204`);
     saveAvail(r.characterActivities?.data);
@@ -2802,8 +2803,10 @@ async function livePoll() {
   } catch { /* fora do ar ou sem permissão: tenta de novo no próximo ciclo */ }
   finally { if (my === LIVE.seq) LIVE.busy = false; if (!LIVE.checked) { LIVE.checked = true; if (tab === 'obj') render(); } }
 }
-function liveStart() { clearInterval(LIVE.timer); livePoll(); LIVE.timer = setInterval(livePoll, 30000); }
-document.addEventListener('visibilitychange', () => { if (!document.hidden && LIVE.timer) livePoll(); if (!document.hidden && loadedAt && Date.now() - loadedAt > 5 * 60000) autoRefresh(); });
+/* a Bungie pede para não consultar em intervalo fixo: só o Hoje (que mostra quando você entra em atividade) consulta a cada 30 s;
+   o resto atualiza quando você volta para a aba ou abre a tela */
+function liveStart() { clearInterval(LIVE.timer); livePoll(); LIVE.timer = setInterval(() => { if (tab === 'obj') livePoll(); }, 30000); }
+document.addEventListener('visibilitychange', () => { if (!document.hidden && LIVE.timer && tab === 'obj') livePoll(); if (!document.hidden && tab === 'gcl' && GD?.clan?.list) clvLoad(); if (!document.hidden && loadedAt && Date.now() - loadedAt > 5 * 60000) autoRefresh(); });
 // recarrega os dados da conta sozinho: ao voltar para a aba depois de 5 min e logo depois de terminar uma atividade (no máximo a cada 2 min)
 let autoT = 0;
 function autoRefresh() {
@@ -4797,7 +4800,6 @@ async function clvLoad(force) {
   } catch {}
   CLV.busy = false; if (isGd() && tab === 'gcl') render();
 }
-setInterval(() => { if (!document.hidden && tab === 'gcl' && GD?.clan?.list) clvLoad(); }, 60000);
 function clvHTML() {
   const T = clvt(), W = u(), list = GD?.clan?.list || []; if (!list.length) return '';
   const on = list.filter(x => x.on); if (on.length && !CLV.at) setTimeout(() => clvLoad(), 0);
