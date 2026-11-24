@@ -131,6 +131,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/padroes",
+      "destination": "/index.html"
+    },
+    {
       "source": "/loadouts",
       "destination": "/index.html"
     },

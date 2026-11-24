@@ -72,6 +72,7 @@ async function runOne(name, { path = '/', auth = true, ls = {}, orla = 200, admi
     if (u.hostname === 'dni-api.dni-site.workers.dev') {
       if (u.pathname === '/err' && r.request().method() === 'POST') { seen.rep = (seen.rep || []).concat(String(r.request().postData() || '').slice(0, 200)); return j({ ok: true }); }
       if (u.pathname === '/defs') return j({});
+      if (u.pathname === '/pat') return j({ v: 'x', l: [[9001, 'Arma Forjável', 'Fuzil de Pulso', 'Fonte: Incursão', '', 9101, 0, 5, 1], [9002, 'Outra Forjável', 'Arco', '', '', 9102, 0, 5, 2]] });
       if (u.pathname === '/twins') return j({ g: [[WPN.A, WPN.T]], f: { '13:5000': [WPN.A, WPN.F] } });
       if (u.pathname === '/videos') return j({ list: [] }); if (u.pathname === '/guias') return j({ m: {} }); if (u.pathname === '/whoami') return j({ owner, uid: owner ? 'u1' : undefined });
       return j({});
@@ -226,6 +227,11 @@ R.push(run('celular: atalhos no Hoje, Como usar, deslizar entre subabas', { path
   const sw = async (x0, x1) => p.evaluate(([a, b]) => { const el = document.querySelector('#list .panel') || document.getElementById('list'), mk = x => new Touch({ identifier: 1, target: el, clientX: x, clientY: 400 }); el.dispatchEvent(new TouchEvent('touchstart', { touches: [mk(a)], changedTouches: [mk(a)], bubbles: true })); el.dispatchEvent(new TouchEvent('touchend', { touches: [], changedTouches: [mk(b)], bubbles: true })); }, [x0, x1]);
   await sw(320, 60); await p.waitForTimeout(800); if (await url(p) !== '/desafios') fail.push('deslizar para a esquerda não foi para Desafios: ' + await url(p));
   await sw(60, 320); await p.waitForTimeout(800); if (await url(p) !== '/hoje') fail.push('deslizar para a direita não voltou: ' + await url(p));
+} }));
+R.push(run('/beta Padrões: lista e filtros', { path: '/beta/padroes', owner: true, clicks: false, ls: { 'dc-ownchk': { o: true, t: Date.now() }, 'dc-lang': 'pt' }, steps: async (p, fail) => {
+  await p.waitForSelector('.pat-r', { timeout: 10000 }).catch(() => fail.push('lista de padrões não apareceu')); if (fail.length) return;
+  const n = await p.$$eval('.pat-r', l => l.length); if (n !== 2) fail.push('esperava 2 padrões, veio ' + n);
+  await p.fill('[data-patq]', 'outra'); await p.waitForTimeout(600); const m = await p.$$eval('.pat-r', l => l.length); if (m !== 1) fail.push('busca não filtrou: ' + m);
 } }));
 R.push(run('rolagem: Voltar devolve a posição; aba nova sobe para a lista', { path: '/hoje', clicks: false, steps: async (p, fail) => {
   await p.evaluate(() => { document.body.style.minHeight = '5000px'; scrollTo(0, 1500); }); await p.waitForTimeout(300);

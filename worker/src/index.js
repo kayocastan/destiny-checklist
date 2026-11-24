@@ -533,6 +533,11 @@ export default {
         if (!v) return new Response('{}', { status: 404, headers: { 'Content-Type': 'application/json', ...cors(req) } });
         return new Response(v, { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=21600', ...cors(req) } });
       }
+      if (path === '/pat' && req.method === 'GET') { // padrões de armas forjáveis (Arsenal › Padrões), gerado pelo script do manifesto
+        const lc = new URL(req.url).searchParams.get('l') === 'pt' ? 'pt' : 'en', v = (await env.DB.prepare('SELECT v FROM meta WHERE k = ?').bind('pat:' + lc).first().catch(() => null))?.v;
+        if (!v) return new Response('{}', { status: 404, headers: { 'Content-Type': 'application/json', ...cors(req) } });
+        return new Response(v, { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=21600', ...cors(req) } });
+      }
       if (path === '/twins' && req.method === 'GET') { // armas lendárias com o mesmo nome e hashes diferentes (relançadas, Adept), gerado pelo script do manifesto
         const v = (await env.DB.prepare("SELECT v FROM meta WHERE k = 'twins'").first().catch(() => null))?.v || '{"g":[]}';
         return new Response(v, { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=21600', ...cors(req) } });

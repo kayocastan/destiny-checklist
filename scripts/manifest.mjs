@@ -55,6 +55,20 @@ async function main() {
     const cl = Object.entries(CD).map(([h, d]) => ({ h, n: d.displayProperties?.name || '', s: d.scope || 0, e: (d.entries || []).map(e => ({ h: e.hash, n: e.displayProperties?.name || e.displayProperties?.description || '', d: e.destinationHash || 0, b: e.bubbleHash || 0, a: e.activityHash || 0 })) })).filter(x => x.n && x.e.length);
     const v = JSON.stringify({ v: version, cl, dn }); await q("INSERT OR REPLACE INTO meta (k, v) VALUES (?, ?)", ['chk:' + lc, v]); log('colecionáveis', lc, Math.round(v.length / 1024), 'KB');
   }
+  // padrões de armas forjáveis (aba Arsenal › Padrões): registro "Weapon Pattern" + a arma com o mesmo nome (tipo, ícone) + onde dropa (coleção)
+  { const RD = await getDefs('en', 'DestinyRecordDefinition'), pats = Object.values(RD).filter(r => r.recordTypeName === 'Weapon Pattern' && r.displayProperties?.name);
+    const need = [];
+    for (const lc of Object.keys(LC)) { const old = (await q("SELECT substr(v, 1, 80) AS v FROM meta WHERE k = ?", ['pat:' + lc])).results?.[0]?.v || ''; if (!old.includes(JSON.stringify(version)) || process.env.FORCE) need.push(lc); }
+    if (need.length) {
+      const IE = await getDefs('en', 'DestinyInventoryItemDefinition'), byName = {};
+      for (const d of Object.values(IE)) if (d.itemType === 3 && d.displayProperties?.name && !d.redacted) (byName[d.displayProperties.name] ||= []).push(d);
+      const base = pats.map(r => { const ws = byName[r.displayProperties.name] || []; const w = ws.find(x => x.collectibleHash) || ws[0]; return w ? { r: r.hash >>> 0, w: w.hash >>> 0, c: w.collectibleHash || 0, s: r.scope || 0 } : null; }).filter(Boolean);
+      for (const lc of need) {
+        const [I, C, R] = lc === 'en' ? [IE, await getDefs(lc, 'DestinyCollectibleDefinition'), RD] : await Promise.all([getDefs(lc, 'DestinyInventoryItemDefinition'), getDefs(lc, 'DestinyCollectibleDefinition'), getDefs(lc, 'DestinyRecordDefinition')]);
+        const l = base.map(b => { const w = I[b.w] || {}, r = R[b.r] || {}; return [b.r, r.displayProperties?.name || w.displayProperties?.name || '', w.itemTypeDisplayName || '', (b.c && C[b.c]?.sourceString) || '', w.displayProperties?.icon || '', b.w, b.s, w.inventory?.tierType || 0, w.defaultDamageType || 0]; });
+        const v = JSON.stringify({ v: version, l }); await q("INSERT OR REPLACE INTO meta (k, v) VALUES (?, ?)", ['pat:' + lc, v]); log('padrões', lc, l.length, Math.round(v.length / 1024), 'KB');
+      }
+    } }
   if (prev?.version === version && prev?.done && !process.env.FORCE) { log('manifesto já carregado:', version); if (twinsOld) await saveTwins(await getDefs('en', 'DestinyInventoryItemDefinition')); return; }
   log('manifesto', version, prev ? `(anterior: ${prev.version}, completo: ${prev.done})` : '(primeira carga)');
 
