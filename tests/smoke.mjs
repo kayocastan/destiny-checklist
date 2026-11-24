@@ -213,6 +213,18 @@ R.push(run('grade: Editar na agenda de Membros abre a edição na /grade', { pat
   if (await url(p) !== '/grade') fail.push('Editar não levou para /grade: ' + await url(p));
   const tx = await p.evaluate(() => document.getElementById('obform')?.textContent || ''); if (!/Editar grade|Edit roster/.test(tx) || !/Fim de Crota/.test(await p.evaluate(() => [...document.querySelectorAll('#obform input')].map(i => i.value).join(' ')))) fail.push('formulário de edição não veio preenchido');
 } }));
+R.push(run('/beta celular: atalhos no Hoje, Como usar, deslizar entre subabas', { path: '/beta/hoje', owner: true, mobile: true, clicks: false, ls: { 'dc-ownchk': { o: true, t: Date.now() }, 'dc-lang': 'pt' }, steps: async (p, fail) => {
+  await p.waitForSelector('[data-pinedit]', { timeout: 8000 }).catch(() => fail.push('bloco de atalhos não apareceu no Hoje')); if (fail.length) return;
+  await p.click('[data-pinedit]'); await p.waitForTimeout(300); await p.click('[data-pintog="vend"]'); await p.waitForTimeout(200); await p.click('[data-pinedit]'); await p.waitForTimeout(300);
+  if (!(await p.$('[data-pingo="vend"]'))) fail.push('atalho Vendedores não ficou fixo');
+  else { await p.click('[data-pingo="vend"]'); await p.waitForTimeout(800); if (await url(p) !== '/beta/vendedores') fail.push('atalho não abriu Vendedores: ' + await url(p)); }
+  await p.evaluate(() => document.getElementById('menubtn')?.click()); await p.waitForTimeout(400);
+  if (!(await p.$('[data-navhelp]'))) fail.push('menu sem Como usar'); else { await p.click('[data-navhelp]'); await p.waitForTimeout(300); const h = await p.evaluate(() => document.getElementById('helpdlg')?.open && document.getElementById('helpdlg').textContent); if (!h || !/Arsenal/.test(h)) fail.push('Como usar não abriu na aba certa'); await p.keyboard.press('Escape'); }
+  await p.goto('http://dpi.test/beta/hoje'); await p.waitForTimeout(1500);
+  const sw = async (x0, x1) => p.evaluate(([a, b]) => { const el = document.querySelector('#list .panel') || document.getElementById('list'), mk = x => new Touch({ identifier: 1, target: el, clientX: x, clientY: 400 }); el.dispatchEvent(new TouchEvent('touchstart', { touches: [mk(a)], changedTouches: [mk(a)], bubbles: true })); el.dispatchEvent(new TouchEvent('touchend', { touches: [], changedTouches: [mk(b)], bubbles: true })); }, [x0, x1]);
+  await sw(320, 60); await p.waitForTimeout(800); if (await url(p) !== '/beta/desafios') fail.push('deslizar para a esquerda não foi para Desafios: ' + await url(p));
+  await sw(60, 320); await p.waitForTimeout(800); if (await url(p) !== '/beta/hoje') fail.push('deslizar para a direita não voltou: ' + await url(p));
+} }));
 R.push(run('rolagem: Voltar devolve a posição; aba nova sobe para a lista', { path: '/hoje', clicks: false, steps: async (p, fail) => {
   await p.evaluate(() => { document.body.style.minHeight = '5000px'; scrollTo(0, 1500); }); await p.waitForTimeout(300);
   await clickSub(p, 'obj', 'cal'); await p.waitForTimeout(900); const y1 = await p.evaluate(() => scrollY); if (y1 > 1200) fail.push('aba nova não subiu (' + y1 + ')');

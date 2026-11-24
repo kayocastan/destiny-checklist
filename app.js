@@ -1792,7 +1792,7 @@ function renderInner() {
   if (tab === 'obj' && have.a && member && LIVE.checked && !LIVE.on) loadSession();
   if ((tab === 'raid' || tab === 'dg' || tab === 'xm') && have.a && member) loadActHist();
   if (tab === 'xm') loadXmRec();
-  $('list').innerHTML = `<div class="panel">${tab === 'obj' ? newsHTML() + todoHTML() : ''}${tab === 'prog' ? chalHTML() + (BETA || FX ? qpHTML() : '') : ''}${tab === 'cal' ? calHTML() : ''}${tab === 'obj' ? sessHTML() : ''}${wkBar}${tsBar}${!secs.length && SCR[tab]?.ov ? `<p class="empty-msg">${lang === 'pt' ? 'Nada para mostrar aqui ainda. Os dados da Bungie desta parte não vieram ou ainda estão carregando; toque em Atualizar.' : 'Nothing to show here yet. Bungie did not send this part or it is still loading; tap Refresh.'}</p>` : ''}${secs.map(sec => {
+  $('list').innerHTML = `<div class="panel">${tab === 'obj' ? pinsHTML() + newsHTML() + todoHTML() : ''}${tab === 'prog' ? chalHTML() + (BETA || FX ? qpHTML() : '') : ''}${tab === 'cal' ? calHTML() : ''}${tab === 'obj' ? sessHTML() : ''}${wkBar}${tsBar}${!secs.length && SCR[tab]?.ov ? `<p class="empty-msg">${lang === 'pt' ? 'Nada para mostrar aqui ainda. Os dados da Bungie desta parte não vieram ou ainda estão carregando; toque em Atualizar.' : 'Nothing to show here yet. Bungie did not send this part or it is still loading; tap Refresh.'}</p>` : ''}${secs.map(sec => {
     if (sec.html) return sec.id === 'vendors' ? vendorsHTML() : sec.id === 'goals' ? goalsHTML() : sec.id === 'post' ? postHTML() : sec.id === 'wishobj' ? wishObjHTML() : sec.id === 'focus' ? focusHTML() : sec.id === 'grank' ? grObjHTML() : '';
     if (FX && sec.id === 'week' && sec.items.length) return weekHTML(sec);
     if (sec.empty) return `<p class="empty-msg${/…$/.test(sec.note || '') ? ' wait' : ''}">${esc(sec.note)}</p>`;
@@ -4809,7 +4809,7 @@ function navDraw() {
   d.innerHTML = `<div class="nav-box"><div class="nav-hd"><b>${esc(T.t)}</b><button type="button" class="nav-x" data-navx aria-label="${esc(T.close)}">✕</button></div>
     <div class="nav-g nav-fzg"><span class="nav-gt">${esc(T.fz)}</span><div class="nav-fz"><button type="button" class="nav-fzb" data-navfz="-1" aria-label="${esc(T.smaller)}"${zi <= 0 ? ' disabled' : ''}>A−</button><b>${Math.round(z * 100)}%</b><button type="button" class="nav-fzb big" data-navfz="1" aria-label="${esc(T.bigger)}"${zi >= FZ.length - 1 ? ' disabled' : ''}>A+</button></div><small>${esc(T.fzD)}</small></div>
     <nav class="nav-l" aria-label="${esc(T.go)}">${GROUPS.map(g => `<div class="nav-g"><span class="nav-gt">${esc(U.tabs[g.id])}</span>${g.subs.map(sb => `<button type="button" class="nav-i${sb === parentOf(cur) ? ' on' : ''}" data-navgo="${sb}"${sb === parentOf(cur) ? ' aria-current="page"' : ''}>${esc(g.subs.length === 1 ? U.tabs[g.id] : (U.subs[sb] || sb))}</button>`).join('')}</div>`).join('')}</nav>
-    <div class="nav-g"><span class="nav-gt">${esc(T.more)}</span>${have.c ? `<button type="button" class="nav-i${cur === 'ld' ? ' on' : ''}" data-navgo="ld">${esc(T.ld)}</button>` : ''}<button type="button" class="nav-i" data-navall>🔎 ${esc(T.all)} <small>${esc(T.allK)}</small></button><button type="button" class="nav-i" data-navfind>${esc(T.find)}</button>${!matchMedia('(display-mode: standalone)').matches && (INST.ev || /iphone|ipad/i.test(navigator.userAgent)) ? `<button type="button" class="nav-i" data-navinst>📲 ${esc(T.inst)}</button>` : ''}<a class="nav-i" href="/novidades">${esc(T.news)}</a></div>
+    <div class="nav-g"><span class="nav-gt">${esc(T.more)}</span>${have.c ? `<button type="button" class="nav-i${cur === 'ld' ? ' on' : ''}" data-navgo="ld">${esc(T.ld)}</button>` : ''}<button type="button" class="nav-i" data-navall>🔎 ${esc(T.all)} <small>${esc(T.allK)}</small></button><button type="button" class="nav-i" data-navfind>${esc(T.find)}</button>${NAV2() ? `<button type="button" class="nav-i" data-navhelp>${esc(hpt().btn)}</button>` : ''}${!matchMedia('(display-mode: standalone)').matches && (INST.ev || /iphone|ipad/i.test(navigator.userAgent)) ? `<button type="button" class="nav-i" data-navinst>📲 ${esc(T.inst)}</button>` : ''}<a class="nav-i" href="/novidades">${esc(T.news)}</a></div>
     <div class="nav-g nav-row"><button type="button" class="nav-i" data-navtheme>${esc(T.theme)}</button><button type="button" class="nav-i" data-navlang>${esc(T.lang)}</button>${auth ? `<button type="button" class="nav-i out" data-navout>${esc(T.out)}</button>` : ''}</div></div>`;
 }
 $('menubtn').hidden = false; fzApply();
@@ -6318,6 +6318,75 @@ addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLower
     t.click(); setTimeout(() => { if (on) fill(); }, 50);
   });
   const mo = new MutationObserver(() => { if (on) fill(); }); mo.observe($('title'), { childList: true, characterData: true, subtree: true });
+})();
+
+
+/* ---------- /beta: navegação no celular e ajuda (puxar para atualizar, deslizar entre subabas, atalhos fixos no Hoje, "Como usar") ---------- */
+var HELP = { // var/function: o render pode rodar antes deste trecho ser lido
+  pt: {
+    obj: ['Hoje', ['<b>Esta semana para você:</b> resumo com o tempo até o reset e a sua patente.', '<b>Como você vai jogar?</b> Sozinho, até 3 ou grupo de 6 muda as sugestões.', '<b>Missões em destaque</b> e exóticas que faltam; <b>Detalhes</b> mostra recompensas e a Sugestão de loadout.', '<b>Desafios:</b> só as missões que você já começou; a ☆ fixa uma na Principal.', '<b>Calendário:</b> resets, Xûr, Osíris e eventos no seu horário.']],
+    act: ['Progresso', ['Escolha <b>Incursões, Masmorras, Campanhas</b> ou Missões exóticas.', '<b>📖 Guia:</b> encontro por encontro, com papéis e passo a passo.', '<b>▶ Vídeos</b> e <b>🖼 Imagens</b> com guias e mapas.', '<b>⚙ Preparar</b> liga uma build sua à atividade.', '<b>Títulos:</b> o que falta item por item; a ☆ acompanha no Foco.']],
+    drops: ['Arsenal', ['<b>Busca</b> por nome ou perk (ex.: perk:frenesi) e filtros de armas, armaduras e repetidas.', '<b>Avaliar rolls</b> dá nota S/A/B/C a cada cópia.', '<b>Trancar S e A</b> de uma vez e <b>Pode desmontar</b> para limpar o cofre.', '<b>Vendedores:</b> o que cada um vende hoje e as moedas do Xûr.', '<b>Loadouts:</b> os do jogo e os criados no site.']],
+    gd: ['Guardião', ['<b>Montar build:</b> subclasse, armas, armaduras, artefato e mods.', '<b>Otimizar armaduras:</b> o DPI acha a melhor combinação.', '<b>Salvar, Aplicar</b> ou <b>Gravar no jogo</b> (sempre com confirmação).', 'Numa build aberta: <b>DIM</b> e <b>Compartilhar</b> (link com prévia ou imagem).', '<b>Estatísticas:</b> temporada, sua evolução, conclusões e armas mais usadas.']],
+    clan: ['Clã', ['<b>Agenda do clã:</b> grades marcadas; entre, fique na reserva ou edite a sua.', '<b>Clã ao vivo:</b> quem está jogando agora; toque para ver a build.', '<b>Placar:</b> ranking do clã por categoria, sempre ou nesta semana.', '<b>Grupos:</b> quem nunca fez cada atividade e quem pode guiar.']],
+    gclo: ['Grade', ['<b>Atividade:</b> escolha da lista ou digite um título livre.', '<b>Titulares</b> e <b>Novatos</b>: vagas e limite de quem nunca fez.', '<b>Dia e horário</b> no seu fuso; toque em <b>Criar grade</b>.', 'Para mudar: <b>✏️ Editar</b> na sua grade; todos os inscritos são avisados.']],
+    nav: ['No celular', ['Deslize para o lado na lista para trocar de subaba.', 'Puxe a tela para baixo no topo para atualizar os dados.', 'Fixe as telas que mais usa em <b>Seus atalhos</b>, no Hoje.']],
+    t: 'Como usar', btn: '❔ Como usar esta tela', close: 'Fechar', pins: 'Seus atalhos', pinsEdit: 'Editar', pinsDone: 'Pronto', pinsNone: 'Fixe aqui as telas que você mais usa.', pinsAdd: '＋ Escolher atalhos', pull: 'Solte para atualizar', pulling: 'Puxe para atualizar'
+  },
+  en: {
+    obj: ['Today', ['<b>This week for you:</b> summary with time to reset and your rank.', '<b>How will you play?</b> Solo, up to 3 or group of 6 changes suggestions.', '<b>Featured missions</b> and missing exotics; <b>Details</b> shows rewards and the loadout suggestion.', '<b>Challenges:</b> only quests you started; ☆ pins one to Main.', '<b>Calendar:</b> resets, Xûr, Osiris and events in your time.']],
+    act: ['Progress', ['Pick <b>Raids, Dungeons, Campaigns</b> or Exotic missions.', '<b>📖 Guide:</b> encounter by encounter, with roles and steps.', '<b>▶ Videos</b> and <b>🖼 Images</b> with guides and maps.', '<b>⚙ Prepare</b> links one of your builds to the activity.', '<b>Titles:</b> what is missing, item by item; ☆ tracks it.']],
+    drops: ['Arsenal', ['<b>Search</b> by name or perk and filter weapons, armor and duplicates.', '<b>Appraise rolls</b> grades each copy S/A/B/C.', '<b>Lock S and A</b> at once and <b>Can dismantle</b> to clean the vault.', '<b>Vendors:</b> what each one sells today and Xûr coins.', '<b>Loadouts:</b> in-game ones and those made on the site.']],
+    gd: ['Guardian', ['<b>Build:</b> subclass, weapons, armor, artifact and mods.', '<b>Optimize armor:</b> DPI finds the best combination.', '<b>Save, Apply</b> or <b>Store in game</b> (always confirmed).', 'On an open build: <b>DIM</b> and <b>Share</b> (link with preview or image).', '<b>Stats:</b> season, your progress, clears and top weapons.']],
+    clan: ['Clan', ['<b>Clan schedule:</b> rosters; join, reserve or edit yours.', '<b>Clan live:</b> who is playing now; tap to see the build.', '<b>Leaderboard:</b> clan ranking by category, all time or this week.', '<b>Groups:</b> who never did each activity and who can guide.']],
+    gclo: ['Roster', ['<b>Activity:</b> pick from the list or type a custom title.', '<b>Members</b> and <b>Rookies</b>: slots and first-timer limit.', '<b>Day and time</b> in your timezone; tap <b>Create roster</b>.', 'To change it: <b>✏️ Edit</b> on your roster; everyone signed up is notified.']],
+    nav: ['On your phone', ['Swipe sideways on the list to switch sub-tabs.', 'Pull down at the top to refresh your data.', 'Pin the screens you use most in <b>Your shortcuts</b>, on Today.']],
+    t: 'How to use', btn: '❔ How to use this screen', close: 'Close', pins: 'Your shortcuts', pinsEdit: 'Edit', pinsDone: 'Done', pinsNone: 'Pin the screens you use most here.', pinsAdd: '＋ Pick shortcuts', pull: 'Release to refresh', pulling: 'Pull to refresh'
+  }
+};
+function hpt() { return HELP[lang === 'pt' ? 'pt' : 'en']; }
+function NAV2() { return BETA; }
+function helpOpen() {
+  const T = hpt(), k = GRADE ? 'gclo' : (groupOf(tab)?.id || 'obj'), [ti, steps] = T[k] || T.obj, [nt, ns] = T.nav;
+  let d = $('helpdlg'); if (!d) { d = document.createElement('dialog'); d.id = 'helpdlg'; d.className = 'help-dlg'; document.body.append(d); d.addEventListener('click', e => { if (e.target === d || e.target.closest('[data-helpx]')) d.close(); }); }
+  const ol = l => `<ol>${l.map(x => `<li>${x}</li>`).join('')}</ol>`;
+  d.innerHTML = `<div class="help-box"><div class="nav-hd"><b>${esc(T.t)} · ${esc(ti)}</b><button type="button" class="nav-x" data-helpx aria-label="${esc(T.close)}">✕</button></div>${ol(steps)}${matchMedia('(pointer: coarse)').matches ? `<h3>${esc(nt)}</h3>${ol(ns)}` : ''}</div>`;
+  d.showModal();
+}
+// atalhos fixos no topo do Hoje
+var PIN = { edit: false };
+function pinChoices() { const U = u(), out = []; for (const g of GROUPS) for (const id of g.subs) if (U.subs[id]) out.push([id, U.subs[id]]); if (orlaOK() || LS.get('dc-orla', null)?.ok) out.push(['gclo', lang === 'pt' ? 'Grade' : 'Roster']); return out; }
+function pinsHTML() {
+  if (!NAV2() || !member || !HELP || !PIN) return ''; const T = hpt(), pins = LS.get('dc-pins', []), ch = pinChoices(), nm = Object.fromEntries(ch), mine = pins.filter(id => nm[id]);
+  if (PIN.edit) return `<section class="pins edit" aria-label="${esc(T.pins)}"><div class="pins-hd"><b>${esc(T.pins)}</b><button type="button" class="lbd-btn" data-pinedit>${esc(T.pinsDone)}</button></div><div class="pins-l">${ch.map(([id, n]) => `<button type="button" class="pin-c" data-pintog="${id}" aria-pressed="${mine.includes(id)}">${mine.includes(id) ? '★' : '☆'} ${esc(n)}</button>`).join('')}</div></section>`;
+  if (!mine.length) return `<section class="pins empty"><button type="button" class="linkb" data-pinedit>${esc(T.pinsAdd)}</button><small>${esc(T.pinsNone)}</small></section>`;
+  return `<section class="pins" aria-label="${esc(T.pins)}"><div class="pins-hd"><b>${esc(T.pins)}</b><button type="button" class="linkb" data-pinedit>${esc(T.pinsEdit)}</button></div><div class="pins-l">${mine.map(id => `<button type="button" class="pin-go" data-pingo="${id}">${esc(nm[id])}</button>`).join('')}</div></section>`;
+}
+document.addEventListener('click', e => {
+  const t = e.target; if (!t.closest) return;
+  if (t.closest('[data-navhelp]')) { $('navdlg')?.close(); helpOpen(); return; }
+  if (t.closest('[data-pinedit]')) { PIN.edit = !PIN.edit; render(); return; }
+  const tg = t.closest('[data-pintog]'); if (tg) { const id = tg.dataset.pintog, l = LS.get('dc-pins', []); LS.set('dc-pins', l.includes(id) ? l.filter(x => x !== id) : [...l, id].slice(0, 8)); render(); return; }
+  const go2 = t.closest('[data-pingo]'); if (go2) { go(go2.dataset.pingo); }
+});
+// deslizar para o lado na lista troca de subaba; puxar para baixo no topo atualiza (só toque, só /beta)
+(() => {
+  if (!NAV2() || !matchMedia('(pointer: coarse)').matches) return;
+  document.documentElement.style.overscrollBehaviorY = 'contain';
+  let x0 = 0, y0 = 0, t0 = 0, pull = false, ind = null;
+  const noSwipe = el => { for (let e = el; e && e !== document.body; e = e.parentElement) { if (e.matches?.('input,textarea,select,dialog,[contenteditable],.cg-w,.noswipe')) return true; const cs = getComputedStyle(e); if (/(auto|scroll)/.test(cs.overflowX) && e.scrollWidth > e.clientWidth + 4) return true; } return false; };
+  const show = (dy, ready) => { if (!ind) { ind = document.createElement('div'); ind.className = 'ptr'; document.body.append(ind); } ind.textContent = ready ? hpt().pull : hpt().pulling; ind.style.transform = `translate(-50%, ${Math.min(dy, 110) - 50}px)`; ind.classList.toggle('ready', ready); ind.hidden = false; };
+  const hide = () => { if (ind) ind.hidden = true; };
+  document.addEventListener('touchstart', e => { if (e.touches.length !== 1 || document.querySelector('dialog[open]')) { t0 = 0; return; } x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now(); pull = scrollY <= 0 && !noSwipe(e.target); }, { passive: true });
+  document.addEventListener('touchmove', e => { if (!t0 || !pull) return; const dy = e.touches[0].clientY - y0, dx = Math.abs(e.touches[0].clientX - x0); if (dy > 12 && dy > dx) show(dy, dy > 90); else hide(); }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (!t0) return; const c = e.changedTouches[0], dx = c.clientX - x0, dy = c.clientY - y0, dt = Date.now() - t0; t0 = 0; hide();
+    if (pull && dy > 90 && dy > Math.abs(dx) * 1.5) { $('refresh')?.click(); return; }
+    if (Math.abs(dx) < 70 || Math.abs(dy) > Math.abs(dx) * 0.5 || dt > 700 || !e.target.closest?.('#list') || noSwipe(e.target)) return;
+    const subs = [...document.querySelectorAll('#subtabs .sub')]; if (subs.length < 2) return;
+    const i = subs.findIndex(b => b.getAttribute('aria-pressed') === 'true'), n = subs[i + (dx < 0 ? 1 : -1)];
+    if (n) n.click();
+  }, { passive: true });
 })();
 
 })();

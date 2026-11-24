@@ -2558,3 +2558,16 @@ html[data-vt="open"]::view-transition-old(root),html[data-vt="open"]::view-trans
 .ls-miss{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;border:1px solid rgba(242,211,107,.45);background:rgba(242,211,107,.06);font-size:13.5px}.ls-miss>b{color:#d9a520;white-space:nowrap}
 .ls-a{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.ls-a button{min-height:40px}.ls-note{margin-left:auto}
 @media (max-width:760px){.ls-g3{grid-template-columns:1fr}.ls-src,.ls-note{margin-left:0}}
+
+/* /beta: atalhos fixos, ajuda e puxar para atualizar */
+.pins{display:grid;gap:8px;margin:0 0 12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.pins.empty{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 14px}.pins.empty small{color:var(--muted)}
+.pins-hd{display:flex;align-items:center;gap:10px}.pins-hd b{font:700 16px var(--display)}.pins-hd>button{margin-left:auto}
+.pins-l{display:flex;flex-wrap:wrap;gap:8px}
+.pin-go,.pin-c{font:inherit;font-size:14px;padding:8px 14px;min-height:40px;border-radius:999px;border:1px solid var(--line);background:var(--chip);color:var(--fg);cursor:pointer}
+.pin-go:hover{border-color:var(--acc)}.pin-c[aria-pressed="true"]{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 16%,var(--chip))}
+.help-dlg{max-width:min(560px,94vw);width:100%;padding:0;border:1px solid var(--line);border-radius:16px;background:var(--surface);color:var(--fg)}
+.help-dlg::backdrop{background:rgba(0,0,0,.5)}
+.help-box{padding:16px 18px 20px}.help-box ol{margin:10px 0 0;padding-left:22px;display:grid;gap:8px;line-height:1.45}.help-box h3{margin:16px 0 0;font:700 15px var(--display);color:var(--muted)}
+.ptr{position:fixed;top:0;left:50%;z-index:80;padding:8px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-size:13px;color:var(--muted);box-shadow:0 6px 20px rgba(0,0,0,.3);transition:color .15s;pointer-events:none}
+.ptr.ready{color:var(--acc);border-color:var(--acc)}
