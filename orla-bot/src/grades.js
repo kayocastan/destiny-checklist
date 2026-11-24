@@ -109,13 +109,32 @@ export async function editGrade(env, a) {
   if (startsAt.getTime() !== new Date(String(act.starts_at).replace(' ', 'T')).getTime()) validateActivityStart(startsAt);
   const name = validateActivityInput(a.atividade, a.integrantes, a.descricao ?? '', a.rookieLimit ?? null);
   const parts = (await db.prepare('SELECT * FROM activity_participants WHERE activity_id = ? ORDER BY created_at, id').bind(act.id).all()).results;
-  const tit = parts.filter(p => p.category === 'titular'), subs = parts.filter(p => p.category === 'substituto');
+  const rl = a.rookieLimit ?? null, limitApplies = !!curated && /^(raid|dungeon):/i.test(curated.eligibility_group);
+  const actChanged = (curated?.id ?? null) !== (act.curated_bungie_activity_id ?? null);
+  // reavalia novato/veterano: atividade nova = consulta todos; limite de novatos = consulta quem ainda não tem classificação
+  const rookie = Object.fromEntries(parts.map(p => [p.discord_user_id, p.is_rookie == null ? null : !!p.is_rookie])), rkStmts = [];
+  if (limitApplies && env.BUNGIE_API_KEY) {
+    for (const p of parts) {
+      if (!actChanged && !(rl != null && rookie[p.discord_user_id] == null)) continue;
+      let v = null;
+      try { const c = await syncPlayerActivities(env, p.discord_user_id, curated.id); v = skillForClears(Object.values(c).reduce((s2, n) => s2 + n, 0)) === 'rookie'; }
+      catch (e) { if (!(e instanceof BungieApiError)) throw e; }
+      rookie[p.discord_user_id] = v; rkStmts.push(db.prepare('UPDATE activity_participants SET is_rookie = ? WHERE id = ?').bind(v == null ? null : v ? 1 : 0, p.id));
+    }
+  } else if (actChanged) for (const p of parts) if (p.is_rookie != null) { rookie[p.discord_user_id] = null; rkStmts.push(db.prepare('UPDATE activity_participants SET is_rookie = NULL WHERE id = ?').bind(p.id)); }
+  // titulares de novo, pela ordem: quem criou, titulares (ordem de entrada) e depois substitutos (ordem de entrada); reserva não muda
+  const byIn = c => parts.filter(p => p.category === c && p.discord_user_id !== act.created_by_discord_id);
+  const me = parts.find(p => p.discord_user_id === act.created_by_discord_id && p.category !== 'reserva');
+  const pool = [...(me ? [me] : []), ...byIn('titular'), ...byIn('substituto')];
+  const down = [], up = [], why = {}; let nT = 0, nR = 0;
+  for (const p of pool) {
+    const rk = rookie[p.discord_user_id], gated = limitApplies && rl != null && (rk == null || (rk && nR >= rl));
+    const to = nT < a.integrantes && !gated ? 'titular' : 'substituto';
+    if (to === 'titular') { nT++; if (rk) nR++; }
+    if (to !== p.category) { (to === 'titular' ? up : down).push(p.discord_user_id); why[p.discord_user_id] = to === 'titular' ? '' : nT >= a.integrantes && !gated ? 'vagas' : rk == null ? 'sem histórico' : 'novatos'; rkStmts.push(db.prepare('UPDATE activity_participants SET category = ? WHERE id = ?').bind(to, p.id)); }
+  }
   const stmts = [db.prepare('UPDATE activities SET name = ?, curated_bungie_activity_id = ?, capacity = ?, rookie_limit = ?, starts_at = ?, description = ? WHERE id = ?')
-    .bind(name, curated?.id ?? null, a.integrantes, a.rookieLimit ?? null, startsAt.toISOString(), a.descricao ?? '', act.id)];
-  // menos vagas: os últimos a entrar viram substitutos (o criador fica); mais vagas: sobem os substitutos mais antigos
-  const over = tit.length - a.integrantes, down = [], up = [];
-  if (over > 0) for (const p of tit.filter(p => p.discord_user_id !== act.created_by_discord_id).slice(-over)) { down.push(p.discord_user_id); stmts.push(db.prepare(`UPDATE activity_participants SET category = 'substituto' WHERE id = ?`).bind(p.id)); }
-  else for (const p of subs.slice(0, -over)) { up.push(p.discord_user_id); stmts.push(db.prepare(`UPDATE activity_participants SET category = 'titular' WHERE id = ?`).bind(p.id)); }
+    .bind(name, curated?.id ?? null, a.integrantes, rl, startsAt.toISOString(), a.descricao ?? '', act.id), ...rkStmts];
   const oldStart = new Date(String(act.starts_at).replace(' ', 'T')), timeChanged = startsAt.getTime() !== oldStart.getTime();
   if (timeChanged) stmts.push(db.prepare('DELETE FROM push_sent WHERE k LIKE ?').bind(`grade:${act.id}:%`)); // horário novo: o aviso de 30 min vale de novo
   await db.batch(stmts);
@@ -133,7 +152,8 @@ export async function editGrade(env, a) {
   if (act.discord_message_id) {
     try { await refreshMessage(env, act.id); } catch (e) { console.error('editar mensagem', e?.message); warning = ' Não consegui atualizar a mensagem da grade no Discord.'; }
     if ((ch.length || down.length || up.length) && notify.length) {
-      const m = id => `<@${id}>`, extra = [down.length ? `\nViraram substitutos (menos vagas): ${down.map(m).join(' ')}` : '', up.length ? `\nSubiram para titular: ${up.map(m).join(' ')}` : ''].join('');
+      const m = id => `<@${id}>`, rs = { vagas: 'menos vagas', novatos: 'limite de novatos', 'sem histórico': 'sem histórico Bungie' };
+      const extra = [down.length ? `\nViraram substitutos: ${down.map(id => `${m(id)} (${rs[why[id]] || why[id]})`).join(', ')}` : '', up.length ? `\nSubiram para titular: ${up.map(m).join(' ')}` : ''].join('');
       try {
         await postMessage(env, act.discord_channel_id, { content: `✏️ <@${act.created_by_discord_id}> editou a grade **${name}**${ch.length ? `\n${line(true)}` : ''}${extra}\nInscritos: ${notify.map(m).join(' ')}`,
           allowed_mentions: { users: [...new Set([act.created_by_discord_id, ...notify])] }, message_reference: { message_id: act.discord_message_id, fail_if_not_exists: false } });
@@ -145,7 +165,7 @@ export async function editGrade(env, a) {
     try {
       const subsP = (await db.prepare(`SELECT endpoint, prefs, discord_user_id d FROM push_subs WHERE discord_user_id IN (${notify.map(() => '?').join(',')})`).bind(...notify).all()).results.filter(s => prefOn(s, 'grade'));
       for (const s of subsP) {
-        const mv = down.includes(s.d) ? ' Você virou substituto (menos vagas).' : up.includes(s.d) ? ' Você subiu para titular.' : '';
+        const mv = down.includes(s.d) ? ` Você virou substituto (${{ vagas: 'menos vagas', novatos: 'limite de novatos', 'sem histórico': 'sem histórico Bungie' }[why[s.d]]}).` : up.includes(s.d) ? ' Você subiu para titular.' : '';
         await notify_(env, s.endpoint, { title: `Grade alterada: ${name}`, body: `${line(false) || 'Inscritos reorganizados.'}${mv}`, url: '/grade', tag: `grade-edit-${act.id}` }).catch(() => {});
       }
     } catch (e) { console.error('push edição', e?.message); }

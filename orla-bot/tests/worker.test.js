@@ -186,13 +186,35 @@ describe('API do DPI', () => {
     expect(cats).toEqual([{ d: '10', c: 'titular' }, { d: '20', c: 'titular' }, { d: '30', c: 'substituto' }, { d: '40', c: 'substituto' }]);
     const aviso = calls.find(c => c.method === 'POST' && c.url.includes('/channels/c1/messages'));
     expect(aviso.body.content).toMatch(/editou a grade \*\*Novo nome\*\*/); expect(aviso.body.allowed_mentions.users).toEqual(expect.arrayContaining(['20', '30', '40'])); // todos os inscritos
-    expect(aviso.body.content).toMatch(/atividade: Velho → \*\*Novo nome\*\*/); expect(aviso.body.content).toMatch(/vagas: 3 → \*\*2\*\*/); expect(aviso.body.content).toMatch(/Viraram substitutos \(menos vagas\): <@30>/);
+    expect(aviso.body.content).toMatch(/atividade: Velho → \*\*Novo nome\*\*/); expect(aviso.body.content).toMatch(/vagas: 3 → \*\*2\*\*/); expect(aviso.body.content).toMatch(/Viraram substitutos: <@30> \(menos vagas\)/);
     const box = (await env.DB.prepare('SELECT title, body FROM push_inbox WHERE endpoint = ?').bind('https://push.example/40').all()).results;
     expect(box).toHaveLength(1); expect(box[0].title).toBe('Grade alterada: Novo nome'); expect(box[0].body).toMatch(/horário: .+ → .+/);
     expect(calls.some(c => c.url === 'https://push.example/40' && c.method === 'POST')).toBe(true);
     expect(await env.DB.prepare('SELECT 1 FROM push_sent WHERE k = ?').bind(`grade:${id}:https://push.example/40`).first()).toBeNull(); // horário novo: lembrete de 30 min vale de novo
     await env.DB.prepare(`UPDATE activities SET created_by_discord_id = '99' WHERE id = ?`).bind(id).run();
     r = await api(`/grades/${id}`, { method: 'PUT', body: JSON.stringify(body) }); expect(r.status).toBe(400);
+  });
+  it('PUT /grades/:id: trocar a atividade reavalia novatos e aplica o limite de novatos', async () => {
+    await link('10');
+    const ins = (d, m) => env.DB.prepare(`INSERT INTO users (discord_user_id, discord_member_name, bungie_membership_id, bungie_membership_type, bungie_name, linked_at) VALUES (?, 'x', ?, 3, ?, 'x')`).bind(d, m, `P${d}#0001`).run();
+    await ins('20', '4620'); await ins('30', '4630'); await ins('40', '4640');
+    const grp = (await env.DB.prepare(`SELECT eligibility_group g FROM curated_bungie_activities WHERE id = 3`).first()).g; // Fim de Crota: Normal
+    const hash = (await env.DB.prepare('SELECT bungie_id h FROM bungie_activities WHERE eligibility_group = ?').bind(grp).first()).h;
+    const clears = { 4611: 8, 4620: 0, 4630: 7, 4640: 1 }; // 10 e 30 veteranos; 20 e 40 novatos
+    const base = vi.mocked(fetch).getMockImplementation();
+    vi.stubGlobal('fetch', vi.fn(async (url, init) => { const u = String(url), m = u.match(/\/(?:Profile|Account)\/(\d+)\//)?.[1];
+      if (u.includes('/LinkedProfiles/')) return new Response(JSON.stringify({ ErrorCode: 1, Response: { profiles: [{ membershipType: 3, membershipId: m }] } }));
+      if (u.includes('components=Profiles')) return new Response(JSON.stringify({ ErrorCode: 1, Response: { profile: { data: { characterIds: ['1'] } } } }));
+      if (u.includes('/AggregateActivityStats/')) return new Response(JSON.stringify({ ErrorCode: 1, Response: { activities: [{ activityHash: hash, values: { activityCompletions: { basic: { value: clears[m] } } } }] } }));
+      return base(url, init); }));
+    const t0 = new Date(Date.now() + 36e5).toISOString();
+    const id = (await env.DB.prepare(`INSERT INTO activities (name, capacity, starts_at, description, created_by_discord_id, created_at, discord_channel_id, discord_message_id) VALUES ('Livre', 4, ?, '', '10', 'x', 'c1', 'm1')`).bind(t0).run()).meta.last_row_id;
+    await env.DB.prepare(`INSERT INTO activity_participants (activity_id, discord_user_id, category, is_rookie, created_at) VALUES (?, '10', 'titular', NULL, 'a'), (?, '20', 'titular', NULL, 'b'), (?, '40', 'titular', NULL, 'c'), (?, '30', 'substituto', NULL, 'd')`).bind(id, id, id, id).run();
+    const r = await api(`/grades/${id}`, { method: 'PUT', body: JSON.stringify({ atividade: 'Fim de Crota: Normal', curatedId: 3, integrantes: 4, novatos: 1, inicio: t0, descricao: '' }) }); expect(r.status).toBe(200);
+    const rows = (await env.DB.prepare('SELECT discord_user_id d, category c, is_rookie r FROM activity_participants WHERE activity_id = ? ORDER BY d').bind(id).all()).results;
+    expect(rows).toEqual([{ d: '10', c: 'titular', r: 0 }, { d: '20', c: 'titular', r: 1 }, { d: '30', c: 'titular', r: 0 }, { d: '40', c: 'substituto', r: 1 }]); // só 1 novato titular; 30 sobe
+    const aviso = calls.find(c => c.method === 'POST' && c.url.includes('/channels/c1/messages'));
+    expect(aviso.body.content).toMatch(/Viraram substitutos: <@40> \(limite de novatos\)/); expect(aviso.body.content).toMatch(/Subiram para titular: <@30>/);
   });
   it('presença: 4 h depois, confere no histórico se cada titular jogou', async () => {
     await link('10');
