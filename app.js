@@ -6506,8 +6506,8 @@ document.addEventListener('input', e => { if (e.target.matches?.('[data-patq]'))
 // Clã › Placar: totais do clã. Abates, mortes e recordes vêm somados pela Bungie (AggregateClanStats); conclusões e horas, da soma do que o Placar já lê de cada membro
 var CTOT = { d: null, busy: false };
 function ctotLoad(g) {
-  if (CTOT.busy) return; const c = LS.get('dc-ctot', null); if (c && c.g === g && Date.now() - c.at < 12 * 36e5) { CTOT.d = c; return; }
-  CTOT.busy = true; bungie(`/Destiny2/Stats/AggregateClanStats/${g}/?modes=4,82,7,5`).then(r => { const d = {}; for (const x of r || []) (d[x.mode] ||= {})[x.statId] = [x.value?.basic?.value || 0, x.value?.basic?.displayValue || '']; CTOT.d = { g, at: Date.now(), d }; try { LS.set('dc-ctot', CTOT.d); } catch {} }).catch(() => { CTOT.d = { g, at: Date.now(), d: {}, err: true }; }).finally(() => { CTOT.busy = false; if (tab === 'gclb') render(); });
+  if (CTOT.busy) return; const c = LS.get('dc-ctot2', null); if (c && c.g === g && Date.now() - c.at < 12 * 36e5) { CTOT.d = c; return; }
+  CTOT.busy = true; bungie(`/Destiny2/Stats/AggregateClanStats/${g}/?modes=4,82,7,5`).then(r => { const d = {}; for (const x of r || []) (d[x.mode] ||= {})[x.statId] = [x.value?.basic?.value || Number(String(x.value?.basic?.displayValue || '').replace(/[^\d.]/g, '')) || 0, x.value?.basic?.displayValue || ''] /* a Bungie manda o número só no texto */; CTOT.d = { g, at: Date.now(), d }; try { LS.set('dc-ctot2', CTOT.d); } catch {} }).catch(() => { CTOT.d = { g, at: Date.now(), d: {}, err: true }; }).finally(() => { CTOT.busy = false; if (tab === 'gclb') render(); });
 }
 function clanTotalsHTML() {
   const g = GD?.clan?.gid; if (!g || !member) return ''; const P = lang === 'pt';
