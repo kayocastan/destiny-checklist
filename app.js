@@ -4006,7 +4006,9 @@ function lbSwap(k, j) {
   d.querySelectorAll('.lb-p[data-lbh]').forEach(el => { if (moved.includes(+el.dataset.lbh)) el.classList.add('lbd-flash'); });
   const btn = d.querySelector(`.lb-p[data-lbh="${moved[0]}"] [data-lb${j < k ? 'up' : 'dn'}]`); if (btn && !btn.disabled) btn.focus();
 }
-document.addEventListener('click', e => { const o = e.target.closest('[data-lbopen]'); if (o) { e.stopPropagation(); lbOpen(o.dataset.lbopen || 'man'); } }, true);
+// "Montar build"/"Montar loadout" começa do zero: o que o personagem usa agora, sem as escolhas da última montagem (abrir uma build salva continua trazendo a build)
+function lbFresh() { const cid = charId; LB.cid = cid; Object.assign(LB, { exo: 'any', set: '', need: 2, sub: 'cur', w: {}, a: {}, artSel: '', so: {}, ao: {}, res: null, pick: '' }); if (LBCFG[cid]) { delete LBCFG[cid]; try { LS.set('dc-lb-cfg', LBCFG); } catch {} } }
+document.addEventListener('click', e => { const o = e.target.closest('[data-lbopen]'); if (o) { e.stopPropagation(); lbFresh(); lbOpen(o.dataset.lbopen || 'man'); } }, true);
 $('lbdlg').addEventListener('click', e => {
   const d = $('lbdlg'), q = s => e.target.closest(s);
   if (e.target === d || q('.pf-x')) { d.close(); return; }
