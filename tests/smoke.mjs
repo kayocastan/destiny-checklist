@@ -19,7 +19,8 @@ const C = ['2305843009000000001', '2305843009000000002', '2305843009000000003'];
 // armas para o Avaliar rolls: A está no Voltron (atual B, dá para chegar a A), T é gêmea por nome de A (sem rolls próprios), X é exótica
 const WPN = { A: 877384, T: 2290416, X: 14194600, F: 2307365 };
 const VOLT = `title:x\ndimwishlist:item=${WPN.A}&perks=1001,1002,1003,1004#notes:pve\n`;
-function arsenal(pr) {
+function arsenal(pr, full) {
+  if (full) { const inv = pr.characterInventories.data[C[0]].items; for (let i = 0; i < 9; i++) inv.push({ itemHash: WPN.F, itemInstanceId: '70' + i, bucketHash: 2465295065, quantity: 1, state: 0 }); } // Titã com as Energéticas cheias (9)
   const it = (h, i) => ({ itemHash: h, itemInstanceId: '69' + i, bucketHash: 138197802, quantity: 1, state: 0 });
   pr.profileInventory.data.items = [it(WPN.A, 1), it(WPN.T, 2), it(WPN.X, 3), it(WPN.F, 4)];
   const sk = l => ({ sockets: l.map(h => ({ plugHash: h, isEnabled: true, isVisible: true })) });
@@ -47,7 +48,7 @@ function profile() {
 }
 const GRADES = [{ id: 1, name: 'Queda do Rei: Normal', g: null, ci: null, desc: '**Atenção**\n\nSó quem já fez.', cap: 6, rk: 0, s: iso(now + 864e5), by: 'Peter', url: null, mine: null, creator: false, p: [{ n: 'Peter', c: 'titular', r: 0 }] }, { id: 2, name: 'Fim de Crota: Normal', g: null, ci: null, desc: 'Inscrita', cap: 6, rk: 0, s: iso(now + 2 * 864e5).replace('T', ' ').slice(0, 19), by: 'Nipanga', url: 'https://discord.com/channels/1/2/3', mine: 'titular', creator: true, p: [{ n: 'Nipanga', c: 'titular', r: 0 }] }];
 
-async function runOne(name, { path = '/', auth = true, ls = {}, orla = 200, admin = false, xsave = false, expectSub = null, expired = false, mobile = false, clicks = true, steps = null, expectText = '', arm = false, owner = false, vc = '', noSub = null, expectBar = false, orlaClan = false }) {
+async function runOne(name, { path = '/', auth = true, ls = {}, orla = 200, admin = false, xsave = false, expectSub = null, expired = false, mobile = false, clicks = true, steps = null, expectText = '', arm = false, owner = false, vc = '', noSub = null, expectBar = false, orlaClan = false, full = false }) {
   const b = await browser(), ctx = await b.newContext(mobile ? { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true } : { viewport: { width: 1366, height: 900 } });
   const page = await ctx.newPage(), errs = [], seen = { refresh: 0 };
   page.on('pageerror', e => errs.push('pageerror: ' + e.message));
@@ -64,7 +65,7 @@ async function runOne(name, { path = '/', auth = true, ls = {}, orla = 200, admi
     if (u.hostname === 'www.bungie.net' && u.pathname.startsWith('/Platform')) { if (process.env.LAT && /Profile/.test(u.pathname)) await new Promise(z => setTimeout(z, 2000));
       const p = u.pathname.replace('/Platform', '');
       if (p.startsWith('/User/GetMembershipsForCurrentUser')) return j({ ErrorCode: 1, Response: { destinyMemberships: [{ membershipId: '4611686018400000001', membershipType: 3, displayName: 'Teste', bungieGlobalDisplayName: 'Teste', bungieGlobalDisplayNameCode: 1234 }], primaryMembershipId: '4611686018400000001', bungieNetUser: { membershipId: '99', uniqueName: 'Teste#1234' } } });
-      if (/\/Profile\/\d+\/\?/.test(p + '?') && !/Item\//.test(p)) return j({ ErrorCode: 1, Response: arm ? arsenal(profile()) : profile() });
+      if (/\/Profile\/\d+\/\?/.test(p + '?') && !/Item\//.test(p)) return j({ ErrorCode: 1, Response: arm ? arsenal(profile(), full) : profile() });
       if (p.startsWith('/GroupV2/User/')) return j({ ErrorCode: 1, Response: { results: [{ group: { groupId: orlaClan ? '5280120' : '4886893', name: 'Clã Teste', clanInfo: { clanCallsign: 'TST' } }, member: { memberType: admin ? 3 : 2 } }] } });
       if (/\/GroupV2\/\d+\/Members/.test(p)) return j({ ErrorCode: 1, Response: { results: [{ memberType: admin ? 3 : 2, isOnline: true, destinyUserInfo: { membershipId: xsave ? '4611686018499999999' : '4611686018400000001', membershipType: xsave ? 1 : 3, bungieGlobalDisplayName: 'Teste', bungieGlobalDisplayNameCode: 1234 } }] } });
       return j({ ErrorCode: 1, Response: {} });
@@ -273,6 +274,28 @@ R.push(run('endereço: /beta/cofre (dono) mantém o /beta', { path: '/beta/cofre
 R.push(run('endereço: link "Marcar grade" (/grade?a=) abre a Grade sem recarregar', { path: '/hoje', clicks: false, steps: async (p, fail) => {
   await p.evaluate(() => { const a = document.createElement('a'); a.href = '/grade?a=teste'; a.id = 'tlink'; document.body.append(a); a.click(); }); await p.waitForTimeout(1500);
   if (!(await url(p)).startsWith('/grade')) fail.push('link Marcar grade: ' + await url(p)); await same(p, fail, 'Marcar grade'); } }));
+R.push(run('inventário: abrir espaço sozinho, lote na busca e atalhos', { path: '/', arm: true, full: true, clicks: false, ls: { 'dc-tab': 'inv', 'dc-lang': 'pt' }, steps: async (p, fail) => {
+  for (let t = 0; t < 30; t++) { if (await p.$('[data-iv="694"]')) break; await p.waitForTimeout(400); }
+  await p.evaluate(() => document.querySelector('[data-iv="694"]')?.click()); await p.waitForTimeout(400);
+  const to = await p.evaluate(() => [...document.querySelectorAll('#ivdlg [data-ivdo]')].find(b => !b.dataset.iveq && /Tit/.test(b.textContent))?.dataset.ivdo);
+  if (!to) { fail.push('sem botão de mover para o Titã'); return; }
+  await p.evaluate(t => document.querySelector(`#ivdlg [data-ivdo="${t}"]:not([data-iveq="1"])`)?.click(), to);
+  let msg = ''; for (let t = 0; t < 30; t++) { msg = await p.evaluate(() => document.querySelector('#ivdlg .iv-msg')?.textContent || ''); if (/Para caber|Sem espaço|recusou/.test(msg)) break; await p.waitForTimeout(300); }
+  if (!/Para caber: .*cofre/.test(msg)) fail.push('mover com o personagem cheio devia abrir espaço · ' + msg.slice(0, 120));
+  if (!(await p.$('#ivdlg [data-ivundo]'))) fail.push('faltou o Desfazer');
+  await p.keyboard.press('Escape'); await p.waitForTimeout(300);
+  await p.keyboard.press('?'); await p.waitForTimeout(300);
+  if (!(await p.evaluate(() => document.getElementById('kbdlg')?.open && /Atalhos/.test(document.getElementById('kbdlg').textContent)))) fail.push('? não abriu os atalhos');
+  await p.keyboard.press('Escape'); await p.waitForTimeout(200);
+  await p.evaluate(() => document.querySelector('[data-ivf="dup"]')?.click()); await p.waitForTimeout(400);
+  const bar = await p.evaluate(() => document.querySelector('.ivb')?.textContent || '');
+  if (!/Com os 10 da busca/.test(bar)) { fail.push('barra de lote: ' + bar.slice(0, 80)); return; }
+  await p.evaluate(() => document.querySelector('[data-ivbk="mv"]')?.click()); await p.waitForTimeout(200);
+  await p.evaluate(() => document.querySelector('[data-ivbk="mv:v"]')?.click()); await p.waitForTimeout(200);
+  await p.evaluate(() => document.querySelector('[data-ivgo="mv:v"]')?.click());
+  let end = ''; for (let t = 0; t < 40; t++) { end = await p.evaluate(() => document.querySelector('.ivj-end')?.textContent || ''); if (end) break; await p.waitForTimeout(300); }
+  if (!/Pronto: 10 de 10/.test(end)) fail.push('lote para o cofre: ' + (end || await p.evaluate(() => document.querySelector('.ivj')?.textContent.slice(0, 200) || 'sem painel')));
+} }));
 R.push(run('grade: sugestão de loadout no cartão em que estou inscrito', { path: '/grade', arm: true, clicks: false, ls: { 'dc-lang': 'pt' }, steps: async (p, fail) => {
   for (let t = 0; t < 30; t++) { if (await p.$('.ls [data-lseq]')) break; await p.waitForTimeout(400); }
   const st = await p.evaluate(() => ({ n: document.querySelectorAll('.ls').length, txt: document.querySelector('.ls')?.innerText || '', eq: !!document.querySelector('.ls [data-lseq]:not([disabled])') }));

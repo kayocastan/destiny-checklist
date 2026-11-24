@@ -2612,3 +2612,22 @@ html[data-vt="open"]::view-transition-old(root),html[data-vt="open"]::view-trans
 .ctot-t{display:grid;gap:2px;padding:12px 14px;border:1px solid var(--line);border-top:3px solid var(--c);border-radius:12px;background:var(--bg)}.ctot-t small{color:var(--muted);font-size:12.5px}.ctot-t b{font:700 28px/1.05 var(--display);font-variant-numeric:tabular-nums}
 .ctot-tb{overflow-x:auto}.ctot-tb table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}.ctot-tb th,.ctot-tb td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}.ctot-tb thead th{color:var(--muted);font-weight:500}.ctot-tb .l{text-align:left}
 .ctot-r{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}.ctot-r span{display:grid;padding:10px 12px;border-radius:10px;background:var(--chip)}.ctot-r small{color:var(--muted);font-size:12.5px}.ctot-r b{font:700 20px var(--display)}
+/* Etapa 1 (DIM): ações em lote na busca, progresso do lote, desfazer e atalhos */
+.ivb{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0 2px;padding:10px 12px;border:1px dashed color-mix(in srgb,var(--acc) 60%,transparent);border-radius:12px;background:color-mix(in srgb,var(--acc) 5%,transparent)}
+.ivb>b{font-size:13.5px;margin-right:4px}
+.ivb-sub{flex-basis:100%;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-top:4px}
+.ivb-sub small{color:var(--muted);font-size:12.5px;flex-basis:100%}
+.ivj{margin:6px 0;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--surface);display:grid;gap:10px}
+.ivj.part{border-color:color-mix(in srgb,var(--wk,#f2d36b) 55%,var(--line))}
+.ivj-hd{display:flex;gap:10px;align-items:center}.ivj-hd b{font-size:15px}.ivj-hd small{color:var(--muted)}.ivj-hd button{margin-left:auto}
+.ivj-l{list-style:none;margin:0;padding:0;max-height:260px;overflow:auto;font-size:13.5px}
+.ivj-l li{display:grid;grid-template-columns:20px 1fr;gap:8px;padding:5px 0;border-bottom:1px solid var(--line)}
+.ivj-l li.ok i{color:var(--done)}.ivj-l li.mv i{color:#e0b84a}.ivj-l li.er i,.ivj-l li.er span{color:var(--hard)}
+.ivj-end{margin:0;padding:9px 12px;border-radius:10px;font-size:13.5px;background:color-mix(in srgb,var(--done) 10%,transparent)}
+.ivj-end.part{background:color-mix(in srgb,#e0b84a 14%,transparent)}
+.iv-undo{font:inherit;font-weight:600;background:none;border:0;padding:0 2px;color:var(--acc);text-decoration:underline;cursor:pointer}
+kbd{font:600 12px var(--mono);min-width:22px;text-align:center;padding:2px 7px;border-radius:6px;border:1px solid var(--line);border-bottom-width:2px;background:var(--surface);display:inline-block}
+@media (pointer:coarse){.kb-h{display:none}}
+.kb-box{max-width:440px}.kb-box h2{margin:0 0 12px;font-size:20px}
+.kb-l{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;align-items:center;margin:0}.kb-l dd{margin:0;font-size:14px}
+.kb-l .kb-s{grid-column:1/-1;margin-top:8px;font:600 11.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}

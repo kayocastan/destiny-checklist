@@ -5279,7 +5279,7 @@ function wishFull(x) {
 const ivTile = (x, big) => { const d = INVD[x.h] || {}, t = tagOf(x.iid), m = ivMatch(x); return `<button type="button" class="iv-t${big ? ' big' : ''}${x.ex ? ' ex' : ''}${m ? '' : ' dim'}${INV.picked.has(x.iid) ? ' pk' : ''}" data-iv="${x.iid}" draggable="true" title="${esc([d.n, x.pw ? '✦ ' + x.pw : '', d.tl].filter(Boolean).join(' · '))}" aria-label="${esc(d.n || '')}">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy" draggable="false">` : ''}${x.pw ? `<b>${x.pw}</b>` : ''}${t ? `<i class="iv-tg t-${t}">${{ fav: '★', keep: '✓', junk: '✕', inf: '⇪' }[t]}</i>` : ''}${x.el && ELEMENTS[x.el] && x.slot < 3 ? `<s class="el-${ELEMENTS[x.el]}"></s>` : ''}${x.slot < 3 ? rlBadge(rlGrade(x.iid, x.h)) : ''}${x.slot < 3 && wishFull(x) ? `<i class="iv-wf" title="${lang === 'pt' ? 'Roll desejado' : 'Wished roll'}">☆</i>` : ''}${x.lk ? '<u class="iv-lk" aria-hidden="true"><svg viewBox="0 0 12 12" width="10" height="10" fill="currentColor"><path d="M3.5 5V3.6a2.5 2.5 0 0 1 5 0V5h.7c.4 0 .8.4.8.8v4.4c0 .4-.4.8-.8.8H2.8a.8.8 0 0 1-.8-.8V5.8c0-.4.4-.8.8-.8zm1.2 0h2.6V3.6a1.3 1.3 0 0 0-2.6 0z"/></svg></u>' : ''}</button>`; };
 function ivBar() {
   const T = ivt(), chip = (k, t) => `<button type="button" class="lbd-chip${INV.f === k ? ' on' : ''}" data-ivf="${k}">${esc(t)}</button>`;
-  return `<div class="iv-bar"><label class="iv-q"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/></svg><input type="search" id="ivq" value="${esc(INV.q)}" placeholder="${esc(T.q)}" aria-label="${esc(T.q)}" autocomplete="off"></label>${ivPkSug()}<div class="lbd-chips">${chip('all', T.all)}${chip('w', T.w)}${chip('a', T.a)}${chip('dup', T.dup)}${chip('fav', T.fav)}${chip('wish', lang === 'pt' ? '☆ Desejados' : '☆ Wished')}${chip('junk', T.junk)}</div><small class="iv-tip">${esc(T.tip)}</small></div>${INV.msg ? `<p class="iv-msg${INV.msg.bad ? ' bad' : ''}">${esc(INV.msg.t)}</p>` : ''}`;
+  return `<div class="iv-bar"><label class="iv-q"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/></svg><input type="search" id="ivq" value="${esc(INV.q)}" placeholder="${esc(T.q)}" aria-label="${esc(T.q)}" autocomplete="off"></label>${ivPkSug()}<div class="lbd-chips">${chip('all', T.all)}${chip('w', T.w)}${chip('a', T.a)}${chip('dup', T.dup)}${chip('fav', T.fav)}${chip('wish', lang === 'pt' ? '☆ Desejados' : '☆ Wished')}${chip('junk', T.junk)}</div><small class="iv-tip">${esc(T.tip)}<span class="kb-h"> · ${lang === 'pt' ? 'atalhos' : 'shortcuts'}: <kbd>?</kbd></span></small></div>${ivMsgH()}${ivBulkH(invAll().filter(ivMatch))}`;
 }
 function invHTML() {
   const T = ivt(), W = u(); if (!have.c) return `<div class="panel"><p class="empty-msg wait">${esc(T.wait)}</p></div>`;
@@ -5319,7 +5319,7 @@ function vltHTML() {
   const gHTML = Object.entries(groups).sort((a, b) => b[1].length - a[1].length).map(([n, xs]) => { const dn = new Set(xs.filter(x => x.dup).map(x => x.h)).size; return `<div class="vl-g"><span class="vl-gh"><b>${esc(n)}</b><small>${xs.length}</small>${dn ? `<small class="vl-d">${esc(T.dups(dn))}</small>` : ''}</span><div class="vl-tiles">${xs.map(x => ivTile(x)).join('')}</div></div>`; }).join('');
   const chars = ivChars(), pk = [...INV.picked].filter(id => V.some(x => x.iid === id) || all.some(x => x.iid === id));
   const bulk = INV.multi ? `<div class="vl-bulk"><b>${esc(T.sel(pk.length))}</b>${pk.length ? chars.map(c => `<button type="button" class="lbd-btn" data-ivbulk="${c.characterId}">${esc(T.take(W.classes[c.classType]))}</button>`).join('') + `<span class="vl-bt">${esc(T.tagAll)} ${TAGS.map(t => `<button type="button" class="tag-b t-${t}" data-ivbtag="${t}">${esc(tagl()[t])}</button>`).join('')}<button type="button" class="tag-b" data-ivbtag="">${esc(T.clear)}</button></span>` : ''}<small>${esc(T.noDel)}</small></div>` : '';
-  return `<div class="panel tr-wrap vl-wrap">${side}<section class="tr-main">${rlBar(V)}<div class="tr-box"><div class="tr-hd"><h2>${esc(cur[1])}</h2><small>${esc(T.items(list.length))}</small><label class="vl-sort">${esc(T.sort)} <select id="vlsort">${[['pw', T.sP], ['wish', T.sW], ['tt', T.sR], ['name', T.sN]].map(([k, t]) => `<option value="${k}"${INV.vs === k ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select></label><button type="button" class="lbd-btn${INV.multi ? ' on' : ''}" data-ivmulti>${esc(INV.multi ? T.multiOff : T.multi)}</button></div>${INV.msg ? `<p class="iv-msg${INV.msg.bad ? ' bad' : ''}">${esc(INV.msg.t)}</p>` : ''}${bulk}${gHTML || `<p class="empty-msg">${esc(T.none)}</p>`}</div></section></div>`;
+  return `<div class="panel tr-wrap vl-wrap">${side}<section class="tr-main">${rlBar(V)}<div class="tr-box"><div class="tr-hd"><h2>${esc(cur[1])}</h2><small>${esc(T.items(list.length))}</small><label class="vl-sort">${esc(T.sort)} <select id="vlsort">${[['pw', T.sP], ['wish', T.sW], ['tt', T.sR], ['name', T.sN]].map(([k, t]) => `<option value="${k}"${INV.vs === k ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select></label><button type="button" class="lbd-btn${INV.multi ? ' on' : ''}" data-ivmulti>${esc(INV.multi ? T.multiOff : T.multi)}</button></div>${ivMsgH()}${ivBulkH(list)}${bulk}${gHTML || `<p class="empty-msg">${esc(T.none)}</p>`}</div></section></div>`;
 }
 /* mover e equipar (escrita na conta), com a cópia local do perfil atualizada na hora */
 function ivFind(iid) { return invAll().find(x => x.iid === iid); }
@@ -5337,24 +5337,29 @@ function ivLocalEquip(x, cid) {
   x.eq = true;
 }
 async function ivXfer(x, toVault, cid) { await wPost('/Destiny2/Actions/Items/TransferItem/', { itemReferenceHash: x.h, stackSize: 1, transferToVault: toVault, itemId: x.iid, characterId: cid }); }
-async function ivDo(iid, to, equip) {
-  const T = ivt(); let x = ivFind(iid); if (!x || INV.busy) return;
+/* ivCore: move/equipa e abre espaço sozinho (regras no módulo "Etapa 1" no fim do arquivo). Lança erro com .code */
+async function ivCore(iid, to, equip, made) {
+  let x = ivFind(iid); if (!x) throw Object.assign(new Error('gone'), { code: 'gone' });
   const ch = to !== 'v' && profile.characters.data[to];
-  if (equip && x.slot >= 3 && x.cls !== 3 && ch && x.cls !== ch.classType) { INV.msg = { bad: true, t: T.errCls }; ivRefresh(); return; }
-  INV.busy = true; INV.msg = { t: T.going }; ivRefresh();
-  try {
-    if (x.eq && !(equip && to === x.where)) { // equipado: troca por outro do mesmo espaço antes de mover
-      const alt = invAll().filter(y => y.where === x.where && !y.eq && y.slot === x.slot && (y.slot < 3 || y.cls === 3 || y.cls === profile.characters.data[x.where].classType)).sort((a, b) => a.ex - b.ex || b.pw - a.pw)[0];
-      if (!alt) throw Object.assign(new Error('eq'), { code: 'eq' });
-      await wPost('/Destiny2/Actions/Items/EquipItem/', { itemId: alt.iid, characterId: x.where }); ivLocalEquip(alt, x.where); x = ivFind(iid);
-    }
-    if (x.where !== 'v' && x.where !== to) { await ivXfer(x, true, x.where); ivLocalMove(x, 'v'); }
-    if (to !== 'v' && x.where === 'v') { await ivXfer(x, false, to); ivLocalMove(x, to); }
-    if (equip && !x.eq) { await wPost('/Destiny2/Actions/Items/EquipItem/', { itemId: x.iid, characterId: to }); ivLocalEquip(x, to); }
-    INV.msg = { t: T.ok };
-  } catch (e) { INV.msg = { bad: true, t: e.code === 'eq' ? T.errEq : e.code === 1671 ? T.errAct : e.code === 1623 || e.code === 1642 ? T.errRoom : T.errGen(e.message || e.code) }; }
+  if (equip && x.slot >= 3 && x.cls !== 3 && ch && x.cls !== ch.classType) throw Object.assign(new Error('cls'), { code: 'cls' });
+  if (x.eq && !(equip && to === x.where)) { // equipado: troca por outro do mesmo espaço antes de mover
+    const alt = invAll().filter(y => y.where === x.where && !y.eq && y.slot === x.slot && (y.slot < 3 || y.cls === 3 || y.cls === profile.characters.data[x.where].classType)).sort((a, b) => a.ex - b.ex || b.pw - a.pw)[0];
+    if (!alt) throw Object.assign(new Error('eq'), { code: 'eq' });
+    await wPost('/Destiny2/Actions/Items/EquipItem/', { itemId: alt.iid, characterId: x.where }); ivLocalEquip(alt, x.where); x = ivFind(iid);
+  }
+  if (x.where !== 'v' && x.where !== to) { await ivVaultRoom(x.iid, to, x.slot, made); await ivXfer(x, true, x.where); ivLocalMove(x, 'v'); }
+  if (to !== 'v' && x.where === 'v') { await ivCharRoom(to, x.slot, x.iid, made); await ivXfer(x, false, to); ivLocalMove(x, to); }
+  if (equip && !x.eq) { await wPost('/Destiny2/Actions/Items/EquipItem/', { itemId: x.iid, characterId: to }); ivLocalEquip(x, to); }
+  IVR.recent[iid] = Date.now();
+}
+function ivErr(e) { const T = ivt(); return e.code === 'cls' ? T.errCls : e.code === 'eq' ? T.errEq : e.code === 1671 ? T.errAct : e.code === 1623 || e.code === 1642 || e.code === 'room' ? T.errRoom : e.code === 'gone' ? (lang === 'pt' ? 'O item não está mais lá.' : 'The item is gone.') : T.errGen(e.message || e.code); }
+async function ivDo(iid, to, equip) {
+  const T = ivt(); if (!ivFind(iid) || INV.busy) return;
+  INV.busy = true; INV.msg = { t: T.going }; ivRefresh(); const made = [];
+  try { await ivCore(iid, to, equip, made); INV.msg = made.length ? { t: T.ok + ' ' + ivMadeT(made), undo: made } : { t: T.ok }; }
+  catch (e) { INV.msg = { bad: true, t: ivErr(e) + (made.length ? ' ' + ivMadeT(made) : ''), undo: made.length ? made : null }; }
   INV.busy = false; ivRefresh();
-  clearTimeout(ivRefresh.t); ivRefresh.t = setTimeout(() => { if (INV.msg && !INV.msg.bad) { INV.msg = null; ivRefresh(); } }, 4000);
+  clearTimeout(ivRefresh.t); ivRefresh.t = setTimeout(() => { if (INV.msg && !INV.msg.bad) { INV.msg = null; ivRefresh(); } }, INV.msg?.undo ? 15000 : 4000);
 }
 function ivRefresh() { if (tab === 'inv' || tab === 'vlt') render(); if ($('ivdlg')?.open) ivDraw(); renderBuild?.(); }
 /* detalhe do item: vantagens (com as outras opções), atributos, etiqueta, anotação e ações */
@@ -5489,7 +5494,7 @@ function ivDraw() {
     <div class="ivd-body"><div class="ivd-main"><div>${perks}</div><div>${stats}</div></div>
     <aside class="ivd-side"><span class="sea-k">${esc(T.equip)} <small class="lb-beta">${esc(T.beta)}</small></span><div class="ivd-row">${chars.map(c => btn(c.characterId, true, W.classes[c.classType], !canCls(c) || (x.eq && x.where === c.characterId))).join('')}</div>
       <span class="sea-k">${esc(T.move)}</span><div class="ivd-row">${x.where !== 'v' ? btn('v', false, T.vaultTo) : ''}${chars.filter(c => c.characterId !== x.where).map(c => btn(c.characterId, false, W.classes[c.classType])).join('')}</div>
-      ${INV.msg ? `<p class="iv-msg${INV.msg.bad ? ' bad' : ''}">${esc(INV.msg.t)}</p>` : ''}
+      ${ivMsgH()}
       <span class="sea-k">${esc(lkt().lockT)}</span><div class="ivd-row"><button type="button" class="lbd-btn ivd-lk${x.lk ? ' on' : ''}" data-ivlock="${x.lk ? 0 : 1}" title="${esc(x.lk ? lkt().tipU : lkt().tipL)}"${INV.busy ? ' disabled' : ''}>${esc(x.lk ? lkt().unlock : lkt().lock)}</button></div><label class="ivd-kl"><input type="checkbox" id="keeplock"${LS.get('dc-keeplock', true) ? ' checked' : ''}> ${esc(lkt().keepAuto)}</label>
       <span class="sea-k">${esc(T.tag)}</span><div class="ivd-row">${TAGS.map(t => `<button type="button" class="tag-b${tg === t ? ' t-' + t : ''}" data-ivtag="${t}">${esc(tagl()[t])}</button>`).join('')}</div>
       <label class="tr-q">${esc(T.note)}<input type="text" id="ivnote" maxlength="120" value="${esc(notes[x.iid] || '')}" placeholder="${esc(T.notePh)}"></label>
@@ -6526,6 +6531,132 @@ function clanTotalsHTML() {
     <div class="ctot-r"><span><small>${P ? 'Abate mais distante (PvE)' : 'Longest kill (PvE)'}</small><b>${n(v(7, 'lbLongestKillDistance'))} m</b></span><span><small>${P ? 'Vida mais longa (PvE)' : 'Longest life (PvE)'}</small><b>${esc(dv(7, 'lbLongestSingleLife'))}</b></span><span><small>${P ? 'Vida mais longa (incursão)' : 'Longest life (raid)'}</small><b>${esc(dv(4, 'lbLongestSingleLife'))}</b></span></div>
     <p class="lbd-n">${P ? `Conclusões e horas: soma do que o Placar lê de cada membro (1x por dia)${out ? `; ${out} sem dados ou com perfil privado ficaram de fora` : ''}.` : `Clears and hours: sum of what the Leaderboard reads from each member (once a day)${out ? `; ${out} without data or private were left out` : ''}.`}</p></section>`;
 }
+
+/* ---------- Etapa 1 (ideias do DIM): abrir espaço sozinho ao mover, ações em lote na busca, atalhos de teclado ----------
+   Abrir espaço: personagem guarda 9 por tipo (fora o equipado); o cofre, VAULT_MAX. Quem sai primeiro (menor nota):
+   nunca equipado nem Favorito; evita Manter, o que você moveu há pouco e o que está num loadout do jogo do personagem;
+   prefere Lixo e Infundir, armadura de outra classe, poder e raridade menores. Tudo o que foi tirado volta com "Desfazer". */
+var IVR = { recent: {}, lr: 0 };
+var IVJ = null; // trabalho em lote em andamento: { act, to, ids, i, ok, log, stop, done }
+const IV_CAP = 9;
+function ivLdSet(cid) { const s = new Set(); for (const l of profile?.characterLoadouts?.data?.[cid]?.loadouts || []) for (const it of l.items || []) if (it.itemInstanceId && it.itemInstanceId !== '0') s.add(it.itemInstanceId); return s; }
+function ivOutScore(y, cid, ld) {
+  const t = tagOf(y.iid); if (y.eq || t === 'fav') return Infinity;
+  let s = 0; if (t === 'keep') s += 1000; if (Date.now() - (IVR.recent[y.iid] || 0) < 10 * 60000) s += 500; if (ld?.has(y.iid)) s += 300;
+  if (t === 'junk') s -= 300; if (t === 'inf') s -= 200; if (y.ex) s += 40;
+  const ct = cid && cid !== 'v' && profile.characters.data[cid]?.classType; if (cid && cid !== 'v' && y.slot >= 3 && y.cls !== 3 && y.cls !== ct) s -= 100;
+  return s + (INVD[y.h]?.tt || 0) * 3 + y.pw / 100;
+}
+const ivVUsed = () => (profile.profileInventory?.data?.items || []).filter(i => i.bucketHash === VAULT_BUCKET).length;
+const ivNameOf = id => INVD[ivFind(id)?.h]?.n || '?';
+// cofre cheio: passa um item do cofre para um personagem com espaço (de preferência o jogado há mais tempo)
+async function ivVaultRoom(exceptIid, avoidCid, avoidSlot, made) {
+  if (ivVUsed() < VAULT_MAX) return;
+  const all = invAll(), chars = ivChars().slice().reverse(), room = (cid, slot) => all.filter(y => y.where === cid && !y.eq && y.slot === slot).length < IV_CAP;
+  let best = null;
+  for (const y of all) {
+    if (y.where !== 'v' || y.iid === exceptIid) continue; const sc = ivOutScore(y, null); if (!isFinite(sc)) continue;
+    const c = chars.find(c => !(c.characterId === avoidCid && y.slot === avoidSlot) && (y.slot < 3 || y.cls === 3 || y.cls === c.classType) && room(c.characterId, y.slot));
+    if (c && (!best || sc < best.sc)) best = { y, c: c.characterId, sc };
+  }
+  if (!best) throw Object.assign(new Error('room'), { code: 'room' });
+  await ivXfer(best.y, false, best.c); ivLocalMove(best.y, best.c); made.push({ iid: best.y.iid, from: 'v', to: best.c });
+}
+// personagem cheio naquele tipo: manda o item de menor nota para o cofre
+async function ivCharRoom(cid, slot, exceptIid, made) {
+  const all = invAll(), here = all.filter(y => y.where === cid && !y.eq && y.slot === slot); if (here.length < IV_CAP) return;
+  const ld = ivLdSet(cid), out = here.filter(y => y.iid !== exceptIid).map(y => [y, ivOutScore(y, cid, ld)]).filter(a => isFinite(a[1])).sort((a, b) => a[1] - b[1])[0]?.[0];
+  if (!out) throw Object.assign(new Error('room'), { code: 'room' });
+  await ivVaultRoom(out.iid, cid, slot, made); await ivXfer(out, true, cid); ivLocalMove(out, 'v'); made.push({ iid: out.iid, from: cid, to: 'v' });
+}
+const ivPlace = w => w === 'v' ? (lang === 'pt' ? 'cofre' : 'vault') : (u().classes[profile.characters.data[w]?.classType] || '?');
+function ivMadeT(made) { const l = made.map(m => `${ivNameOf(m.iid)} → ${ivPlace(m.to)}`).join(', '); return lang === 'pt' ? `Para caber: ${l}.` : `To make room: ${l}.`; }
+function ivMsgH() {
+  if (!INV.msg) return ''; const u2 = INV.msg.undo?.length && !INV.busy;
+  return `<p class="iv-msg${INV.msg.bad ? ' bad' : ''}">${esc(INV.msg.t)}${u2 ? ` <button type="button" class="iv-undo" data-ivundo>${lang === 'pt' ? 'Desfazer' : 'Undo'}</button>` : ''}</p>`;
+}
+document.addEventListener('click', async e => {
+  if (!e.target.closest('[data-ivundo]') || INV.busy || !INV.msg?.undo) return;
+  const list = INV.msg.undo.slice().reverse(); INV.busy = true; INV.msg = { t: ivt().going }; ivRefresh(); let bad = 0;
+  for (const m of list) { try { await ivCore(m.iid, m.from, false, []); } catch { bad++; } }
+  INV.busy = false; INV.msg = bad ? { bad: true, t: lang === 'pt' ? `Desfeito em parte: ${bad} não voltou.` : `Partly undone: ${bad} did not go back.` } : { t: lang === 'pt' ? 'Desfeito.' : 'Undone.' }; ivRefresh();
+});
+/* ações em lote sobre o que a busca achou */
+function ivBulkH(list) {
+  if (IVJ) return ivJobH();
+  if (!member || INV.multi || !(INV.q.trim() || INV.f !== 'all') || !list.length) return '';
+  const P = lang === 'pt', n = list.length, W = u(), chars = ivChars(), b = INV.bk || '';
+  const ch = (k, t, on) => `<button type="button" class="lbd-chip${on ? ' on' : ''}" data-ivbk="${k}">${esc(t)}</button>`;
+  let sub = '';
+  if (b.startsWith('mv')) { const to = b.slice(3); sub = `<div class="ivb-sub"><span class="sea-k">${P ? 'Mover para' : 'Move to'}</span>${chars.map((c, i) => ch('mv:' + c.characterId, W.classes[c.classType] + (i === 0 ? (P ? ' (atual)' : ' (current)') : ''), to === c.characterId)).join('')}${ch('mv:v', P ? 'Cofre' : 'Vault', to === 'v')}${to ? `<button type="button" class="lb-run" data-ivgo="mv:${to}">${esc(P ? `Mover ${n} para ${to === 'v' ? 'o cofre' : 'o ' + ivPlace(to)}` : `Move ${n} to ${ivPlace(to)}`)}</button><small>${P ? 'Equipados ficam onde estão. Se faltar espaço, o DPI abre espaço sozinho.' : 'Equipped items stay. If there is no room, DPI makes room.'}</small>` : ''}</div>`; }
+  if (b === 'tag') sub = `<div class="ivb-sub"><span class="sea-k">${P ? 'Etiquetar' : 'Tag'}</span>${TAGS.map(t => `<button type="button" class="tag-b t-${t}" data-ivgo="tag:${t}">${esc(tagl()[t])}</button>`).join('')}<button type="button" class="tag-b" data-ivgo="tag:">${P ? 'Tirar etiqueta' : 'Clear tag'}</button></div>`;
+  return `<div class="ivb"><b>${esc(P ? `Com os ${n} da busca:` : `With the ${n} found:`)}</b>${ch('mv', (P ? 'Mover para' : 'Move to') + ' ▾', b.startsWith('mv'))}${ch('tag', (P ? 'Etiquetar' : 'Tag') + ' ▾', b === 'tag')}<button type="button" class="lbd-chip" data-ivgo="lk:1">🔒 ${P ? 'Trancar' : 'Lock'}</button><button type="button" class="lbd-chip" data-ivgo="lk:0">🔓 ${P ? 'Destrancar' : 'Unlock'}</button>${sub}</div>`;
+}
+function ivJobH() {
+  const J = IVJ, P = lang === 'pt', n = J.ids.length, bad = J.log.filter(l => l.k === 'er').length;
+  const tt = J.act === 'mv' ? (P ? `Movendo ${n} itens para ${J.to === 'v' ? 'o cofre' : 'o ' + ivPlace(J.to)}` : `Moving ${n} items to ${ivPlace(J.to)}`) : J.act === 'lk1' ? (P ? `Trancando ${n} itens` : `Locking ${n} items`) : (P ? `Destrancando ${n} itens` : `Unlocking ${n} items`);
+  const sym = { ok: '✓', mv: '↪', er: '✕' };
+  const end = J.done ? `<p class="ivj-end${bad ? ' part' : ''}">${esc(bad ? (P ? `Terminou em parte: ${J.ok} de ${n} deram certo, ${bad} ficaram de fora (motivo na lista).` : `Partly done: ${J.ok} of ${n} worked, ${bad} left out (reason in the list).`) : J.stop ? (P ? `Parado: ${J.ok} de ${n} feitos.` : `Stopped: ${J.ok} of ${n} done.`) : (P ? `Pronto: ${J.ok} de ${n}.` : `Done: ${J.ok} of ${n}.`))}${J.act === 'mv' ? ` ${esc(P ? 'Nada foi desmontado: a Bungie não deixa o site desmontar.' : 'Nothing was dismantled: Bungie does not allow it from the site.')}` : ''}</p>` : '';
+  return `<section class="ivj${J.done && bad ? ' part' : ''}" aria-live="polite"><div class="ivj-hd"><b>${esc(tt)}</b><small>${J.i} ${P ? 'de' : 'of'} ${n}</small>${J.done ? `<button type="button" class="lbd-btn" data-ivjx>${P ? 'Fechar' : 'Close'}</button>` : `<button type="button" class="lbd-btn" data-ivjstop>${P ? 'Parar' : 'Stop'}</button>`}</div><i class="sea-bar"><u style="width:${n ? J.i / n * 100 : 0}%"></u></i><ul class="ivj-l">${J.log.slice(-40).map(l => `<li class="${l.k}"><i>${sym[l.k]}</i><span>${esc(l.t)}</span></li>`).join('')}</ul>${end}</section>`;
+}
+async function ivJobRun(act, to, ids) {
+  const P = lang === 'pt'; IVJ = { act, to, ids, i: 0, ok: 0, log: [], stop: false, done: false }; INV.busy = true; INV.bk = null; render();
+  const J = IVJ;
+  for (const id of ids) {
+    if (J.stop) break; const x = ivFind(id), nm = ivNameOf(id);
+    try {
+      if (!x) throw Object.assign(new Error('gone'), { code: 'gone' });
+      if (act === 'mv') {
+        if (x.where === to && !x.eq) { J.ok++; J.log.push({ k: 'ok', t: `${nm} · ${P ? 'já estava lá' : 'already there'}` }); }
+        else if (x.eq) J.log.push({ k: 'er', t: `${nm} · ${P ? 'equipado, ficou onde está' : 'equipped, left in place'}` });
+        else { const from = x.where, made = []; await ivCore(id, to, false, made); for (const m of made) J.log.push({ k: 'mv', t: `${P ? 'Para caber' : 'To make room'}: ${ivNameOf(m.iid)} → ${ivPlace(m.to)}` }); J.ok++; J.log.push({ k: 'ok', t: `${nm} · ${P ? 'de' : 'from'} ${ivPlace(from)}` }); }
+      } else { const st = act === 'lk1'; if (x.lk !== st) await ivLock(x, st); J.ok++; J.log.push({ k: 'ok', t: nm }); }
+    } catch (e) { J.log.push({ k: 'er', t: `${nm} · ${ivErr(e)}` }); if (e.code === 1671) { J.stop = true; } }
+    J.i++; if (tab === 'inv' || tab === 'vlt') render();
+  }
+  J.done = true; INV.busy = false; render();
+}
+document.addEventListener('click', e => {
+  if (tab !== 'inv' && tab !== 'vlt') return;
+  const k = e.target.closest('[data-ivbk]'); if (k) { const v = k.dataset.ivbk; INV.bk = v === 'mv' ? (INV.bk?.startsWith('mv') ? null : 'mv') : v.startsWith('mv:') ? (INV.bk === v ? 'mv' : v) : (INV.bk === v ? null : v); render(); return; }
+  if (e.target.closest('[data-ivjstop]') && IVJ) { IVJ.stop = true; return; }
+  if (e.target.closest('[data-ivjx]')) { IVJ = null; render(); return; }
+  const g = e.target.closest('[data-ivgo]'); if (!g || INV.busy) return;
+  const [a, v] = g.dataset.ivgo.split(':'), all = invAll(), list = (tab === 'vlt' ? all.filter(x => x.where === 'v') : all).filter(ivMatch).map(x => x.iid);
+  if (a === 'tag') { const m = LS.get('dc-tags', {}); for (const id of list) { if (v) m[id] = v; else delete m[id]; } LS.set('dc-tags', m); INV.bk = null; INV.msg = { t: lang === 'pt' ? `${list.length} etiquetados.` : `${list.length} tagged.` }; render(); return; }
+  if (a === 'mv') ivJobRun('mv', v, list); else if (a === 'lk') ivJobRun('lk' + v, null, list);
+});
+/* atalhos de teclado (computador) — ? mostra a lista */
+const KBT = () => lang === 'pt' ? [['?', 'Mostrar esta lista'], ['F', 'Buscar no inventário'], ['R', 'Atualizar (no máximo a cada 15 s)'], ['Esc', 'Fechar / limpar a busca'], ['1–5', 'Hoje · Progresso · Arsenal · Guardião · Clã'], [null, 'Com um item aberto'], ['E', 'Equipar no personagem atual'], ['P', 'Puxar para o personagem atual'], ['V', 'Mandar para o cofre'], ['L', 'Trancar / destrancar'], ['C', 'Comparar'], ['⇧1–4', 'Favorito · Manter · Lixo · Infundir']]
+  : [['?', 'Show this list'], ['F', 'Search the inventory'], ['R', 'Refresh (at most every 15 s)'], ['Esc', 'Close / clear search'], ['1–5', 'Today · Progress · Arsenal · Guardian · Clan'], [null, 'With an item open'], ['E', 'Equip on current character'], ['P', 'Pull to current character'], ['V', 'Send to vault'], ['L', 'Lock / unlock'], ['C', 'Compare'], ['⇧1–4', 'Favorite · Keep · Junk · Infuse']];
+function kbOpen() {
+  let d = $('kbdlg'); if (!d) { d = document.createElement('dialog'); d.id = 'kbdlg'; d.className = 'pf kbdlg'; document.body.append(d); d.addEventListener('click', e => { if (e.target === d || e.target.closest('.pf-x')) d.close(); }); }
+  d.innerHTML = `<div class="pf-box kb-box"><button type="button" class="pf-x" aria-label="${esc(u().w.giClose)}">✕</button><h2>${lang === 'pt' ? 'Atalhos de teclado' : 'Keyboard shortcuts'}</h2><dl class="kb-l">${KBT().map(([k, t]) => k ? `<dt><kbd>${esc(k)}</kbd></dt><dd>${esc(t)}</dd>` : `<dt class="kb-s">${esc(t)}</dt>`).join('')}</dl></div>`;
+  if (!d.open) d.showModal();
+}
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey || e.isComposing) return;
+  const el = e.target, typing = el && (el.matches?.('input,textarea,select') || el.isContentEditable);
+  if (typing) { if (e.key === 'Escape' && el.id === 'ivq' && INV.q) { e.preventDefault(); INV.q = ''; render(); } return; }
+  const k = e.key.toLowerCase(), iv = $('ivdlg')?.open && INV.sel ? ivFind(INV.sel) : null;
+  if (e.key === '?') { e.preventDefault(); kbOpen(); return; }
+  if (document.querySelector('dialog[open]:not(#ivdlg)')) return; // outra janela aberta: não mexe
+  if (iv) {
+    const cur = ivChars()[0]?.characterId;
+    if (e.shiftKey && /^Digit[1-4]$/.test(e.code)) { e.preventDefault(); const t = TAGS[+e.code.slice(5) - 1], m = LS.get('dc-tags', {}); if (m[iv.iid] === t) delete m[iv.iid]; else m[iv.iid] = t; LS.set('dc-tags', m); ivRefresh(); if (m[iv.iid] === 'keep') keepLock(iv.iid); return; }
+    if (e.shiftKey) return;
+    if (k === 'e' && cur) { e.preventDefault(); ivDo(iv.iid, cur, true); return; }
+    if (k === 'p' && cur) { e.preventDefault(); if (iv.where !== cur) ivDo(iv.iid, cur, false); return; }
+    if (k === 'v') { e.preventDefault(); if (iv.where !== 'v') ivDo(iv.iid, 'v', false); return; }
+    if (k === 'l') { e.preventDefault(); ivLockUI(iv.iid, !iv.lk); return; }
+    if (k === 'c') { e.preventDefault(); $('ivdlg').querySelector('[data-ivcmp]:not([disabled])')?.click(); return; }
+    return;
+  }
+  if (e.shiftKey) return;
+  if (k === 'f') { e.preventDefault(); const f = () => { const q = $('ivq'); if (q) { q.focus(); q.select(); } }; if (tab === 'inv' || tab === 'vlt') f(); else { go('inv'); setTimeout(f, 450); } return; }
+  if (k === 'r') { e.preventDefault(); if (Date.now() - IVR.lr < 15000) { status(lang === 'pt' ? 'Espere alguns segundos para atualizar de novo.' : 'Wait a few seconds to refresh again.'); return; } IVR.lr = Date.now(); $('refresh')?.click(); return; }
+  if (/^[1-5]$/.test(e.key)) { const g = GROUPS[+e.key - 1]; if (!g?.subs?.length) return; e.preventDefault(); go(groupOf(lastSub[g.id])?.id === g.id ? lastSub[g.id] : g.subs[0], { grp: true }); }
+});
 
 // deslizar para o lado na lista troca de subaba; puxar para baixo no topo atualiza (só toque, só /beta)
 (() => {
