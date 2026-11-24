@@ -368,7 +368,7 @@ async function idbDel(k) { try { const db = await idb(); db.transaction('kv', 'r
 // id: personagens e equipados (cabeçalho e cor da subclasse, sempre primeiro) · q: missões e contratos
 // a: coleções, métricas, marcos e elogios · b: triunfos · c: inventário, instâncias e loadouts · g: encaixes do equipamento (build)
 // 201 também em c: a Bungie só manda instâncias (300) dos itens incluídos na mesma resposta
-const PARTS = { id: '200,205', q: '201,301', a: '100,202,800,1100,1400', b: '900', c: '102,201,205,206,300', g: '205,300,305' };
+const PARTS = { id: '200,205', q: '201,301', a: '100,202,800,1100,1200,1400', b: '900', c: '102,201,205,206,300', g: '205,300,305' };
 // parte de que cada aba depende: ela é pedida logo depois do cabeçalho
 const TAB_PART = Object.fromEntries(SCREENS.filter(x => x.part).map(x => [x.id, x.part]));
 let have = { id: false, q: false, a: false, b: false, c: false, g: false };
@@ -635,7 +635,9 @@ const CAMPAIGN_RE = /^(the edge of fate|renegades|lightfall|the final shape|lega
 
 /* ---------- montagem das seções ---------- */
 // Tira o nome repetido no começo da descrição ("Nome — texto") e variáveis internas do jogo ({var:123}).
-const cleanDesc = x => { const n = x.qd.n || x.q.n || ''; let d = (x.qd.d || '').replace(/\{var:\d+\}/g, '…'); if (n && d.startsWith(n + ' — ')) d = d.slice(n.length + 3); if (x.qd.ql && x.qd.ql !== n) d = x.qd.ql + ' — ' + d; return d.trim(); };
+// {var:123} nas descrições: número da conta (componente 1200: perfil + personagem); sem o número, "…"
+const fillVars = t => String(t || '').replace(/\{var:(\d+)\}/g, (_, h) => { const v = profile?.characterStringVariables?.data?.[charId]?.integerValuesByHash?.[h] ?? profile?.profileStringVariables?.data?.integerValuesByHash?.[h]; return v == null ? '…' : Number(v).toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US'); });
+const cleanDesc = x => { const n = x.qd.n || x.q.n || ''; let d = fillVars(x.qd.d); if (n && d.startsWith(n + ' — ')) d = d.slice(n.length + 3); if (x.qd.ql && x.qd.ql !== n) d = x.qd.ql + ' — ' + d; return d.trim(); };
 const S = (tab, id, title, note, items, extra) => ({ tab, id, title, note, items, ...extra });
 const I = (id, t, d, c, done, extra) => ({ id, t, d, c: c || [], auto: !!done, ...extra });
 function build() {
@@ -736,7 +738,7 @@ function build() {
   const ordered = sealStats.slice().sort((a, b) => (a.se.tier - b.se.tier) || (b.done / b.total - a.done / a.total));
   for (const x of ordered) {
     const items = x.recs.map(r => { const st = recState(r[0]), dn = recDone(st), tl = !dn && st ? objList(st) : null; return I('t-' + r[0], L(r[1]), L(r[2]), [(!dn && progAny(st)) || U.chip[['Fácil', 'Médio', 'Difícil', 'Muito difícil', 'Evento'][x.se.tier - 1]]].filter(Boolean), dn, tl ? { tl } : undefined); });
-    out.push(S('tit', 'seal-' + x.se.cr, L(x.se.t), (x.dead ? (lang === 'pt' ? '⚠ Não dá mais para completar: a Bungie retirou um dos triunfos. ' : '⚠ No longer completable: Bungie retired one of its triumphs. ') : '') + s.tierNote[x.se.tier - 1] + '. ' + L(x.se.ds), items, { coll: true, titleSeal: true, tier: x.se.tier, dead: x.dead }));
+    out.push(S('tit', 'seal-' + x.se.cr, L(x.se.t), (x.dead ? (lang === 'pt' ? '⚠ Não dá mais para completar: a Bungie retirou um dos triunfos. ' : '⚠ No longer completable: Bungie retired one of its triumphs. ') : '') + s.tierNote[x.se.tier - 1] + '. ' + L(x.se.ds), items, { coll: true, titleSeal: true, tier: x.se.tier, dead: x.dead, cr: x.se.cr }));
   }
   // Drops: exóticos
   const cls = ch.classType;
@@ -970,6 +972,9 @@ function jumpTo(t, id) { go(t); requestAnimationFrame(() => { const sec = docume
 // ordem escolhida em Títulos, Incursões, Masmorras e Missões exóticas (guardada por aba)
 const SORT_TABS = ['tit', 'raid', 'dg', 'xm'], TSORT = { v: Object.assign({ tit: LS.get('dc-titsort', 'tier') }, LS.get('dc-sorts', {})) };
 const TIER_N = { 'Fácil': 1, 'Médio': 2, 'Difícil': 3, 'Muito difícil': 4 };
+// progresso oficial do título: o registro de conclusão do selo traz o x/y que o jogo mostra; título ganho = esse registro concluído
+function sealOfficial(cr) { const o = recState(cr)?.objectives?.[0]; return o && o.completionValue ? [Math.min(o.progress, o.completionValue), o.completionValue] : null; }
+function sealEarned(cr) { const st = recState(cr); return !!st && recDone(st); }
 // título que não fecha mais: a Bungie esconde (Invisible, 16) os triunfos retirados; se um deles ficou sem fazer (4), o selo não completa
 function sealDead(se) { return (se.r || []).some(r => { const st = recState(r[0]); return st && (st.state & 16) && (st.state & 4); }); }
 const secTier = sec => sec.tier || (sec.kind && TIER_N[(sec.kind === 'raid' ? defs.raids : defs.dungeons).find(x => x.k === sec.key)?.d]) || 0;
@@ -1581,7 +1586,7 @@ async function loadVendors(my) {
           const ps = (r.itemComponents?.sockets?.data?.[i]?.sockets || []).filter(sk => sk.plugHash && sk.isVisible !== false).map(sk => sk.plugHash).filter(h => pShow(en[h]));
           const kind = h => { const pc = en[h]?.pc || ''; return /intrinsics/.test(pc) ? 'k' : /^(frames|origins)$/.test(pc) ? 'tr' : /masterworks/.test(pc) ? 'mw' : ''; };
           weapons.push({ h: x.itemHash, n: d.n, tl: d.tl, ic: d.ic, dt: e.dt, owned, so: r.itemComponents?.sockets?.data?.[i]?.sockets || null, ex: e.tt === 6, perks: ps.map(h => ({ n: loc[h]?.n || en[h].n, ic: loc[h]?.ic || en[h].ic, k: kind(h) })), cost });
-        } else other.push({ n: d.n, d: (d.d || '').replace(/\{var:\d+\}/g, '…').split('\n')[0], ic: d.ic, cost });
+        } else other.push({ n: d.n, d: fillVars(d.d).split('\n')[0], ic: d.ic, cost });
       }
       // Shaxx e Zavala: as armas ficam na sub-loja de foco (escolher com engrama), sem roll fixo; o resto da loja é emblema e material
       let focus = null; const fv = VENDORS[vi][3];
@@ -1842,7 +1847,8 @@ function update() {
   let full = 0;
   for (const sec of SECTIONS) {
     const el = document.querySelector(`[data-sc="${sec.id}"]`); if (!el) continue;
-    const n = sec.items.filter(isDone).length, t = sec.items.length;
+    let n = sec.items.filter(isDone).length, t = sec.items.length;
+    if (sec.cr) { const o = sealOfficial(sec.cr); if (o) [n, t] = o; } // contagem oficial da Bungie (objetivo do registro do título)
     el.textContent = (t && n === t ? '✓ ' : '') + `${n}/${t}`;
     document.querySelector(`[data-sb="${sec.id}"]`).style.width = (t ? n / t * 100 : 0) + '%';
     const complete = t > 0 && n === t; const secEl = el.closest('section'); secEl.classList.toggle('complete', complete); if (complete && !secEl.classList.contains('keep')) full++;
@@ -1852,7 +1858,7 @@ function update() {
   const secs = SECTIONS.filter(x => x.tab === tab && !x.empty && !x.html && secAvail(x));
   let n, t, label;
   if (tab === 'raid' || tab === 'dg' || tab === 'xm') { t = secs.length; n = secs.filter(x => isDone(x.items[0])).length; label = U[tab](n, t); }
-  else if (tab === 'tit') { t = secs.length; n = secs.filter(x => x.items.every(isDone)).length; label = U.tit(n, t); }
+  else if (tab === 'tit') { t = secs.length; n = secs.filter(x => x.cr ? sealEarned(x.cr) : x.items.every(isDone)).length; label = U.tit(n, t); }
   else if (tab === 'camp') { const cs = secs.filter(x => x.camp); t = cs.length; n = cs.filter(x => x.items.every(isDone)).length; label = U.campDone(n, t); }
   else { const items = secs.flatMap(x => x.items); t = items.length; n = items.filter(isDone).length; label = U.done1(n, t); }
   $('ovcount').textContent = label; $('ovbar').style.width = (t ? n / t * 100 : 0) + '%';
@@ -2190,7 +2196,7 @@ function ldListHTML() {
     const ws = WEAPON_B.map(b => eq.find(i => i.bucketHash === b)).filter(Boolean), xa = eq.find(i => ARMOR_B.includes(i.bucketHash) && B.en[i.itemHash]?.tt === 6);
     const ic = (i, cls = '') => { const x = d(i.itemHash); return `<span class="ldc-i ${cls}${B.en[i.itemHash]?.tt === 6 ? ' ex' : ''}" title="${esc(x.n || '')}">${x.ic ? `<img src="${BNET}${x.ic}" alt="" loading="lazy">` : ''}</span>`; };
     const same = buildSig(C) === buildSig(ownCtx());
-    return `<div class="ldc-w">${wOk() && !same ? `<button type="button" class="ldc-eq" data-ldeq="${l.i}" title="${esc(lang === 'pt' ? 'Equipar este loadout no personagem' : 'Equip this loadout on the character')}">${esc(lang === 'pt' ? 'Equipar' : 'Equip')}</button>` : ''}<button type="button" class="ld ldc" data-ldo="${l.i}" style="--el:${a1}"><div class="ldc-top">${sub ? ic(sub, 'ldc-sub') : ''}<div class="ldc-t"><small><span class="ld-tag game">${esc(lw().inGame)}</span> ${esc(l.name)}${same ? ` · <b>${esc(W.ldEq)}</b>` : ''}</small><h2>${esc(charTitle(u().classes[C.p.characters.data[C.cid].classType] || '', d(sub?.itemHash).n))}</h2></div><span class="chev" aria-hidden="true"></span></div>
+    return `<div class="ldc-w">${BETA && wOk() ? `<span class="ldc-ed"><button type="button" data-lded="${l.i}">${lang === 'pt' ? 'Editar' : 'Edit'}</button></span>` : ''}${wOk() && !same ? `<button type="button" class="ldc-eq" data-ldeq="${l.i}" title="${esc(lang === 'pt' ? 'Equipar este loadout no personagem' : 'Equip this loadout on the character')}">${esc(lang === 'pt' ? 'Equipar' : 'Equip')}</button>` : ''}<button type="button" class="ld ldc" data-ldo="${l.i}" style="--el:${a1}"><div class="ldc-top">${sub ? ic(sub, 'ldc-sub') : ''}<div class="ldc-t"><small><span class="ld-tag game">${esc(lw().inGame)}</span> ${esc(l.name)}${same ? ` · <b>${esc(W.ldEq)}</b>` : ''}</small><h2>${esc(charTitle(u().classes[C.p.characters.data[C.cid].classType] || '', d(sub?.itemHash).n))}</h2></div><span class="chev" aria-hidden="true"></span></div>
       <div class="ldc-g">${ws.map(i => ic(i)).join('')}${xa ? ic(xa) : ''}<span class="ldc-n">${esc([...ws, xa].filter(Boolean).filter(i => B.en[i.itemHash]?.tt === 6).map(i => d(i.itemHash).n).join(' · '))}</span></div></button></div>`;
   }).join('') + '</div>' + site + '</div>';
 }
@@ -4905,12 +4911,12 @@ function qpHTML() {
   const P = lang === 'pt', s = u().s; if (!have.a) return '';
   const pc = x => Math.round(x.frac * 100), ob = x => x.objs.filter(o => (o.completionValue || 0) > 1 || x.objs.length > 1).slice(0, 4);
   const card = (x, tag) => { const n = x.qd.n || x.q.n || '', d = cleanDesc(x), w = questWhere(x), ex = x.it.expirationDate ? Math.max(0, Math.round((Date.parse(x.it.expirationDate) - Date.now()) / 36e5)) : null;
-    return `<article class="qp-c${x.frac >= 1 ? ' ok' : ''}"><div class="qp-h"><span class="qp-tag">${esc(tag)}</span>${focBtn('q:' + x.it.itemHash, ` data-focn="${esc(n)}" data-focd="${esc(d.slice(0, 140))}"`)}</div><b class="qp-t">${esc(n)}</b>${w ? `<span class="qp-w">📍 ${esc(w)}</span>` : ''}${d ? `<p class="qp-d">${esc(d)}</p>` : ''}
+    return `<article class="qp-c${x.frac >= 1 ? ' ok' : ''}"><div class="qp-h"><span class="qp-tag">${esc(tag)}</span>${qtrkBtn(x.it)}${focBtn('q:' + x.it.itemHash, ` data-focn="${esc(n)}" data-focd="${esc(d.slice(0, 140))}"`)}</div><b class="qp-t">${esc(n)}</b>${w ? `<span class="qp-w">📍 ${esc(w)}</span>` : ''}${d ? `<p class="qp-d">${esc(d)}</p>` : ''}
       <div class="qp-p"><i class="sea-bar"><u style="width:${pc(x)}%"></u></i><b>${x.frac >= 1 ? (P ? 'Pronta' : 'Ready') : pc(x) + '%'}</b></div>${ob(x).length ? `<ul class="qp-o">${ob(x).map(o => `<li class="${o.complete ? 'ok' : ''}"><span>${o.complete ? '✓' : ''}</span><small>${fmtN(Math.min(o.progress || 0, o.completionValue || 1))}/${fmtN(o.completionValue || 1)}</small></li>`).join('')}</ul>` : ''}${ex != null && ex < 24 * 14 ? `<small class="qp-x">${esc(s.expires(ex))}</small>` : ''}</article>`; };
   const quests = QI.filter(x => !x.isCamp && !x.isContract && x.objs.length && x.frac > 0 && x.frac < 1).sort((a, b) => b.frac - a.frac);
   const notStarted = QI.filter(x => !x.isCamp && !x.isContract && x.objs.length && x.frac === 0).length;
   const ctr = QI.filter(x => x.isContract).sort((a, b) => b.frac - a.frac);
-  const recOK = have.b, near = !recOK ? [] : defs.seals.map(se => { const recs = se.r.filter(r => { const st = recState(r[0]); return !st || !(st.state & 16); }); const done = recs.filter(r => recDone(recState(r[0]))).length; return { se, done, total: recs.length }; }).filter(x => x.total && x.done < x.total && x.done / x.total >= 0.5 && x.se.tier < 5).sort((a, b) => b.done / b.total - a.done / a.total).slice(0, 6);
+  const recOK = have.b, near = !recOK ? [] : defs.seals.filter(se => !sealDead(se)).map(se => { const recs = se.r.filter(r => { const st = recState(r[0]); return !st || !(st.state & 16); }); const done = recs.filter(r => recDone(recState(r[0]))).length; return { se, done, total: recs.length }; }).filter(x => x.total && x.done < x.total && x.done / x.total >= 0.5 && x.se.tier < 5).sort((a, b) => b.done / b.total - a.done / a.total).slice(0, 6);
   const cats = !recOK ? [] : defs.cats.map(c => ({ c, r: recState(c.h) })).filter(x => x.r && !(x.r.state & 16) && !recDone(x.r) && pct(x.r) >= 0.3).sort((a, b) => pct(b.r) - pct(a.r)).slice(0, 6);
   const box = (t, note, body, n) => `<div class="qp-b"><div class="qp-bh"><h3>${esc(t)}</h3>${n != null ? `<span class="count">${n}</span>` : ''}</div>${note ? `<p class="lbd-n">${esc(note)}</p>` : ''}${body}</div>`;
   const grid = l => l.length ? `<div class="qp-g">${l.join('')}</div>` : '';
@@ -6392,6 +6398,65 @@ function nearTitleHTML() {
   const miss = best.items.filter(i => !isDone(i)).slice(0, 3);
   return `<section class="nt-a"><div class="vs-h"><b>🏅 ${P ? 'Título mais perto' : 'Closest title'}: ${esc(best.title)}</b><button type="button" class="linkb" data-jump="tit:${esc(best.id)}">${P ? 'Ver' : 'See'} →</button></div><small>${P ? `Faltam ${n} de ${best.items.length}` : `${n} of ${best.items.length} left`}</small><ul>${miss.map(i => `<li>${esc(i.t)}</li>`).join('')}</ul></section>`;
 }
+
+
+// /beta Desafios: seguir a missão no jogo (estado "seguida" = bit 2 do item). A Bungie demora: confere até 4 vezes, a cada 2,5 s
+var QTRK = { busy: '', msg: null };
+function qtrkBtn(it) {
+  if (!BETA || !QTRK || !it?.itemInstanceId || !wOk()) return ''; const P = lang === 'pt', on = !!(it.state & 2), b = QTRK.busy === it.itemInstanceId;
+  return `<button type="button" class="qp-trk${on ? ' on' : ''}" data-qtrk="${it.itemInstanceId}" aria-pressed="${on}"${b ? ' disabled' : ''}>${b ? (P ? 'Conferindo…' : 'Checking…') : on ? (P ? '📍 Seguindo' : '📍 Tracked') : (P ? '📍 Seguir no jogo' : '📍 Track in game')}</button>${QTRK.msg?.id === it.itemInstanceId ? `<small class="qp-trkm${QTRK.msg.bad ? ' bad' : ''}">${esc(QTRK.msg.t)}</small>` : ''}`;
+}
+document.addEventListener('click', async e => {
+  const b = e.target.closest?.('[data-qtrk]'); if (!b || QTRK.busy) return; e.stopPropagation();
+  const id = b.dataset.qtrk, x = QI.find(q => q.it.itemInstanceId === id); if (!x) return; const P = lang === 'pt', want = !(x.it.state & 2);
+  QTRK.busy = id; QTRK.msg = null; render();
+  try {
+    await wPost('/Destiny2/Actions/Items/SetTrackedState/', { state: want, itemId: id, characterId: charId });
+    let ok = false;
+    for (let t = 0; t < 4 && !ok; t++) { if (t) await new Promise(r => setTimeout(r, 2500)); const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/Item/${id}/?components=307`).catch(() => null); const st = r?.item?.data?.state; if (st != null) { x.it.state = st; ok = !!(st & 2) === want; } }
+    QTRK.msg = { id, t: ok ? (want ? (P ? 'Seguindo no jogo.' : 'Tracked in game.') : (P ? 'Não está mais sendo seguida.' : 'No longer tracked.')) : (P ? 'Enviado; o jogo ainda não confirmou. Confira no jogo.' : 'Sent; the game has not confirmed yet. Check in game.'), bad: !ok };
+    if (!ok) { if (want) x.it.state |= 2; else x.it.state &= ~2; }
+  } catch (err) { QTRK.msg = { id, t: (P ? 'Não deu certo: ' : 'Failed: ') + (err?.message || ''), bad: true }; }
+  QTRK.busy = ''; render();
+}, true);
+
+
+// /beta Loadouts: trocar nome, cor e ícone de um loadout do jogo, ou limpar. A Bungie só aceita os da lista do jogo; confere até 4 vezes (2,5 s)
+var LDE = null;
+function ldeDraw() {
+  const d = $('ldedlg'); if (!d || !LDE) return; const P = lang === 'pt', D = LDC.d, K = LDE;
+  const body = !D ? `<p class="wait">…</p>` : `<label class="wid-n"><span>${P ? 'Nome' : 'Name'}</span><select id="ldenm">${D.n.map(([h, n]) => `<option value="${h}"${h === K.n ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select></label>
+    <span class="wr-k">${P ? 'Cor' : 'Color'}</span><div class="wid-g c">${D.c.map(([h, p]) => `<button type="button" class="wid${h === K.c ? ' on' : ''}" data-ldec="${h}">${p ? `<img src="${BNET}${p}" alt="">` : ''}</button>`).join('')}</div>
+    <span class="wr-k">${P ? 'Ícone' : 'Icon'}</span><div class="wid-g">${D.i.map(([h, p]) => `<button type="button" class="wid${h === K.i ? ' on' : ''}" data-ldei="${h}">${p ? `<img src="${BNET}${p}" alt="">` : ''}</button>`).join('')}</div>`;
+  d.innerHTML = `<div class="pf-box wr-box"><button type="button" class="pf-x" data-ldex aria-label="${P ? 'Fechar' : 'Close'}">✕</button><header class="wr-hd"><small>${P ? 'Loadout do jogo' : 'In-game loadout'} · beta</small><h1>${P ? 'Loadout' : 'Loadout'} ${K.i + 1}</h1></header>${body}
+    <div class="lde-act"><button type="button" class="lb-run" data-ldesave${K.busy ? ' disabled' : ''}>${P ? 'Salvar nome, cor e ícone' : 'Save name, color and icon'}</button>${K.ask ? `<span class="lde-q">${P ? 'Apagar os itens deste loadout no jogo? Não dá para desfazer.' : 'Erase the items of this loadout in game? This cannot be undone.'} <button type="button" class="lbd-btn bad" data-ldeclr="1"${K.busy ? ' disabled' : ''}>${P ? 'Sim, limpar' : 'Yes, clear'}</button> <button type="button" class="lbd-btn" data-ldeno>${P ? 'Cancelar' : 'Cancel'}</button></span>` : `<button type="button" class="lbd-btn" data-ldeclr${K.busy ? ' disabled' : ''}>${P ? 'Limpar loadout' : 'Clear loadout'}</button>`}</div>
+    ${K.msg ? `<p class="lde-m${K.msg.bad ? ' bad' : ''}" role="status">${esc(K.msg.t)}</p>` : ''}<small class="lbd-n">${P ? 'A Bungie só aceita nomes, cores e ícones da lista do jogo.' : 'Bungie only accepts names, colors and icons from the game list.'}</small></div>`;
+}
+async function ldeRun(kind) {
+  const P = lang === 'pt', K = LDE, cid = charId; K.busy = true; K.msg = { t: P ? 'Enviando…' : 'Sending…' }; ldeDraw();
+  try {
+    if (kind === 'id') await wPost('/Destiny2/Actions/Loadouts/UpdateLoadoutIdentifiers/', { loadoutIndex: K.i, characterId: cid, colorHash: K.c, iconHash: K.ic, nameHash: K.n });
+    else await wPost('/Destiny2/Actions/Loadouts/ClearLoadout/', { loadoutIndex: K.i, characterId: cid });
+    let ok = false;
+    for (let t = 0; t < 4 && !ok; t++) { if (t) await new Promise(r => setTimeout(r, 2500)); const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=206`).catch(() => null); const L = r?.characterLoadouts?.data?.[cid]?.loadouts?.[K.i]; if (!L) continue;
+      ok = kind === 'id' ? L.nameHash === K.n && L.colorHash === K.c && L.iconHash === K.ic : !(L.items || []).some(x => x.itemInstanceId && x.itemInstanceId !== '0');
+      if (ok && profile.characterLoadouts?.data?.[cid]) profile.characterLoadouts.data[cid].loadouts[K.i] = L; }
+    K.msg = ok ? { t: kind === 'id' ? (P ? 'Pronto: nome, cor e ícone trocados no jogo.' : 'Done: name, color and icon changed in game.') : (P ? 'Pronto: loadout limpo no jogo.' : 'Done: loadout cleared in game.') } : { t: P ? 'Enviado; o jogo ainda não confirmou. Confira no jogo.' : 'Sent; the game has not confirmed yet. Check in game.', bad: true };
+    if (ok) loadLoadouts(gen, true);
+  } catch (e) { K.msg = { t: (P ? 'Não deu certo: ' : 'Failed: ') + wMsg(e), bad: true }; }
+  K.busy = false; K.ask = false; ldeDraw();
+}
+document.addEventListener('click', e => {
+  const t = e.target; if (!t.closest) return;
+  const o = t.closest('[data-lded]'); if (o) { e.stopPropagation(); const i = +o.dataset.lded, L = profile?.characterLoadouts?.data?.[charId]?.loadouts?.[i] || {}; LDE = { i, n: L.nameHash, c: L.colorHash, ic: L.iconHash }; let d = $('ldedlg'); if (!d) { d = document.createElement('dialog'); d.id = 'ldedlg'; d.className = 'pf-dlg wr-dlg'; document.body.append(d); } ldeDraw(); d.showModal(); ldcLoad()?.then(() => ldeDraw()); return; }
+  if (!t.closest('#ldedlg') || !LDE) return;
+  if (t.closest('[data-ldex]')) { $('ldedlg').close(); return; }
+  const c = t.closest('[data-ldec]'); if (c) { LDE.c = +c.dataset.ldec; ldeDraw(); return; }
+  const ii = t.closest('[data-ldei]'); if (ii) { LDE.ic = +ii.dataset.ldei; ldeDraw(); return; }
+  if (t.closest('[data-ldesave]')) { const s = $('ldenm'); if (s) LDE.n = +s.value; ldeRun('id'); return; }
+  if (t.closest('[data-ldeno]')) { LDE.ask = false; ldeDraw(); return; }
+  const cl = t.closest('[data-ldeclr]'); if (cl) { if (cl.dataset.ldeclr === '1') ldeRun('clear'); else { LDE.ask = true; ldeDraw(); } }
+}, true);
 
 // deslizar para o lado na lista troca de subaba; puxar para baixo no topo atualiza (só toque, só /beta)
 (() => {
