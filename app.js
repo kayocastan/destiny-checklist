@@ -5880,7 +5880,7 @@ async function rlLoad() {
     }
     RL.m = c.m; RL.at = c.at;
     // vantagens encaixadas de todas as armas (o perfil comum só traz as dos itens equipados)
-    if (member) { const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=102,201,304,305`).catch(() => null); RL.so = Object.assign(RL.so || {}, r?.itemComponents?.sockets?.data || {}); APC.clear(); RL.sts = r?.itemComponents?.stats?.data || {}; }
+    if (member) { const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=102,201,304,305`).catch(() => null); RL.so = Object.assign(RL.so || {}, r?.itemComponents?.sockets?.data || {}); APC.clear(); RL.sts = r?.itemComponents?.stats?.data || {}; if (tab === 'ld') render(); }
     RL.st = 'ok';
   } catch (e) { console.warn('rolls', e); RL.st = 'err'; }
   if (tab === 'inv' || tab === 'vlt' || tab === 'novo' || $('ivdlg')?.open || $('lcdlg')?.open) { render(); if ($('ivdlg')?.open) ivDraw(); if ($('lcdlg')?.open) lcDraw(); }
@@ -6799,7 +6799,7 @@ function ldaInst() { const m = {}; const add = l => { for (const it of l || []) 
 function ldaGame(i) { const l = profile?.characterLoadouts?.data?.[charId]?.loadouts?.[i]; if (!l) return null; const all = ldaInst(); return ldaRun('g' + charId + ':' + i, (l.items || []).filter(x => x.itemInstanceId && x.itemInstanceId !== '0').map(x => ({ iid: x.itemInstanceId, h: all[x.itemInstanceId]?.itemHash || 0, plugs: (x.plugItemHashes || []).filter(h => h && h !== 2166136261), gone: !all[x.itemInstanceId] })), profile.characters?.data?.[charId]?.classType); }
 function ldaSaved(x) { const cid = x.cid, eq = x.p?.characterEquipment?.data?.[cid]?.items || [], so = x.p?.itemComponents?.sockets?.data || {}, all = ldaInst(); return ldaRun('s' + x.k, eq.filter(i => i.itemInstanceId).map(i => ({ iid: i.itemInstanceId, h: i.itemHash, plugs: (so[i.itemInstanceId]?.sockets || []).map(s => s.plugHash).filter(Boolean), gone: !all[i.itemInstanceId] && i.bucketHash !== ARTIFACT_BUCKET })), x.p?.characters?.data?.[cid]?.classType ?? profile?.characters?.data?.[cid]?.classType); }
 function ldaRun(key, kit, cls) {
-  const A = lda(), sig = key + '|' + lang + '|' + JSON.stringify(kit.map(k => [k.iid, k.gone ? 1 : 0, k.plugs.length])); if (A.m[sig]) return A.m[sig];
+  if (!RL.st) setTimeout(rlLoad); const A = lda(), sig = key + '|' + lang + '|' + (RL.sts ? 1 : 0) + '|' + JSON.stringify(kit.map(k => [k.iid, k.gone ? 1 : 0, k.plugs.length])); if (A.m[sig]) return A.m[sig];
   if (!A.busy.has(sig)) { A.busy.add(sig); ldaCheck(kit, cls).then(r => { A.m[sig] = r; }).catch(() => { A.m[sig] = []; }).finally(() => { A.busy.delete(sig); clearTimeout(ldaRun.t); ldaRun.t = setTimeout(() => { if (tab === 'ld') render(); }, 150); }); }
   return null;
 }
@@ -6828,7 +6828,20 @@ async function ldaCheck(kit, cls) {
     const mods = k.plugs.filter(h => /^enhancements\./.test(en[h]?.pc || '')); if (!mods.length) continue;
     const miss = mods.filter(h => !(h in PDESC.m)); if (miss.length) await pdescLoad(miss, 12);
     if (mods.some(h => !(h in PDESC.m))) continue; const used = mods.reduce((t, h) => t + (PDESC.m[h].e || 0), 0);
+    const art = mods.filter(h => /season|artifact/i.test(en[h]?.pc || ''));
+    if (art.length) out.push(['warn', P ? `Mod do artefato: ${art.map(nm).join(', ')} em ${nm(k.h)} só vale nesta temporada; quando ela acabar, sai sozinho.` : `Artifact mod: ${art.map(nm).join(', ')} on ${nm(k.h)} only works this season.`]);
     if (used > E) out.push(['warn', P ? `Mods que não cabem: ${nm(k.h)} tem ${E} de energia e os mods pedem ${used}. O DPI aplica o resto e avisa “parcial”.` : `Mods don't fit: ${nm(k.h)} has ${E} energy, mods need ${used}.`]);
+  }
+  // armadura melhor disponível: mesma peça/classe (exótico: o mesmo exótico), todos os atributos iguais ou maiores e total maior
+  const sts = RL.sts; if (sts) {
+    const all = invAll(), sv = iid => { const o = sts[iid]?.stats || {}; const r = {}; for (const [h, v] of Object.entries(o)) r[h] = v.value || 0; return r; }, tot = o => Object.values(o).reduce((a, b) => a + b, 0), ups = [];
+    for (const k of here) {
+      const x = all.find(y => y.iid === k.iid); if (!x || x.slot < 3) continue; const a = sv(x.iid), ta = tot(a); if (!ta) continue;
+      let best = null;
+      for (const y of all) { if (y.iid === x.iid || y.slot !== x.slot || (y.cls !== x.cls && y.cls !== 3) || (x.ex ? y.h !== x.h : y.ex)) continue; const b2 = sv(y.iid), tb = tot(b2); if (tb <= ta) continue; if (Object.keys(a).some(h => (b2[h] || 0) < a[h])) continue; if (!best || tb > best.t) best = { y, t: tb }; }
+      if (best) ups.push(P ? `${nm(k.h)} → ${INVD[best.y.h]?.n || 'outra peça'} (+${best.t - ta} no total, nenhum atributo menor, ${best.y.where === 'v' ? 'no cofre' : 'no personagem'})` : `${nm(k.h)} → ${INVD[best.y.h]?.n || 'another piece'} (+${best.t - ta} total, no stat lower)`);
+    }
+    if (ups.length) out.push(['up', (P ? 'Armadura melhor disponível: ' : 'Better armor available: ') + ups.join(' · ') + (P ? '. Confira o bônus de conjunto antes de trocar.' : '. Check set bonuses before swapping.')]);
   }
   return out;
 }
