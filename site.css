@@ -2591,3 +2591,24 @@ html[data-vt="open"]::view-transition-old(root),html[data-vt="open"]::view-trans
 .pat-p{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center}.pat-p b{font:700 14px var(--mono)}.pat-r.ok .pat-p b{color:#7fe08f}
 @media (max-width:640px){.pat-r{grid-template-columns:44px minmax(0,1fr)}.pat-p{grid-column:2}.pat-l{grid-template-columns:1fr}}
 .panel>.pat{grid-column:1/-1}
+/* Relatórios: um cartão por jogador (armas, abates por tipo) e quem mais joga com você */
+.rep-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.rep-c{display:grid;gap:10px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.rep-c.me{border-color:color-mix(in srgb,var(--acc) 55%,var(--line))}.rep-c.left{opacity:.7}
+.rep-c .rep-p{display:flex;gap:10px;align-items:center;text-align:left;background:none;border:0;padding:0;color:var(--fg);font:inherit;cursor:pointer}
+.rep-c .rep-p small{display:block;color:var(--muted);font-size:12.5px}.rep-you{margin-left:auto;font:600 11.5px var(--mono);font-style:normal;color:var(--acc)}
+.rep-st{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;text-align:center}.rep-st span{display:grid;padding:6px 2px;border-radius:9px;background:var(--chip)}.rep-st b{font:700 20px var(--display);font-variant-numeric:tabular-nums}.rep-st small{font-size:11.5px;color:var(--muted)}
+.rep-l{display:block;font:600 11px var(--mono);letter-spacing:.08em;color:var(--muted)}
+.rep-ws{display:grid;gap:6px}.rep-wr{display:grid;grid-template-columns:28px minmax(0,1fr) 90px 40px;gap:8px;align-items:center}.rep-wr img{width:28px;height:28px;border-radius:4px}
+.rep-wn{display:grid;min-width:0}.rep-wn b{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rep-wn small{font-size:11.5px;color:var(--muted)}
+.rep-bar{display:block;height:7px;border-radius:4px;background:var(--chip);overflow:hidden}.rep-bar u{display:block;height:100%;background:var(--acc)}.rep-wk{text-align:right;font:600 13px var(--mono)}
+.rep-ty{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.rep-ty .rep-l{width:100%}.rep-ty span{font-size:12.5px;padding:3px 9px;border-radius:999px;background:var(--chip)}
+.rep-bl{justify-self:start}
+.rep-mates{display:grid;gap:6px;margin-top:12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.rep-mt{display:flex;justify-content:space-between;gap:10px;background:none;border:0;border-bottom:1px solid var(--line);padding:6px 0;color:var(--fg);font:inherit;cursor:pointer;text-align:left}.rep-mt small{color:var(--muted)}
+.ctot{grid-column:1/-1;display:grid;gap:12px;padding:16px 18px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.ctot-hd{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px}.ctot-hd h2{margin:0;font:700 22px var(--display)}.ctot-hd small{color:var(--muted)}
+.ctot-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.ctot-t{display:grid;gap:2px;padding:12px 14px;border:1px solid var(--line);border-top:3px solid var(--c);border-radius:12px;background:var(--bg)}.ctot-t small{color:var(--muted);font-size:12.5px}.ctot-t b{font:700 28px/1.05 var(--display);font-variant-numeric:tabular-nums}
+.ctot-tb{overflow-x:auto}.ctot-tb table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}.ctot-tb th,.ctot-tb td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}.ctot-tb thead th{color:var(--muted);font-weight:500}.ctot-tb .l{text-align:left}
+.ctot-r{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}.ctot-r span{display:grid;padding:10px 12px;border-radius:10px;background:var(--chip)}.ctot-r small{color:var(--muted);font-size:12.5px}.ctot-r b{font:700 20px var(--display)}
