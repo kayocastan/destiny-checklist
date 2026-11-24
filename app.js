@@ -1578,7 +1578,7 @@ async function loadVendors(my) {
         if (e.it === 3) {
           const ps = (r.itemComponents?.sockets?.data?.[i]?.sockets || []).filter(sk => sk.plugHash && sk.isVisible !== false).map(sk => sk.plugHash).filter(h => pShow(en[h]));
           const kind = h => { const pc = en[h]?.pc || ''; return /intrinsics/.test(pc) ? 'k' : /^(frames|origins)$/.test(pc) ? 'tr' : /masterworks/.test(pc) ? 'mw' : ''; };
-          weapons.push({ h: x.itemHash, n: d.n, tl: d.tl, ic: d.ic, dt: e.dt, owned, perks: ps.map(h => ({ n: loc[h]?.n || en[h].n, ic: loc[h]?.ic || en[h].ic, k: kind(h) })), cost });
+          weapons.push({ h: x.itemHash, n: d.n, tl: d.tl, ic: d.ic, dt: e.dt, owned, so: r.itemComponents?.sockets?.data?.[i]?.sockets || null, ex: e.tt === 6, perks: ps.map(h => ({ n: loc[h]?.n || en[h].n, ic: loc[h]?.ic || en[h].ic, k: kind(h) })), cost });
         } else other.push({ n: d.n, d: (d.d || '').replace(/\{var:\d+\}/g, '…').split('\n')[0], ic: d.ic, cost });
       }
       // Shaxx e Zavala: as armas ficam na sub-loja de foco (escolher com engrama), sem roll fixo; o resto da loja é emblema e material
@@ -1589,7 +1589,7 @@ async function loadVendors(my) {
     } catch { out[vi] = { opt: VENDORS[vi][2], name: vname, failed: true }; }
   }));
   vendLoading = false; if (cid !== charId) return;
-  VEND = out.filter(Boolean); if (tab === 'vend') render();
+  VEND = out.filter(Boolean); if (tab === 'vend' || (tab === 'obj' && NAV2())) render();
 }
 const COLL = {};
 const EL_COLOR = { 1: '#d5dbe6', 2: 'var(--arc)', 3: 'var(--solar)', 4: '#b48cff', 6: '#6fa8ff', 7: 'var(--done)' };
@@ -1792,7 +1792,7 @@ function renderInner() {
   if (tab === 'obj' && have.a && member && LIVE.checked && !LIVE.on) loadSession();
   if ((tab === 'raid' || tab === 'dg' || tab === 'xm') && have.a && member) loadActHist();
   if (tab === 'xm') loadXmRec();
-  $('list').innerHTML = `<div class="panel">${tab === 'obj' ? pinsHTML() + newsHTML() + todoHTML() : ''}${tab === 'prog' ? chalHTML() + (BETA || FX ? qpHTML() : '') : ''}${tab === 'cal' ? calHTML() : ''}${tab === 'obj' ? sessHTML() : ''}${wkBar}${tsBar}${!secs.length && SCR[tab]?.ov ? `<p class="empty-msg">${lang === 'pt' ? 'Nada para mostrar aqui ainda. Os dados da Bungie desta parte não vieram ou ainda estão carregando; toque em Atualizar.' : 'Nothing to show here yet. Bungie did not send this part or it is still loading; tap Refresh.'}</p>` : ''}${secs.map(sec => {
+  $('list').innerHTML = `<div class="panel">${tab === 'obj' ? pinsHTML() + vendSHTML() + nearTitleHTML() + newsHTML() + todoHTML() : ''}${tab === 'prog' ? chalHTML() + (BETA || FX ? qpHTML() : '') : ''}${tab === 'cal' ? calHTML() : ''}${tab === 'obj' ? sessHTML() : ''}${wkBar}${tsBar}${!secs.length && SCR[tab]?.ov ? `<p class="empty-msg">${lang === 'pt' ? 'Nada para mostrar aqui ainda. Os dados da Bungie desta parte não vieram ou ainda estão carregando; toque em Atualizar.' : 'Nothing to show here yet. Bungie did not send this part or it is still loading; tap Refresh.'}</p>` : ''}${secs.map(sec => {
     if (sec.html) return sec.id === 'vendors' ? vendorsHTML() : sec.id === 'goals' ? goalsHTML() : sec.id === 'post' ? postHTML() : sec.id === 'wishobj' ? wishObjHTML() : sec.id === 'focus' ? focusHTML() : sec.id === 'grank' ? grObjHTML() : '';
     if (FX && sec.id === 'week' && sec.items.length) return weekHTML(sec);
     if (sec.empty) return `<p class="empty-msg${/…$/.test(sec.note || '') ? ' wait' : ''}">${esc(sec.note)}</p>`;
@@ -6120,7 +6120,7 @@ const APG = (m, n) => !m ? 'C' : n - m === 0 ? 'S' : n - m === 1 ? 'A' : n - m =
 function apEval(x) {
   const ck = x.iid + '|' + RL.mode; if (APC.has(ck)) return APC.get(ck);
   let out, partial = false;
-  const so = RL.so?.[x.iid]?.sockets || profile?.itemComponents?.sockets?.data?.[x.iid]?.sockets, L0 = rlFor(x.h) || (so ? famFor(x.h, so) : null);
+  const so = x.so || RL.so?.[x.iid]?.sockets || profile?.itemComponents?.sockets?.data?.[x.iid]?.sockets, L0 = rlFor(x.h) || (so ? famFor(x.h, so) : null);
   if (x.ex) out = { why: 'ex' }; else if (!L0) out = { why: 'nol' }; else if (!so) out = { why: 'nos' };
   else {
     const L = L0.filter(e => RL.mode === 'both' || !e[1] || e[1] === (RL.mode === 'pve' ? 'e' : 'v'));
@@ -6369,6 +6369,26 @@ document.addEventListener('click', e => {
   const tg = t.closest('[data-pintog]'); if (tg) { const id = tg.dataset.pintog, l = LS.get('dc-pins', []); LS.set('dc-pins', l.includes(id) ? l.filter(x => x !== id) : [...l, id].slice(0, 8)); render(); return; }
   const go2 = t.closest('[data-pingo]'); if (go2) { go(go2.dataset.pingo); }
 });
+
+// /beta Hoje: arma com roll S à venda nos vendedores (nota pelo Avaliar rolls) e o título mais perto de fechar
+function vendSHTML() {
+  if (!NAV2() || !HELP || !have.a || !member) return '';
+  if (!VEND) { if (!vendLoading) setTimeout(() => { if (!VEND && !vendLoading) loadVendors(gen); }, 1500); return ''; }
+  if (!RL.m) { if (!RL.st) rlLoad().then(() => { if (tab === 'obj') render(); }); return ''; }
+  const P = lang === 'pt', hits = [];
+  VEND.forEach((v, vi) => (v.weapons || []).forEach((w, wi) => { if (!w.so || w.ex) return; const r = apEval({ iid: `vend:${vi}:${wi}:${w.h}`, h: w.h, ex: w.ex, so: w.so }); if (r?.g === 'S') hits.push({ v, w }); }));
+  if (!hits.length) return '';
+  return `<section class="vs-a" aria-label="${P ? 'Roll S à venda' : 'S roll for sale'}"><div class="vs-h"><b>🎯 ${P ? (hits.length > 1 ? `${hits.length} armas com roll S à venda` : 'Arma com roll S à venda') : (hits.length > 1 ? `${hits.length} S-roll weapons for sale` : 'S-roll weapon for sale')}</b><button type="button" class="linkb" data-pingo="vend">${P ? 'Ver vendedores' : 'See vendors'} →</button></div>${hits.slice(0, 4).map(({ v, w }) => `<div class="vs-i">${w.ic ? `<img src="${BNET}${w.ic}" alt="" loading="lazy">` : ''}<span><b>${esc(w.n)}</b><small>${esc(v.name)}${w.cost ? ' · ' + esc(w.cost) : ''}</small><small class="vs-p">${esc(w.perks.filter(p => !p.k).map(p => p.n).slice(0, 4).join(' · '))}</small></span><em>S</em></div>`).join('')}</section>`;
+}
+function nearTitleHTML() {
+  if (!NAV2() || !HELP || !member) return '';
+  const P = lang === 'pt', ts = SECTIONS.filter(x => x.tab === 'tit' && secAvail(x) && x.items.length && !x.items.every(isDone));
+  if (!ts.length) return '';
+  const left = x => x.items.filter(i => !isDone(i)).length, best = ts.slice().sort((a, b) => left(a) - left(b) || secTier(a) - secTier(b) || secPct(b) - secPct(a))[0], n = left(best);
+  const miss = best.items.filter(i => !isDone(i)).slice(0, 3);
+  return `<section class="nt-a"><div class="vs-h"><b>🏅 ${P ? 'Título mais perto' : 'Closest title'}: ${esc(best.title)}</b><button type="button" class="linkb" data-jump="tit:${esc(best.id)}">${P ? 'Ver' : 'See'} →</button></div><small>${P ? `Faltam ${n} de ${best.items.length}` : `${n} of ${best.items.length} left`}</small><ul>${miss.map(i => `<li>${esc(i.t)}</li>`).join('')}</ul></section>`;
+}
+
 // deslizar para o lado na lista troca de subaba; puxar para baixo no topo atualiza (só toque, só /beta)
 (() => {
   if (!NAV2() || !matchMedia('(pointer: coarse)').matches) return;
