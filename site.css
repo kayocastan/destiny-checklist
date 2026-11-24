@@ -889,7 +889,7 @@ table.cmpg th:not(:first-child),table.cmpg td:not(:first-child){text-align:right
 .lv-g{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap}
 .lv-g .chip{display:inline-flex;align-items:center;height:24px;box-sizing:border-box;line-height:1;text-decoration:none}
 /* build pública aberta por link: sem a busca por cima */
-#finddlg.pubview .fd-t,#finddlg.pubview .fd-q,#finddlg.pubview .fd-back{display:none}
+#finddlg.pubview .fd-t,#finddlg.pubview .fd-q,#finddlg.pubview .fd-back,#finddlg.ownview .fd-t,#finddlg.ownview .fd-q,#finddlg.ownview .fd-back{display:none}
 /* menu Compartilhar */
 .shr{position:relative;display:inline-flex}
 .shr-b{position:relative}

@@ -228,7 +228,7 @@ R.push(run('celular: atalhos no Hoje, Como usar, deslizar entre subabas', { path
   await sw(320, 60); await p.waitForTimeout(800); if (await url(p) !== '/desafios') fail.push('deslizar para a esquerda não foi para Desafios: ' + await url(p));
   await sw(60, 320); await p.waitForTimeout(800); if (await url(p) !== '/hoje') fail.push('deslizar para a direita não voltou: ' + await url(p));
 } }));
-R.push(run('/beta Padrões: lista e filtros', { path: '/beta/padroes', owner: true, clicks: false, ls: { 'dc-ownchk': { o: true, t: Date.now() }, 'dc-lang': 'pt' }, steps: async (p, fail) => {
+R.push(run('Padrões: lista e filtros', { path: '/padroes', clicks: false, ls: { 'dc-lang': 'pt' }, steps: async (p, fail) => {
   await p.waitForSelector('.pat-r', { timeout: 10000 }).catch(() => fail.push('lista de padrões não apareceu')); if (fail.length) return;
   const n = await p.$$eval('.pat-r', l => l.length); if (n !== 2) fail.push('esperava 2 padrões, veio ' + n);
   await p.fill('[data-patq]', 'outra'); await p.waitForTimeout(600); const m = await p.$$eval('.pat-r', l => l.length); if (m !== 1) fail.push('busca não filtrou: ' + m);
