@@ -1,0 +1,88 @@
+[
+{"f":"00-comecando","no":"0/6","a":"#6fd3ff","url":"","k":"Tutorial · Começando","t":"Primeiros passos no DPI","s":"O DPI lê a sua conta pela API oficial da Bungie e junta tudo do Destiny 2 num lugar só.",
+ "secs":[
+  {"h":"Entrar","i":"uma vez","num":1,"it":[
+   ["1","Toque em <span class='ui p'>Entrar com a Bungie</span> e autorize o DPI na página da Bungie."],
+   ["2","Escolha o <b>personagem</b> no topo (Titã, Caçador, Arcano). Tudo no site acompanha a troca."],
+   ["3","Pelo celular, instale como app: no menu <span class='ui'>☰</span>, toque em <b>Instalar</b> (no iPhone: Compartilhar › Adicionar à Tela de Início)."]]},
+  {"h":"Navegar","i":"5 abas + Grade","it":[
+   ["<b>Hoje</b> (o que fazer agora) · <b>Progresso</b> (atividades e títulos) · <b>Arsenal</b> (armas e cofre) · <b>Guardião</b> (builds e números) · <b>Clã</b>."],
+   ["<span class='ui v'>📅 Grade</span> no topo: marcar e entrar em grades do clã com o Orla Bot."],
+   ["<span class='ui'>🔍 Buscar</span> ou <b>Ctrl+K</b>: acha abas, atividades, títulos, exóticos, itens do inventário e membros do clã."]]},
+  {"h":"Avisos e preferências","c":"#7fe08f","it":[
+   ["<b>Avisos no celular:</b> ative na Agenda (30 min antes da sua grade) e no card do Xûr (exótico que você não tem)."],
+   ["No menu <span class='ui'>☰</span>: idioma PT/EN, tema claro ou escuro, tamanho da letra e <b>Novidades e sugestões</b>."]]}],
+ "tip":"<b>Seguro:</b> o DPI só muda algo na sua conta (equipar, trancar, trocar perks) quando você toca no botão e confirma."},
+
+{"f":"01-hoje","no":"1/6","a":"#6fd3ff","url":"/hoje","k":"Tutorial · Aba Hoje","t":"Hoje: o que vale a pena agora","s":"Resumo da semana montado com as suas pendências. É a primeira tela ao abrir o site.",
+ "secs":[
+  {"h":"Principal","i":"/hoje","it":[
+   ["<b>Esta semana:</b> as atividades em destaque (incursão, masmorra, missão exótica) com o que ainda falta para você. Toque em <b>Detalhes</b> para ver recompensas e a <b>Sugestão de loadout</b>."],
+   ["Sem destaque pendente, o site sugere outra coisa: masmorra sem o exótico, missão exótica, título perto de fechar."],
+   ["<b>Alertas no topo da conta:</b> correio cheio, engramas acumulados, cofre quase lotado e lumen."],
+   ["<span class='ui'>📅 Marcar grade</span> ao lado de cada atividade abre a Grade já preenchida."]]},
+  {"h":"Desafios","i":"/desafios","c":"#7fe08f","it":[
+   ["Missões e desafios <b>em andamento</b> em mini painéis, com a barra de progresso."],
+   ["Toque na <b>☆</b> para fixar um desafio no topo (o Foco)."]]},
+  {"h":"Calendário","i":"/calendario","c":"#f2d36b","it":[
+   ["Resets diário e semanal, chegada do <b>Xûr</b>, Desafios de Osíris, eventos em andamento e o fim da temporada, num calendário em grade."]]}],
+ "tip":"<b>Dica:</b> o que você marca com ☆ em qualquer aba aparece junto no Foco, para não se perder."},
+
+{"f":"02-progresso","no":"2/6","a":"#7fe08f","url":"/incursoes","k":"Tutorial · Aba Progresso","t":"Progresso: atividades e títulos","s":"Checklist de tudo o que dá para concluir, com guias para cada encontro.",
+ "secs":[
+  {"h":"Atividades","i":"incursões · masmorras · campanhas · missões","it":[
+   ["Cada atividade mostra o que você já fez: conclusão, exótico, triunfos (ex.: <b>0/19</b>) e tentativas com abates e mortes."],
+   ["<span class='ui'>📖 Guia</span> explica encontro por encontro (objetivo, papéis, passos). O <b>modo encontros</b> abre em tela cheia, um cartão por encontro."],
+   ["<span class='ui'>▶ Vídeos</span> e <span class='ui'>🖼 Imagens</span> trazem guias em vídeo e mapas."],
+   ["<span class='ui'>⚙️ Preparar</span> liga uma build sua à atividade para aplicar antes de entrar."],
+   ["Missões exóticas somam os personagens: vezes feitas, tempo mais rápido e a arma que cada uma dá."]]},
+  {"h":"Títulos e triunfos","i":"/titulos","c":"#f2d36b","it":[
+   ["Cada título com o que falta, item por item. Use a <b>☆</b> para acompanhar no Foco."]]},
+  {"h":"Colecionáveis","i":"/colecionaveis","c":"#c99bff","it":[
+   ["Fragmentos de lore, ghosts, gatos e afins: quantos você tem e quais ainda faltam."]]}],
+ "tip":"<b>Dica:</b> a barra no topo de cada lista mostra o seu total; o filtro esconde o que já está feito."},
+
+{"f":"03-arsenal","no":"3/6","a":"#f2d36b","url":"/personagens","k":"Tutorial · Aba Arsenal","t":"Arsenal: armas e cofre","s":"Inventário de todos os personagens e do cofre, com avaliação de rolls.",
+ "secs":[
+  {"h":"Inventário","i":"personagens · cofre","it":[
+   ["Busque por nome ou perk. Toque num item para ver perks, comparar e mover entre personagens e cofre."],
+   ["<span class='ui'>Avaliar rolls</span> dá nota <b>S/A/B/C</b> a cada cópia pelos rolls recomendados. Troque perks, ou toque em <b>⚡ Aplicar os melhores perks</b>."],
+   ["<b>Trancar S e A</b> de uma vez, e o filtro <b>Pode desmontar</b> lista as notas C e as cópias repetidas piores."],
+   ["<b>☆ Lista de desejos:</b> salve um roll e receba aviso quando cair uma cópia com ele."]]},
+  {"h":"Coleção e vendedores","i":"exóticos · catalisadores","c":"#7fe08f","it":[
+   ["<b>Exóticos</b> e <b>Catalisadores</b>: o que falta na sua coleção e o progresso de cada catalisador."],
+   ["<b>Vendedores:</b> o que cada um vende hoje. O <b>Xûr</b> mostra as moedas que você tem e as que precisa."]]},
+  {"h":"Loadouts","i":"/loadouts","c":"#c99bff","it":[
+   ["Veja os loadouts do jogo e os criados no site. <b>Gravar no jogo</b> salva uma build num espaço de loadout, para usar até no console."]]}],
+ "tip":"<b>Seguro:</b> trancar, trocar perks e equipar sempre pedem confirmação, e o DPI confere no jogo se deu certo."},
+
+{"f":"04-guardiao","no":"4/6","a":"#c99bff","url":"/builds","k":"Tutorial · Aba Guardião","t":"Guardião: builds e números","s":"Monte builds, veja suas partidas e acompanhe sua evolução.",
+ "secs":[
+  {"h":"Builds","i":"/builds","num":1,"it":[
+   ["1","<span class='ui p'>Montar build</span>: subclasse, armas, armaduras, artefato e mods, peça por peça."],
+   ["2","<span class='ui'>Otimizar armaduras</span>: escolha o exótico e a ordem dos atributos; o DPI testa as combinações do cofre e dos personagens."],
+   ["3","<b>Salve</b> a build, <b>aplique</b> na conta ou <b>grave num loadout</b> do jogo. Faltou mod ou aspecto? O resultado sai como <b>parcial</b>, sem quebrar nada."]]},
+  {"h":"Relatórios","i":"/relatorios","c":"#6fd3ff","it":[
+   ["Suas incursões e masmorras recentes. Toque numa para ver o relatório completo da partida."]]},
+  {"h":"Estatísticas","i":"/estatisticas","c":"#7fe08f","it":[
+   ["<b>Patente de Guardião:</b> o que falta para a próxima."],
+   ["<b>Sua evolução:</b> poder, patente, triunfos e horas por <b>semana, mês, 6 meses</b> ou tudo."],
+   ["Conclusões de cada atividade e seus <b>recordes</b> de tempo."]]}],
+ "tip":"<b>Dica:</b> a evolução é guardada pelo DPI, um ponto por dia em que você entra; quanto mais usa, mais completa fica."},
+
+{"f":"05-cla","no":"5/6","a":"#ff9f5a","url":"/membros","k":"Tutorial · Aba Clã","t":"Clã: membros, placar e grupos","s":"Tudo do seu clã, lido da Bungie. Algumas partes são exclusivas do clã Orla Emaranhada.",
+ "secs":[
+  {"h":"Membros","i":"/membros","it":[
+   ["<b>Aviso do clã</b> no topo e a <b>Agenda</b> das grades marcadas (entrar, reserva, sair, Editar)."],
+   ["Quem está online agora, a lista de membros e <b>quando o clã costuma estar online</b> (lido de hora em hora)."],
+   ["<b>Aniversários de clã</b> do mês."]]},
+  {"h":"Placar e grupos","i":"/placar · /grupos","c":"#f2d36b","it":[
+   ["<b>Placar:</b> ranking do clã em conclusões, impecáveis, guiados, patente, títulos, triunfos, horas e poder."],
+   ["<b>Grupo de primeira vez:</b> escolha a atividade e veja quem nunca fez e quem já fez e pode guiar."],
+   ["<b>Checklist do clã</b> e <b>Comparar guardiões</b> lado a lado."]]},
+  {"h":"Administração","i":"só admins","c":"#c99bff","it":[
+   ["Admins do clã veem <b>Administração</b> e <b>Discord do clã</b>: participação nas grades e experiência de cada um por atividade."]]}],
+ "tip":"<b>Privacidade:</b> quem deixa o perfil privado na Bungie aparece sem números; nada é mostrado fora do clã."},
+
+{"f":"06-grade","no":"6/6","a":"#6fd3ff","url":"/grade","k":"","t":"","s":"","secs":[]}
+]
