@@ -6961,6 +6961,8 @@ document.addEventListener('click', e => {
   if (F.help && !e.target.closest('.farm-q')) { F.help = false; render(); }
 });
 
+/* depuração: só com localStorage dc-debug = 1 (no aparelho do próprio usuário) */
+try { if (localStorage.getItem('dc-debug') === '1') window.__dpi = { invAll: () => invAll(), apEval: x => apEval(x), rlGrade: (i, h) => rlGrade(i, h), tierOf: x => tierOf(x), RL: () => RL, AP: () => AP }; } catch {}
 // deslizar para o lado na lista troca de subaba; puxar para baixo no topo atualiza (só toque, só /beta)
 (() => {
   if (!NAV2() || !matchMedia('(pointer: coarse)').matches) return;
