@@ -6806,7 +6806,7 @@ async function ldaCheck(kit, cls) {
   const P = lang === 'pt', out = [], L = lang === 'pt' ? 'pt' : 'en';
   const en = await entities('DestinyInventoryItemDefinition', [...kit.map(k => k.h), ...kit.flatMap(k => k.plugs)].filter(Boolean), L, true);
   const nm = h => en[h]?.n || '?';
-  for (const k of kit) if (k.gone) out.push(['err', P ? `Item sumido: ${k.h && en[k.h]?.n ? en[k.h].n : 'um item'} não está mais na conta (desmontado?).` : `Missing item: ${k.h && en[k.h]?.n ? en[k.h].n : 'an item'} is no longer on the account.`]);
+  for (const k of kit) if (k.gone) out.push(['err', k.h && en[k.h]?.n ? (P ? `Item sumido: ${en[k.h].n} não está na sua conta (desmontado, ou a build é de outra pessoa).` : `Missing item: ${en[k.h].n} is not on your account (dismantled, or someone else's build).`) : (P ? 'Item sumido: um dos itens deste loadout não está mais na conta (desmontado?). O jogo deixa o espaço como está.' : 'Missing item: one item of this loadout is no longer on the account (dismantled?).')]);
   const here = kit.filter(k => !k.gone && k.h), slot = k => { const c = ITEMS?.[k.h]; return c == null ? -1 : Math.floor(c / 100); };
   const exA = here.filter(k => slot(k) >= 3 && slot(k) <= 7 && en[k.h]?.tt === 6), exW = here.filter(k => slot(k) >= 0 && slot(k) < 3 && en[k.h]?.tt === 6);
   if (exA.length > 1) out.push(['err', P ? `Dois exóticos de armadura: ${exA.map(k => nm(k.h)).join(' e ')}. O jogo só equipa um.` : `Two exotic armor pieces: ${exA.map(k => nm(k.h)).join(' and ')}.`]);
