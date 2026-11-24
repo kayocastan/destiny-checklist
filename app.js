@@ -5880,7 +5880,7 @@ async function rlLoad() {
     }
     RL.m = c.m; RL.at = c.at;
     // vantagens encaixadas de todas as armas (o perfil comum só traz as dos itens equipados)
-    if (member) { const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=102,201,304,305`).catch(() => null); RL.so = r?.itemComponents?.sockets?.data || {}; RL.sts = r?.itemComponents?.stats?.data || {}; }
+    if (member) { const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=102,201,304,305`).catch(() => null); RL.so = Object.assign(RL.so || {}, r?.itemComponents?.sockets?.data || {}); APC.clear(); RL.sts = r?.itemComponents?.stats?.data || {}; }
     RL.st = 'ok';
   } catch (e) { console.warn('rolls', e); RL.st = 'err'; }
   if (tab === 'inv' || tab === 'vlt' || tab === 'novo' || $('ivdlg')?.open || $('lcdlg')?.open) { render(); if ($('ivdlg')?.open) ivDraw(); if ($('lcdlg')?.open) lcDraw(); }
@@ -6187,7 +6187,7 @@ function apEval(x) {
       out = { g, gc, pct: Math.round(best.sc * 100), e: best.e, m: best.m, n: best.n, mc: now.m, nc: now.n, plan: 'SABC'.indexOf(gc) > 'SABC'.indexOf(g) ? best.plan : [], tw: !!L0.tw, est: L0.est || '', src: L0.est ? 'fam' : L0.tw ? 'tw' : 'v', L };
     }
   }
-  if (!partial) APC.set(ck, out); return out;
+  if (!partial && out.g) APC.set(ck, out); return out; // sem nota (sem perks ainda, sem lista) não fica guardado: volta a tentar quando os dados chegam
 }
 const APE = new Set(); let apeT = 0;
 function apEntLoad(hs) { const n = hs.filter(h => !APE.has(h)); if (!n.length) return; n.forEach(h => APE.add(h)); clearTimeout(apeT); apeT = setTimeout(() => entities('DestinyInventoryItemDefinition', [...APE].filter(h => !entCache[lang]?.['DestinyInventoryItemDefinition:' + h]), lang).catch(() => {}).finally(() => { APC.clear(); rapRedraw(); if (tab === 'inv' || tab === 'vlt' || tab === 'novo') render(); }), 120); }
