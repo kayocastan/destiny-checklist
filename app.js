@@ -2075,7 +2075,7 @@ function shareMenu(where, ready, profileLink) {
 document.addEventListener('click', e => {
   const b = e.target.closest('.shr-b'), open = document.querySelectorAll('.shr-m:not([hidden])');
   open.forEach(m => { if (!b || m.previousElementSibling !== b) { m.hidden = true; m.previousElementSibling?.setAttribute('aria-expanded', 'false'); } });
-  if (b) { const m = b.nextElementSibling; m.hidden = !m.hidden; b.setAttribute('aria-expanded', String(!m.hidden)); e.stopPropagation(); return; }
+  if (b) { const m = b.nextElementSibling; m.hidden = !m.hidden; b.setAttribute('aria-expanded', String(!m.hidden)); if (!m.hidden) { m.style.left = m.style.right = ''; const r = m.getBoundingClientRect(), vw = document.documentElement.clientWidth; if (r.left < 8) { m.style.left = '0'; m.style.right = 'auto'; } else if (r.right > vw - 8) { m.style.right = '0'; m.style.left = 'auto'; } } /* menu não sai da tela (botão à esquerda no celular) */ e.stopPropagation(); return; }
   const it = e.target.closest('.shr-m button'); if (it) { const m = it.closest('.shr-m'); setTimeout(() => { m.hidden = true; m.previousElementSibling?.setAttribute('aria-expanded', 'false'); }, 0); }
 }, true);
 async function pubMeta(C) {
