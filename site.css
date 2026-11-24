@@ -2589,3 +2589,4 @@ html[data-vt="open"]::view-transition-old(root),html[data-vt="open"]::view-trans
 .pat-r{display:grid;grid-template-columns:44px minmax(0,1fr) 110px;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;background:var(--surface);border:1px solid var(--line)}.pat-r img{width:44px;height:44px;border-radius:6px}
 .pat-n{display:grid;min-width:0}.pat-n b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pat-n small{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pat-p{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center}.pat-p b{font:700 14px var(--mono)}.pat-r.ok .pat-p b{color:#7fe08f}
+@media (max-width:640px){.pat-r{grid-template-columns:44px minmax(0,1fr)}.pat-p{grid-column:2}.pat-l{grid-template-columns:1fr}}
