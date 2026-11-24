@@ -2359,7 +2359,7 @@ html.bx :where([id],h2,h3){scroll-margin-top:84px}
 /* select nativo legível no Windows com tema escuro */
 html.bx select{background-color:var(--surface);color:var(--fg)}
 /* listas longas: o navegador só desenha os painéis que estão na tela (Triunfos, Coleções, Arsenal) */
-html.bx #list>.panel{content-visibility:auto;contain-intrinsic-size:auto 640px}
+/* content-visibility no painel inteiro tirado: o painel está sempre na tela e o tamanho guardado fazia a página pular ao abrir/fechar ilhas */
 /* menos movimento para quem pede no sistema */
 @media (prefers-reduced-motion:reduce){html.bx *,html.bx *::before,html.bx *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 /* Agenda do clã: descrição escrita por quem criou a grade */

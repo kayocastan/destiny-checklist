@@ -673,7 +673,7 @@ function build() {
   const nearCats = !recOK ? [] : defs.cats.map(c => ({ c, r: recState(c.h) })).filter(x => x.r && !recDone(x.r) && pct(x.r) >= 0.5).sort((a, b) => pct(b.r) - pct(a.r));
   if (nearCats.length) out.push(S('obj', 'nearcats', s.nearCats, s.nearCatsNote, nearCats.map(x => I('c-' + x.c.h, L(x.c.n), L(x.c.d), [progText(x.r) || Math.round(pct(x.r) * 100) + '%'], false))));
   // títulos quase prontos
-  const sealStats = !recOK ? [] : defs.seals.map(se => { const recs = se.r.filter(r => { const st = recState(r[0]); return !st || !(st.state & 16); }); const done = recs.filter(r => recDone(recState(r[0]))).length; return { se, recs, done, total: recs.length }; }).filter(x => x.total);
+  const sealStats = !recOK ? [] : defs.seals.map(se => ({ se, dead: sealDead(se) })).map(({ se, dead }) => { const recs = se.r.filter(r => { const st = recState(r[0]); return !st || !(st.state & 16); }); const done = recs.filter(r => recDone(recState(r[0]))).length; return { se, recs, done, total: recs.length, dead }; }).filter(x => x.total);
   const near = sealStats.filter(x => x.done < x.total && x.done / x.total >= 0.7 && x.se.tier < 5).sort((a, b) => b.done / b.total - a.done / a.total).slice(0, 5);
   if (near.length) out.push(S('obj', 'neartitles', s.nearTitles, s.nearTitlesNote, near.map(x => I('nt-' + x.se.cr, L(x.se.t), L(x.se.ds), [`${x.done}/${x.total}`], false))));
   // Campanhas: cada expansão com Normal, Lendário e Mestre (pelos triunfos), e o passo atual quando ainda está no registro
@@ -736,7 +736,7 @@ function build() {
   const ordered = sealStats.slice().sort((a, b) => (a.se.tier - b.se.tier) || (b.done / b.total - a.done / a.total));
   for (const x of ordered) {
     const items = x.recs.map(r => { const st = recState(r[0]), dn = recDone(st), tl = !dn && st ? objList(st) : null; return I('t-' + r[0], L(r[1]), L(r[2]), [(!dn && progAny(st)) || U.chip[['Fácil', 'Médio', 'Difícil', 'Muito difícil', 'Evento'][x.se.tier - 1]]].filter(Boolean), dn, tl ? { tl } : undefined); });
-    out.push(S('tit', 'seal-' + x.se.cr, L(x.se.t), s.tierNote[x.se.tier - 1] + '. ' + L(x.se.ds), items, { coll: true, titleSeal: true, tier: x.se.tier }));
+    out.push(S('tit', 'seal-' + x.se.cr, L(x.se.t), (x.dead ? (lang === 'pt' ? '⚠ Não dá mais para completar: a Bungie retirou um dos triunfos. ' : '⚠ No longer completable: Bungie retired one of its triumphs. ') : '') + s.tierNote[x.se.tier - 1] + '. ' + L(x.se.ds), items, { coll: true, titleSeal: true, tier: x.se.tier, dead: x.dead }));
   }
   // Drops: exóticos
   const cls = ch.classType;
@@ -970,6 +970,8 @@ function jumpTo(t, id) { go(t); requestAnimationFrame(() => { const sec = docume
 // ordem escolhida em Títulos, Incursões, Masmorras e Missões exóticas (guardada por aba)
 const SORT_TABS = ['tit', 'raid', 'dg', 'xm'], TSORT = { v: Object.assign({ tit: LS.get('dc-titsort', 'tier') }, LS.get('dc-sorts', {})) };
 const TIER_N = { 'Fácil': 1, 'Médio': 2, 'Difícil': 3, 'Muito difícil': 4 };
+// título que não fecha mais: a Bungie esconde (Invisible, 16) os triunfos retirados; se um deles ficou sem fazer (4), o selo não completa
+function sealDead(se) { return (se.r || []).some(r => { const st = recState(r[0]); return st && (st.state & 16) && (st.state & 4); }); }
 const secTier = sec => sec.tier || (sec.kind && TIER_N[(sec.kind === 'raid' ? defs.raids : defs.dungeons).find(x => x.k === sec.key)?.d]) || 0;
 const secPct = sec => sec.items.length ? sec.items.filter(isDone).length / sec.items.length : 0;
 // opções de cada página (missões exóticas ainda sem dificuldade nos dados)
@@ -3471,7 +3473,7 @@ function lsHTML(ac, gid) {
 }
 document.addEventListener('click', e => {
   const t = e.target; let b;
-  if ((b = t.closest('[data-lsalt]'))) { const k = b.dataset.lsalt; LS_.alt[k] = !LS_.alt[k]; vt(render, 'open'); return; }
+  if ((b = t.closest('[data-lsalt]'))) { const k = b.dataset.lsalt; LS_.alt[k] = !LS_.alt[k]; render(); return; }
   if ((b = t.closest('[data-lspick]'))) { const [k, i, iid] = b.dataset.lspick.split('|'); (LS_.pick[k] ||= {})[i] = iid; render(); return; }
   const plan = (k, slot) => { const r = LS_.c[k]; if (!r) return null; const pk = r.pick.map((o, i) => (LS_.pick[k]?.[i] && r.alts[i].find(a => a.x.iid === LS_.pick[k][i])) || o).filter(Boolean);
     return { cid: charId, name: lang === 'pt' ? 'Sugestão de loadout' : 'Loadout suggestion', items: pk.map(o => ({ id: o.x.iid, h: o.x.h, b: WEAPON_B[o.x.slot] })), sub: null, mods: {}, ...(slot != null ? { slot } : {}) }; };
@@ -5677,7 +5679,7 @@ function todoCards() {
   }
   const xm = xurMissing(); if (xm.length && XUR?.until && Date.parse(XUR.until) > Date.now()) { const x = xm[0]; out.push({ id: 'xur-' + x.h, kind: 'xur', score: 85, t: T.xurT(x.n), why: T.xurW(x.why), min: 5, grp: 'solo', gl: T.grp.solo, until: T.until, act: [{ t: T.xurSee, jump: 'vend:vendors' }] }); }
   if (have.b) {
-    const st = defs.seals.map(se => { const rs = se.r.map(r => recState(r[0])).filter(r => r && !(r.state & 16)), done = rs.filter(recDone).length, claim = rs.filter(r => recDone(r) && !(r.state & 1)).length; return { se, done, tot: rs.length, claim }; }).filter(x => x.tot && x.done < x.tot && x.done / x.tot >= 0.6).sort((a, b) => (b.done / b.tot) - (a.done / a.tot));
+    const st = defs.seals.filter(se => !sealDead(se)).map(se => { const rs = se.r.map(r => recState(r[0])).filter(r => r && !(r.state & 16)), done = rs.filter(recDone).length, claim = rs.filter(r => recDone(r) && !(r.state & 1)).length; return { se, done, tot: rs.length, claim }; }).filter(x => x.tot && x.done < x.tot && x.done / x.tot >= 0.6).sort((a, b) => (b.done / b.tot) - (a.done / a.tot));
     for (const x of st.slice(0, 1)) out.push({ id: 'tit-' + x.se.cr, kind: 'tit', score: 60 + x.done / x.tot * 30, t: T.titT(x.tot - x.done, L(x.se.t)), why: T.titW(x.claim), min: 40, grp: 'solo', gl: T.grp.solo, act: [{ t: T.see, jump: `tit:seal-${x.se.cr}` }], foc: 'sec:seal-' + x.se.cr, bar: { a: x.done, b: x.tot } });
     const cat = defs.cats.map(c => ({ c, r: recState(c.h) })).filter(x => x.r && !(x.r.state & 16) && !recDone(x.r) && pct(x.r) >= 0.5).sort((a, b) => pct(b.r) - pct(a.r))[0];
     if (cat) { const p = Math.floor(pct(cat.r) * 100); out.push({ id: 'cat-' + cat.c.h, kind: 'cat', score: 50 + p / 5, t: T.catT(L(cat.c.n).replace(/^Catalisador (da|do|de) |^| Catalyst$/g, ''), p), why: T.catW, min: 20, grp: 'solo', gl: T.grp.solo, act: [{ t: T.see, jump: 'cat:cat-prog' }], bar: { a: p, b: 100, pct: true } }); }
@@ -5766,7 +5768,7 @@ function todoHTML3() {
       ${rest.length && !NW ? `<div class="t3-rest"><small class="t3-hk">${esc(P ? 'Também para você' : 'Also for you')}</small>${rest.map(row).join('')}</div>` : ''}${nh && !TD.show ? `<button type="button" class="linkb" data-tdshow>${esc(T.hidden(nh))}</button>` : ''}</div>${side}</div></section>`;
 }
 async function obApiSafe(p) { try { return await obApi(p); } catch { return null; } }
-document.addEventListener('click', e => { const x = e.target.closest('[data-tdex]'); if (!x) return; const id = x.dataset.tdex; TD.ex.has(id) ? TD.ex.delete(id) : TD.ex.add(id); LS.set('dc-td-ex', [...TD.ex].slice(-20)); vt(render, 'open'); });
+document.addEventListener('click', e => { const x = e.target.closest('[data-tdex]'); if (!x) return; const id = x.dataset.tdex; TD.ex.has(id) ? TD.ex.delete(id) : TD.ex.add(id); LS.set('dc-td-ex', [...TD.ex].slice(-20)); render(); });
 document.addEventListener('click', e => {
   const m = e.target.closest('[data-tdm]'); if (m) { TD.m = m.dataset.tdm; LS.set('dc-td-mode', TD.m); vt(render); return; }
   const f = e.target.closest('[data-tdfirst]'); if (f) { FIRST.k = f.dataset.tdfirst; LS.set('dc-first', FIRST.k); go('gclg'); scrollTo({ top: 0 }); }
@@ -6207,7 +6209,7 @@ document.addEventListener('click', async e => {
   if (!AP.on) return;
   const ap = t.closest('[data-apf]'); if (ap) { AP.f = AP.f === ap.dataset.apf ? '' : ap.dataset.apf; render(); return; }
   if (t.closest('[data-apretry]')) { AP.av = ''; apAvLoad(true); render(); return; }
-  const o = t.closest('[data-apopen]'); if (o) { const id = o.dataset.apopen; AP.open = AP.open === id ? '' : id; RAP.sel = id; RAP.sim = {}; RAP.msg = null; vt(render, 'open'); return; }
+  const o = t.closest('[data-apopen]'); if (o) { const id = o.dataset.apopen; AP.open = AP.open === id ? '' : id; RAP.sel = id; RAP.sim = {}; RAP.msg = null; render(); return; }
   const op = t.closest('[data-apopt]'); if (op) { const x = invAll().find(y => y.iid === op.dataset.apopt); if (x) apOpt(x, apEval(x)); return; }
   if (t.closest('.ap-x')) { rapClick(e); return; }
   if (t.closest('[data-apall]')) { const ws = invAll().filter(x => x.slot < 3); const sk = ws.filter(x => apEval(x).plan?.length && apEval(x).est).length; AP.bulk = { st: 'ask', sk, ids: ws.filter(x => apEval(x).plan?.length && !apEval(x).est && (!AP.ty || INVD[x.h]?.tl === AP.ty) && (!AP.q.trim() || palNorm(ivName(x) + ' ' + pkNames(x)).includes(palNorm(AP.q.trim())))).map(x => x.iid), n: 0, f: 0 }; render(); return; }
@@ -6384,7 +6386,7 @@ function vendSHTML() {
 }
 function nearTitleHTML() {
   if (!NAV2() || !HELP || !member) return '';
-  const P = lang === 'pt', ts = SECTIONS.filter(x => x.tab === 'tit' && secAvail(x) && x.items.length && !x.items.every(isDone));
+  const P = lang === 'pt', ts = SECTIONS.filter(x => x.tab === 'tit' && !x.dead && secAvail(x) && x.items.length && !x.items.every(isDone));
   if (!ts.length) return '';
   const left = x => x.items.filter(i => !isDone(i)).length, best = ts.slice().sort((a, b) => left(a) - left(b) || secTier(a) - secTier(b) || secPct(b) - secPct(a))[0], n = left(best);
   const miss = best.items.filter(i => !isDone(i)).slice(0, 3);
