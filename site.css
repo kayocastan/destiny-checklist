@@ -2755,3 +2755,4 @@ kbd{font:600 12px var(--mono);min-width:22px;text-align:center;padding:2px 7px;b
 .fm-k{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px}
 .fm-k .ok{color:var(--done)}.fm-k .wa{color:#e0b84a}.fm-k .er{color:var(--hard)}.fm-k small{color:var(--muted)}
 .farm-isl{border:1px solid color-mix(in srgb,var(--done) 45%,var(--line));border-radius:14px;background:var(--surface);padding:10px 14px;margin:8px 0}
+#kbdlg{margin:auto}.ivd-tier .rl-leg .rl-t{position:static;display:inline-grid}
