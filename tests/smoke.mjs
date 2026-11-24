@@ -47,9 +47,8 @@ function profile() {
 }
 const GRADES = [{ id: 1, name: 'Queda do Rei: Normal', g: null, ci: null, desc: '**Atenção**\n\nSó quem já fez.', cap: 6, rk: 0, s: iso(now + 864e5), by: 'Peter', url: null, mine: null, creator: false, p: [{ n: 'Peter', c: 'titular', r: 0 }] }, { id: 2, name: 'Fim de Crota: Normal', g: null, ci: null, desc: 'Inscrita', cap: 6, rk: 0, s: iso(now + 2 * 864e5).replace('T', ' ').slice(0, 19), by: 'Nipanga', url: 'https://discord.com/channels/1/2/3', mine: 'titular', creator: true, p: [{ n: 'Nipanga', c: 'titular', r: 0 }] }];
 
-async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin = false, xsave = false, expectSub = null, expired = false, mobile = false, clicks = true, steps = null, expectText = '', arm = false, owner = false, vc = '', noSub = null, expectBar = false, orlaClan = false }) {
-  if (process.env.F && !name.includes(process.env.F)) return true; // F=trecho: roda só os testes com esse nome
-  const b = await chromium.launch(), ctx = await b.newContext(mobile ? { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true } : { viewport: { width: 1366, height: 900 } });
+async function runOne(name, { path = '/', auth = true, ls = {}, orla = 200, admin = false, xsave = false, expectSub = null, expired = false, mobile = false, clicks = true, steps = null, expectText = '', arm = false, owner = false, vc = '', noSub = null, expectBar = false, orlaClan = false }) {
+  const b = await browser(), ctx = await b.newContext(mobile ? { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true } : { viewport: { width: 1366, height: 900 } });
   const page = await ctx.newPage(), errs = [], seen = { refresh: 0 };
   page.on('pageerror', e => errs.push('pageerror: ' + e.message));
   page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource|ERR_|favicon/.test(m.text())) errs.push('console: ' + m.text().slice(0, 200)); });
@@ -143,41 +142,49 @@ async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin =
   if (expectText) { let ok = false; for (let t = 0; t < 20 && !ok; t++) { ok = (await page.evaluate(() => document.getElementById('list')?.innerText || '')).includes(expectText); if (!ok) await page.waitForTimeout(500); } if (!ok) fail.push(`faltou o texto "${expectText}" na tela`); }
   if (seen.rep?.length) fail.push('o site relatou erro ao montar a tela: ' + seen.rep[0]);
   if (expired && (seen.refresh < 1 || seen.refresh > (steps ? 2 : 1))) fail.push(`login vencido: renovou ${seen.refresh} vezes (devia ser 1)`);
-  await b.close();
+  await ctx.close();
   const all = [...fail, ...errs];
-  console.log(`${all.length ? '✗' : '✓'} ${name}${all.length ? '\n    ' + [...new Set(all)].slice(0, 8).join('\n    ') : ''}`);
-  return all.length === 0;
+  return { ok: all.length === 0, msg: `${all.length ? '✗' : '✓'} ${name}${all.length ? '\n    ' + [...new Set(all)].slice(0, 8).join('\n    ') : ''}` };
+}
+/* testes em paralelo (P=4 por padrão; P=1 = um por vez), um navegador só para todos; o resultado sai na ordem em que os testes aparecem */
+let BR = null; const browser = () => (BR ??= chromium.launch());
+const PAR = Math.max(1, Number(process.env.P) || 4); let busy = 0; const waitq = [];
+const slot = () => busy < PAR ? (busy++, Promise.resolve()) : new Promise(r => waitq.push(r));
+const free = () => { const n = waitq.shift(); if (n) n(); else busy--; };
+function run(name, o) {
+  if (process.env.F && !name.includes(process.env.F)) return Promise.resolve({ ok: true, msg: '' }); // F=trecho: roda só os testes com esse nome
+  return slot().then(() => runOne(name, o).catch(e => ({ ok: false, msg: `✗ ${name}\n    o teste quebrou: ${String(e.message || e).split('\n')[0]}` }))).finally(free);
 }
 
 const R = [];
-if (process.env.ONLY) { R.push(await run(process.env.ONLY, { path: process.env.OPATH || '/beta', arm: !process.env.SHOTS, clicks: false, ls: { 'dc-tab': process.env.SHOTS || 'inv', ...(process.env.SHOTLS ? JSON.parse(process.env.SHOTLS) : {}) } })); console.log(R.every(Boolean) ? 'ok' : 'falhou'); process.exit(R.every(Boolean) ? 0 : 1); }
-R.push(await run('sem login: página inicial', { auth: false }));
-R.push(await run('membro comum: todas as abas', {}));
-R.push(await run('admin do clã: todas as abas', { admin: true }));
-R.push(await run('celular: todas as abas', { mobile: true }));
-R.push(await run('login vencido: renova uma vez só', { expired: true, clicks: false, ls: { 'dc-member': { type: 3, id: '4611686018400000001', name: 'Teste#1234' } } }));
-R.push(await run('admin do clã por outra plataforma (cross-save)', { admin: true, xsave: true, clicks: false, expectSub: ['clan', 'gcla'] }));
-R.push(await run('aba de admin guardada, sem ser admin', { ls: { 'dc-tab': 'gcla' }, clicks: false }));
-R.push(await run('aba que não existe mais', { ls: { 'dc-tab': 'xyz' }, clicks: false }));
-R.push(await run('/grade: membro do clã', { path: '/grade', clicks: false }));
-R.push(await run('/grade: inglês', { path: '/grade', ls: { 'dc-lang': 'en' }, clicks: false }));
-R.push(await run('/beta ver como: membro comum (admin real)', { path: '/beta', owner: true, admin: true, vc: 'm', ls: { 'dc-ownchk': { o: true, t: Date.now() } }, noSub: ['clan', 'gcla'], expectBar: true }));
-R.push(await run('/beta ver como: sem clã', { path: '/beta', owner: true, vc: 'n', ls: { 'dc-ownchk': { o: true, t: Date.now() } }, expectBar: true }));
-R.push(await run('/beta ver como: agenda recusada', { path: '/beta', owner: true, vc: 'a', ls: { 'dc-ownchk': { o: true, t: Date.now() }, 'dc-tab': 'gcl' }, clicks: false, expectBar: true }));
-R.push(await run('avaliar rolls (nota, gêmea, família, exótica, otimizar)', { path: '/', arm: true, clicks: false, ls: { 'dc-tab': 'inv' } }));
-R.push(await run('/grade: bot recusa a sessão (401) mostra aviso', { path: '/grade', auth: true, orla: 401, clicks: false, ls: { 'dc-lang': 'pt' }, expectText: 'Entrar de novo' }));
-R.push(await run('/grade: fora do clã (403) mostra aviso', { path: '/grade', auth: true, orla: 403, clicks: false, ls: { 'dc-lang': 'pt' }, expectText: 'Orla Emaranhada' }));
-R.push(await run('/grade: bot fora do ar (503) mostra aviso', { path: '/grade', auth: true, orla: 503, clicks: false, ls: { 'dc-lang': 'pt' }, expectText: 'Tentar de novo' }));
-R.push(await run('/grade ver como: fora do clã', { path: '/grade', owner: true, vc: 'gc', clicks: false, ls: { 'dc-lang': 'pt', 'dc-ownchk': { o: true, t: Date.now() } }, expectText: 'Orla Emaranhada', expectBar: true }));
+if (process.env.ONLY) { R.push(run(process.env.ONLY, { path: process.env.OPATH || '/beta', arm: !process.env.SHOTS, clicks: false, ls: { 'dc-tab': process.env.SHOTS || 'inv', ...(process.env.SHOTLS ? JSON.parse(process.env.SHOTLS) : {}) } })); const r0 = await R[0]; console.log(r0.msg); console.log(r0.ok ? 'ok' : 'falhou'); process.exit(r0.ok ? 0 : 1); }
+R.push(run('sem login: página inicial', { auth: false }));
+R.push(run('membro comum: todas as abas', {}));
+R.push(run('admin do clã: todas as abas', { admin: true }));
+R.push(run('celular: todas as abas', { mobile: true }));
+R.push(run('login vencido: renova uma vez só', { expired: true, clicks: false, ls: { 'dc-member': { type: 3, id: '4611686018400000001', name: 'Teste#1234' } } }));
+R.push(run('admin do clã por outra plataforma (cross-save)', { admin: true, xsave: true, clicks: false, expectSub: ['clan', 'gcla'] }));
+R.push(run('aba de admin guardada, sem ser admin', { ls: { 'dc-tab': 'gcla' }, clicks: false }));
+R.push(run('aba que não existe mais', { ls: { 'dc-tab': 'xyz' }, clicks: false }));
+R.push(run('/grade: membro do clã', { path: '/grade', clicks: false }));
+R.push(run('/grade: inglês', { path: '/grade', ls: { 'dc-lang': 'en' }, clicks: false }));
+R.push(run('/beta ver como: membro comum (admin real)', { path: '/beta', owner: true, admin: true, vc: 'm', ls: { 'dc-ownchk': { o: true, t: Date.now() } }, noSub: ['clan', 'gcla'], expectBar: true }));
+R.push(run('/beta ver como: sem clã', { path: '/beta', owner: true, vc: 'n', ls: { 'dc-ownchk': { o: true, t: Date.now() } }, expectBar: true }));
+R.push(run('/beta ver como: agenda recusada', { path: '/beta', owner: true, vc: 'a', ls: { 'dc-ownchk': { o: true, t: Date.now() }, 'dc-tab': 'gcl' }, clicks: false, expectBar: true }));
+R.push(run('avaliar rolls (nota, gêmea, família, exótica, otimizar)', { path: '/', arm: true, clicks: false, ls: { 'dc-tab': 'inv' } }));
+R.push(run('/grade: bot recusa a sessão (401) mostra aviso', { path: '/grade', auth: true, orla: 401, clicks: false, ls: { 'dc-lang': 'pt' }, expectText: 'Entrar de novo' }));
+R.push(run('/grade: fora do clã (403) mostra aviso', { path: '/grade', auth: true, orla: 403, clicks: false, ls: { 'dc-lang': 'pt' }, expectText: 'Orla Emaranhada' }));
+R.push(run('/grade: bot fora do ar (503) mostra aviso', { path: '/grade', auth: true, orla: 503, clicks: false, ls: { 'dc-lang': 'pt' }, expectText: 'Tentar de novo' }));
+R.push(run('/grade ver como: fora do clã', { path: '/grade', owner: true, vc: 'gc', clicks: false, ls: { 'dc-lang': 'pt', 'dc-ownchk': { o: true, t: Date.now() } }, expectText: 'Orla Emaranhada', expectBar: true }));
 
 // ---------- navegação por endereço (abas com endereço próprio, Voltar/Avançar, /grade sem recarregar, permissões) ----------
 const url = p => p.evaluate(() => location.pathname + location.search), act = p => p.evaluate(() => document.querySelector('#subtabs .sub.on, #subtabs .sub[aria-selected="true"], #subtabs .sub[aria-current]')?.dataset.sub || document.querySelector('#subtabs .on')?.dataset.sub || '');
 const same = async (p, fail, w) => { if (!(await p.evaluate(() => window.__noReload === 1))) fail.push(`${w}: a página recarregou (devia trocar sem recarregar)`); };
 const clickSub = async (p, g, sub) => { if (!(await p.$(`#subtabs .sub[data-sub="${sub}"]`))) { await p.evaluate(g => document.querySelector(`#tabs .tab[data-group="${g}"]`)?.click(), g); await p.waitForTimeout(400); } await p.evaluate(sub => document.querySelector(`#subtabs .sub[data-sub="${sub}"]`)?.click(), sub); };
 const kidClick = (p, k) => p.evaluate(k => document.querySelector(`[data-kid="${k}"]`)?.click(), k);
-R.push(await run('endereço: /cofre abre o Cofre', { path: '/cofre', clicks: false, steps: async (p, fail) => { await p.waitForTimeout(1500); if (!(await p.$('.vl-wrap, .iv-wrap'))) fail.push('/cofre não abriu o cofre'); if (await url(p) !== '/cofre') fail.push('endereço mudou: ' + await url(p)); } }));
-R.push(await run('endereço: "/" retoma a última aba e mostra o endereço dela', { path: '/', clicks: false, ls: { 'dc-tab': 'vend' }, steps: async (p, fail) => { await p.waitForTimeout(800); if (await url(p) !== '/vendedores') fail.push('esperava /vendedores, veio ' + await url(p)); } }));
-R.push(await run('endereço: trocar de aba muda o endereço e Voltar/Avançar funcionam', { path: '/hoje', clicks: false, steps: async (p, fail) => {
+R.push(run('endereço: /cofre abre o Cofre', { path: '/cofre', clicks: false, steps: async (p, fail) => { await p.waitForTimeout(1500); if (!(await p.$('.vl-wrap, .iv-wrap'))) fail.push('/cofre não abriu o cofre'); if (await url(p) !== '/cofre') fail.push('endereço mudou: ' + await url(p)); } }));
+R.push(run('endereço: "/" retoma a última aba e mostra o endereço dela', { path: '/', clicks: false, ls: { 'dc-tab': 'vend' }, steps: async (p, fail) => { await p.waitForTimeout(800); if (await url(p) !== '/vendedores') fail.push('esperava /vendedores, veio ' + await url(p)); } }));
+R.push(run('endereço: trocar de aba muda o endereço e Voltar/Avançar funcionam', { path: '/hoje', clicks: false, steps: async (p, fail) => {
   await clickSub(p, 'drops', 'vend'); await p.waitForTimeout(600); if (await url(p) !== '/vendedores') fail.push('clique em Vendedores: endereço ' + await url(p));
   await clickSub(p, 'gd', 'gst'); await p.waitForTimeout(600); if (await url(p) !== '/estatisticas') fail.push('clique em Estatísticas: endereço ' + await url(p));
   await p.goBack(); await p.waitForTimeout(800); if (await url(p) !== '/vendedores') fail.push('Voltar: esperava /vendedores, veio ' + await url(p));
@@ -185,7 +192,7 @@ R.push(await run('endereço: trocar de aba muda o endereço e Voltar/Avançar fu
   await p.goBack(); await p.waitForTimeout(800); if (await url(p) !== '/hoje') fail.push('Voltar 2x: esperava /hoje, veio ' + await url(p));
   await p.goForward(); await p.waitForTimeout(800); if (await url(p) !== '/vendedores') fail.push('Avançar: esperava /vendedores, veio ' + await url(p));
   await same(p, fail, 'Voltar/Avançar'); } }));
-R.push(await run('endereço: Hoje → Grade → Arsenal → Voltar (sem recarregar)', { path: '/hoje', clicks: false, ls: { 'dc-lang': 'pt' }, steps: async (p, fail) => {
+R.push(run('endereço: Hoje → Grade → Arsenal → Voltar (sem recarregar)', { path: '/hoje', clicks: false, ls: { 'dc-lang': 'pt' }, steps: async (p, fail) => {
   await p.evaluate(() => { const b = document.getElementById('gradebtn'); if (b) { b.hidden = false; b.click(); } }); await p.waitForTimeout(1500);
   if (await url(p) !== '/grade') fail.push('botão Grade: endereço ' + await url(p));
   if (!(await p.evaluate(() => document.documentElement.classList.contains('grade')))) fail.push('Grade: faltou o visual da página da grade');
@@ -198,22 +205,22 @@ R.push(await run('endereço: Hoje → Grade → Arsenal → Voltar (sem recarreg
   await p.goBack(); await p.waitForTimeout(1200); if (await url(p) !== '/grade') fail.push('Voltar para a Grade: endereço ' + await url(p));
   if (!(await p.evaluate(() => (document.getElementById('list')?.innerText || '').includes('Agenda')))) fail.push('Voltar para a Grade: agenda sumiu');
   await same(p, fail, 'Grade ida e volta'); } }));
-R.push(await run('endereço: /grade → clicar em aba vai sem recarregar', { path: '/grade', clicks: false, steps: async (p, fail) => {
+R.push(run('endereço: /grade → clicar em aba vai sem recarregar', { path: '/grade', clicks: false, steps: async (p, fail) => {
   await clickSub(p, 'gd', 'gd'); await p.waitForTimeout(1000); if (await url(p) !== '/builds') fail.push('da grade para Builds: ' + await url(p)); await same(p, fail, 'grade → builds'); } }));
-R.push(await run('grade: Editar na agenda de Membros abre a edição na /grade', { path: '/membros', orlaClan: true, clicks: false, ls: { 'dc-lang': 'pt' }, steps: async (p, fail) => {
+R.push(run('grade: Editar na agenda de Membros abre a edição na /grade', { path: '/membros', orlaClan: true, clicks: false, ls: { 'dc-lang': 'pt' }, steps: async (p, fail) => {
   await p.waitForSelector('[data-obedit]', { timeout: 8000 }).catch(() => fail.push('botão Editar não apareceu em Membros'));
   if (fail.length) return; await p.click('[data-obedit]'); await p.waitForTimeout(900);
   if (await url(p) !== '/grade') fail.push('Editar não levou para /grade: ' + await url(p));
   const tx = await p.evaluate(() => document.getElementById('obform')?.textContent || ''); if (!/Editar grade|Edit roster/.test(tx) || !/Fim de Crota/.test(await p.evaluate(() => [...document.querySelectorAll('#obform input')].map(i => i.value).join(' ')))) fail.push('formulário de edição não veio preenchido');
 } }));
-R.push(await run('rolagem: Voltar devolve a posição; aba nova sobe para a lista', { path: '/hoje', clicks: false, steps: async (p, fail) => {
+R.push(run('rolagem: Voltar devolve a posição; aba nova sobe para a lista', { path: '/hoje', clicks: false, steps: async (p, fail) => {
   await p.evaluate(() => { document.body.style.minHeight = '5000px'; scrollTo(0, 1500); }); await p.waitForTimeout(300);
   await clickSub(p, 'obj', 'cal'); await p.waitForTimeout(900); const y1 = await p.evaluate(() => scrollY); if (y1 > 1200) fail.push('aba nova não subiu (' + y1 + ')');
   await p.goBack(); await p.waitForTimeout(1200); const y2 = await p.evaluate(() => scrollY); if (Math.abs(y2 - 1500) > 60) fail.push('Voltar não devolveu a rolagem (' + y2 + ')'); } }));
-R.push(await run('teclado: trocar de aba pelo teclado leva o foco ao conteúdo', { path: '/hoje', clicks: false, steps: async (p, fail) => {
+R.push(run('teclado: trocar de aba pelo teclado leva o foco ao conteúdo', { path: '/hoje', clicks: false, steps: async (p, fail) => {
   await p.focus('#tabs .tab[data-group="drops"]'); await p.keyboard.press('Enter'); await p.waitForTimeout(900);
   if (!(await p.evaluate(() => document.activeElement?.id === 'list'))) fail.push('foco não foi para o conteúdo: ' + await p.evaluate(() => document.activeElement?.className || document.activeElement?.tagName)); } }));
-R.push(await run('tempo: abrir de novo mostra a última visita antes da Bungie responder', { path: '/hoje', expired: true, clicks: false, steps: async (p, fail) => {
+R.push(run('tempo: abrir de novo mostra a última visita antes da Bungie responder', { path: '/hoje', expired: true, clicks: false, steps: async (p, fail) => {
   await p.waitForTimeout(process.env.LAT ? 6000 : 2500); await p.reload(); const t0 = Date.now();
   let ms = -1; for (let t = 0; t < 120; t++) { if (await p.evaluate(() => (document.getElementById('list')?.textContent || '').length > 300 && !!document.querySelector('#tabs .tab'))) { ms = Date.now() - t0; break; } await p.waitForTimeout(50); }
   let live = -1; for (let t = 0; t < 160; t++) { if (await p.evaluate(() => /Atualizado às|Updated at/.test(document.body.innerText) && !/cópia|copy|salv/i.test(document.getElementById('updated')?.textContent || ''))) { live = Date.now() - t0; break; } await p.waitForTimeout(50); }
@@ -225,28 +232,28 @@ const SCREENS = new Function('return ' + readFileSync(new URL('../app.js', impor
 { const miss = SCREENS.filter(x => !REWRITE['/' + x.r]); const ok = !miss.length; console.log((ok ? '✓' : '✗') + ' tabela de telas: todo endereço tem rewrite no vercel.json' + (ok ? '' : '\n    faltam: ' + miss.map(x => '/' + x.r).join(', '))); R.push(ok); }
 for (const x of SCREENS) {
   const who = x.who || 'all', want = who === 'all' ? '/' + x.r : who === 'admin' ? '/membros' : '/hoje';
-  R.push(await run(`tela ${x.id} (/${x.r}) como membro comum`, { path: '/' + x.r, clicks: false, steps: async (p, fail) => {
+  R.push(run(`tela ${x.id} (/${x.r}) como membro comum`, { path: '/' + x.r, clicks: false, steps: async (p, fail) => {
     await p.waitForTimeout(x.id === 'gclo' ? 2000 : 1200); const u = await url(p); if (u !== want) fail.push(`esperava ${want} (who=${who}), veio ${u}`);
     if (who === 'all' && x.id !== 'gclo' && x.g && !(await p.evaluate(g => !!document.querySelector(`#tabs .tab[data-group="${g}"][aria-current="true"]`), x.g))) fail.push('aba do grupo ' + x.g + ' não ficou ativa');
     const ovShown = await p.evaluate(() => !document.getElementById('overall')?.hidden); if (who === 'all' && x.id !== 'gclo' && ovShown !== !!x.ov) fail.push(`barra "x de y feitos": ${ovShown ? 'apareceu' : 'sumiu'} (tabela diz ov=${!!x.ov})`); } }));
 }
-for (const x of SCREENS.filter(x => x.who === 'admin')) R.push(await run(`tela ${x.id} (/${x.r}) como admin`, { path: '/' + x.r, admin: true, clicks: false, steps: async (p, fail) => { await p.waitForTimeout(1500); if (await url(p) !== '/' + x.r) fail.push('admin não abriu: ' + await url(p)); } }));
-for (const x of SCREENS.filter(x => x.who === 'beta')) R.push(await run(`tela ${x.id} (/beta/${x.r}) no /beta`, { path: '/beta/' + x.r, owner: true, clicks: false, ls: { 'dc-ownchk': { o: true, t: Date.now() } }, steps: async (p, fail) => { await p.waitForTimeout(1500); if (await url(p) !== '/beta/' + x.r) fail.push('/beta não abriu: ' + await url(p)); } }));
-R.push(await run('permissão: /administracao sem ser admin cai em Membros', { path: '/administracao', clicks: false, steps: async (p, fail) => {
+for (const x of SCREENS.filter(x => x.who === 'admin')) R.push(run(`tela ${x.id} (/${x.r}) como admin`, { path: '/' + x.r, admin: true, clicks: false, steps: async (p, fail) => { await p.waitForTimeout(1500); if (await url(p) !== '/' + x.r) fail.push('admin não abriu: ' + await url(p)); } }));
+for (const x of SCREENS.filter(x => x.who === 'beta')) R.push(run(`tela ${x.id} (/beta/${x.r}) no /beta`, { path: '/beta/' + x.r, owner: true, clicks: false, ls: { 'dc-ownchk': { o: true, t: Date.now() } }, steps: async (p, fail) => { await p.waitForTimeout(1500); if (await url(p) !== '/beta/' + x.r) fail.push('/beta não abriu: ' + await url(p)); } }));
+R.push(run('permissão: /administracao sem ser admin cai em Membros', { path: '/administracao', clicks: false, steps: async (p, fail) => {
   await p.waitForTimeout(1500); if (await url(p) !== '/membros') fail.push('esperava /membros, veio ' + await url(p)); if (await p.$('#subtabs .sub[data-sub="gcla"]')) fail.push('aba Administração apareceu para não-admin'); } }));
-R.push(await run('permissão: /administracao como admin abre', { path: '/administracao', admin: true, clicks: false, steps: async (p, fail) => {
+R.push(run('permissão: /administracao como admin abre', { path: '/administracao', admin: true, clicks: false, steps: async (p, fail) => {
   await p.waitForTimeout(1500); if (await url(p) !== '/administracao') fail.push('admin: esperava /administracao, veio ' + await url(p)); } }));
-R.push(await run('endereço: sem login em /cofre mostra a entrada e guarda a volta', { path: '/cofre', auth: false, clicks: false, steps: async (p, fail) => {
+R.push(run('endereço: sem login em /cofre mostra a entrada e guarda a volta', { path: '/cofre', auth: false, clicks: false, steps: async (p, fail) => {
   await p.waitForTimeout(800); if (await url(p) !== '/cofre') fail.push('sem login: endereço mudou para ' + await url(p));
   await p.route('https://www.bungie.net/**/OAuth/**', r => r.abort());
   await p.evaluate(() => { setTimeout(() => document.getElementById('loginbtn')?.click(), 0); }); await p.waitForTimeout(1200);
   const st = await p.context().storageState(), ls2 = st.origins.find(o => o.origin === 'http://dpi.test')?.localStorage || [], r = (() => { try { return JSON.parse(ls2.find(x => x.name === 'dc-ret2')?.value || 'null')?.r; } catch { return null; } })(); if (r !== '/cofre') fail.push('entrar: não guardou a volta para /cofre (' + r + ')'); } }));
-R.push(await run('endereço: /beta/cofre (dono) mantém o /beta', { path: '/beta/cofre', owner: true, clicks: false, ls: { 'dc-ownchk': { o: true, t: Date.now() } }, steps: async (p, fail) => {
+R.push(run('endereço: /beta/cofre (dono) mantém o /beta', { path: '/beta/cofre', owner: true, clicks: false, ls: { 'dc-ownchk': { o: true, t: Date.now() } }, steps: async (p, fail) => {
   await p.waitForTimeout(1200); if (await url(p) !== '/beta/cofre') fail.push('beta: endereço ' + await url(p)); await clickSub(p, 'drops', 'vend'); await p.waitForTimeout(600); if (await url(p) !== '/beta/vendedores') fail.push('beta: aba nova foi para ' + await url(p)); } }));
-R.push(await run('endereço: link "Marcar grade" (/grade?a=) abre a Grade sem recarregar', { path: '/hoje', clicks: false, steps: async (p, fail) => {
+R.push(run('endereço: link "Marcar grade" (/grade?a=) abre a Grade sem recarregar', { path: '/hoje', clicks: false, steps: async (p, fail) => {
   await p.evaluate(() => { const a = document.createElement('a'); a.href = '/grade?a=teste'; a.id = 'tlink'; document.body.append(a); a.click(); }); await p.waitForTimeout(1500);
   if (!(await url(p)).startsWith('/grade')) fail.push('link Marcar grade: ' + await url(p)); await same(p, fail, 'Marcar grade'); } }));
-R.push(await run('grade: sugestão de loadout no cartão em que estou inscrito', { path: '/grade', arm: true, clicks: false, ls: { 'dc-lang': 'pt' }, steps: async (p, fail) => {
+R.push(run('grade: sugestão de loadout no cartão em que estou inscrito', { path: '/grade', arm: true, clicks: false, ls: { 'dc-lang': 'pt' }, steps: async (p, fail) => {
   for (let t = 0; t < 30; t++) { if (await p.$('.ls [data-lseq]')) break; await p.waitForTimeout(400); }
   const st = await p.evaluate(() => ({ n: document.querySelectorAll('.ls').length, txt: document.querySelector('.ls')?.innerText || '', eq: !!document.querySelector('.ls [data-lseq]:not([disabled])') }));
   if (st.n !== 1) fail.push('esperava 1 sugestão (só na grade em que estou), veio ' + st.n);
@@ -256,7 +263,10 @@ R.push(await run('grade: sugestão de loadout no cartão em que estou inscrito',
   await p.evaluate(() => document.querySelector('.ls [data-lsalt]')?.click()); await p.waitForTimeout(500);
   await p.evaluate(() => document.querySelector('.ls [data-lseq]')?.click()); await p.waitForTimeout(1500);
   if (!(await p.evaluate(() => document.getElementById('wrdlg')?.open))) fail.push('Equipar não abriu a confirmação'); } }));
-R.push(await run('/grade: sem login', { path: '/grade', auth: false, clicks: false }));
-const bad = R.filter(x => !x).length;
-console.log(bad ? `\n${bad} teste(s) falharam.` : '\nTudo certo.');
+R.push(run('/grade: sem login', { path: '/grade', auth: false, clicks: false }));
+const RES = await Promise.all(R.map(x => typeof x === 'boolean' ? { ok: x, msg: '' } : x));
+for (const x of RES) if (x.msg) console.log(x.msg);
+await (await BR)?.close?.();
+const bad = RES.filter(x => !x.ok).length;
+console.log((bad ? `\n${bad} teste(s) falharam.` : '\nTudo certo.') + ` (${PAR} em paralelo)`);
 process.exit(bad ? 1 : 0);

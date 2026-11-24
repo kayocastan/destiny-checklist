@@ -131,7 +131,7 @@ Tudo bem abaixo do incluído no plano pago do Cloudflare. A Vercel não muda. A 
 - O que fazer hoje, rolos e evolução (inclui o painel único de Hoje): `DrFBgrjVWcJFXx1yrW4LWp`
 
 ## Testes antes de publicar
-- `node tests/smoke.mjs` abre o site com perfis simulados (sem login, membro, admin, admin por outra plataforma, celular, login vencido, aba antiga guardada, /grade) e falha se alguma tela ficar em branco ou der erro de JavaScript.
+- `node tests/smoke.mjs` abre o site com perfis simulados (sem login, membro, admin, admin por outra plataforma, celular, login vencido, aba antiga guardada, /grade) e falha se alguma tela ficar em branco ou der erro de JavaScript. Roda 4 testes ao mesmo tempo num navegador só (~1,5 min); `P=1` volta a um por vez, `P=6` acelera mais.
 - Rodar SEMPRE antes de `git push` quando mexer em app.js, index.html, site.css ou guias.html. O GitHub também roda a cada envio (workflow "Testes do site").
 - Erros reais dos visitantes: `GET /err` no servidor do DPI (só o dono), últimos 300.
 - Se um bug novo escapar, acrescente um cenário em tests/smoke.mjs que reproduza o bug antes de corrigir.

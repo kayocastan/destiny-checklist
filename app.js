@@ -218,7 +218,7 @@ const VT_OFF = /AppleWebKit/.test(navigator.userAgent) && !/(Chrome|Chromium|Edg
 function vt(fn, kind = 'tab') {
   if (!document.startViewTransition || VT_OFF || RM.matches || document.visibilityState !== 'visible') { fn(); return Promise.resolve(); }
   document.documentElement.dataset.vt = kind;
-  const t = document.startViewTransition(fn); t.finished.finally(() => { delete document.documentElement.dataset.vt; }).catch(() => {});
+  const t = document.startViewTransition(fn); t.ready.catch(() => {}); /* clique rápido: a transição anterior é pulada (não é erro) */ t.finished.finally(() => { delete document.documentElement.dataset.vt; }).catch(() => {});
   return t.updateCallbackDone.catch(() => {});
 }
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; // a rolagem de cada aba é devolvida por nós no Voltar
