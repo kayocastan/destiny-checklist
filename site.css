@@ -1829,7 +1829,7 @@ dialog.ivdlg{width:min(1000px,calc(100vw - 24px))}
 .ivd-r{position:absolute;bottom:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:#7fe08f;color:#0d1219;font:700 10px/16px var(--sans,inherit);font-style:normal;text-align:center}
 .ivd-rl{display:grid;gap:3px;margin-top:8px;padding:10px 12px;border-radius:10px;background:var(--chip);border:1px solid var(--line);font-size:13px}
 .ivd-rl small{font-size:12px;color:var(--muted)}.ivd-rl.rl-g{border-color:rgba(127,224,143,.5)}.ivd-rl.rl-g span{color:#7fe08f}.ivd-rl.rl-p span{color:#f2d36b}.ivd-rl.rl-n span{color:#ff8a7a}
-@media (max-width:760px){.rl-k{margin-left:0}.td-hd .lbd-chips{margin-left:0}}
+@media (max-width:760px){.rl-k{margin-left:0;width:100%;flex-wrap:wrap}.rl-k>button{flex:1 1 0;min-width:0}.rl-k>.rl-ap{flex:1 1 100%}.ap .rl-k>button:not(.rl-ap){flex:0 1 auto}.td-hd .lbd-chips{margin-left:0}}
 .tdo-w{background:none!important;padding:0!important;border:0!important}
 /* O que fazer hoje: identidade própria (azul), para não confundir com Última sessão (dourado) */
 .td{border-color:color-mix(in srgb,var(--acc) 45%,transparent)!important;background:linear-gradient(180deg,color-mix(in srgb,var(--acc) 12%,var(--surface,var(--chip))) 0,var(--surface,var(--chip)) 140px)!important}
@@ -2512,13 +2512,13 @@ button.cg-chip{cursor:pointer}button.cg-chip:hover{background:color-mix(in srgb,
 .cg-d{min-height:84px;padding:6px 8px;border-radius:8px;background:var(--bg);display:flex;flex-direction:column;gap:4px;min-width:0}
 .cg-d.past{opacity:.55}.cg-d.now{outline:2px solid var(--acc);outline-offset:-2px}
 .cg-n{display:flex;align-items:baseline;gap:6px}.cg-n small{color:var(--muted);text-transform:capitalize;font-size:12px}.cg-n b{font:700 18px var(--display)}.cg-n em{margin-left:auto;font:600 10.5px var(--mono);color:var(--acc);text-transform:uppercase;font-style:normal}
-.cg-m{font-size:11.5px;line-height:1.25;padding:2px 6px;border-radius:6px;border-left:3px solid var(--c);background:color-mix(in srgb,var(--c) 10%,transparent);overflow-wrap:anywhere}
+.cg-m{font-size:11.5px;line-height:1.25;padding:2px 6px;border-radius:6px;border-left:3px solid var(--c);background:color-mix(in srgb,var(--c) 10%,transparent);overflow-wrap:anywhere}.cg-m i{font-style:normal}.cg-ms{display:none}
 .cg-bar{display:flex;align-items:center;gap:8px;min-width:0;padding:3px 8px;border-radius:999px;background:color-mix(in srgb,var(--c) 22%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 55%,transparent);font-size:12px}
 .cg-bar span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}.cg-bar small{margin-left:auto;white-space:nowrap;color:var(--muted)}
 .cg-bar.live{box-shadow:inset 3px 0 0 var(--c)}
 .cg-leg{display:flex;flex-wrap:wrap;gap:12px;font-size:12.5px;color:var(--muted)}.cg-leg span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--c);margin-right:6px;vertical-align:-1px}.cg-leg em{font-style:normal}
 .cg-sea{display:grid;gap:6px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}.cg-sea span{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}.cg-sea small{color:var(--muted)}
-@media (max-width:640px){.cg-d{min-height:64px;padding:4px}.cg-n small{display:none}.cg-m{font-size:10.5px}.cg-bar{font-size:11px;padding:2px 6px}.cg-bar small{display:none}}
+@media (max-width:640px){.cg-mf{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.cg-ms{display:inline}.cg-m{padding:2px 3px;overflow-wrap:normal;white-space:nowrap}.cg-d{min-height:64px;padding:4px}.cg-n small{display:none}.cg-m{font-size:10.5px}.cg-bar{font-size:11px;padding:2px 6px}.cg-bar small{display:none}}
 /* Esta semana: números de progresso (/beta) */
 .t4-ms{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin:10px 0 4px}
 .t4-m{all:unset;box-sizing:border-box;display:flex;flex-direction:column;gap:4px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer;min-width:0}

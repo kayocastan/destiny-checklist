@@ -825,12 +825,12 @@ function calHTML2() {
   const spans = [{ n: 'Xûr', c: '#f2d36b', s: xs, e: xe }, { n: P ? 'Desafios de Osíris' : 'Trials of Osiris', c: '#ff9f5a', s: xs, e: xe }, { n: 'Xûr', c: '#f2d36b', s: xs + 7 * 864e5, e: xe + 7 * 864e5 }, { n: P ? 'Desafios de Osíris' : 'Trials of Osiris', c: '#ff9f5a', s: xs + 7 * 864e5, e: xe + 7 * 864e5 },
     ...evs.map(m => ({ n: m.n, c: /bandeira|iron/i.test(m.n) ? '#ff6b6b' : '#c6a8ff', s: now - 864e5 * 30, e: m.end }))];
   // marcas de um dia
-  const marks = {}; const mk = (t, txt, c) => { const i = di(t); if (i >= 0 && i < 14) (marks[i] ||= []).push({ txt: `${txt} · ${hm(t)}`, c }); };
+  const marks = {}; const mk = (t, txt, c) => { const i = di(t); if (i >= 0 && i < 14) (marks[i] ||= []).push({ txt: `${txt} · ${hm(t)}`, sh: hm(t), c }); };
   for (let k = -1; k < 3; k++) mk(wk + k * 7 * 864e5, P ? 'Reset semanal' : 'Weekly reset', '#6fd3ff');
   for (const m of evs) mk(m.end, (P ? 'Fim: ' : 'Ends: ') + m.n, '#c6a8ff');
   if (S?.e) mk(S.e, (P ? 'Fim da temporada' : 'Season ends'), '#7fe08f');
   const today = di(now), dn = i => D(i).toLocaleDateString(loc, { weekday: 'short' }).replace('.', '');
-  const week = w => { const cells = [...Array(7)].map((_, j) => { const i = w * 7 + j, d = D(i); return `<div class="cg-d${i === today ? ' now' : ''}${i < today ? ' past' : ''}"${i === today ? ` aria-current="date"` : ''} style="grid-column:${j + 1};grid-row:1"><span class="cg-n"><small>${esc(dn(i))}</small><b>${d.getDate()}</b></span>${(marks[i] || []).map(m => `<span class="cg-m" style="--c:${m.c}">${esc(m.txt)}</span>`).join('')}</div>`; }).join('');
+  const week = w => { const cells = [...Array(7)].map((_, j) => { const i = w * 7 + j, d = D(i); return `<div class="cg-d${i === today ? ' now' : ''}${i < today ? ' past' : ''}"${i === today ? ` aria-current="date"` : ''} style="grid-column:${j + 1};grid-row:1"><span class="cg-n"><small>${esc(dn(i))}</small><b>${d.getDate()}</b></span>${(marks[i] || []).map(m => `<span class="cg-m" style="--c:${m.c}" title="${esc(m.txt)}"><i class="cg-mf">${esc(m.txt)}</i><i class="cg-ms" aria-hidden="true">${esc(m.sh)}</i></span>`).join('')}</div>`; }).join('');
     const rows = []; const bars = spans.map(sp => { const a = Math.max(di(sp.s), w * 7), b = Math.min(di(sp.e), w * 7 + 6); if (b < w * 7 || a > w * 7 + 6 || b < a) return ''; const live = sp.s <= now && now < sp.e;
       // empacota: mesma linha para faixas que não se cruzam (e o mesmo nome fica na mesma linha)
       let r = rows.findIndex(x => x.n === sp.n && x.u.every(([p, q]) => b < p || a > q)); if (r < 0) r = rows.findIndex(x => x.u.every(([p, q]) => b < p || a > q) && !rows.some(y => y.n === sp.n)); if (r < 0) { rows.push({ n: sp.n, u: [] }); r = rows.length - 1; } rows[r].u.push([a, b]);

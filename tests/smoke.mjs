@@ -157,7 +157,7 @@ function run(name, o) {
 }
 
 const R = [];
-if (process.env.ONLY) { R.push(run(process.env.ONLY, { path: process.env.OPATH || '/beta', arm: !process.env.SHOTS, clicks: false, ls: { 'dc-tab': process.env.SHOTS || 'inv', ...(process.env.SHOTLS ? JSON.parse(process.env.SHOTLS) : {}) } })); const r0 = await R[0]; console.log(r0.msg); console.log(r0.ok ? 'ok' : 'falhou'); process.exit(r0.ok ? 0 : 1); }
+if (process.env.ONLY) { R.push(run(process.env.ONLY, { path: process.env.OPATH || '/beta', arm: !process.env.SHOTS, mobile: !!process.env.MOB, clicks: false, ls: { 'dc-tab': process.env.SHOTS || 'inv', ...(process.env.SHOTLS ? JSON.parse(process.env.SHOTLS) : {}) } })); const r0 = await R[0]; console.log(r0.msg); console.log(r0.ok ? 'ok' : 'falhou'); process.exit(r0.ok ? 0 : 1); }
 R.push(run('sem login: página inicial', { auth: false }));
 R.push(run('membro comum: todas as abas', {}));
 R.push(run('admin do clã: todas as abas', { admin: true }));
