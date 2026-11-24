@@ -308,6 +308,16 @@ R.push(run('itens novos: lista, etiqueta, triagem e comparar', { path: '/itens-n
   await p.keyboard.press('Escape'); await p.evaluate(() => document.querySelector('[data-nvall]')?.click()); await p.waitForTimeout(300);
   if ((await p.$$('.nv-r')).length) fail.push('marcar todos como vistos não limpou');
 } }));
+R.push(run('cofre: grupos, repetidas juntas, tabela e vendedores', { path: '/cofre', arm: true, full: true, clicks: false, ls: { 'dc-lang': 'pt' }, steps: async (p, fail) => {
+  for (let t = 0; t < 30; t++) { if (await p.$('[data-vlg]')) break; await p.waitForTimeout(400); }
+  await p.evaluate(() => document.querySelector('[data-vlg]')?.click()); await p.waitForTimeout(300);
+  if (!(await p.$('.vl-g.shut'))) fail.push('grupo não recolheu');
+  await p.evaluate(() => document.querySelector('[data-vlvt="t"]')?.click()); await p.waitForTimeout(400);
+  const rows = (await p.$$('.vt tbody tr')).length; if (!rows) fail.push('tabela sem linhas');
+  await p.evaluate(() => document.querySelector('[data-vlpickall]')?.click()); await p.waitForTimeout(300);
+  if (!(await p.$('.vt-bulk'))) fail.push('marcar todos não mostrou as ações');
+  const ov = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth); if (ov > 2) fail.push('tabela estourou a largura da página: ' + ov + 'px');
+} }));
 R.push(run('grade: sugestão de loadout no cartão em que estou inscrito', { path: '/grade', arm: true, clicks: false, ls: { 'dc-lang': 'pt' }, steps: async (p, fail) => {
   for (let t = 0; t < 30; t++) { if (await p.$('.ls [data-lseq]')) break; await p.waitForTimeout(400); }
   const st = await p.evaluate(() => ({ n: document.querySelectorAll('.ls').length, txt: document.querySelector('.ls')?.innerText || '', eq: !!document.querySelector('.ls [data-lseq]:not([disabled])') }));

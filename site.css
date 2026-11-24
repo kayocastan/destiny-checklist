@@ -2666,3 +2666,68 @@ kbd{font:600 12px var(--mono);min-width:22px;text-align:center;padding:2px 7px;b
 .si-x{margin:0 0 6px;font-size:12.5px;color:var(--muted);line-height:1.45}
 .si-pv{display:block;font-size:12.5px;color:var(--acc);margin-bottom:4px}
 .si-wrap{display:grid;gap:4px}.si-wrap .ivd-st{grid-template-columns:110px minmax(0,1fr) 36px 34px}
+/* bordas: diálogos que reaproveitam .ivd-box (sem cabeçalho próprio) precisam do respiro de volta */
+.ivd-box.cmp-box,.ivd-box.mcmp-box{padding:22px 24px 20px!important;gap:14px!important}
+.cmp-hd{padding:0 52px 12px 0!important;border-bottom:1px solid var(--line);margin-bottom:4px}
+.cmp-s{padding:2px 0}.cmp-act{margin-top:8px;padding-top:12px;border-top:1px solid var(--line)}
+.mcmp-t{padding-right:52px}
+.mcmp{min-width:max-content}
+.mcmp thead th{text-align:center;padding-bottom:10px}.mcmp thead th:first-child{text-align:left}
+.mcmp td{text-align:center}
+.mcmp-n{display:inline-flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;max-width:150px;white-space:normal;line-height:1.2}
+.mcmp-n img{width:56px;height:56px;border-radius:6px;border:1px solid var(--line)}
+.mcmp thead th.ex .mcmp-n img{border-color:#e0b84a}
+.mcmp thead th.me .mcmp-n img{box-shadow:0 0 0 2px #e0b84a}
+.mcmp thead th.me .mcmp-n span{color:#e0b84a}
+.mcmp .mu{color:var(--muted)}
+/* cofre: grupos que abrem e fecham; repetidas juntas */
+.vl-gh{font:inherit;color:inherit;background:none;border:0;padding:4px 0;cursor:pointer;text-align:left;width:100%;border-bottom:1px solid var(--line)}
+.vl-ar{font-style:normal;color:var(--muted);transition:transform .15s;display:inline-block}.vl-g.shut .vl-ar{transform:rotate(-90deg)}
+.vl-ga{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 2px}.vl-jn{margin-left:auto;display:flex;gap:6px;align-items:center;font-size:13px}
+.vl-tiles{display:flex!important;flex-wrap:wrap;gap:6px}
+.vl-tiles .iv-t{width:60px;flex:none}
+.vl-dg{display:inline-flex;gap:4px;align-items:flex-end;padding:4px 6px 4px 4px;border:1px dashed color-mix(in srgb,var(--acc) 55%,var(--line));border-radius:9px;background:color-mix(in srgb,var(--acc) 6%,transparent)}
+.vl-dg small{font:600 11px var(--mono);color:var(--acc);padding-left:2px}
+@media (max-width:760px){.vl-tiles .iv-t{width:52px}}
+/* Etapa 4: análise de loadouts */
+.lda-p{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 12px}
+.lda-b{font:inherit;font-size:13.5px;padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:inherit;cursor:pointer}
+.lda-b b{font-family:var(--display,inherit);font-size:15px;margin-right:2px}
+.lda-b.err{border-color:color-mix(in srgb,var(--hard) 60%,var(--line))}.lda-b.err b{color:var(--hard)}
+.lda-b.warn{border-color:color-mix(in srgb,#e0b84a 60%,var(--line))}.lda-b.warn b{color:#e0b84a}
+.lda-b.up{border-color:color-mix(in srgb,var(--acc) 60%,var(--line))}.lda-b.up b{color:var(--acc)}
+.lda-b.ok b{color:var(--done)}.lda-b.on{background:color-mix(in srgb,var(--acc) 14%,var(--surface))}
+.lda{display:grid;gap:5px;padding:8px 10px 10px;min-width:0}
+.lda-n{margin:0;display:grid;grid-template-columns:18px minmax(0,1fr);gap:6px;font-size:12.5px;line-height:1.4;padding:5px 8px;border-radius:8px;overflow-wrap:anywhere}
+.lda-n i{font-style:normal;font-weight:700}
+.lda-n.err{background:color-mix(in srgb,var(--hard) 10%,transparent)}.lda-n.err i{color:var(--hard)}
+.lda-n.warn{background:color-mix(in srgb,#e0b84a 12%,transparent)}.lda-n.warn i{color:#e0b84a}
+.lda-n.up{background:color-mix(in srgb,var(--acc) 10%,transparent)}.lda-n.up i{color:var(--acc)}
+.lda-n.ok{background:color-mix(in srgb,var(--done) 10%,transparent)}.lda-n.ok i{color:var(--done)}
+.vd-only{display:flex;gap:8px;align-items:center;justify-content:flex-end;font-size:14px;margin:0 0 10px}
+/* Etapa 5: cofre em tabela, CSV, modo farm */
+.vl-seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.vl-seg button{font:inherit;font-size:13px;padding:6px 12px;border:0;background:none;color:var(--muted);cursor:pointer}
+.vl-seg button[aria-pressed="true"]{background:color-mix(in srgb,var(--acc) 16%,transparent);color:var(--acc)}
+.vl-imp{cursor:pointer}
+.vl-impc{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;padding:10px 12px;border:1px dashed color-mix(in srgb,var(--acc) 60%,transparent);border-radius:10px;font-size:13.5px;margin:6px 0}
+.vl-impc span{flex:1 1 260px}
+.vt-w{overflow-x:auto;max-width:100%;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+.vt{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+.vt th,.vt td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap;vertical-align:middle}
+.vt thead th{position:sticky;top:0;background:var(--surface);z-index:1}
+.vt th button{font:inherit;font-weight:500;color:var(--muted);background:none;border:0;padding:0;cursor:pointer}.vt th button.on{color:var(--acc)}
+.vt tr.pk td{background:color-mix(in srgb,var(--acc) 8%,transparent)}
+.vt td.num{text-align:right}
+.vt-n button{font:inherit;color:inherit;background:none;border:0;padding:0;display:flex;gap:8px;align-items:center;cursor:pointer;text-align:left}
+.vt-n img{width:28px;height:28px;border-radius:4px;flex:none}.vt-n span{font-weight:600}
+.vt-pk{max-width:260px;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+.vt-nt{max-width:180px;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+.vt-bulk{margin-top:6px}
+.farm{display:grid;gap:6px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);margin-bottom:10px}
+.farm.on{border-color:color-mix(in srgb,var(--done) 55%,var(--line))}
+.farm small{color:var(--muted);font-size:12.5px;line-height:1.45}
+.farm-h{display:flex;gap:10px;align-items:center}.farm-h .lbd-btn{margin-left:auto}
+.farm-t{display:flex;gap:8px;align-items:center;font-size:14.5px;cursor:pointer}
+.farm-l{list-style:none;margin:0;padding:0;display:grid;gap:3px;font-size:13px}
+.farm-l .ok{color:var(--done)}.farm-l .wa{color:#e0b84a}.farm-l .er{color:var(--hard)}.farm-l small{color:var(--muted)}

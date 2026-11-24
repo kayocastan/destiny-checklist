@@ -1607,16 +1607,19 @@ function vendorsHTML() {
   // Xûr
   const cls = profile.characters.data[charId].classType, miss = xurMissing().map(x => x.h);
   const xu = XUR && XUR.items.length && (!XUR.until || Date.parse(XUR.until) > now);
-  const xItems = xu ? XUR.items.filter(x => { const e = exoOf(x); return e && (e.t === 'w' || e.c === cls); }) : [];
-  const xCats = xu ? XUR.cats || [] : [], xLeg = xu ? XUR.leg || [] : [];
+  const only = LS.get('dc-vmiss', false), P2 = lang === 'pt';
+  const xItems = xu ? XUR.items.filter(x => { const e = exoOf(x); return e && (e.t === 'w' || e.c === cls) && (!only || miss.includes(x.h)); }) : [];
+  const xCats = xu ? (XUR.cats || []).filter(c => !only || (have.b && xurCatMissing(c))) : [], xLeg = xu && !only ? XUR.leg || [] : [];
   const xMiss = xItems.filter(x => miss.includes(x.h)).length + (have.b ? xCats.filter(xurCatMissing).length : 0);
   const hc = have.c ? coins() : null, cc = c => !c ? '' : hc == null ? `${c} ${esc(W.coins)}` : `<b class="vd-cc${hc >= c ? ' ok' : ''}">${Math.min(hc, c)}/${c}</b> ${esc(W.coins)}`;
   const xur = card('vd-xur', 'Xûr', xu ? W.xurSub2(xItems.length, cd(Date.parse(XUR.until) - now), u().classes[cls]) + (hc != null ? ' · ' + W.coinsHave(hc) : '') : (XUR ? W.xurGoneShort : u().loadingDefs), xMiss ? W.missN(xMiss) : '',
     pushBox('xur') + (xu ? `<div class="vd-x">${xItems.map(x => `<div class="vd-xi${miss.includes(x.h) ? ' miss' : ''}">${x.ic ? `<img src="${BNET}${x.ic}" alt="" loading="lazy">` : ''}<div><b>${esc(x.n)}</b><small>${esc(x.tl)}${x.cost ? ` · ${cc(x.cost)}` : ''}</small></div>${miss.includes(x.h) ? `<span class="chip hot">${esc(x.why === 'held' ? W.notHeld : W.notOwned)}</span>` : ''}</div>`).join('')}</div>${xCats.length ? `<div class="vd-k">${esc(W.xurCats)}</div><div class="vd-x">${xCats.map(x => { const m = have.b && xurCatMissing(x); return `<div class="vd-xi${m ? ' miss' : ''}">${x.ic ? `<img src="${BNET}${x.ic}" alt="" loading="lazy">` : ''}<div><b>${esc(x.n)}</b><small>${cc(x.cost)}</small></div>${m ? `<span class="chip hot">${esc(W.notOwned)}</span>` : ''}</div>`; }).join('')}</div>` : ''}${xLeg.length ? `<details class="vd-more"><summary>${esc(W.xurLeg(xLeg.length))}</summary><div class="vd-x">${xLeg.map(x => `<div class="vd-xi">${x.ic ? `<img src="${BNET}${x.ic}" alt="" loading="lazy">` : ''}<div><b>${esc(x.n)}</b><small>${esc(x.tl)}${x.cost ? ` · ${cc(x.cost)}` : ''}</small></div></div>`).join('')}</div></details>` : ''}${have.c ? `<p class="vd-note">${esc(W.coinsHave(coins()))}</p>` : ''}` : `<p class="vd-note">${esc(XUR ? W.xurGone : u().loadingDefs)}</p>`));
-  if (!VEND) return xur + VENDORS.filter(v => !v[2]).map(([, n], k) => card('vd-' + k, n, u().loadingDefs, '', '')).join('');
+  const tg = `<label class="vd-only"><input type="checkbox" data-vmiss${only ? ' checked' : ''}> ${P2 ? 'Só o que falta coletar' : 'Only what I still need'}</label>`;
+  if (!VEND) return tg + xur + VENDORS.filter(v => !v[2]).map(([, n], k) => card('vd-' + k, n, u().loadingDefs, '', '')).join('');
   const others = VEND.map((v, k) => {
     if (v.opt && (v.failed || (!v.weapons.length && !v.other.length && !v.focus?.length))) return '';
-    if (v.failed) return card('vd-' + k, v.name, W.unavailable, '', '');
+    if (v.failed) return only ? '' : card('vd-' + k, v.name, W.unavailable, '', '');
+    if (only) { const ws = (v.weapons || []).filter(w => w.owned === false); if (!ws.length) return ''; v = { ...v, weapons: ws, other: [], focus: null, sh: 0 }; }
     const wm = v.weapons.filter(w => w.owned === false).length;
     const sub = [v.focus?.length ? W.nFocus(v.focus.length) : '', v.weapons.length ? W.nWeapons(v.weapons.length) : '', v.other.length ? W.nOther(v.other.length) : '', v.until ? W.changesIn(cd(Date.parse(v.until) - now)) : ''].filter(Boolean).join(' · ');
     const body = `${v.weapons.map(w => `<div class="vd-w${wishHas(w.h) ? ' wished' : ''}"><div class="vd-wh">${FX ? wishBtn(w) : ''}${w.ic ? `<img src="${BNET}${w.ic}" alt="" loading="lazy">` : ''}<div><b>${esc(w.n)}</b><small><span class="vd-el" style="--c:${EL_COLOR[w.dt] || 'var(--muted)'}"></span>${esc(w.tl)}${w.cost ? ' · ' + esc(w.cost) : ''}</small></div>${w.owned === false ? `<span class="chip hot">${esc(W.notOwned)}</span>` : ''}</div>
@@ -1626,7 +1629,7 @@ function vendorsHTML() {
       ${v.sh ? `<p class="vd-note">${esc(W.shaders(v.sh, v.shOwn))}</p>` : ''}${v.weapons.length ? `<p class="vd-note">${esc(W.perksGold)}</p>` : ''}`;
     return card('vd-' + k, v.name, sub, wm ? W.missN(wm) : '', body);
   }).join('');
-  return xur + others;
+  return tg + (only && !xItems.length && !xCats.length ? '' : xur) + (others || (only ? `<p class="empty-msg">${P2 ? 'Nenhum vendedor tem hoje algo que falta na sua coleção.' : 'No vendor has anything you still need today.'}</p>` : ''));
 }
 
 /* ---------- Limpeza do cofre: espaço usado e itens repetidos (só mostra; desmontar é no jogo) ---------- */
@@ -1799,7 +1802,7 @@ function renderInner() {
   if (tab === 'obj' && have.a && member && LIVE.checked && !LIVE.on) loadSession();
   if ((tab === 'raid' || tab === 'dg' || tab === 'xm') && have.a && member) loadActHist();
   if (tab === 'xm') loadXmRec();
-  $('list').innerHTML = `<div class="panel">${tab === 'obj' ? newsHTML() + todoHTML() + hjExtraHTML() : ''}${tab === 'prog' ? chalHTML() + (BETA || FX ? qpHTML() : '') : ''}${tab === 'cal' ? calHTML() : ''}${tab === 'pat' ? patHTML() : ''}${tab === 'obj' ? sessHTML() : ''}${wkBar}${tsBar}${!secs.length && SCR[tab]?.ov ? `<p class="empty-msg">${lang === 'pt' ? 'Nada para mostrar aqui ainda. Os dados da Bungie desta parte não vieram ou ainda estão carregando; toque em Atualizar.' : 'Nothing to show here yet. Bungie did not send this part or it is still loading; tap Refresh.'}</p>` : ''}${secs.map(sec => {
+  $('list').innerHTML = `<div class="panel">${tab === 'obj' ? newsHTML() + todoHTML() + farmHTML('obj') + hjExtraHTML() : ''}${tab === 'prog' ? chalHTML() + (BETA || FX ? qpHTML() : '') : ''}${tab === 'cal' ? calHTML() : ''}${tab === 'pat' ? patHTML() : ''}${tab === 'obj' ? sessHTML() : ''}${wkBar}${tsBar}${!secs.length && SCR[tab]?.ov ? `<p class="empty-msg">${lang === 'pt' ? 'Nada para mostrar aqui ainda. Os dados da Bungie desta parte não vieram ou ainda estão carregando; toque em Atualizar.' : 'Nothing to show here yet. Bungie did not send this part or it is still loading; tap Refresh.'}</p>` : ''}${secs.map(sec => {
     if (sec.html) return sec.id === 'vendors' ? vendorsHTML() : sec.id === 'goals' ? goalsHTML() : sec.id === 'post' ? postHTML() : sec.id === 'wishobj' ? wishObjHTML() : sec.id === 'focus' ? focusHTML() : sec.id === 'grank' ? grObjHTML() : '';
     if (FX && sec.id === 'week' && sec.items.length) return weekHTML(sec);
     if (sec.empty) return `<p class="empty-msg${/…$/.test(sec.note || '') ? ' wait' : ''}">${esc(sec.note)}</p>`;
@@ -2188,8 +2191,8 @@ document.addEventListener('click', e => { const b = e.target.closest('[data-ldeq
 function ldListHTML() {
   const W = u().w;
   const ok = member && lbAllowed(), T = lw(), mine = ok ? savedList().map((x, i) => ({ x, i })).filter(o => o.x.cid === charId) : [];
-  const site = ok ? `<div class="ld-sec"><h3>${esc(T.onSite)} <small>${mine.length}</small></h3><p>${esc(T.onSiteN)}</p></div><div class="ld-grid">` + mine.map(({ x, i }) => `<div class="ld ldc ld-site"><div class="ldc-top"><div class="ldc-t"><small><span class="ld-tag site">${esc(T.onSite.replace(/^Criados no |^Made on the /, ''))}</span> ${esc(W.savedOn(new Date(x.at).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR', { day: '2-digit', month: '2-digit' })))}</small><h2>${esc(x.title || x.t)}</h2></div></div><div class="ld-acts"><button type="button" class="lbd-btn" data-sv="${i}">${esc(T.see)}</button>${wBtn(`data-svap="${i}"`)}${wBtn(`data-svgame="${i}"`, T.toGame)}<button type="button" class="lbd-btn ld-del${SVDEL === x.k ? ' on' : ''}" data-svdel="${i}" aria-label="${esc(T.del)}">${SVDEL === x.k ? esc(T.delQ) : '✕ ' + esc(T.del)}</button></div></div>`).join('') + '</div>' : '';
-  return `<div class="ld-wrap"><p class="ld-intro">${esc(W.ldNote)}</p>${member && lbAllowed() ? `<div class="ld-short"><button type="button" class="lb-run" data-lbopen="man">＋ ${esc(lw().ldShort)}</button><small class="lb-beta">beta</small></div>` : ''}${ok ? `<div class="ld-sec"><h3>${esc(T.inGame)} <small>${LOADOUTS.length}</small></h3></div>` : ''}<div class="ld-grid">` + LOADOUTS.map(l => {
+  const site = ok ? `<div class="ld-sec"><h3>${esc(T.onSite)} <small>${mine.length}</small></h3><p>${esc(T.onSiteN)}</p></div><div class="ld-grid">` + mine.map(({ x, i }) => `<div class="ld ldc ld-site"><div class="ldc-top"><div class="ldc-t"><small><span class="ld-tag site">${esc(T.onSite.replace(/^Criados no |^Made on the /, ''))}</span> ${esc(W.savedOn(new Date(x.at).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR', { day: '2-digit', month: '2-digit' })))}</small><h2>${esc(x.title || x.t)}</h2></div></div><div class="ld-acts"><button type="button" class="lbd-btn" data-sv="${i}">${esc(T.see)}</button>${wBtn(`data-svap="${i}"`)}${wBtn(`data-svgame="${i}"`, T.toGame)}<button type="button" class="lbd-btn ld-del${SVDEL === x.k ? ' on' : ''}" data-svdel="${i}" aria-label="${esc(T.del)}">${SVDEL === x.k ? esc(T.delQ) : '✕ ' + esc(T.del)}</button></div>${ldaNotes(ldaSaved(x))}</div>`).filter(h => ldaShow(h)).join('') + '</div>' : '';
+  return `<div class="ld-wrap"><p class="ld-intro">${esc(W.ldNote)}</p>${ldaPills()}${member && lbAllowed() ? `<div class="ld-short"><button type="button" class="lb-run" data-lbopen="man">＋ ${esc(lw().ldShort)}</button><small class="lb-beta">beta</small></div>` : ''}${ok ? `<div class="ld-sec"><h3>${esc(T.inGame)} <small>${LOADOUTS.length}</small></h3></div>` : ''}<div class="ld-grid">` + LOADOUTS.map(l => {
     const C = LDCTX[charId + ':' + l.i + ':' + lang], B = C?.B;
     if (!B) return `<button type="button" class="ld ldc" data-ldo="${l.i}"><div class="ld-head"><h2>${esc(l.name)}</h2></div><p class="ld-idea wait" role="status">${esc(u().loadingDefs)}</p></button>`;
     const eq = C.p.characterEquipment.data[C.cid].items, sub = eq.find(i => i.bucketHash === SUB_BUCKET), d = h => B.loc[h] || B.en[h] || {};
@@ -2198,8 +2201,8 @@ function ldListHTML() {
     const ic = (i, cls = '') => { const x = d(i.itemHash); return `<span class="ldc-i ${cls}${B.en[i.itemHash]?.tt === 6 ? ' ex' : ''}" title="${esc(x.n || '')}">${x.ic ? `<img src="${BNET}${x.ic}" alt="" loading="lazy">` : ''}</span>`; };
     const same = buildSig(C) === buildSig(ownCtx());
     return `<div class="ldc-w">${wOk() ? `<span class="ldc-ed"><button type="button" data-lded="${l.i}">${lang === 'pt' ? 'Editar' : 'Edit'}</button></span>` : ''}${wOk() && !same ? `<button type="button" class="ldc-eq" data-ldeq="${l.i}" title="${esc(lang === 'pt' ? 'Equipar este loadout no personagem' : 'Equip this loadout on the character')}">${esc(lang === 'pt' ? 'Equipar' : 'Equip')}</button>` : ''}<button type="button" class="ld ldc" data-ldo="${l.i}" style="--el:${a1}"><div class="ldc-top">${sub ? ic(sub, 'ldc-sub') : ''}<div class="ldc-t"><small><span class="ld-tag game">${esc(lw().inGame)}</span> ${esc(l.name)}${same ? ` · <b>${esc(W.ldEq)}</b>` : ''}</small><h2>${esc(charTitle(u().classes[C.p.characters.data[C.cid].classType] || '', d(sub?.itemHash).n))}</h2></div><span class="chev" aria-hidden="true"></span></div>
-      <div class="ldc-g">${ws.map(i => ic(i)).join('')}${xa ? ic(xa) : ''}<span class="ldc-n">${esc([...ws, xa].filter(Boolean).filter(i => B.en[i.itemHash]?.tt === 6).map(i => d(i.itemHash).n).join(' · '))}</span></div></button></div>`;
-  }).join('') + '</div>' + site + '</div>';
+      <div class="ldc-g">${ws.map(i => ic(i)).join('')}${xa ? ic(xa) : ''}<span class="ldc-n">${esc([...ws, xa].filter(Boolean).filter(i => B.en[i.itemHash]?.tt === 6).map(i => d(i.itemHash).n).join(' · '))}</span></div></button>${ldaNotes(ldaGame(l.i))}</div>`;
+  }).filter(h => ldaShow(h)).join('') + '</div>' + site + '</div>';
 }
 /* builds salvas: uma cópia do equipamento daquele momento, guardada neste navegador */
 const savedList = () => LS.get('dc-builds', []);
@@ -5297,7 +5300,7 @@ function invHTML() {
     return `<div class="iv-l">${esc(T.slots[s])}</div>${cells}${showV ? `<div class="iv-c iv-v" data-ivdrop="v" data-ivslot="${s}"><small class="iv-vn">${esc(T.inVault(vs.length))}${dn ? ` · <b>${esc(T.dups(dn))}</b>` : ''}</small><div class="iv-vg">${vs.map(x => ivTile(x)).join('')}</div></div>` : ''}`;
   }).join('');
   const nc = cols.length + (showV ? 1 : 0);
-  return `<div class="panel iv-wrap">${rlBar(all)}${ivBar()}${mob}<div class="iv-grid" style="--ivc:${cols.length};--ivv:${showV ? 1 : 0}"><span></span>${cols.map(head).join('')}${showV ? vHead : ''}${rows}</div></div>`;
+  return `<div class="panel iv-wrap">${farmHTML('inv')}${rlBar(all)}${ivBar()}${mob}<div class="iv-grid" style="--ivc:${cols.length};--ivv:${showV ? 1 : 0}"><span></span>${cols.map(head).join('')}${showV ? vHead : ''}${rows}</div></div>`;
 }
 // Cofre organizado: categorias, agrupar e ordenar, vários de uma vez
 function vltHTML() {
@@ -5316,10 +5319,13 @@ function vltHTML() {
   list.sort(sorters[INV.vs] || sorters.pw);
   const gk = x => INV.vg === 'slot' ? T.slots[x.slot] : INV.vg === 'el' ? (x.slot < 3 ? (ELEMENTS[x.el] ? (lang === 'pt' ? { prismatic: 'Prismático', arc: 'Arco', solar: 'Solar', void: 'Vácuo', stasis: 'Estase', strand: 'Filamento' } : { prismatic: 'Prismatic', arc: 'Arc', solar: 'Solar', void: 'Void', stasis: 'Stasis', strand: 'Strand' })[ELEMENTS[x.el]] : (lang === 'pt' ? 'Cinética' : 'Kinetic')) : T.other) : (INVD[x.h]?.tl || '…');
   const groups = {}; for (const x of list) (groups[gk(x)] = groups[gk(x)] || []).push(x);
-  const gHTML = Object.entries(groups).sort((a, b) => b[1].length - a[1].length).map(([n, xs]) => { const dn = new Set(xs.filter(x => x.dup).map(x => x.h)).size; return `<div class="vl-g"><span class="vl-gh"><b>${esc(n)}</b><small>${xs.length}</small>${dn ? `<small class="vl-d">${esc(T.dups(dn))}</small>` : ''}</span><div class="vl-tiles">${xs.map(x => ivTile(x)).join('')}</div></div>`; }).join('');
+  const col = new Set(LS.get('dc-vlcol', [])), jn = LS.get('dc-vljoin', true), P2 = lang === 'pt';
+  const tilesOf = xs => { if (!jn) return xs.map(x => ivTile(x)).join(''); const by = new Map(); for (const x of xs) { if (!by.has(x.h)) by.set(x.h, []); by.get(x.h).push(x); } return [...by.values()].map(cs => cs.length > 1 ? `<span class="vl-dg" title="${esc(T.copies(cs.length))}">${cs.map(x => ivTile(x)).join('')}<small>×${cs.length}</small></span>` : ivTile(cs[0])).join(''); };
+  const gl = Object.entries(groups).sort((a, b) => b[1].length - a[1].length);
+  const gHTML = (gl.length > 1 ? `<div class="vl-ga"><button type="button" class="lbd-chip" data-vlall="1">${P2 ? 'Expandir tudo' : 'Expand all'}</button><button type="button" class="lbd-chip" data-vlall="0">${P2 ? 'Recolher tudo' : 'Collapse all'}</button><label class="vl-jn"><input type="checkbox" data-vljoin${jn ? ' checked' : ''}> ${P2 ? 'Juntar repetidas' : 'Group duplicates'}</label></div>` : '') + gl.map(([n, xs]) => { const dn = new Set(xs.filter(x => x.dup).map(x => x.h)).size, shut = col.has(n) && !INV.q.trim(); return `<div class="vl-g${shut ? ' shut' : ''}"><button type="button" class="vl-gh" data-vlg="${esc(n)}" aria-expanded="${!shut}"><i class="vl-ar" aria-hidden="true">▾</i><b>${esc(n)}</b><small>${xs.length}</small>${dn ? `<small class="vl-d">${esc(T.dups(dn))}</small>` : ''}</button>${shut ? '' : `<div class="vl-tiles">${tilesOf(xs)}</div>`}</div>`; }).join('');
   const chars = ivChars(), pk = [...INV.picked].filter(id => V.some(x => x.iid === id) || all.some(x => x.iid === id));
   const bulk = INV.multi ? `<div class="vl-bulk"><b>${esc(T.sel(pk.length))}</b>${pk.length ? chars.map(c => `<button type="button" class="lbd-btn" data-ivbulk="${c.characterId}">${esc(T.take(W.classes[c.classType]))}</button>`).join('') + `<span class="vl-bt">${esc(T.tagAll)} ${TAGS.map(t => `<button type="button" class="tag-b t-${t}" data-ivbtag="${t}">${esc(tagl()[t])}</button>`).join('')}<button type="button" class="tag-b" data-ivbtag="">${esc(T.clear)}</button></span>` : ''}<small>${esc(T.noDel)}</small></div>` : '';
-  return `<div class="panel tr-wrap vl-wrap">${side}<section class="tr-main">${rlBar(V)}<div class="tr-box"><div class="tr-hd"><h2>${esc(cur[1])}</h2><small>${esc(T.items(list.length))}</small><label class="vl-sort">${esc(T.sort)} <select id="vlsort">${[['pw', T.sP], ['wish', T.sW], ['tt', T.sR], ['name', T.sN]].map(([k, t]) => `<option value="${k}"${INV.vs === k ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select></label><button type="button" class="lbd-btn${INV.multi ? ' on' : ''}" data-ivmulti>${esc(INV.multi ? T.multiOff : T.multi)}</button></div>${ivMsgH()}${ivBulkH(list)}${bulk}${gHTML || `<p class="empty-msg">${esc(T.none)}</p>`}</div></section></div>`;
+  return `<div class="panel tr-wrap vl-wrap">${side}<section class="tr-main">${rlBar(V)}<div class="tr-box"><div class="tr-hd"><h2>${esc(cur[1])}</h2><small>${esc(T.items(list.length))}</small><label class="vl-sort">${esc(T.sort)} <select id="vlsort">${[['pw', T.sP], ['wish', T.sW], ['tt', T.sR], ['name', T.sN]].map(([k, t]) => `<option value="${k}"${INV.vs === k ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select></label><button type="button" class="lbd-btn${INV.multi ? ' on' : ''}" data-ivmulti>${esc(INV.multi ? T.multiOff : T.multi)}</button>${vlTools()}</div>${ivMsgH()}${ivBulkH(list)}${bulk}${vlImpH()}${(INV.vt === 't' ? vlTableHTML(list) : gHTML) || `<p class="empty-msg">${esc(T.none)}</p>`}</div></section></div>`;
 }
 /* mover e equipar (escrita na conta), com a cópia local do perfil atualizada na hora */
 function ivFind(iid) { return invAll().find(x => x.iid === iid); }
@@ -5516,12 +5522,16 @@ document.addEventListener('click', e => {
   const f = e.target.closest('[data-ivf]'); if (f) { INV.f = f.hasAttribute('data-rltog') && INV.f === f.dataset.ivf ? 'all' : f.dataset.ivf; render(); return; }
   const mc = e.target.closest('[data-ivmc]'); if (mc) { INV.mc = mc.dataset.ivmc; render(); return; }
   const vg = e.target.closest('[data-vg]'); if (vg) { INV.vg = vg.dataset.vg; LS.set('dc-vg', INV.vg); render(); return; }
+  const vlg = e.target.closest('[data-vlg]'); if (vlg) { const c = new Set(LS.get('dc-vlcol', [])), n = vlg.dataset.vlg; c.has(n) ? c.delete(n) : c.add(n); LS.set('dc-vlcol', [...c]); render(); return; }
+  const vla = e.target.closest('[data-vlall]'); if (vla) { LS.set('dc-vlcol', vla.dataset.vlall === '1' ? [] : [...document.querySelectorAll('[data-vlg]')].map(b => b.dataset.vlg)); render(); return; }
   const vc = e.target.closest('[data-vc]'); if (vc) { INV.vc = vc.dataset.vc; LS.set('dc-vc', INV.vc); render(); return; }
   if (e.target.closest('[data-ivmulti]')) { INV.multi = !INV.multi; INV.picked.clear(); render(); return; }
   const bt = e.target.closest('[data-ivbtag]'); if (bt) { const m = LS.get('dc-tags', {}); for (const id of INV.picked) { if (bt.dataset.ivbtag) m[id] = bt.dataset.ivbtag; else delete m[id]; } LS.set('dc-tags', m); render(); return; }
   const bk = e.target.closest('[data-ivbulk]'); if (bk && !INV.busy) { (async () => { for (const id of [...INV.picked]) { await ivDo(id, bk.dataset.ivbulk, false); if (INV.msg?.bad) break; INV.picked.delete(id); } })(); }
 });
 document.addEventListener('input', e => { if (e.target.id !== 'ivq') return; INV.q = e.target.value; clearTimeout(INV.qt); INV.qt = setTimeout(() => { const pos = e.target.selectionStart; render(); const q = $('ivq'); if (q) { q.focus(); try { q.setSelectionRange(pos, pos); } catch {} } }, 180); });
+document.addEventListener('change', e => { if (e.target.matches?.('[data-vmiss]')) { LS.set('dc-vmiss', e.target.checked); render(); } });
+document.addEventListener('change', e => { if (e.target.matches?.('[data-vljoin]')) { LS.set('dc-vljoin', e.target.checked); render(); } });
 document.addEventListener('change', e => { if (e.target.id !== 'vlsort') return; INV.vs = e.target.value; LS.set('dc-vs', INV.vs); render(); });
 // arrastar (computador): solte numa coluna para mover; no quadrado grande para equipar
 document.addEventListener('dragstart', e => { const t = e.target.closest?.('[data-iv]'); if (!t || (tab !== 'inv' && tab !== 'vlt' && tab !== 'novo')) return; e.dataTransfer.setData('text/plain', t.dataset.iv); e.dataTransfer.effectAllowed = 'move'; document.body.classList.add('iv-dragging'); });
@@ -6708,13 +6718,13 @@ function ivMCmpHTML() {
   if (!ready) return box(`<p class="wait">${esc(T.loadingItem)}</p>`);
   const isW = xs[0].slot < 3, sd = Object.assign({}, ...xs.map(x => INV.det[x.iid].sd)), hs = [...new Set(xs.flatMap(x => Object.keys(INV.det[x.iid].st).map(Number)))].filter(h => sd[h]?.n && !STAT_NOBAR.has(h));
   if (!isW) hs.sort((a, b) => STAT_ORDER.indexOf(a) - STAT_ORDER.indexOf(b));
-  const val = (x, h) => INV.det[x.iid].st[h]?.value ?? 0;
-  let cols = xs.slice(); if (INV.msort) cols.sort((a, b) => INV.msort === 'pw' ? b.pw - a.pw : val(b, INV.msort) - val(a, INV.msort));
-  const cls = (v, vs) => { const mx = Math.max(...vs), mn = Math.min(...vs); if (mx === mn) return ''; if (v === mx) return 'mb'; const k = (v - mn) / (mx - mn); return k >= .75 ? 'm1' : k >= .5 ? 'm2' : k >= .25 ? 'm3' : 'm4'; };
-  const row = (lab, key, f, num) => { const vs = cols.map(f); return `<tr><th scope="row"${key ? ` data-ivms="${key}" class="srt${INV.msort == key ? ' on' : ''}"` : ''}>${esc(lab)}${key ? ' ↕' : ''}</th>${vs.map(v => `<td class="${num ? cls(v, vs) : ''}">${num ? v : v}</td>`).join('')}</tr>`; };
+  const val = (x, h) => INV.det[x.iid].st[h]?.value ?? null;
+  let cols = xs.slice(); if (INV.msort) cols.sort((a, b) => INV.msort === 'pw' ? b.pw - a.pw : (val(b, INV.msort) ?? -1) - (val(a, INV.msort) ?? -1));
+  const cls = (v, vs0) => { const vs = vs0.filter(n => n != null); if (v == null || vs.length < 2) return ''; const mx = Math.max(...vs), mn = Math.min(...vs); if (mx === mn) return ''; if (v === mx) return 'mb'; const k = (v - mn) / (mx - mn); return k >= .75 ? 'm1' : k >= .5 ? 'm2' : k >= .25 ? 'm3' : 'm4'; };
+  const row = (lab, key, f, num) => { const vs = cols.map(f); return `<tr><th scope="row"${key ? ` data-ivms="${key}" class="srt${INV.msort == key ? ' on' : ''}"` : ''}>${esc(lab)}${key ? ' ↕' : ''}</th>${vs.map(v => `<td class="${num ? cls(v, vs) : ''}">${v == null ? '—' : v}</td>`).join('')}</tr>`; };
   const W = u(), wh = x => x.where === 'v' ? T.inV : (W.classes[profile.characters.data[x.where]?.classType] || '');
-  const head = `<tr><th></th>${cols.map(x => `<th class="${x.iid === INV.sel ? 'me' : ''}"><button type="button" class="mcmp-n" data-ivmo="${x.iid}">${esc(INVD[x.h]?.n || '…')}</button><small>${esc(wh(x))}</small></th>`).join('')}</tr>`;
-  const body = [row(P ? 'Poder' : 'Power', 'pw', x => x.pw, true), ...hs.map(h => row(sd[h].n, h, x => val(x, h), true)), ...(isW ? [`<tr><th scope="row">${P ? 'Nota do roll' : 'Roll grade'}</th>${cols.map(x => `<td>${rlBadge(rlGrade(x.iid, x.h)) || '—'}</td>`).join('')}</tr>`] : []), `<tr><th scope="row">${P ? 'Etiqueta' : 'Tag'}</th>${cols.map(x => `<td>${esc(tagOf(x.iid) ? tagl()[tagOf(x.iid)] : '—')}</td>`).join('')}</tr>`].join('');
+  const head = `<tr><th></th>${cols.map(x => `<th class="${x.iid === INV.sel ? 'me' : ''}${x.ex ? ' ex' : ''}"><button type="button" class="mcmp-n" data-ivmo="${x.iid}">${INVD[x.h]?.ic ? `<img src="${BNET}${INVD[x.h].ic}" alt="">` : ''}<span>${esc(INVD[x.h]?.n || '…')}</span></button><small>${esc(wh(x))}</small></th>`).join('')}</tr>`;
+  const body = [row(P ? 'Poder' : 'Power', 'pw', x => x.pw, true), ...hs.map(h => row(sd[h].n, h, x => val(x, h), true)), ...(isW ? [`<tr><th scope="row">${P ? 'Nota do roll' : 'Roll grade'}</th>${cols.map(x => `<td>${rlBadge(rlGrade(x.iid, x.h)) || '<span class="mu">—</span>'}</td>`).join('')}</tr>`] : []), `<tr><th scope="row">${P ? 'Etiqueta' : 'Tag'}</th>${cols.map(x => `<td>${esc(tagOf(x.iid) ? tagl()[tagOf(x.iid)] : '—')}</td>`).join('')}</tr>`].join('');
   return box(`<small class="lbd-n">${P ? 'Azul = melhor; verde → vermelho. Toque no nome da linha para ordenar; no nome do item para abrir.' : 'Blue = best; green → red. Tap a row name to sort; an item name to open it.'}</small><div class="mcmp-w"><table class="mcmp"><thead>${head}</thead><tbody>${body}</tbody></table></div>`);
 }
 document.addEventListener('click', e => {
@@ -6779,6 +6789,149 @@ function siStatsHTML(x, det, sk) {
   const main = rows.filter(r => !r.hid), hid = rows.filter(r => r.hid);
   return `<div class="si-wrap"><span class="sea-k">${esc(T.stats)}</span><div class="si-lg"><span><u class="b"></u>${P ? 'base' : 'base'}</span><span><u class="p"></u>${P ? 'vantagens' : 'perks'}</span><span><u class="m"></u>${P ? 'obra-prima' : 'masterwork'}</span><span><u class="n"></u>${P ? 'perde' : 'loss'}</span></div>${sw ? `<small class="si-pv">${esc(P ? `Prévia com ${det.en[sw.h]?.n || ''} no lugar de ${det.en[det.so[sw.i].plugHash]?.n || ''}` : `Preview with ${det.en[sw.h]?.n || ''} instead of ${det.en[det.so[sw.i].plugHash]?.n || ''}`)}</small>` : ''}${main.map(line).join('')}${hid.length ? `<span class="sea-k">${P ? 'Escondidos · o jogo não mostra' : 'Hidden · not shown in game'}</span>${hid.map(line).join('')}` : ''}<small class="lbd-n">${P ? 'Toque num atributo para ver quanto cada peça soma de verdade. Carregador (≈) pode diferir do jogo.' : 'Tap a stat to see what each piece really adds. Magazine (≈) may differ from the game.'}</small></div>`;
 }
+
+/* ---------- Etapa 4 (ideia do DIM): análise de loadouts do jogo e builds salvas ----------
+   problema (err): item sumido, fragmentos além do que os aspectos dão, dois exóticos, armadura de outra classe
+   aviso (warn): mods que passam da energia da peça · melhoria (up): espaço de fragmento sobrando. Roda em segundo plano e guarda por assinatura. */
+var LDA; function lda() { return LDA || (LDA = { m: {}, busy: new Set(), f: null }); }
+function ldaInst() { const m = {}; const add = l => { for (const it of l || []) if (it.itemInstanceId) m[it.itemInstanceId] = it; }; add(profile?.profileInventory?.data?.items); for (const v of Object.values(profile?.characterInventories?.data || {})) add(v.items); for (const v of Object.values(profile?.characterEquipment?.data || {})) add(v.items); return m; }
+function ldaGame(i) { const l = profile?.characterLoadouts?.data?.[charId]?.loadouts?.[i]; if (!l) return null; const all = ldaInst(); return ldaRun('g' + charId + ':' + i, (l.items || []).filter(x => x.itemInstanceId && x.itemInstanceId !== '0').map(x => ({ iid: x.itemInstanceId, h: all[x.itemInstanceId]?.itemHash || 0, plugs: (x.plugItemHashes || []).filter(h => h && h !== 2166136261), gone: !all[x.itemInstanceId] })), profile.characters?.data?.[charId]?.classType); }
+function ldaSaved(x) { const cid = x.cid, eq = x.p?.characterEquipment?.data?.[cid]?.items || [], so = x.p?.itemComponents?.sockets?.data || {}, all = ldaInst(); return ldaRun('s' + x.k, eq.filter(i => i.itemInstanceId).map(i => ({ iid: i.itemInstanceId, h: i.itemHash, plugs: (so[i.itemInstanceId]?.sockets || []).map(s => s.plugHash).filter(Boolean), gone: !all[i.itemInstanceId] && i.bucketHash !== ARTIFACT_BUCKET })), x.p?.characters?.data?.[cid]?.classType ?? profile?.characters?.data?.[cid]?.classType); }
+function ldaRun(key, kit, cls) {
+  const A = lda(), sig = key + '|' + lang + '|' + JSON.stringify(kit.map(k => [k.iid, k.gone ? 1 : 0, k.plugs.length])); if (A.m[sig]) return A.m[sig];
+  if (!A.busy.has(sig)) { A.busy.add(sig); ldaCheck(kit, cls).then(r => { A.m[sig] = r; }).catch(() => { A.m[sig] = []; }).finally(() => { A.busy.delete(sig); clearTimeout(ldaRun.t); ldaRun.t = setTimeout(() => { if (tab === 'ld') render(); }, 150); }); }
+  return null;
+}
+async function ldaCheck(kit, cls) {
+  const P = lang === 'pt', out = [], L = lang === 'pt' ? 'pt' : 'en';
+  const en = await entities('DestinyInventoryItemDefinition', [...kit.map(k => k.h), ...kit.flatMap(k => k.plugs)].filter(Boolean), L, true);
+  const nm = h => en[h]?.n || '?';
+  for (const k of kit) if (k.gone) out.push(['err', P ? `Item sumido: ${k.h && en[k.h]?.n ? en[k.h].n : 'um item'} não está mais na conta (desmontado?).` : `Missing item: ${k.h && en[k.h]?.n ? en[k.h].n : 'an item'} is no longer on the account.`]);
+  const here = kit.filter(k => !k.gone && k.h), slot = k => { const c = ITEMS?.[k.h]; return c == null ? -1 : Math.floor(c / 100); };
+  const exA = here.filter(k => slot(k) >= 3 && slot(k) <= 7 && en[k.h]?.tt === 6), exW = here.filter(k => slot(k) >= 0 && slot(k) < 3 && en[k.h]?.tt === 6);
+  if (exA.length > 1) out.push(['err', P ? `Dois exóticos de armadura: ${exA.map(k => nm(k.h)).join(' e ')}. O jogo só equipa um.` : `Two exotic armor pieces: ${exA.map(k => nm(k.h)).join(' and ')}.`]);
+  if (exW.length > 1) out.push(['err', P ? `Duas armas exóticas: ${exW.map(k => nm(k.h)).join(' e ')}. O jogo só equipa uma.` : `Two exotic weapons: ${exW.map(k => nm(k.h)).join(' and ')}.`]);
+  for (const k of here) { const c = ITEMS?.[k.h], kc = c == null ? 3 : Math.floor(c / 10) % 10; if (slot(k) >= 3 && slot(k) <= 7 && cls != null && kc !== 3 && kc !== cls) out.push(['err', P ? `${nm(k.h)} é armadura de outra classe.` : `${nm(k.h)} is another class's armor.`]); }
+  // subclasse: aspectos × fragmentos
+  for (const k of here) {
+    const asp = k.plugs.filter(h => /\.aspects$/.test(en[h]?.pc || '')), frs = k.plugs.filter(h => /\.fragments$/.test(en[h]?.pc || '') && en[h]?.n && !/vazi|empty/i.test(en[h].n));
+    if (!asp.length) continue; for (let w = 0; w < 6 && asp.map(h => aspCap(h)).some(c => c == null); w++) await new Promise(r => setTimeout(r, 800));
+    if (asp.some(h => aspCap(h) == null)) continue; const cap = asp.reduce((t, h) => t + (aspCap(h) || 0), 0); if (!cap) continue;
+    if (frs.length > cap) out.push(['err', P ? `Fragmentos demais: ${frs.length} para ${cap} espaços (os aspectos dão ${cap}).` : `Too many fragments: ${frs.length} for ${cap} slots.`]);
+    else if (frs.length < cap) out.push(['up', P ? `Espaço de fragmento vazio: os aspectos dão ${cap} e só ${frs.length} ${frs.length === 1 ? 'está usado' : 'estão usados'}.` : `Empty fragment slot: aspects give ${cap}, only ${frs.length} used.`]);
+  }
+  // armadura: mods × energia da peça
+  const inst = profile?.itemComponents?.instances?.data || {};
+  for (const k of here) {
+    if (!(slot(k) >= 3 && slot(k) <= 7)) continue; const E = inst[k.iid]?.energy?.energyCapacity; if (!E) continue;
+    const mods = k.plugs.filter(h => /^enhancements\./.test(en[h]?.pc || '')); if (!mods.length) continue;
+    const miss = mods.filter(h => !(h in PDESC.m)); if (miss.length) await pdescLoad(miss, 12);
+    if (mods.some(h => !(h in PDESC.m))) continue; const used = mods.reduce((t, h) => t + (PDESC.m[h].e || 0), 0);
+    if (used > E) out.push(['warn', P ? `Mods que não cabem: ${nm(k.h)} tem ${E} de energia e os mods pedem ${used}. O DPI aplica o resto e avisa “parcial”.` : `Mods don't fit: ${nm(k.h)} has ${E} energy, mods need ${used}.`]);
+  }
+  return out;
+}
+const LDA_LV = { err: 3, warn: 2, up: 1 };
+function ldaLevel(r) { return !r ? '' : !r.length ? 'ok' : r.reduce((a, [k]) => LDA_LV[k] > LDA_LV[a] ? k : a, 'up'); }
+function ldaNotes(r) { const lv = ldaLevel(r), P = lang === 'pt'; if (!lv) return '<!--lda:-->'; const sym = { err: '✕', warn: '!', up: '＋', ok: '✓' }; return `<!--lda:${lv}--><div class="lda">${r.length ? r.map(([k, t]) => `<p class="lda-n ${k}"><i>${sym[k]}</i><span>${esc(t)}</span></p>`).join('') : `<p class="lda-n ok"><i>✓</i><span>${P ? 'Tudo certo: itens na conta, fragmentos e mods cabem.' : 'All good: items present, fragments and mods fit.'}</span></p>`}</div>`; }
+function ldaShow(h) { const f = lda().f; if (!f) return true; const m = /<!--lda:(\w*)-->/.exec(h); return !!m && m[1] === f; }
+function ldaPills() {
+  const A = lda(), P = lang === 'pt', cnt = { err: 0, warn: 0, up: 0, ok: 0 }; let any = false;
+  for (const l of LOADOUTS) { const lv = ldaLevel(A.m[Object.keys(A.m).find(k => k.startsWith('g' + charId + ':' + l.i + '|'))] || null); if (lv) { cnt[lv]++; any = true; } }
+  for (const x of (member && lbAllowed() ? savedList().filter(o => o.cid === charId) : [])) { const lv = ldaLevel(A.m[Object.keys(A.m).find(k => k.startsWith('s' + x.k + '|'))] || null); if (lv) { cnt[lv]++; any = true; } }
+  if (!any) return '';
+  const lab = { err: P ? 'com problema' : 'with problems', warn: P ? 'com aviso' : 'with warnings', up: P ? 'podem melhorar' : 'can improve', ok: P ? 'tudo certo' : 'all good' };
+  return `<div class="lda-p">${['err', 'warn', 'up', 'ok'].filter(k => cnt[k]).map(k => `<button type="button" class="lda-b ${k}${A.f === k ? ' on' : ''}" data-ldaf="${k}"><b>${cnt[k]}</b> ${esc(lab[k])}</button>`).join('')}${A.f ? `<button type="button" class="lbd-chip" data-ldaf="">${P ? 'Ver todos' : 'Show all'}</button>` : ''}</div>`;
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-ldaf]'); if (!b || tab !== 'ld') return; const A = lda(); A.f = b.dataset.ldaf && A.f !== b.dataset.ldaf ? b.dataset.ldaf : null; render(); });
+
+/* ---------- Etapa 5 (ideias do DIM): cofre em tabela, planilha CSV e modo farm ---------- */
+function vlTools() {
+  const P = lang === 'pt', t = INV.vt === 't';
+  return `<span class="vl-seg" role="group" aria-label="${P ? 'Ver como' : 'View as'}"><button type="button" data-vlvt="g" aria-pressed="${!t}">${P ? 'Grade' : 'Grid'}</button><button type="button" data-vlvt="t" aria-pressed="${t}">${P ? 'Tabela' : 'Table'}</button></span><button type="button" class="lbd-btn" data-csvout title="${P ? 'Baixar armas e armaduras numa planilha' : 'Download weapons and armor as a spreadsheet'}">⬇ CSV</button><label class="lbd-btn vl-imp" title="${P ? 'Importar etiquetas e anotações de uma planilha' : 'Import tags and notes from a spreadsheet'}">⬆ ${P ? 'Importar' : 'Import'}<input type="file" accept=".csv,text/csv" data-csvin hidden></label>`;
+}
+function vlTableHTML(list) {
+  const P = lang === 'pt', T = ivt(), W = u(), ts = INV.ts || { k: 'pw', d: -1 };
+  const elN = x => x.slot < 3 ? (ELEMENTS[x.el] || (P ? 'cinética' : 'kinetic')) : '';
+  const cols = [['n', P ? 'Nome' : 'Name', x => INVD[x.h]?.n || ''], ['tl', P ? 'Tipo' : 'Type', x => INVD[x.h]?.tl || ''], ['sl', P ? 'Espaço' : 'Slot', x => T.slots[x.slot]], ['el', P ? 'Elemento' : 'Element', elN], ['pw', P ? 'Poder' : 'Power', x => x.pw], ['gr', P ? 'Nota' : 'Grade', x => x.slot < 3 ? ({ s: 5, g: 4, a: 3, p: 2, b: 2, n: 1, c: 1 }[rlGrade(x.iid, x.h)] || 0) : 0], ['pk', P ? 'Vantagens' : 'Perks', x => x.slot < 3 ? pkNames(x) : ''], ['tg', P ? 'Etiqueta' : 'Tag', x => tagOf(x.iid) ? tagl()[tagOf(x.iid)] : ''], ['nt', P ? 'Anotação' : 'Note', x => LS.get('dc-notes', {})[x.iid] || '']];
+  const f = cols.find(c => c[0] === ts.k)?.[2] || cols[4][2], rows = list.slice().sort((a, b) => { const va = f(a), vb = f(b); return (typeof va === 'number' ? va - vb : String(va).localeCompare(String(vb))) * ts.d; });
+  if (!PKN.done) pkLoad();
+  const pk = INV.picked, all = rows.length && rows.every(x => pk.has(x.iid)), chars = ivChars();
+  const bulk = pk.size ? `<div class="vl-bulk vt-bulk"><b>${esc(T.sel(pk.size))}</b>${chars.map(c => `<button type="button" class="lbd-btn" data-ivbulk="${c.characterId}">${esc(T.take(W.classes[c.classType]))}</button>`).join('')}<span class="vl-bt">${esc(T.tagAll)} ${TAGS.map(t => `<button type="button" class="tag-b t-${t}" data-ivbtag="${t}">${esc(tagl()[t])}</button>`).join('')}<button type="button" class="tag-b" data-ivbtag="">${esc(T.clear)}</button></span></div>` : '';
+  const th = ([k, n]) => `<th scope="col"><button type="button" data-vlts="${k}" class="${ts.k === k ? 'on' : ''}">${esc(n)}${ts.k === k ? (ts.d < 0 ? ' ↓' : ' ↑') : ''}</button></th>`;
+  const td = x => { const D = INVD[x.h] || {}, g = x.slot < 3 ? rlBadge(rlGrade(x.iid, x.h)) : ''; return `<tr${pk.has(x.iid) ? ' class="pk"' : ''}><td><input type="checkbox" data-vlpick="${x.iid}"${pk.has(x.iid) ? ' checked' : ''} aria-label="${esc(D.n || '')}"></td><td class="vt-n"><button type="button" data-iv="${x.iid}">${D.ic ? `<img src="${BNET}${D.ic}" alt="" loading="lazy">` : ''}<span>${esc(D.n || '…')}</span></button></td><td>${esc(D.tl || '')}</td><td>${esc(T.slots[x.slot])}</td><td>${x.slot < 3 && ELEMENTS[x.el] ? `<span class="vd-el" style="--c:${EL_COLOR[x.el] || 'var(--muted)'}"></span>` : ''}</td><td class="num">${x.pw || ''}</td><td>${g || ''}</td><td class="vt-pk">${esc(x.slot < 3 ? pkNames(x) : '')}</td><td>${esc(tagOf(x.iid) ? tagl()[tagOf(x.iid)] : '')}</td><td class="vt-nt">${esc(LS.get('dc-notes', {})[x.iid] || '')}</td></tr>`; };
+  return `${bulk}<div class="vt-w"><table class="vt"><thead><tr><th><input type="checkbox" data-vlpickall${all ? ' checked' : ''} aria-label="${P ? 'Marcar todos' : 'Select all'}"></th>${cols.map(th).join('')}</tr></thead><tbody>${rows.map(td).join('')}</tbody></table></div>`;
+}
+document.addEventListener('click', e => {
+  if (tab !== 'vlt') return;
+  const v = e.target.closest('[data-vlvt]'); if (v) { INV.vt = v.dataset.vlvt; LS.set('dc-vt', INV.vt); INV.picked.clear(); render(); return; }
+  const so = e.target.closest('[data-vlts]'); if (so) { const k = so.dataset.vlts, ts = INV.ts || { k: 'pw', d: -1 }; INV.ts = { k, d: ts.k === k ? -ts.d : (k === 'pw' || k === 'gr' ? -1 : 1) }; render(); return; }
+  if (e.target.closest('[data-csvout]')) csvOut();
+  if (e.target.closest('[data-impok]') && INV.imp) { LS.set('dc-tags', INV.imp.tags); LS.set('dc-notes', INV.imp.notes); INV.imp = null; INV.msg = { t: lang === 'pt' ? 'Etiquetas e anotações gravadas.' : 'Tags and notes saved.' }; render(); return; }
+  if (e.target.closest('[data-impx]')) { INV.imp = null; render(); }
+});
+document.addEventListener('change', e => {
+  if (e.target.matches?.('[data-vlpick]')) { const id = e.target.dataset.vlpick; e.target.checked ? INV.picked.add(id) : INV.picked.delete(id); render(); return; }
+  if (e.target.matches?.('[data-vlpickall]')) { const ids = [...document.querySelectorAll('[data-vlpick]')].map(i => i.dataset.vlpick); if (e.target.checked) ids.forEach(id => INV.picked.add(id)); else INV.picked.clear(); render(); return; }
+  if (e.target.matches?.('[data-csvin]')) { const f = e.target.files?.[0]; if (f) f.text().then(csvIn).catch(() => {}); e.target.value = ''; }
+});
+if (INV.vt == null) INV.vt = LS.get('dc-vt', 'g');
+const csvQ = v => { const t = String(v ?? ''); return /[;"\n\r]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; };
+function csvOut() {
+  const P = lang === 'pt', T = ivt(), W = u(), notes = LS.get('dc-notes', {}); if (!PKN.done) pkLoad();
+  const head = P ? ['Id', 'Hash', 'Nome', 'Tipo', 'Espaço', 'Classe', 'Elemento', 'Poder', 'Nota', 'Vantagens', 'Onde', 'Equipado', 'Trancado', 'Etiqueta', 'Anotação'] : ['Id', 'Hash', 'Name', 'Type', 'Slot', 'Class', 'Element', 'Power', 'Grade', 'Perks', 'Where', 'Equipped', 'Locked', 'Tag', 'Notes'];
+  const rows = invAll().map(x => { const D = INVD[x.h] || {}; return [x.iid, x.h, D.n || '', D.tl || '', T.slots[x.slot], x.slot < 3 || x.cls === 3 ? '' : W.classes[x.cls] || '', x.slot < 3 ? ELEMENTS[x.el] || '' : '', x.pw || '', x.slot < 3 ? (rlGrade(x.iid, x.h) || '').toUpperCase() : '', x.slot < 3 ? pkNames(x) : '', x.where === 'v' ? T.vault : W.classes[profile.characters.data[x.where]?.classType] || '', x.eq ? 'x' : '', x.lk ? 'x' : '', tagOf(x.iid) ? tagl()[tagOf(x.iid)] : '', notes[x.iid] || '']; });
+  const csv = '﻿' + [head, ...rows].map(r => r.map(csvQ).join(';')).join('\r\n'), a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = `dpi-armas-e-armaduras-${new Date().toISOString().slice(0, 10)}.csv`; document.body.append(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+function csvParse(t) {
+  t = t.replace(/^﻿/, ''); const sep = (t.split('\n')[0].match(/;/g) || []).length >= (t.split('\n')[0].match(/,/g) || []).length ? ';' : ',', rows = []; let row = [], cur = '', q = false;
+  for (let i = 0; i < t.length; i++) { const c = t[i]; if (q) { if (c === '"') { if (t[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; } else if (c === '"') q = true; else if (c === sep) { row.push(cur); cur = ''; } else if (c === '\n' || c === '\r') { if (c === '\r' && t[i + 1] === '\n') i++; row.push(cur); rows.push(row); row = []; cur = ''; } else cur += c; }
+  if (cur || row.length) { row.push(cur); rows.push(row); } return rows.filter(r => r.some(x => x.trim()));
+}
+function csvIn(text) {
+  const P = lang === 'pt', rows = csvParse(text); if (rows.length < 2) return; const h = rows[0].map(x => palNorm(x.trim()));
+  const ci = h.indexOf('id'), ti = h.findIndex(x => x === 'etiqueta' || x === 'tag'), ni = h.findIndex(x => x === 'anotacao' || x === 'notes' || x === 'nota de texto');
+  if (ci < 0 || (ti < 0 && ni < 0)) { INV.msg = { bad: true, t: P ? 'A planilha precisa das colunas Id e Etiqueta ou Anotação.' : 'The sheet needs Id and Tag or Notes columns.' }; render(); return; }
+  const have = new Set(invAll().map(x => x.iid)), tags = LS.get('dc-tags', {}), notes = LS.get('dc-notes', {}), lab = {}; for (const k of TAGS) { lab[palNorm(tagl()[k])] = k; lab[k] = k; } Object.assign(lab, { favorite: 'fav', keep: 'keep', junk: 'junk', infuse: 'inf', favorito: 'fav', manter: 'keep', lixo: 'junk', infundir: 'inf' });
+  let nt = 0, nn = 0, skip = 0;
+  for (const r of rows.slice(1)) { const id = (r[ci] || '').trim(); if (!have.has(id)) { skip++; continue; }
+    if (ti >= 0) { const v = palNorm((r[ti] || '').trim()), k = v ? lab[v] : ''; if (k !== undefined && (tags[id] || '') !== (k || '')) { if (k) tags[id] = k; else delete tags[id]; nt++; } }
+    if (ni >= 0) { const v = (r[ni] || '').trim().slice(0, 120); if ((notes[id] || '') !== v) { if (v) notes[id] = v; else delete notes[id]; nn++; } } }
+  INV.imp = { tags, notes, nt, nn, skip }; render();
+}
+function vlImpH() { const I = INV.imp, P = lang === 'pt'; if (!I) return ''; return `<div class="vl-impc"><span>${esc(P ? `Vai mudar ${I.nt} etiqueta${I.nt === 1 ? '' : 's'} e ${I.nn} anotaç${I.nn === 1 ? 'ão' : 'ões'}${I.skip ? ` (${I.skip} linha${I.skip === 1 ? '' : 's'} de itens que não estão mais na conta ficam de fora)` : ''}.` : `${I.nt} tags and ${I.nn} notes will change${I.skip ? ` (${I.skip} rows skipped)` : ''}.`)}</span><button type="button" class="lb-run" data-impok${I.nt + I.nn ? '' : ' disabled'}>${P ? 'Gravar' : 'Save'}</button><button type="button" class="lbd-btn" data-impx>${P ? 'Cancelar' : 'Cancel'}</button></div>`; }
+/* modo farm: só para o clã; a cada 2 min deixa 1 espaço livre de cada tipo no personagem (manda o de menor nota para o cofre). Desliga em 3 h. */
+var FARM; function farm() { return FARM || (FARM = { on: false, cid: null, t: null, at: 0, moved: [], busy: false, err: '', last: 0, pm: 0 }); }
+const farmOk = () => !!member && (orlaOK() || LS.get('dc-orla', null)?.ok === true);
+function farmStop() { const F = farm(); F.on = false; clearInterval(F.t); F.t = null; render(); }
+function farmStart() { const F = farm(), c = ivChars()[0]; if (!c) return; Object.assign(F, { on: true, cid: c.characterId, at: Date.now(), moved: [], err: '' }); clearInterval(F.t); F.t = setInterval(farmTick, 120000); farmTick(); render(); }
+async function farmTick() {
+  const F = farm(); if (!F.on || F.busy || !profile) return; if (Date.now() - F.at > 3 * 3600e3) { farmStop(); return; } F.busy = true;
+  try {
+    const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=102,201,205,300`);
+    if (r.profileInventory) profile.profileInventory = r.profileInventory; if (r.characterInventories) profile.characterInventories = r.characterInventories; if (r.characterEquipment) profile.characterEquipment = r.characterEquipment;
+    if (r.itemComponents?.instances?.data) Object.assign(profile.itemComponents.instances.data, r.itemComponents.instances.data);
+    F.pm = (profile.characterInventories?.data?.[F.cid]?.items || []).filter(i => i.bucketHash === 215593132).length;
+    for (let sl = 0; sl < 8; sl++) {
+      const here = invAll().filter(y => y.where === F.cid && !y.eq && y.slot === sl); if (here.length < IV_CAP) continue;
+      const ld = ivLdSet(F.cid), out = here.map(y => [y, ivOutScore(y, F.cid, ld)]).filter(a => isFinite(a[1]) && tagOf(a[0].iid) !== 'keep').sort((a, b) => a[1] - b[1])[0]?.[0]; if (!out) continue;
+      await ivVaultRoom(out.iid, F.cid, sl, []); await ivXfer(out, true, F.cid); ivLocalMove(out, 'v'); F.moved.push(out.iid);
+    }
+    F.err = '';
+  } catch (e) { F.err = ivErr(e); }
+  F.busy = false; F.last = Date.now(); if (tab === 'inv' || tab === 'obj') render();
+}
+function farmHTML(where) {
+  if (!farmOk() || !have.c) return ''; const F = farm(), P = lang === 'pt', W = u();
+  if (!F.on) return where === 'obj' ? '' : `<div class="farm"><label class="farm-t"><input type="checkbox" data-farm> <b>${P ? 'Modo farm' : 'Farming mode'}</b> <small class="lb-beta">${P ? 'clã' : 'clan'}</small></label><small>${P ? 'Confere a cada 2 min e manda para o cofre o necessário para deixar 1 espaço livre de cada tipo no personagem atual, para nada cair no Postmaster. Nunca move equipado, Favorito nem Manter. Desliga sozinho em 3 h ou ao fechar o site.' : 'Every 2 min, sends items to the vault so each slot keeps 1 free space on your current character. Never moves equipped, Favorite or Keep items. Turns off after 3 h or when you close the site.'}</small></div>`;
+  const mins = Math.round((Date.now() - F.at) / 60000), nx = F.last ? Math.max(0, Math.round((F.last + 120000 - Date.now()) / 1000)) : 0, vUsed = ivVUsed();
+  return `<div class="farm on"><div class="farm-h"><label class="farm-t"><input type="checkbox" data-farm checked> <b>${esc(P ? `Modo farm no ${W.classes[profile.characters.data[F.cid]?.classType] || ''}` : `Farming on ${W.classes[profile.characters.data[F.cid]?.classType] || ''}`)}</b></label><button type="button" class="lbd-btn" data-farmstop>${P ? 'Parar' : 'Stop'}</button></div>
+    <small class="farm-s">${esc(P ? `Ligado há ${mins} min${F.busy ? ' · conferindo agora…' : nx ? ` · próxima conferida em ~${Math.ceil(nx / 60)} min` : ''}` : `On for ${mins} min${F.busy ? ' · checking…' : ''}`)}</small>
+    <ul class="farm-l"><li class="ok">✓ ${esc(P ? `${F.moved.length} ${F.moved.length === 1 ? 'item foi' : 'itens foram'} para o cofre` : `${F.moved.length} items sent to the vault`)}${F.moved.length ? ` <small>(${esc(F.moved.slice(-4).map(ivNameOf).join(', '))})</small>` : ''}</li><li class="${F.pm ? 'wa' : 'ok'}">${F.pm ? '!' : '✓'} ${esc(P ? (F.pm ? `Postmaster: ${F.pm} ${F.pm === 1 ? 'item' : 'itens'}` : 'Postmaster vazio') : (F.pm ? `Postmaster: ${F.pm}` : 'Postmaster empty'))}</li><li class="${vUsed >= VAULT_MAX - 10 ? 'wa' : 'ok'}">${vUsed >= VAULT_MAX - 10 ? '!' : '✓'} ${esc((P ? 'Cofre: ' : 'Vault: ') + vUsed + ' / ' + VAULT_MAX)}</li>${F.err ? `<li class="er">✕ ${esc(F.err)}</li>` : ''}</ul></div>`;
+}
+document.addEventListener('change', e => { if (e.target.matches?.('[data-farm]')) { if (e.target.checked) farmStart(); else farmStop(); } });
+document.addEventListener('click', e => { if (e.target.closest('[data-farmstop]')) farmStop(); });
 
 // deslizar para o lado na lista troca de subaba; puxar para baixo no topo atualiza (só toque, só /beta)
 (() => {
