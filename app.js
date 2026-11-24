@@ -34,7 +34,7 @@ const UI = {
     newsLink: 'Novidades e sugestões', newsShort: 'Novidades', sugNew: n => n === 1 ? '1 sugestão nova' : `${n} sugestões novas`, disclaimer: 'Dados lidos da sua conta pela API oficial da Bungie. Este site não é afiliado à Bungie.',
     loadouts: 'Loadouts', checklist: 'Central', outQ: 'Confirmar?', liveT: 'Ao vivo', liveYou: 'você', liveSince: t => `desde ${t}`, livePriv: 'Build privada', liveTap: 'Toque para ver a build completa', statsT: 'Atributos', glT: 'Metas de build', ssRec: 'Novo recorde', ssRecBest: 'seu melhor tempo até hoje', ssRecSub: (o, d) => `antes ${o} · ${d} mais rápido`, ssSolo: 'Solo', ssSoloFl: 'Solo sem morrer', wkFeatT: 'Em destaque', wkFull: 'Abrir página', wkAllDone: 'Tudo feito aqui.', wkRwSt: { red: 'resgatada', earn: 'pronta para resgatar', todo: 'falta fazer' }, wkKind: { ch: 'Desafio', rw: 'Recompensas', q: 'Missão' }, glNote: 'Builds que você quer montar: cada item se marca sozinho quando você libera ou pega.', glAdd: n => `Faltam ${n} itens para você usar esta build.`, glBtn: '＋ Virar objetivo', glDone: 'Já é um objetivo', glView: 'Ver build', glDel: 'Remover', glAt: d => `adicionada em ${d}`, glSet: (n, k) => `Conjunto ${n}: ${k} ${k === 1 ? 'peça' : 'peças'}`, glSetSrc: 'qualquer peça do conjunto, para os bônus', glRef: 'Atributos da build', glYou: 'você', glNone: 'Nenhuma meta ainda. Na comparação de builds, use “Virar objetivo” no que falta.', glSrcPlug: 'Liberar no menu da subclasse', glG: { asp: 'Aspectos', fr: 'Fragmentos', ab: 'Habilidades', w: 'Armas', a: 'Armadura' }, tsK: 'Ordenar', ytGuide: 'Guia em vídeo', postT: 'Correios', lbT: 'Montador de loadout', lbNote: 'Escolha o exótico e a ordem dos atributos: o DPI testa as combinações das suas armaduras (cofre e personagens) e manda a escolhida para o DIM.', lbLoad: 'Carregar minhas armaduras', lbLoading: 'Lendo as armaduras e os atributos de cada peça…', lbErr: 'Não deu para ler as armaduras agora.', lbExo: 'Exótico', lbExoAny: 'Qualquer um', lbExoNone: 'Nenhum', lbSet: 'Bônus de conjunto', lbSetAny: 'Não importa', lbNeed: 'Peças do conjunto', lbPrio: 'Atributos em ordem de importância (mínimo opcional)', lbMin: 'mín.', lbRun: 'Buscar combinações', lbRunning: 'Testando…', lbPieces: n => `${n} peças desta classe`, lbReload: 'Recarregar armaduras', lbMeta: (n, s) => `${n} combinações testadas em ${s} s · 10 melhores`, lbNone: 'Nenhuma combinação atende aos mínimos escolhidos.', lbNoSet: 'Sem bônus de conjunto', lbDim: 'Abrir no DIM', lbVault: 'Cofre', lbEquipped: 'Equipada', pfNotFound: n => `Não encontrei o guardião ${n}.`, pfErr: 'Não deu para carregar o perfil agora.', pfRank: n => `Patente de Guardião ${n}`, pfCmp: 'Comparar comigo', pfCopy: 'Copiar link', pfPlayed: d => `jogou em ${d}`, pfClears: 'conclusões no total', pfSeals: 'títulos completos', pfHours: 'Horas jogadas', pfAllChars: 'em todos os personagens', pfActs: 'Incursões e masmorras', pfAct: 'Atividade', pfClearsH: 'Conclusões', pfFast: 'Mais rápida', pfNone: 'Nenhuma incursão ou masmorra concluída ainda (ou perfil privado).', pfRest: n => `${n} ainda não concluídas não aparecem aqui.`, pfPriv: 'Triunfos privados.', pfBuild: 'Build atual', pfBuildNote: 'O que está equipado agora no personagem jogado por último, com perks e mods.', pfBuildBtn: 'Ver build completa', pfFoot: 'Dados ao vivo da API da Bungie.', pubB: 'Link público da build', pubWait: 'Gerando link…', pubImg: 'Gerando a prévia…', pubOk: 'Link copiado!', pubRepl: t => `Link copiado · substituiu o mais antigo (${t})`, pubErr: 'Não deu certo, tente de novo', shrT: 'Compartilhar', shrPub: 'Link desta build', shrPubD: 'Fica igual para sempre e mostra prévia no Discord. Até 5 por conta: o 6º substitui o mais antigo.', shrProf: 'Link do perfil', shrProfD: 'Sempre mostra a build que está em uso no momento.', shrImg: 'Imagem da build', shrImgD: 'Gera uma imagem para mandar como foto.', wishT: 'Lista de desejos', wishHave: 'já tem na coleção', focT: 'Foco', focNote: 'O que você marcou com ☆ em títulos, incursões, masmorras, missões, exóticos e catalisadores.', focMore: n => `+ ${n} itens`, focDone: 'Tudo feito!', wishAny: 'Qualquer', wishSt1: 'Atributo principal', wishSt2: 'Secundário', wishNoSrc: 'Fonte não informada pela Bungie.', wishObjNote: 'Armas e armaduras que você marcou com ☆: o roll ou os atributos que você quer e onde dropam.', wishOnSaleN: n => n === 1 ? '1 está à venda agora!' : `${n} estão à venda agora!`, wishShort: 'Desejo', wishNote: 'Toque na ☆ de uma arma nos vendedores para guardar aqui. Quando ela estiver à venda, aparece em Hoje.', wishNone: 'Nada na lista ainda.', wishSale: who => `à venda agora com ${who}`, todayT: 'Hoje', todayReset: t => `Reseta em ${t} (14h de Brasília).`, todayNone: 'Nenhuma arma nova nos vendedores hoje.', todayNote: 'Armas que os vendedores trocam todo dia; ☆ guarda na lista de desejos.', clckT: 'Checklist do clã', clckNote: 'Quem do clã já fez cada incursão e masmorra, para montar grupos de primeira vez.', clckBtn: n => `Carregar (${n} membros)`, clckLoading: (a, b) => `Carregando ${a}/${b}…`, clckNever: 'Nunca fizeram:', clckAll: 'Todo mundo já fez.', clckPriv: n => n ? `${n} com perfil privado ficaram de fora.` : '', clckRe: 'Atualizar', clckAllF: 'Todas', fgT: 'Grupo de primeira vez', fgAnyAll: 'Nunca fez nenhuma incursão nem masmorra', fgAnyRaid: 'Nunca fez nenhuma incursão', fgAnyDg: 'Nunca fez nenhuma masmorra', fgNote: 'Escolha a incursão ou masmorra: aparece quem do clã nunca fez (online primeiro) e quem já fez e pode guiar.', fgLoad: 'Carregar dados do clã', fgMe: 'Você também nunca fez esta: boa hora para montar o grupo!', fgOn: n => `Online agora e nunca fizeram (${n})`, fgNoneOn: 'Ninguém online que nunca fez.', fgOff: 'Nunca fizeram (jogaram por último)', fgGuides: n => `Já fizeram e podem guiar (${n})`, cmpgT: 'Comparar guardiões', cmpgNote: 'Conclusões de cada incursão e masmorra, lado a lado.', cmpgPick: 'Escolha um favorito ou alguém do clã…', cmpgYou: 'Você', cmpgTot: 'Total', cmpgPriv: 'Esse guardião tem o perfil privado.', postEmpty: 'Nada parado nos correios dos seus personagens.', postFull: 'Correio quase cheio: com 21 itens, o que chegar depois se perde.', postNote: 'Pegue no Postmaster, na Torre. Os exóticos aparecem em dourado.', newsT: t => `Destiny 2 atualizou: ${t.replace(/^Destiny 2\s*/i, '')}`, newsAgo: d => d <= 0 ? 'hoje' : d === 1 ? 'ontem' : `há ${d} dias`, newsRead: 'Ler as notas ↗', ytMany: n => `Vídeos (${n})`, giBtn: n => `Imagens (${n})`, giFull: 'Tamanho original', giClose: 'Fechar', tsO: { tier: 'Dificuldade', wpn: 'Falta arma', cat: 'Falta catalisador', near: 'Quase lá', low: 'Menos feitos', name: 'A–Z' }, tsNone: 'Nada aqui com esse filtro.', statsHi: 'acima de 100: bônus extra',
     tabs: { obj: 'Hoje', act: 'Progresso', drops: 'Arsenal', gd: 'Guardião', clan: 'Clã' },
-    subs: { pat: 'Padrões', cal: 'Calendário', acts: 'Atividades', tt: 'Títulos e triunfos', colx: 'Colecionáveis', invp: 'Inventário', coll: 'Coleção', ld: 'Loadouts', inv: 'Personagens', vlt: 'Cofre', obj: 'Principal', prog: 'Desafios', camp: 'Campanhas', raid: 'Incursões', dg: 'Masmorras', xm: 'Missões exóticas', tit: 'Títulos', tri: 'Triunfos', exo: 'Exóticos', cat: 'Catalisadores', vend: 'Vendedores', gd: 'Builds', gcl: 'Membros', gclb: 'Placar', gclg: 'Grupos', gcla: 'Administração', gcld: 'Discord do clã', gclo: 'Orla Bot', grep: 'Relatórios', gst: 'Estatísticas', gar: 'Armaduras' },
+    subs: { novo: 'Itens novos', pat: 'Padrões', cal: 'Calendário', acts: 'Atividades', tt: 'Títulos e triunfos', colx: 'Colecionáveis', invp: 'Inventário', coll: 'Coleção', ld: 'Loadouts', inv: 'Personagens', vlt: 'Cofre', obj: 'Principal', prog: 'Desafios', camp: 'Campanhas', raid: 'Incursões', dg: 'Masmorras', xm: 'Missões exóticas', tit: 'Títulos', tri: 'Triunfos', exo: 'Exóticos', cat: 'Catalisadores', vend: 'Vendedores', gd: 'Builds', gcl: 'Membros', gclb: 'Placar', gclg: 'Grupos', gcla: 'Administração', gcld: 'Discord do clã', gclo: 'Orla Bot', grep: 'Relatórios', gst: 'Estatísticas', gar: 'Armaduras' },
     heroTitle: 'Central do Guardião', heroText: 'Entre com a sua conta Bungie.net para verificar seus objetivos, acompanhar a rotação semanal, completar seu arsenal exótico e compartilhar suas builds.', lsQ: 'Buscar guardião: Nome#1234', lsBtn: 'Buscar', lsHint: 'Veja a build equipada de qualquer jogador, sem precisar entrar.',
     heroList: ['O site só lê os seus dados; não altera nada no jogo.', 'Sua senha fica na Bungie; o site nunca vê.', 'Marcações, favoritos e builds salvas sincronizam entre celular e PC.'],
     login: 'Entrar com Bungie.net', notConfigured: 'O site ainda não foi configurado: faltam as chaves da Bungie nas variáveis de ambiente da Vercel.',
@@ -89,7 +89,7 @@ const UI = {
     newsLink: "What's new & suggestions", newsShort: "What's new", sugNew: n => n === 1 ? '1 new suggestion' : `${n} new suggestions`, disclaimer: 'Data read from your account through the official Bungie API. This site is not affiliated with Bungie.',
     loadouts: 'Loadouts', checklist: 'Hub', outQ: 'Confirm?', liveT: 'Live', liveYou: 'you', liveSince: t => `since ${t}`, livePriv: 'Private build', liveTap: 'Tap to see the full build', statsT: 'Stats', glT: 'Build goals', ssRec: 'New record', ssRecBest: 'your best time ever', ssRecSub: (o, d) => `was ${o} · ${d} faster`, ssSolo: 'Solo', ssSoloFl: 'Solo flawless', wkFeatT: 'Featured', wkFull: 'Open page', wkAllDone: 'All done here.', wkRwSt: { red: 'claimed', earn: 'ready to claim', todo: 'to do' }, wkKind: { ch: 'Challenge', rw: 'Rewards', q: 'Quest' }, glNote: 'Builds you want to put together: each item checks itself off when you unlock or get it.', glAdd: n => `You're missing ${n} items to run this build.`, glBtn: '＋ Make it a goal', glDone: 'Already a goal', glView: 'View build', glDel: 'Remove', glAt: d => `added ${d}`, glSet: (n, k) => `${n} set: ${k} ${k === 1 ? 'piece' : 'pieces'}`, glSetSrc: 'any piece of the set, for the bonuses', glRef: 'Build stats', glYou: 'you', glNone: 'No goals yet. In build comparison, use “Make it a goal” on what is missing.', glSrcPlug: 'Unlock in the subclass menu', glG: { asp: 'Aspects', fr: 'Fragments', ab: 'Abilities', w: 'Weapons', a: 'Armor' }, tsK: 'Sort', ytGuide: 'Video guide', postT: 'Postmaster', lbT: 'Loadout builder', lbNote: 'Pick the exotic and the stat order: DPI tests the combinations of your armor (vault and characters) and sends the one you pick to DIM.', lbLoad: 'Load my armor', lbLoading: 'Reading your armor and each piece stats…', lbErr: "Couldn't read your armor right now.", lbExo: 'Exotic', lbExoAny: 'Any', lbExoNone: 'None', lbSet: 'Set bonus', lbSetAny: "Doesn't matter", lbNeed: 'Set pieces', lbPrio: 'Stats in order of importance (optional minimum)', lbMin: 'min.', lbRun: 'Find combinations', lbRunning: 'Testing…', lbPieces: n => `${n} pieces for this class`, lbReload: 'Reload armor', lbMeta: (n, s) => `${n} combinations tested in ${s} s · top 10`, lbNone: 'No combination meets the chosen minimums.', lbNoSet: 'No set bonus', lbDim: 'Open in DIM', lbVault: 'Vault', lbEquipped: 'Equipped', pfNotFound: n => `Couldn't find the guardian ${n}.`, pfErr: "Couldn't load the profile right now.", pfRank: n => `Guardian Rank ${n}`, pfCmp: 'Compare with me', pfCopy: 'Copy link', pfPlayed: d => `played ${d}`, pfClears: 'total clears', pfSeals: 'titles completed', pfHours: 'Hours played', pfAllChars: 'across all characters', pfActs: 'Raids and dungeons', pfAct: 'Activity', pfClearsH: 'Clears', pfFast: 'Fastest', pfNone: 'No raid or dungeon clears yet (or private profile).', pfRest: n => `${n} not cleared yet are hidden.`, pfPriv: 'Triumphs are private.', pfBuild: 'Current build', pfBuildNote: 'What is equipped right now on the last played character, with perks and mods.', pfBuildBtn: 'See full build', pfFoot: 'Live data from the Bungie API.', pubB: 'Public build link', pubWait: 'Creating link…', pubImg: 'Making the preview…', pubOk: 'Link copied!', pubRepl: t => `Link copied · replaced the oldest (${t})`, pubErr: 'Something went wrong, try again', shrT: 'Share', shrPub: 'Link to this build', shrPubD: 'Stays the same forever and shows a preview on Discord. Up to 5 per account: the 6th replaces the oldest.', shrProf: 'Profile link', shrProfD: 'Always shows the build in use right now.', shrImg: 'Build image', shrImgD: 'Makes an image to send as a picture.', wishT: 'Wishlist', wishHave: 'already in collection', focT: 'Focus', focNote: 'What you starred in titles, raids, dungeons, missions, exotics and catalysts.', focMore: n => `+ ${n} more`, focDone: 'All done!', wishAny: 'Any', wishSt1: 'Primary stat', wishSt2: 'Secondary', wishNoSrc: 'No source listed by Bungie.', wishObjNote: 'Weapons and armor you starred: the roll or stats you want and where they drop.', wishOnSaleN: n => n === 1 ? '1 is for sale now!' : `${n} are for sale now!`, wishShort: 'Wish', wishNote: 'Tap the ☆ on a vendor weapon to save it here. When it is for sale, it shows up in Today.', wishNone: 'Nothing on the list yet.', wishSale: who => `for sale now at ${who}`, todayT: 'Today', todayReset: t => `Resets in ${t} (17:00 UTC).`, todayNone: 'No new weapons at the vendors today.', todayNote: 'Weapons the vendors swap every day; ☆ saves to your wishlist.', clckT: 'Clan checklist', clckNote: 'Who in the clan has done each raid and dungeon, to build first-timer groups.', clckBtn: n => `Load (${n} members)`, clckLoading: (a, b) => `Loading ${a}/${b}…`, clckNever: 'Never done:', clckAll: 'Everyone has done it.', clckPriv: n => n ? `${n} with private profiles left out.` : '', clckRe: 'Refresh', clckAllF: 'All', fgT: 'First-timer group', fgAnyAll: 'Never done any raid or dungeon', fgAnyRaid: 'Never done any raid', fgAnyDg: 'Never done any dungeon', fgNote: 'Pick the raid or dungeon: see who in the clan has never done it (online first) and who has and can guide.', fgLoad: 'Load clan data', fgMe: 'You have never done this one either: good time to build the group!', fgOn: n => `Online now, never done (${n})`, fgNoneOn: 'Nobody online who has never done it.', fgOff: 'Never done (most recently played)', fgGuides: n => `Done it and can guide (${n})`, cmpgT: 'Compare guardians', cmpgNote: 'Clears for every raid and dungeon, side by side.', cmpgPick: 'Pick a favorite or a clanmate…', cmpgYou: 'You', cmpgTot: 'Total', cmpgPriv: 'This guardian has a private profile.', postEmpty: 'Nothing waiting at the Postmaster on your characters.', postFull: 'Postmaster almost full: at 21 items, anything new is lost.', postNote: 'Pick them up from the Postmaster in the Tower. Gold ones are exotics.', newsT: t => `Destiny 2 updated: ${t.replace(/^Destiny 2\s*/i, '')}`, newsAgo: d => d <= 0 ? 'today' : d === 1 ? 'yesterday' : `${d} days ago`, newsRead: 'Read the notes ↗', ytMany: n => `Videos (${n})`, giBtn: n => `Images (${n})`, giFull: 'Full size', giClose: 'Close', tsO: { tier: 'Difficulty', wpn: 'Missing weapon', cat: 'Missing catalyst', near: 'Almost done', low: 'Least done', name: 'A–Z' }, tsNone: 'Nothing here with this filter.', statsHi: 'above 100: extra bonus',
     tabs: { obj: 'Today', act: 'Progress', drops: 'Arsenal', gd: 'Guardian', clan: 'Clan' },
-    subs: { pat: 'Patterns', cal: 'Calendar', acts: 'Activities', tt: 'Titles & triumphs', colx: 'Collectibles', invp: 'Inventory', coll: 'Collection', ld: 'Loadouts', inv: 'Characters', vlt: 'Vault', obj: 'Main', prog: 'Challenges', camp: 'Campaigns', raid: 'Raids', dg: 'Dungeons', xm: 'Exotic missions', tit: 'Titles', tri: 'Triumphs', exo: 'Exotics', cat: 'Catalysts', vend: 'Vendors', gd: 'Builds', gcl: 'Members', gclb: 'Leaderboard', gclg: 'Groups', gcla: 'Admin', gcld: 'Clan Discord', gclo: 'Orla Bot', grep: 'Reports', gst: 'Stats', gar: 'Armor' },
+    subs: { novo: 'New items', pat: 'Patterns', cal: 'Calendar', acts: 'Activities', tt: 'Titles & triumphs', colx: 'Collectibles', invp: 'Inventory', coll: 'Collection', ld: 'Loadouts', inv: 'Characters', vlt: 'Vault', obj: 'Main', prog: 'Challenges', camp: 'Campaigns', raid: 'Raids', dg: 'Dungeons', xm: 'Exotic missions', tit: 'Titles', tri: 'Triumphs', exo: 'Exotics', cat: 'Catalysts', vend: 'Vendors', gd: 'Builds', gcl: 'Members', gclb: 'Leaderboard', gclg: 'Groups', gcla: 'Admin', gcld: 'Clan Discord', gclo: 'Orla Bot', grep: 'Reports', gst: 'Stats', gar: 'Armor' },
     heroTitle: 'Guardian Hub', heroText: 'Sign in with your Bungie.net account to check your goals, follow the weekly rotation, complete your exotic arsenal and share your builds.', lsQ: 'Search guardian: Name#1234', lsBtn: 'Search', lsHint: "See any player's equipped build, no sign-in needed.",
     heroList: ['The site only reads your data; it never changes anything in the game.', 'Your password stays with Bungie; the site never sees it.', 'Checkmarks, favorites and saved builds sync between phone and PC.'],
     login: 'Sign in with Bungie.net', notConfigured: "The site isn't configured yet: the Bungie keys are missing from the Vercel environment variables.",
@@ -162,7 +162,7 @@ const SCREENS = [
   { id: 'raid', g: 'act', k: 'acts', r: 'incursoes', part: 'a', ov: 1 }, { id: 'dg', g: 'act', k: 'acts', r: 'masmorras', part: 'a', ov: 1 }, { id: 'camp', g: 'act', k: 'acts', r: 'campanhas', part: 'q', ov: 1 }, { id: 'xm', g: 'act', k: 'acts', r: 'missoes-exoticas', part: 'a', ov: 1 },
   { id: 'tit', g: 'act', k: 'tt', r: 'titulos', part: 'b', ov: 1 }, { id: 'tri', g: 'act', k: 'tt', r: 'triunfos', part: 'b' }, { id: 'colx', g: 'act', r: 'colecionaveis', part: 'a' },
   { id: 'inv', g: 'drops', k: 'invp', r: 'personagens', part: 'c' }, { id: 'vlt', g: 'drops', k: 'invp', r: 'cofre', part: 'c' }, { id: 'exo', g: 'drops', k: 'coll', r: 'exoticos', part: 'a', ov: 1 }, { id: 'cat', g: 'drops', k: 'coll', r: 'catalisadores', part: 'b', ov: 1 },
-  { id: 'vend', g: 'drops', r: 'vendedores', part: 'a' }, { id: 'pat', g: 'drops', r: 'padroes', part: 'b' }, { id: 'ld', g: 'drops', r: 'loadouts', part: 'c', ov: 1 },
+  { id: 'novo', g: 'drops', r: 'itens-novos', part: 'c' }, { id: 'vend', g: 'drops', r: 'vendedores', part: 'a' }, { id: 'pat', g: 'drops', r: 'padroes', part: 'b' }, { id: 'ld', g: 'drops', r: 'loadouts', part: 'c', ov: 1 },
   { id: 'gd', g: 'gd', r: 'builds', part: 'a', gdArea: 1 }, { id: 'gar', g: 'gd', r: 'armaduras', who: 'beta' }, { id: 'grep', g: 'gd', r: 'relatorios', gdArea: 1 }, { id: 'gst', g: 'gd', r: 'estatisticas', gdArea: 1 },
   { id: 'gcl', g: 'clan', r: 'membros', gdArea: 1 }, { id: 'gclb', g: 'clan', r: 'placar', gdArea: 1 }, { id: 'gclg', g: 'clan', r: 'grupos', gdArea: 1 }, { id: 'gcla', g: 'clan', r: 'administracao', who: 'admin', gdArea: 1 }, { id: 'gcld', g: 'clan', r: 'discord', who: 'admin', gdArea: 1 },
   { id: 'gclo', g: null, r: 'grade' } // Grade do Orla Bot: aba sem grupo (botão Grade no topo), visual próprio
@@ -1773,7 +1773,7 @@ function renderInner() {
   if (tab === 'gar') { $('list').innerHTML = armHTML(); return; }
   if (tab === 'tri') { $('list').innerHTML = triHTML(); return; }
   if (tab === 'colx') { $('list').innerHTML = colHTML(); return; }
-  if (tab === 'inv' || tab === 'vlt') { const y = scrollY; $('list').innerHTML = tab === 'inv' ? invHTML() : vltHTML(); if (Math.abs(scrollY - y) > 2) scrollTo(0, y); return; }
+  if (tab === 'inv' || tab === 'vlt' || tab === 'novo') { const y = scrollY; $('list').innerHTML = tab === 'inv' ? invHTML() : tab === 'novo' ? novoHTML() : vltHTML(); if (Math.abs(scrollY - y) > 2) scrollTo(0, y); return; }
   if (tab === 'vend' && !VEND && have.a && member) loadVendors(gen);
   if (tab === 'gclo') { gradeRender(); if (!GD && have.a) loadGuardian(gen); return; }
   if (isGd()) { $('list').innerHTML = gdHTML(); if (!GD && have.a) loadGuardian(gen); if (!VAULT && have.c) loadVault(gen); return; }
@@ -5233,7 +5233,7 @@ function invAll() {
   for (const [cid, v] of Object.entries(p.characterInventories?.data || {})) add(v.items, cid, false);
   for (const [cid, v] of Object.entries(p.characterEquipment?.data || {})) add(v.items, cid, true);
   const need = [...new Set(out.map(x => x.h))].filter(h => !INVD[h] && !ivReq.has(h));
-  if (need.length) { need.forEach(h => ivReq.add(h)); entities('DestinyInventoryItemDefinition', need, lang === 'pt' ? 'pt' : 'en').then(m => { Object.assign(INVD, m); if (tab === 'inv' || tab === 'vlt') render(); if ($('ivdlg')?.open) ivDraw(); }).catch(() => {}); }
+  if (need.length) { need.forEach(h => ivReq.add(h)); entities('DestinyInventoryItemDefinition', need, lang === 'pt' ? 'pt' : 'en').then(m => { Object.assign(INVD, m); if (tab === 'inv' || tab === 'vlt' || tab === 'novo') render(); if ($('ivdlg')?.open) ivDraw(); }).catch(() => {}); }
   const cnt = {}; for (const x of out) cnt[x.h] = (cnt[x.h] || 0) + 1; for (const x of out) x.dup = cnt[x.h] > 1;
   return out;
 }
@@ -5361,7 +5361,7 @@ async function ivDo(iid, to, equip) {
   INV.busy = false; ivRefresh();
   clearTimeout(ivRefresh.t); ivRefresh.t = setTimeout(() => { if (INV.msg && !INV.msg.bad) { INV.msg = null; ivRefresh(); } }, INV.msg?.undo ? 15000 : 4000);
 }
-function ivRefresh() { if (tab === 'inv' || tab === 'vlt') render(); if ($('ivdlg')?.open) ivDraw(); renderBuild?.(); }
+function ivRefresh() { if (tab === 'inv' || tab === 'vlt' || tab === 'novo') render(); if ($('ivdlg')?.open) ivDraw(); renderBuild?.(); }
 /* detalhe do item: vantagens (com as outras opções), atributos, etiqueta, anotação e ações */
 async function ivLoadDet(iid) {
   if (INV.det[iid]) return; INV.det[iid] = { busy: true };
@@ -5371,6 +5371,7 @@ async function ivLoadDet(iid) {
     const plugs = [...new Set([...so.map(s => s.plugHash), ...Object.values(rp).flat().map(p => p.plugItemHash)].filter(Boolean))];
     const L = lang === 'pt' ? 'pt' : 'en', en = await entities('DestinyInventoryItemDefinition', plugs, L, true), sd = await entities('DestinyStatDefinition', Object.keys(st).map(Number), lang).catch(() => ({}));
     INV.det[iid] = { so, rp, st, en, sd, inst: r.instance?.data || null };
+    const xi = ivFind(iid); if (xi && xi.slot < 3) siLoad(iid);
   } catch { INV.det[iid] = { err: true }; }
   if ($('ivdlg')?.open) ivDraw();
 }
@@ -5468,6 +5469,7 @@ document.addEventListener('click', e => {
 });
 function ivDraw() {
   const d = $('ivdlg'), T = ivt(), W = u(); if (!d) return; const x = ivFind(INV.sel); if (!x) { d.close(); return; }
+  if (INV.mview) { d.innerHTML = ivMCmpHTML(); return; }
   if (INV.cmpView) { const h = ivCmpHTML(); if (h) { d.innerHTML = h; return; } }
   const D = INVD[x.h] || {}, det = INV.det[x.iid], chars = ivChars(), tg = tagOf(x.iid), notes = LS.get('dc-notes', {});
   const copies = invAll().filter(y => y.h === x.h).length, loc = x.where === 'v' ? T.inV : T.on(W.classes[profile.characters.data[x.where]?.classType] || '') + (x.eq ? ' · ' + T.eqd : '');
@@ -5485,7 +5487,7 @@ function ivDraw() {
       perks += RL.st === 'ok' ? `<div class="ivd-rl rl-${g || 'x'}"><b>${esc(RT.det)}</b><span>${esc(!rlL.length ? RT.detNo : g === 'g' ? RT.detG(RL.mode === 'both' ? 'PvE/PvP' : md) : g === 'p' ? RT.detP : RT.detN)}</span>${rlL.length ? `<small>${esc(RT.legend)}</small><ul class="rl-leg">${RT.leg.map(([k, a, b]) => `<li class="${k === g ? 'on' : ''}"><i class="rl-b rl-${k}">${{ g: '✓', p: '½', n: '✕' }[k]}</i><b>${esc(a.slice(2))}</b> <span>${esc(b)}</span></li>`).join('')}</ul>` : ''}${bestN ? `<small><b>${esc(RT.note)}:</b> ${esc(bestN)}</small>` : ''}</div>` : ''; }
     const sk = Object.entries(det.st).map(([h, v]) => ({ h: +h, v: v.value, n: det.sd[h]?.n || '' })).filter(s => s.n);
     if (!isW) sk.sort((a, b) => STAT_ORDER.indexOf(a.h) - STAT_ORDER.indexOf(b.h));
-    stats = sk.length ? `<span class="sea-k">${esc(T.stats)}</span>${sk.map(s => `<div class="ivd-st"><span>${esc(s.n)}</span>${STAT_NOBAR.has(s.h) ? '<i></i>' : `<i class="sea-bar"><u style="width:${Math.min(100, s.v)}%"></u></i>`}<b>${s.v}</b></div>`).join('')}${!isW ? `<small class="lbd-n">${esc(T.mw)}</small>` : ''}` : '';
+    stats = x.slot < 3 && det.si?.ok ? siStatsHTML(x, det, sk) : sk.length ? `<span class="sea-k">${esc(T.stats)}</span>${sk.map(s => `<div class="ivd-st"><span>${esc(s.n)}</span>${STAT_NOBAR.has(s.h) ? '<i></i>' : `<i class="sea-bar"><u style="width:${Math.min(100, s.v)}%"></u></i>`}<b>${s.v}</b></div>`).join('')}${!isW ? `<small class="lbd-n">${esc(T.mw)}</small>` : ''}` : '';
   }
   const btn = (to, eq, label, dis) => `<button type="button" class="lbd-btn" data-ivdo="${to}" data-iveq="${eq ? 1 : ''}"${dis || INV.busy ? ' disabled' : ''}>${esc(label)}</button>`;
   const canCls = c => x.slot < 3 || x.cls === 3 || x.cls === c.classType;
@@ -5499,17 +5501,17 @@ function ivDraw() {
       <span class="sea-k">${esc(T.tag)}</span><div class="ivd-row">${TAGS.map(t => `<button type="button" class="tag-b${tg === t ? ' t-' + t : ''}" data-ivtag="${t}">${esc(tagl()[t])}</button>`).join('')}</div>
       <label class="tr-q">${esc(T.note)}<input type="text" id="ivnote" maxlength="120" value="${esc(notes[x.iid] || '')}" placeholder="${esc(T.notePh)}"></label>
       <span class="sea-k">${lang === 'pt' ? 'Comparar' : 'Compare'}</span><div class="ivd-row">${(() => { const c = INV.cmp && INV.cmp !== x.iid ? ivFind(INV.cmp) : null, ok = c && (c.slot < 3) === (x.slot < 3); return `<button type="button" class="lbd-btn${c ? ' on' : ''}" data-ivcmp${c && !ok ? ' disabled' : ''}>${esc(c ? (lang === 'pt' ? 'Comparar com ' : 'Compare with ') + (INVD[c.h]?.n || '') : INV.cmp === x.iid ? (lang === 'pt' ? 'Escolhido: abra outro item' : 'Picked: open another item') : (lang === 'pt' ? 'Comparar com outro item' : 'Compare with another item'))}</button>`; })()}</div>
-      <span class="sea-k">${esc(T.more)}</span><a href="https://www.light.gg/db/items/${x.h}/" target="_blank" rel="noopener">${esc(T.lgg)} ↗</a></aside></div></div>`;
+      ${ivTriH(x)}${ivFuelH(x)}<span class="sea-k">${esc(T.more)}</span><a href="https://www.light.gg/db/items/${x.h}/" target="_blank" rel="noopener">${esc(T.lgg)} ↗</a></aside></div></div>`;
   if (!det) ivLoadDet(x.iid); if (!RL.st && x.slot < 3) rlLoad();
 }
 function ivOpen(iid) {
   let d = $('ivdlg'); if (!d) { d = document.createElement('dialog'); d.id = 'ivdlg'; d.className = 'pf ivdlg'; document.body.append(d);
     d.addEventListener('click', e => { if (e.target === d || e.target.closest('.pf-x')) { d.close(); return; } const b = e.target.closest('[data-ivdo]'); if (b) { ivDo(INV.sel, b.dataset.ivdo, !!b.dataset.iveq); return; } const t = e.target.closest('[data-ivtag]'); if (t) { const m = LS.get('dc-tags', {}); if (m[INV.sel] === t.dataset.ivtag) delete m[INV.sel]; else m[INV.sel] = t.dataset.ivtag; LS.set('dc-tags', m); ivRefresh(); if (m[INV.sel] === 'keep') keepLock(INV.sel); return; } const p = e.target.closest('[data-ivperk]'); if (p) { const same = INV.perk === +p.dataset.ivperk; INV.perk = same ? null : +p.dataset.ivperk; INV.sock = !same && p.dataset.ivsock ? +p.dataset.ivsock : null; INV.mp = null; ivDraw(); } });
     d.addEventListener('change', e => { if (e.target.id !== 'ivnote') return; const m = LS.get('dc-notes', {}); const v = e.target.value.trim(); if (v) m[INV.sel] = v; else delete m[INV.sel]; const ks = Object.keys(m); if (ks.length > 500) delete m[ks[0]]; LS.set('dc-notes', m); }); }
-  INV.sel = iid; INV.perk = null; INV.sock = null; INV.mp = null; INV.msg = null; INV.cmpView = false; ivDraw(); if (!d.open) d.showModal();
+  INV.sel = iid; INV.perk = null; INV.sock = null; INV.mp = null; INV.msg = null; INV.cmpView = false; INV.mview = null; INV.stSel = null; ivDraw(); if (!d.open) d.showModal();
 }
 document.addEventListener('click', e => {
-  if (tab !== 'inv' && tab !== 'vlt') return;
+  if (tab !== 'inv' && tab !== 'vlt' && tab !== 'novo') return;
   const t = e.target.closest('[data-iv]'); if (t && $('list').contains(t)) { if (INV.multi && tab === 'vlt') { const id = t.dataset.iv; INV.picked.has(id) ? INV.picked.delete(id) : INV.picked.add(id); render(); } else ivOpen(t.dataset.iv); return; }
   const f = e.target.closest('[data-ivf]'); if (f) { INV.f = f.hasAttribute('data-rltog') && INV.f === f.dataset.ivf ? 'all' : f.dataset.ivf; render(); return; }
   const mc = e.target.closest('[data-ivmc]'); if (mc) { INV.mc = mc.dataset.ivmc; render(); return; }
@@ -5522,7 +5524,7 @@ document.addEventListener('click', e => {
 document.addEventListener('input', e => { if (e.target.id !== 'ivq') return; INV.q = e.target.value; clearTimeout(INV.qt); INV.qt = setTimeout(() => { const pos = e.target.selectionStart; render(); const q = $('ivq'); if (q) { q.focus(); try { q.setSelectionRange(pos, pos); } catch {} } }, 180); });
 document.addEventListener('change', e => { if (e.target.id !== 'vlsort') return; INV.vs = e.target.value; LS.set('dc-vs', INV.vs); render(); });
 // arrastar (computador): solte numa coluna para mover; no quadrado grande para equipar
-document.addEventListener('dragstart', e => { const t = e.target.closest?.('[data-iv]'); if (!t || (tab !== 'inv' && tab !== 'vlt')) return; e.dataTransfer.setData('text/plain', t.dataset.iv); e.dataTransfer.effectAllowed = 'move'; document.body.classList.add('iv-dragging'); });
+document.addEventListener('dragstart', e => { const t = e.target.closest?.('[data-iv]'); if (!t || (tab !== 'inv' && tab !== 'vlt' && tab !== 'novo')) return; e.dataTransfer.setData('text/plain', t.dataset.iv); e.dataTransfer.effectAllowed = 'move'; document.body.classList.add('iv-dragging'); });
 document.addEventListener('dragend', () => document.body.classList.remove('iv-dragging'));
 document.addEventListener('dragover', e => { const z = e.target.closest?.('[data-ivdrop]'); if (!z) return; e.preventDefault(); document.querySelectorAll('.iv-c.ov').forEach(x => x !== z && x.classList.remove('ov')); z.classList.add('ov'); });
 document.addEventListener('dragleave', e => { const z = e.target.closest?.('[data-ivdrop]'); if (z && !z.contains(e.relatedTarget)) z.classList.remove('ov'); });
@@ -5870,7 +5872,7 @@ async function rlLoad() {
     if (member) { const r = await bungie(`/Destiny2/${member.type}/Profile/${member.id}/?components=102,201,304,305`).catch(() => null); RL.so = r?.itemComponents?.sockets?.data || {}; RL.sts = r?.itemComponents?.stats?.data || {}; }
     RL.st = 'ok';
   } catch (e) { console.warn('rolls', e); RL.st = 'err'; }
-  if (tab === 'inv' || tab === 'vlt' || $('ivdlg')?.open || $('lcdlg')?.open) { render(); if ($('ivdlg')?.open) ivDraw(); if ($('lcdlg')?.open) lcDraw(); }
+  if (tab === 'inv' || tab === 'vlt' || tab === 'novo' || $('ivdlg')?.open || $('lcdlg')?.open) { render(); if ($('ivdlg')?.open) ivDraw(); if ($('lcdlg')?.open) lcDraw(); }
 }
 // nota do item: 'g' bom, 'p' parcial, 'n' nada de bom, '' sem recomendação; usa as vantagens encaixadas (ou as opções, quando o detalhe foi aberto)
 function rlGrade(iid, h, extra) {
@@ -6015,7 +6017,7 @@ async function rapGo(auto) {
     if (!plan.length) { RAP.msg = { bad: true, t: T.noneAv }; rapRedraw(); return; } }
   RAP.busy = true; const r = await rapApply(c.x, plan); RAP.busy = false; RAP.sim = {};
   RAP.msg = r.err && !r.ok ? { bad: true, t: wMsg(r.err) } : lack || r.err ? { t: T.partial(r.ok, lack + (plan.length - r.ok)) } : { ok: true, t: T.okAll(r.ok) };
-  rapRedraw(); if (tab === 'inv' || tab === 'vlt') render();
+  rapRedraw(); if (tab === 'inv' || tab === 'vlt' || tab === 'novo') render();
 }
 function rapInsHTML(sel, all, inline) {
   const T = rapt(), P = lang === 'pt', nm = x => ivName(x) || '…', tl = x => INVD[x.h]?.tl || '';
@@ -6057,7 +6059,7 @@ function rapInsHTML(sel, all, inline) {
   }
   return { ins, simil };
 }
-function rapRedraw() { if ($('rapdlg')?.open) rapDraw(); else if (AP.on && (tab === 'inv' || tab === 'vlt')) { if (RAP.sel) apClear(RAP.sel); clearTimeout(AP.rt); AP.rt = setTimeout(render, 60); } }
+function rapRedraw() { if ($('rapdlg')?.open) rapDraw(); else if (AP.on && (tab === 'inv' || tab === 'vlt' || tab === 'novo')) { if (RAP.sel) apClear(RAP.sel); clearTimeout(AP.rt); AP.rt = setTimeout(render, 60); } }
 function rapDraw() {
   const d = $('rapdlg'); if (!d) return; const T = rapt(), RT = rlt(), P = lang === 'pt';
   if (RL.st !== 'ok') { d.innerHTML = `<div class="rap-top"><b>⚖ ${esc(T.t)}</b><button type="button" class="lbd-btn" data-rapx>✕ ${esc(T.close)}</button></div><p class="wait rap-pad">${esc(RL.st === 'err' ? RT.err : RT.load)}</p>`; return; }
@@ -6111,7 +6113,7 @@ const TWN = new Map(); let TWC = {};
 function twLoad() {
   if (AP.tw || AP.twB || !APIW) return; AP.twB = true;
   const c = LS.get('dc-twins2', null); if (c && Date.now() - c.at < 864e5) { AP.tw = c.g; AP.fam = c.f || {}; twIdx(); AP.twB = false; return; }
-  fetch(APIW + '/twins').then(r => r.json()).then(j => { AP.tw = j.g || []; AP.fam = j.f || {}; try { LS.set('dc-twins2', { at: Date.now(), g: AP.tw, f: AP.fam }); } catch {} twIdx(); rapRedraw(); if (tab === 'inv' || tab === 'vlt') render(); }).catch(() => { AP.tw = []; }).finally(() => { AP.twB = false; });
+  fetch(APIW + '/twins').then(r => r.json()).then(j => { AP.tw = j.g || []; AP.fam = j.f || {}; try { LS.set('dc-twins2', { at: Date.now(), g: AP.tw, f: AP.fam }); } catch {} twIdx(); rapRedraw(); if (tab === 'inv' || tab === 'vlt' || tab === 'novo') render(); }).catch(() => { AP.tw = []; }).finally(() => { AP.twB = false; });
 }
 function twIdx() { TWN.clear(); TWC = {}; FMN.clear(); FMC = {}; APC.clear(); for (const g of AP.tw || []) for (const h of g) TWN.set(String(h), g); for (const [k, l] of Object.entries(AP.fam || {})) for (const h of l) FMN.set(String(h), k); }
 // nota estimada: arma sem roll (nem pela outra versão) usa os rolls das armas do mesmo tipo e frame
@@ -6134,14 +6136,14 @@ function apAvLoad(force) {
     for (const [iid, v] of Object.entries(rp)) RAPP[iid] = Object.fromEntries(Object.entries(v.plugs || {}).map(([k, l]) => [k, l.filter(p => p.canInsert !== false && p.enabled !== false).map(p => p.plugItemHash)]));
     for (const [iid, v] of Object.entries(so)) { (RL.so ||= {})[iid] = v; if (!RAPP[iid]) RAPP[iid] = {}; }
     AP.av = 'ok'; AP.pk = false; APC.clear();
-  }).catch(() => { AP.av = 'err'; }).finally(() => { if (tab === 'inv' || tab === 'vlt') render(); });
+  }).catch(() => { AP.av = 'err'; }).finally(() => { if (tab === 'inv' || tab === 'vlt' || tab === 'novo') render(); });
 }
 // mesma "cara" de perk para a versão comum e a aprimorada (mesmo ícone)
 const apKeyF = h => { const e = entCache[lang]?.['DestinyInventoryItemDefinition:' + h]; return e?.ic || e?.n || 'h' + h; }, apKey = apKeyF;
 function apPerkLoad(ws) {
   if (AP.pk || AP.av !== 'ok') return; AP.pk = true; const hs = new Set();
   for (const x of ws) { const so = RL.so?.[x.iid]?.sockets || []; so.forEach(s => s.plugHash && hs.add(s.plugHash)); Object.values(RAPP[x.iid] || {}).forEach(l => l.forEach(h => hs.add(h))); (rlFor(x.h) || []).forEach(e => e[0].forEach(h => hs.add(h))); }
-  entities('DestinyInventoryItemDefinition', [...hs], lang).catch(() => {}).finally(() => { AP.pkOk = true; APC.clear(); if (tab === 'inv' || tab === 'vlt') render(); });
+  entities('DestinyInventoryItemDefinition', [...hs], lang).catch(() => {}).finally(() => { AP.pkOk = true; APC.clear(); if (tab === 'inv' || tab === 'vlt' || tab === 'novo') render(); });
 }
 // avaliação de uma cópia: nota atual, nota máxima com os perks dela e o que trocar para chegar lá
 const APG = (m, n) => !m ? 'C' : n - m === 0 ? 'S' : n - m === 1 ? 'A' : n - m === 2 ? 'B' : 'C';
@@ -6177,7 +6179,7 @@ function apEval(x) {
   if (!partial) APC.set(ck, out); return out;
 }
 const APE = new Set(); let apeT = 0;
-function apEntLoad(hs) { const n = hs.filter(h => !APE.has(h)); if (!n.length) return; n.forEach(h => APE.add(h)); clearTimeout(apeT); apeT = setTimeout(() => entities('DestinyInventoryItemDefinition', [...APE].filter(h => !entCache[lang]?.['DestinyInventoryItemDefinition:' + h]), lang).catch(() => {}).finally(() => { APC.clear(); rapRedraw(); if (tab === 'inv' || tab === 'vlt') render(); }), 120); }
+function apEntLoad(hs) { const n = hs.filter(h => !APE.has(h)); if (!n.length) return; n.forEach(h => APE.add(h)); clearTimeout(apeT); apeT = setTimeout(() => entities('DestinyInventoryItemDefinition', [...APE].filter(h => !entCache[lang]?.['DestinyInventoryItemDefinition:' + h]), lang).catch(() => {}).finally(() => { APC.clear(); rapRedraw(); if (tab === 'inv' || tab === 'vlt' || tab === 'novo') render(); }), 120); }
 const apClear = iid => { for (const k of [...APC.keys()]) if (!iid || k.startsWith(iid + '|')) APC.delete(k); };
 const apStop = e => e?.code === 2108 || e?.code === 12 || e?.code === 99 || e?.message === 'auth';
 async function apOpt(x, ev) {
@@ -6231,7 +6233,7 @@ function apHTML(all) {
 }
 document.addEventListener('click', async e => {
   const t = e.target;
-  if (t.closest('[data-rap]')) { e.preventDefault(); $('ivdlg')?.open && $('ivdlg').close(); AP.on = !AP.on; if (AP.on && tab !== 'inv' && tab !== 'vlt') go('inv'); else render(); return; }
+  if (t.closest('[data-rap]')) { e.preventDefault(); $('ivdlg')?.open && $('ivdlg').close(); AP.on = !AP.on; if (AP.on && tab !== 'inv' && tab !== 'vlt' && tab !== 'novo') go('inv'); else render(); return; }
   if (!AP.on) return;
   const ap = t.closest('[data-apf]'); if (ap) { AP.f = AP.f === ap.dataset.apf ? '' : ap.dataset.apf; render(); return; }
   if (t.closest('[data-apretry]')) { AP.av = ''; apAvLoad(true); render(); return; }
@@ -6612,12 +6614,12 @@ async function ivJobRun(act, to, ids) {
         else { const from = x.where, made = []; await ivCore(id, to, false, made); for (const m of made) J.log.push({ k: 'mv', t: `${P ? 'Para caber' : 'To make room'}: ${ivNameOf(m.iid)} → ${ivPlace(m.to)}` }); J.ok++; J.log.push({ k: 'ok', t: `${nm} · ${P ? 'de' : 'from'} ${ivPlace(from)}` }); }
       } else { const st = act === 'lk1'; if (x.lk !== st) await ivLock(x, st); J.ok++; J.log.push({ k: 'ok', t: nm }); }
     } catch (e) { J.log.push({ k: 'er', t: `${nm} · ${ivErr(e)}` }); if (e.code === 1671) { J.stop = true; } }
-    J.i++; if (tab === 'inv' || tab === 'vlt') render();
+    J.i++; if (tab === 'inv' || tab === 'vlt' || tab === 'novo') render();
   }
   J.done = true; INV.busy = false; render();
 }
 document.addEventListener('click', e => {
-  if (tab !== 'inv' && tab !== 'vlt') return;
+  if (tab !== 'inv' && tab !== 'vlt' && tab !== 'novo') return;
   const k = e.target.closest('[data-ivbk]'); if (k) { const v = k.dataset.ivbk; INV.bk = v === 'mv' ? (INV.bk?.startsWith('mv') ? null : 'mv') : v.startsWith('mv:') ? (INV.bk === v ? 'mv' : v) : (INV.bk === v ? null : v); render(); return; }
   if (e.target.closest('[data-ivjstop]') && IVJ) { IVJ.stop = true; return; }
   if (e.target.closest('[data-ivjx]')) { IVJ = null; render(); return; }
@@ -6627,8 +6629,8 @@ document.addEventListener('click', e => {
   if (a === 'mv') ivJobRun('mv', v, list); else if (a === 'lk') ivJobRun('lk' + v, null, list);
 });
 /* atalhos de teclado (computador) — ? mostra a lista */
-const KBT = () => lang === 'pt' ? [['?', 'Mostrar esta lista'], ['F', 'Buscar no inventário'], ['R', 'Atualizar (no máximo a cada 15 s)'], ['Esc', 'Fechar / limpar a busca'], ['1–5', 'Hoje · Progresso · Arsenal · Guardião · Clã'], [null, 'Com um item aberto'], ['E', 'Equipar no personagem atual'], ['P', 'Puxar para o personagem atual'], ['V', 'Mandar para o cofre'], ['L', 'Trancar / destrancar'], ['C', 'Comparar'], ['⇧1–4', 'Favorito · Manter · Lixo · Infundir']]
-  : [['?', 'Show this list'], ['F', 'Search the inventory'], ['R', 'Refresh (at most every 15 s)'], ['Esc', 'Close / clear search'], ['1–5', 'Today · Progress · Arsenal · Guardian · Clan'], [null, 'With an item open'], ['E', 'Equip on current character'], ['P', 'Pull to current character'], ['V', 'Send to vault'], ['L', 'Lock / unlock'], ['C', 'Compare'], ['⇧1–4', 'Favorite · Keep · Junk · Infuse']];
+const KBT = () => lang === 'pt' ? [['?', 'Mostrar esta lista'], ['F', 'Buscar no inventário'], ['R', 'Atualizar (no máximo a cada 15 s)'], ['Esc', 'Fechar / limpar a busca'], ['1–5', 'Hoje · Progresso · Arsenal · Guardião · Clã'], [null, 'Com um item aberto'], ['E', 'Equipar no personagem atual'], ['P', 'Puxar para o personagem atual'], ['V', 'Mandar para o cofre'], ['L', 'Trancar / destrancar'], ['C', 'Comparar'], ['I', 'Ver o combustível de infusão'], ['⇧1–4', 'Favorito · Manter · Lixo · Infundir']]
+  : [['?', 'Show this list'], ['F', 'Search the inventory'], ['R', 'Refresh (at most every 15 s)'], ['Esc', 'Close / clear search'], ['1–5', 'Today · Progress · Arsenal · Guardian · Clan'], [null, 'With an item open'], ['E', 'Equip on current character'], ['P', 'Pull to current character'], ['V', 'Send to vault'], ['L', 'Lock / unlock'], ['C', 'Compare'], ['I', 'Show infusion fuel'], ['⇧1–4', 'Favorite · Keep · Junk · Infuse']];
 function kbOpen() {
   let d = $('kbdlg'); if (!d) { d = document.createElement('dialog'); d.id = 'kbdlg'; d.className = 'pf kbdlg'; document.body.append(d); d.addEventListener('click', e => { if (e.target === d || e.target.closest('.pf-x')) d.close(); }); }
   d.innerHTML = `<div class="pf-box kb-box"><button type="button" class="pf-x" aria-label="${esc(u().w.giClose)}">✕</button><h2>${lang === 'pt' ? 'Atalhos de teclado' : 'Keyboard shortcuts'}</h2><dl class="kb-l">${KBT().map(([k, t]) => k ? `<dt><kbd>${esc(k)}</kbd></dt><dd>${esc(t)}</dd>` : `<dt class="kb-s">${esc(t)}</dt>`).join('')}</dl></div>`;
@@ -6650,13 +6652,133 @@ document.addEventListener('keydown', e => {
     if (k === 'v') { e.preventDefault(); if (iv.where !== 'v') ivDo(iv.iid, 'v', false); return; }
     if (k === 'l') { e.preventDefault(); ivLockUI(iv.iid, !iv.lk); return; }
     if (k === 'c') { e.preventDefault(); $('ivdlg').querySelector('[data-ivcmp]:not([disabled])')?.click(); return; }
+    if (k === 'i') { e.preventDefault(); $('ivdlg').querySelector('.ivd-fuel')?.scrollIntoView({ block: 'start', behavior: 'smooth' }); return; }
     return;
   }
   if (e.shiftKey) return;
-  if (k === 'f') { e.preventDefault(); const f = () => { const q = $('ivq'); if (q) { q.focus(); q.select(); } }; if (tab === 'inv' || tab === 'vlt') f(); else { go('inv'); setTimeout(f, 450); } return; }
+  if (k === 'f') { e.preventDefault(); const f = () => { const q = $('ivq'); if (q) { q.focus(); q.select(); } }; if (tab === 'inv' || tab === 'vlt' || tab === 'novo') f(); else { go('inv'); setTimeout(f, 450); } return; }
   if (k === 'r') { e.preventDefault(); if (Date.now() - IVR.lr < 15000) { status(lang === 'pt' ? 'Espere alguns segundos para atualizar de novo.' : 'Wait a few seconds to refresh again.'); return; } IVR.lr = Date.now(); $('refresh')?.click(); return; }
   if (/^[1-5]$/.test(e.key)) { const g = GROUPS[+e.key - 1]; if (!g?.subs?.length) return; e.preventDefault(); go(groupOf(lastSub[g.id])?.id === g.id ? lastSub[g.id] : g.subs[0], { grp: true }); }
 });
+
+/* ---------- Etapa 2 (ideias do DIM): itens novos, triagem, comparar com cores, combustível de infusão ----------
+   "Novo" = id de instância maior que o maior que existia na primeira visita (a Bungie numera em ordem). "Marcar todos" sobe essa linha. */
+var NEWI; // lido na primeira vez (o render pode rodar antes deste trecho)
+function newI() { return NEWI || (NEWI = { base: LS.get('dc-newbase', null), hide: LS.get('dc-newhide', true) }); }
+function ivIsNew(x) { const N = newI(); try { return N.base != null && BigInt(x.iid) > BigInt(N.base); } catch { return false; } }
+function newMark(all) { let m = 0n; for (const x of all) { try { const b = BigInt(x.iid); if (b > m) m = b; } catch {} } if (m) { newI().base = String(m); LS.set('dc-newbase', newI().base); } }
+function novoHTML() {
+  const P = lang === 'pt', T = ivt(), W = u(); if (!have.c) return `<div class="panel"><p class="empty-msg wait">${esc(T.wait)}</p></div>`;
+  const all = invAll(), N = newI(); if (N.base == null && all.length) newMark(all);
+  const list = all.filter(x => ivIsNew(x) && !(N.hide && tagOf(x.iid))).sort((a, b) => { try { return BigInt(b.iid) > BigInt(a.iid) ? 1 : -1; } catch { return 0; } });
+  const where = x => x.where === 'v' ? T.inV : T.on(W.classes[profile.characters.data[x.where]?.classType] || '') + (x.eq ? ' · ' + T.eqd : '');
+  const row = x => { const D = INVD[x.h] || {}, t = tagOf(x.iid); return `<div class="nv-r">${ivTile(x)}<div class="nv-n"><b>${esc(D.n || '…')}${x.slot < 3 ? ' ' + rlBadge(rlGrade(x.iid, x.h)) : ''}</b><small>${esc([D.tl, T.slots[x.slot], x.pw ? '✦ ' + x.pw : '', where(x), invAll().filter(y => y.h === x.h).length > 1 ? T.copies(invAll().filter(y => y.h === x.h).length) : ''].filter(Boolean).join(' · '))}</small></div><div class="nv-t">${TAGS.map(k => `<button type="button" class="tag-b${t === k ? ' t-' + k : ''}" data-nvt="${x.iid}:${k}" title="${esc(tagl()[k])}" aria-label="${esc(tagl()[k])}">${{ fav: '★', keep: '✓', junk: '✕', inf: '⇪' }[k]}</button>`).join('')}</div></div>`; };
+  return `<div class="panel nv"><div class="nv-hd"><h2>${P ? 'Chegaram desde a última vez' : 'Arrived since last time'}</h2><small>${P ? `${list.length} ${list.length === 1 ? 'item' : 'itens'} · o mais novo primeiro` : `${list.length} items · newest first`}</small><label class="nv-tg"><input type="checkbox" data-nvhide${N.hide ? ' checked' : ''}> ${P ? 'Esconder os que já têm etiqueta' : 'Hide tagged items'}</label><button type="button" class="lbd-btn" data-nvall${list.length ? '' : ' disabled'}>${P ? 'Marcar todos como vistos' : 'Mark all as seen'}</button></div>
+    ${list.length ? `<div class="nv-l">${list.map(row).join('')}</div>` : `<p class="empty-msg">${P ? 'Nada novo. Quando cair arma ou armadura, ela aparece aqui para você decidir: toque no item para ver a nota do roll, os loadouts e as cópias parecidas.' : 'Nothing new. New drops show up here so you can decide: tap an item to see its roll grade, loadouts and similar copies.'}</p>`}
+    <small class="nv-n2">${P ? '“Novo” = chegou depois da sua primeira visita a esta tela ou do último “Marcar todos”. Dar uma etiqueta tira o item daqui (dá para desligar acima). Itens no Postmaster aparecem depois de retirados.' : '“New” = arrived after your first visit here or the last “Mark all”. Tagging removes the item (toggle above). Postmaster items show up after you pull them.'}</small></div>`;
+}
+document.addEventListener('click', e => {
+  if (tab !== 'novo') return;
+  const t = e.target.closest('[data-nvt]'); if (t) { const [id, k] = t.dataset.nvt.split(':'), m = LS.get('dc-tags', {}); if (m[id] === k) delete m[id]; else m[id] = k; LS.set('dc-tags', m); if (m[id] === 'keep') keepLock(id); render(); return; }
+  if (e.target.closest('[data-nvall]')) { newMark(invAll()); render(); }
+});
+document.addEventListener('change', e => { if (e.target.matches?.('[data-nvhide]')) { newI().hide = e.target.checked; LS.set('dc-newhide', newI().hide); render(); } });
+// triagem no detalhe: loadouts do jogo com o item e itens parecidos (mesmo tipo e elemento; armadura: cópias)
+function ivSim(x) { const D = INVD[x.h] || {}; return invAll().filter(y => y.iid !== x.iid && y.slot === x.slot && (x.slot >= 3 ? y.h === x.h : (y.h === x.h || ((INVD[y.h]?.tl || '') === (D.tl || '') && y.el === x.el)))).sort((a, b) => (b.h === x.h) - (a.h === x.h) || b.pw - a.pw).slice(0, 5); }
+function ivTriH(x) {
+  const P = lang === 'pt', W = u(), lds = [];
+  for (const c of ivChars()) (profile.characterLoadouts?.data?.[c.characterId]?.loadouts || []).forEach((l, i) => { if ((l.items || []).some(it => it.itemInstanceId === x.iid)) lds.push(`${P ? 'Loadout' : 'Loadout'} ${i + 1} ${P ? 'do' : 'on'} ${W.classes[c.classType] || ''}`); });
+  const sim = ivSim(x);
+  return `<span class="sea-k">${P ? 'Triagem' : 'Triage'}</span><div class="ivd-tri"><small><b>${P ? 'Em loadouts do jogo:' : 'In game loadouts:'}</b> ${esc(lds.length ? lds.join(', ') : (P ? 'nenhum' : 'none'))}</small><small><b>${P ? 'Parecidas que você tem:' : 'Similar ones you have:'}</b> ${sim.length ? esc(sim.map(y => INVD[y.h]?.n || '…').join(', ')) : (P ? 'nenhuma' : 'none')}</small>${sim.length ? `<button type="button" class="lbd-btn" data-ivmv>${esc(P ? `Comparar as ${sim.length + 1} lado a lado` : `Compare all ${sim.length + 1}`)}</button>` : ''}</div>`;
+}
+// combustível de infusão: cópia do mesmo item (mais barato) e o de mais poder no mesmo espaço
+function ivFuelH(x) {
+  if (!x.pw) return ''; const P = lang === 'pt';
+  const c = invAll().filter(y => y.iid !== x.iid && y.slot === x.slot && y.pw > x.pw && (x.slot < 3 || y.cls === x.cls || y.cls === 3)); if (!c.length) return '';
+  const cheap = c.filter(y => y.h === x.h).sort((a, b) => b.pw - a.pw)[0], top = c.slice().sort((a, b) => b.pw - a.pw)[0], cur = ivChars()[0];
+  const card = (y, k, d) => `<div class="ivd-fu${k === 'c' ? ' ch' : ''}"><small>${esc(k === 'c' ? (P ? 'MAIS BARATO' : 'CHEAPEST') : (P ? 'MAIS PODER' : 'MOST POWER'))}</small><b>${esc(INVD[y.h]?.n || '…')} ✦ ${y.pw}</b><span>${esc(d)}</span><button type="button" class="lbd-btn" data-ivfuel="${y.iid}"${INV.busy ? ' disabled' : ''}>${esc(P ? `Trazer os dois para o ${u().classes[cur.classType]}` : `Bring both to ${u().classes[cur.classType]}`)}</button></div>`;
+  return `<span class="sea-k ivd-fuel">${P ? 'Combustível de infusão' : 'Infusion fuel'}</span>${cheap ? card(cheap, 'c', P ? 'Cópia do mesmo item: costuma custar menos.' : 'Copy of the same item: usually costs less.') : ''}${top && top !== cheap ? card(top, 't', P ? 'Mesmo espaço, poder mais alto.' : 'Same slot, higher power.') : ''}<small class="lbd-n">${P ? 'O DPI não infunde (a Bungie não deixa): só junta os dois no personagem.' : 'DPI does not infuse (Bungie does not allow it): it only brings both to your character.'}</small>`;
+}
+// comparar lado a lado com cores: azul = melhor; verde → vermelho
+function ivMCmpHTML() {
+  const P = lang === 'pt', T = ivt(), ids = INV.mview.filter(id => ivFind(id)), xs = ids.map(ivFind); ids.forEach(id => { if (!INV.det[id]) ivLoadDet(id); });
+  const ready = xs.every(x => INV.det[x.iid] && !INV.det[x.iid].busy && !INV.det[x.iid].err);
+  const back = `<div class="ivd-row cmp-act"><button type="button" class="lbd-btn" data-ivmx>${P ? '← Voltar ao item' : '← Back to the item'}</button></div>`;
+  const box = b => `<div class="pf-box ivd-box mcmp-box"><button type="button" class="pf-x" aria-label="${esc(u().w.giClose)}">✕</button><h2 class="mcmp-t">${P ? 'Comparar' : 'Compare'}</h2>${b}${back}</div>`;
+  if (!ready) return box(`<p class="wait">${esc(T.loadingItem)}</p>`);
+  const isW = xs[0].slot < 3, sd = Object.assign({}, ...xs.map(x => INV.det[x.iid].sd)), hs = [...new Set(xs.flatMap(x => Object.keys(INV.det[x.iid].st).map(Number)))].filter(h => sd[h]?.n && !STAT_NOBAR.has(h));
+  if (!isW) hs.sort((a, b) => STAT_ORDER.indexOf(a) - STAT_ORDER.indexOf(b));
+  const val = (x, h) => INV.det[x.iid].st[h]?.value ?? 0;
+  let cols = xs.slice(); if (INV.msort) cols.sort((a, b) => INV.msort === 'pw' ? b.pw - a.pw : val(b, INV.msort) - val(a, INV.msort));
+  const cls = (v, vs) => { const mx = Math.max(...vs), mn = Math.min(...vs); if (mx === mn) return ''; if (v === mx) return 'mb'; const k = (v - mn) / (mx - mn); return k >= .75 ? 'm1' : k >= .5 ? 'm2' : k >= .25 ? 'm3' : 'm4'; };
+  const row = (lab, key, f, num) => { const vs = cols.map(f); return `<tr><th scope="row"${key ? ` data-ivms="${key}" class="srt${INV.msort == key ? ' on' : ''}"` : ''}>${esc(lab)}${key ? ' ↕' : ''}</th>${vs.map(v => `<td class="${num ? cls(v, vs) : ''}">${num ? v : v}</td>`).join('')}</tr>`; };
+  const W = u(), wh = x => x.where === 'v' ? T.inV : (W.classes[profile.characters.data[x.where]?.classType] || '');
+  const head = `<tr><th></th>${cols.map(x => `<th class="${x.iid === INV.sel ? 'me' : ''}"><button type="button" class="mcmp-n" data-ivmo="${x.iid}">${esc(INVD[x.h]?.n || '…')}</button><small>${esc(wh(x))}</small></th>`).join('')}</tr>`;
+  const body = [row(P ? 'Poder' : 'Power', 'pw', x => x.pw, true), ...hs.map(h => row(sd[h].n, h, x => val(x, h), true)), ...(isW ? [`<tr><th scope="row">${P ? 'Nota do roll' : 'Roll grade'}</th>${cols.map(x => `<td>${rlBadge(rlGrade(x.iid, x.h)) || '—'}</td>`).join('')}</tr>`] : []), `<tr><th scope="row">${P ? 'Etiqueta' : 'Tag'}</th>${cols.map(x => `<td>${esc(tagOf(x.iid) ? tagl()[tagOf(x.iid)] : '—')}</td>`).join('')}</tr>`].join('');
+  return box(`<small class="lbd-n">${P ? 'Azul = melhor; verde → vermelho. Toque no nome da linha para ordenar; no nome do item para abrir.' : 'Blue = best; green → red. Tap a row name to sort; an item name to open it.'}</small><div class="mcmp-w"><table class="mcmp"><thead>${head}</thead><tbody>${body}</tbody></table></div>`);
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#ivdlg')) return;
+  if (e.target.closest('[data-ivmv]')) { const x = ivFind(INV.sel); if (x) { INV.mview = [x.iid, ...ivSim(x).map(y => y.iid)]; INV.msort = null; ivDraw(); } return; }
+  if (e.target.closest('[data-ivmx]')) { INV.mview = null; ivDraw(); return; }
+  const o = e.target.closest('[data-ivmo]'); if (o) { INV.mview = null; INV.sel = o.dataset.ivmo; INV.msg = null; ivDraw(); return; }
+  const so = e.target.closest('[data-ivms]'); if (so) { const k = so.dataset.ivms === 'pw' ? 'pw' : +so.dataset.ivms; INV.msort = INV.msort === k ? null : k; ivDraw(); return; }
+  const f = e.target.closest('[data-ivfuel]'); if (f && !INV.busy) { (async () => { const cur = ivChars()[0]?.characterId, ids = [INV.sel, f.dataset.ivfuel], made = [], P = lang === 'pt'; INV.busy = true; INV.msg = { t: ivt().going }; ivRefresh();
+    try { for (const id of ids) { const y = ivFind(id); if (y && (y.where !== cur || y.eq)) { if (y.eq && y.where === cur) continue; await ivCore(id, cur, false, made); } } INV.msg = { t: (P ? 'Os dois estão no personagem: infunda no jogo.' : 'Both are on your character: infuse in game.') + (made.length ? ' ' + ivMadeT(made) : ''), undo: made.length ? made : null }; }
+    catch (er) { INV.msg = { bad: true, t: ivErr(er) }; }
+    INV.busy = false; ivRefresh(); })(); return; }
+  const st = e.target.closest('[data-sist]'); if (st) { INV.stSel = INV.stSel === +st.dataset.sist ? null : +st.dataset.sist; ivDraw(); }
+});
+/* ---------- Etapa 3 (ideias do DIM): atributos de arma calculados como o jogo ----------
+   investimento (item + vantagens + obra-prima) → tabela da arma (statGroup) → número do jogo. Dados do /si (manifesto, guardado no Cloudflare).
+   Quanto cada peça soma = valor com tudo − valor sem ela. Se a conta não bater com o número da Bungie, mostra só o número da Bungie. */
+const SI_HID = [1345609583, 3555269338, 2715839340, 2714457168, 1931675084]; // assistência de mira, zoom, direção do recuo, eficácia no ar, inventário
+async function siLoad(iid) {
+  const det = INV.det[iid], x = ivFind(iid); if (!det || det.si || !x || !APIW) return; det.si = { busy: true };
+  try {
+    const plugs = [...new Set([...det.so.map(s => s.plugHash), ...Object.values(det.rp || {}).flat().map(p => p.plugItemHash)].filter(Boolean))], out = { p: {} };
+    for (let i = 0; i < Math.max(1, plugs.length); i += 30) {
+      const r = await fetch(APIW + '/si', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-API-Key': cfg.apiKey }, body: JSON.stringify({ h: i ? 0 : x.h, p: plugs.slice(i, i + 30) }) });
+      if (!r.ok) throw 0; const j = await r.json(); if (j.i) { out.i = j.i; out.g = j.g; } Object.assign(out.p, j.p || {});
+    }
+    if (!out.i || !out.g) throw 0;
+    const hid = SI_HID.filter(h => !(h in det.st)); if (hid.length) Object.assign(det.sd, await entities('DestinyStatDefinition', hid, lang).catch(() => ({})));
+    det.si = { ok: true, ...out };
+  } catch { det.si = { err: true }; }
+  if ($('ivdlg')?.open && INV.sel === iid) ivDraw();
+}
+function siInterp(t, v) {
+  if (!t?.length) return v; const a = t.slice().sort((x, y) => x[0] - y[0]); if (v <= a[0][0]) return a[0][1]; const l = a[a.length - 1]; if (v >= l[0]) return l[1];
+  for (let i = 1; i < a.length; i++) if (v <= a[i][0]) { const s0 = a[i - 1], e0 = a[i]; return s0[1] + (v - s0[0]) / (e0[0] - s0[0]) * (e0[1] - s0[1]); } return v;
+}
+function siVal(si, h, inv) { const t = si.g?.t?.[h]; if (!t) return Math.max(0, inv); let v = Math.round(siInterp(t, Math.max(0, inv))); const m = si.g.m?.[h]; return m ? Math.min(v, m) : v; }
+// soma o investimento por grupo: base (item + intrínseco/quadro), vantagens, obra-prima; "swap" troca um plug para a prévia
+function siSum(det, swap) {
+  const si = det.si, g = { base: {}, perk: {}, mw: {}, by: [] }, add = (o, s, v) => { o[s] = (o[s] || 0) + v; };
+  for (const [s, v] of Object.entries(si.i.s || {})) add(g.base, s, v);
+  det.so.forEach((so, i) => { let h = so.plugHash; if (swap && swap.i === i) h = swap.h; const inv = si.p[h]; if (!h || !inv) return; const pc = det.en[h]?.pc || '', k = /masterwork/i.test(pc) ? 'mw' : /intrinsics|frames/i.test(pc) ? 'base' : 'perk'; for (const [s, v] of Object.entries(inv)) add(g[k], s, v); g.by.push({ h, k, inv }); });
+  return g;
+}
+function siStatsHTML(x, det, sk) {
+  const P = lang === 'pt', T = ivt(), si = det.si, g = siSum(det), tot = s => (g.base[s] || 0) + (g.perk[s] || 0) + (g.mw[s] || 0);
+  // prévia: vantagem tocada que não está colocada
+  let sw = null; if (INV.perk && !det.so.some(s => s.plugHash === INV.perk)) { for (const [i, ps] of Object.entries(det.rp || {})) if (ps.some(p => p.plugItemHash === INV.perk) && si.p[INV.perk] !== undefined) { sw = { i: +i, h: INV.perk }; break; } }
+  const gp = sw ? siSum(det, sw) : null, totP = s => (gp.base[s] || 0) + (gp.perk[s] || 0) + (gp.mw[s] || 0);
+  const rows = sk.slice(), seen = new Set(rows.map(r => r.h)); for (const h of SI_HID) if (!seen.has(h) && tot(h) && det.sd[h]?.n) rows.push({ h, v: siVal(si, h, tot(h)), n: det.sd[h].n, hid: true });
+  const line = r => {
+    const s = r.h, all = siVal(si, s, tot(s)), ok = !si.g.t[s] ? false : (r.hid || Math.abs(all - r.v) <= 1), shown = r.hid ? all : r.v;
+    if (STAT_NOBAR.has(s) || !ok) return `<div class="ivd-st"><span>${esc(r.n)}</span>${STAT_NOBAR.has(s) ? '<i></i>' : `<i class="sea-bar"><u style="width:${Math.min(100, shown)}%"></u></i>`}<b>${shown}</b>${s === 3871231066 ? '<small class="si-d">≈</small>' : ''}</div>`;
+    const noMW = siVal(si, s, tot(s) - (g.mw[s] || 0)), noP = siVal(si, s, tot(s) - (g.mw[s] || 0) - (g.perk[s] || 0)), dP = noMW - noP, dM = all - noMW;
+    const pos = Math.max(0, dP) + Math.max(0, dM), neg = Math.max(0, -dP) + Math.max(0, -dM), base = all - pos, d = dP + dM;
+    const pv = gp ? siVal(si, s, totP(s)) - all : 0;
+    const seg = `<i class="si-bar"><u class="b" style="width:${Math.max(0, base)}%"></u>${dP > 0 ? `<u class="p" style="width:${dP}%"></u>` : ''}${dM > 0 ? `<u class="m" style="width:${dM}%"></u>` : ''}${neg ? `<u class="n" style="width:${neg}%"></u>` : ''}</i>`;
+    const delta = gp && pv ? `<small class="si-d pv ${pv > 0 ? 'up' : 'dn'}">${pv > 0 ? '+' : ''}${pv}</small>` : d ? `<small class="si-d ${d < 0 ? 'dn' : dM > 0 ? 'mw' : 'up'}">${d > 0 ? '+' : ''}${d}</small>` : '<small class="si-d"></small>';
+    let det2 = ''; if (INV.stSel === s) { const parts = g.by.filter(b => b.inv[s]).map(b => { const v = all - siVal(si, s, tot(s) - b.inv[s]); return `${det.en[b.h]?.n || '?'} ${v > 0 ? '+' : ''}${v}${v !== b.inv[s] ? (P ? ` (investimento ${b.inv[s] > 0 ? '+' : ''}${b.inv[s]})` : ` (investment ${b.inv[s] > 0 ? '+' : ''}${b.inv[s]})`) : ''}`; }); det2 = `<p class="si-x">${esc(parts.length ? parts.join(' · ') : (P ? 'Só a base da arma.' : 'Weapon base only.'))}</p>`; }
+    return `<button type="button" class="ivd-st si-r${INV.stSel === s ? ' on' : ''}" data-sist="${s}"><span>${esc(r.n)}</span>${seg}<b>${gp && pv ? all + pv : all}</b>${delta}</button>${det2}`;
+  };
+  const main = rows.filter(r => !r.hid), hid = rows.filter(r => r.hid);
+  return `<div class="si-wrap"><span class="sea-k">${esc(T.stats)}</span><div class="si-lg"><span><u class="b"></u>${P ? 'base' : 'base'}</span><span><u class="p"></u>${P ? 'vantagens' : 'perks'}</span><span><u class="m"></u>${P ? 'obra-prima' : 'masterwork'}</span><span><u class="n"></u>${P ? 'perde' : 'loss'}</span></div>${sw ? `<small class="si-pv">${esc(P ? `Prévia com ${det.en[sw.h]?.n || ''} no lugar de ${det.en[det.so[sw.i].plugHash]?.n || ''}` : `Preview with ${det.en[sw.h]?.n || ''} instead of ${det.en[det.so[sw.i].plugHash]?.n || ''}`)}</small>` : ''}${main.map(line).join('')}${hid.length ? `<span class="sea-k">${P ? 'Escondidos · o jogo não mostra' : 'Hidden · not shown in game'}</span>${hid.map(line).join('')}` : ''}<small class="lbd-n">${P ? 'Toque num atributo para ver quanto cada peça soma de verdade. Carregador (≈) pode diferir do jogo.' : 'Tap a stat to see what each piece really adds. Magazine (≈) may differ from the game.'}</small></div>`;
+}
 
 // deslizar para o lado na lista troca de subaba; puxar para baixo no topo atualiza (só toque, só /beta)
 (() => {

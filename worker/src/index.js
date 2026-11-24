@@ -61,6 +61,34 @@ async function defs(req, env) {
   return json(req, { d: out });
 }
 
+/* ---------- /si: dados para calcular atributos de arma como o jogo (investimento + tabela da arma) ----------
+   POST { h: hash do item, p: [hashes de plugs] } → { i: { s: {stat: inv}, g: statGroup }, g: { t: {stat: [[valor, peso]...]}, m: {stat: max} }, p: { plug: {stat: inv} } }
+   Só o investimento que vale sempre (isConditionallyActive fica de fora). Guardado no D1 como "si:<tipo>:<hash>". */
+async function statInfo(req, env) {
+  const { h, p } = await req.json().catch(() => ({}));
+  const ih = Number(h) >>> 0, ph = [...new Set((Array.isArray(p) ? p : []).map(x => Number(x) >>> 0).filter(Boolean))].slice(0, 30);
+  if (!ih && !ph.length) return json(req, { error: 'bad request' }, 400);
+  const keys = [...(ih ? ['si:i:' + ih] : []), ...ph.map(x => 'si:p:' + x)], got = {}, fresh = [], now = Date.now();
+  const rows = await env.DB.prepare(`SELECT k, v FROM defs WHERE k IN (${keys.map(() => '?').join(',')})`).bind(...keys).all();
+  for (const r of rows.results || []) got[r.k] = JSON.parse(r.v);
+  const inv = d => { const o = {}; for (const x of d.investmentStats || []) if (!x.isConditionallyActive && x.value) o[x.statTypeHash] = (o[x.statTypeHash] || 0) + x.value; return o; };
+  await Promise.all(keys.filter(k => !got[k]).map(async k => {
+    try { const d = await bungie(req, `/Destiny2/Manifest/DestinyInventoryItemDefinition/${k.split(':')[2]}/`); const v = k.startsWith('si:i:') ? { s: inv(d), g: d.stats?.statGroupHash || 0 } : inv(d); got[k] = v; fresh.push([k, JSON.stringify(v)]); }
+    catch (e) { if (e.code === 2101 || e.code === 2102 || e.code === 2107) throw e; }
+  }));
+  const out = { p: {} }; for (const x of ph) if (got['si:p:' + x]) out.p[x] = got['si:p:' + x];
+  if (ih && got['si:i:' + ih]) {
+    out.i = got['si:i:' + ih]; const gk = 'si:g:' + out.i.g;
+    if (out.i.g) {
+      let g = (await env.DB.prepare('SELECT v FROM defs WHERE k = ?').bind(gk).first())?.v; g = g ? JSON.parse(g) : null;
+      if (!g) { try { const d = await bungie(req, `/Destiny2/Manifest/DestinyStatGroupDefinition/${out.i.g}/`); g = { t: {}, m: {} }; for (const s of d.scaledStats || []) { g.t[s.statHash] = (s.displayInterpolation || []).map(x => [x.value, x.weight]); g.m[s.statHash] = s.maximumValue; } fresh.push([gk, JSON.stringify(g)]); } catch { g = null; } }
+      if (g) out.g = g;
+    }
+  }
+  if (fresh.length && !(await brake(env))) await env.DB.prepare(`INSERT OR REPLACE INTO defs (k, v, t) VALUES ${fresh.map(() => '(?, ?, ?)').join(',')}`).bind(...fresh.flatMap(([k, v]) => [k, v, now])).run().catch(() => {});
+  return json(req, out);
+}
+
 // quem está pedindo: confere o token da Bungie (guardado por 50 min pelo resumo do token, nunca o token em si)
 async function who(req, env) {
   const auth = req.headers.get('Authorization') || '', token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
@@ -518,6 +546,7 @@ export default {
     try {
       if (path !== '/stats' && path !== '/whoami' && path !== '/health' && !path.startsWith('/page/') && !path.startsWith('/gpage/') && !(path.startsWith('/pubimg/') && req.method === 'GET') && (await brake(env)) >= 2) return json(req, { error: 'brake' }, 503);
       if (path === '/defs' && req.method === 'POST') return await defs(req, env);
+      if (path === '/si' && req.method === 'POST') return await statInfo(req, env);
       if (path === '/sync' && (req.method === 'GET' || req.method === 'PUT')) return await sync(req, env);
       if (path === '/clan/notice' || path === '/clan/hours') return await clanRoute(req, env, path, new URL(req.url));
       if (path === '/clan/social' && req.method === 'GET') return await socialRoute(req, env, new URL(req.url));

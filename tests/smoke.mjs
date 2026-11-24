@@ -296,6 +296,18 @@ R.push(run('inventário: abrir espaço sozinho, lote na busca e atalhos', { path
   let end = ''; for (let t = 0; t < 40; t++) { end = await p.evaluate(() => document.querySelector('.ivj-end')?.textContent || ''); if (end) break; await p.waitForTimeout(300); }
   if (!/Pronto: 10 de 10/.test(end)) fail.push('lote para o cofre: ' + (end || await p.evaluate(() => document.querySelector('.ivj')?.textContent.slice(0, 200) || 'sem painel')));
 } }));
+R.push(run('itens novos: lista, etiqueta, triagem e comparar', { path: '/itens-novos', arm: true, clicks: false, ls: { 'dc-lang': 'pt', 'dc-newbase': '0' }, steps: async (p, fail) => {
+  for (let t = 0; t < 30; t++) { if (await p.$('.nv-r')) break; await p.waitForTimeout(400); }
+  const n = (await p.$$('.nv-r')).length; if (n !== 4) { fail.push('itens novos: esperava 4 linhas, veio ' + n); return; }
+  await p.evaluate(() => document.querySelector('[data-nvt="691:junk"]')?.click()); await p.waitForTimeout(400);
+  if ((await p.$$('.nv-r')).length !== 3) fail.push('etiquetar devia tirar o item da lista');
+  await p.evaluate(() => document.querySelector('.nv-r [data-iv]')?.click()); await p.waitForTimeout(600);
+  const tri = await p.evaluate(() => document.querySelector('#ivdlg .ivd-tri')?.textContent || ''); if (!/Em loadouts do jogo/.test(tri)) fail.push('triagem não apareceu · ' + tri.slice(0, 80));
+  const cmp = await p.$('#ivdlg [data-ivmv]'); if (cmp) { await cmp.click(); for (let t = 0; t < 20; t++) { if (await p.$('#ivdlg .mcmp')) break; await p.waitForTimeout(300); } if (!(await p.$('#ivdlg .mcmp'))) fail.push('comparar lado a lado não abriu'); }
+  if (!(await p.evaluate(() => document.querySelector('#ivdlg .ivd-fuel') || document.querySelector('#ivdlg .mcmp')))) fail.push('faltou combustível de infusão');
+  await p.keyboard.press('Escape'); await p.evaluate(() => document.querySelector('[data-nvall]')?.click()); await p.waitForTimeout(300);
+  if ((await p.$$('.nv-r')).length) fail.push('marcar todos como vistos não limpou');
+} }));
 R.push(run('grade: sugestão de loadout no cartão em que estou inscrito', { path: '/grade', arm: true, clicks: false, ls: { 'dc-lang': 'pt' }, steps: async (p, fail) => {
   for (let t = 0; t < 30; t++) { if (await p.$('.ls [data-lseq]')) break; await p.waitForTimeout(400); }
   const st = await p.evaluate(() => ({ n: document.querySelectorAll('.ls').length, txt: document.querySelector('.ls')?.innerText || '', eq: !!document.querySelector('.ls [data-lseq]:not([disabled])') }));

@@ -135,6 +135,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/itens-novos",
+      "destination": "/index.html"
+    },
+    {
       "source": "/loadouts",
       "destination": "/index.html"
     },
