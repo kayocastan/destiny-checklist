@@ -178,12 +178,19 @@ describe('API do DPI', () => {
     const t0 = new Date(Date.now() + 36e5).toISOString();
     const id = (await env.DB.prepare(`INSERT INTO activities (name, capacity, starts_at, description, created_by_discord_id, created_at, discord_channel_id, discord_message_id) VALUES ('Velho', 3, ?, '', '10', 'x', 'c1', 'm1')`).bind(t0).run()).meta.last_row_id;
     await env.DB.prepare(`INSERT INTO activity_participants (activity_id, discord_user_id, category, is_rookie, created_at) VALUES (?, '10', 'titular', 0, 'a'), (?, '20', 'titular', 0, 'b'), (?, '30', 'titular', 0, 'c'), (?, '40', 'substituto', 0, 'd')`).bind(id, id, id, id).run();
+    await env.DB.prepare(`INSERT INTO push_subs (endpoint, uid, discord_user_id, prefs, created_at, updated_at) VALUES ('https://push.example/40', 'u40', '40', '{"grade":1}', 'x', 'x'), ('https://push.example/20', 'u20', '20', '{"grade":0}', 'x', 'x')`).run();
+    await env.DB.prepare(`INSERT INTO push_sent (k, at) VALUES (?, 'x')`).bind(`grade:${id}:https://push.example/40`).run();
     const body = { atividade: 'Novo nome', integrantes: 2, novatos: '', inicio: new Date(Date.now() + 2 * 36e5).toISOString(), descricao: 'oi' };
     let r = await api(`/grades/${id}`, { method: 'PUT', body: JSON.stringify(body) }); expect(r.status).toBe(200);
     const cats = (await env.DB.prepare('SELECT discord_user_id d, category c FROM activity_participants WHERE activity_id = ? ORDER BY d').bind(id).all()).results;
     expect(cats).toEqual([{ d: '10', c: 'titular' }, { d: '20', c: 'titular' }, { d: '30', c: 'substituto' }, { d: '40', c: 'substituto' }]);
     const aviso = calls.find(c => c.method === 'POST' && c.url.includes('/channels/c1/messages'));
-    expect(aviso.body.content).toMatch(/editou a grade \*\*Novo nome\*\*/); expect(aviso.body.allowed_mentions.users).toEqual(expect.arrayContaining(['20', '30']));
+    expect(aviso.body.content).toMatch(/editou a grade \*\*Novo nome\*\*/); expect(aviso.body.allowed_mentions.users).toEqual(expect.arrayContaining(['20', '30', '40'])); // todos os inscritos
+    expect(aviso.body.content).toMatch(/atividade: Velho → \*\*Novo nome\*\*/); expect(aviso.body.content).toMatch(/vagas: 3 → \*\*2\*\*/); expect(aviso.body.content).toMatch(/Viraram substitutos \(menos vagas\): <@30>/);
+    const box = (await env.DB.prepare('SELECT title, body FROM push_inbox WHERE endpoint = ?').bind('https://push.example/40').all()).results;
+    expect(box).toHaveLength(1); expect(box[0].title).toBe('Grade alterada: Novo nome'); expect(box[0].body).toMatch(/horário: .+ → .+/);
+    expect(calls.some(c => c.url === 'https://push.example/40' && c.method === 'POST')).toBe(true);
+    expect(await env.DB.prepare('SELECT 1 FROM push_sent WHERE k = ?').bind(`grade:${id}:https://push.example/40`).first()).toBeNull(); // horário novo: lembrete de 30 min vale de novo
     await env.DB.prepare(`UPDATE activities SET created_by_discord_id = '99' WHERE id = ?`).bind(id).run();
     r = await api(`/grades/${id}`, { method: 'PUT', body: JSON.stringify(body) }); expect(r.status).toBe(400);
   });

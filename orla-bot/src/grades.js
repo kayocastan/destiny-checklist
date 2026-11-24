@@ -4,6 +4,7 @@ import { BungieApiError, syncPlayerActivities } from './bungie.js';
 import { getRoster, enroll, removeSignup, SignupError } from './signups.js';
 import { renderActivity, BUTTONS } from './embed.js';
 import { postMessage, editMessage, deleteMessage, DiscordError } from './discord.js';
+import { notify as notify_, prefOn } from './push.js';
 
 export const CATALOG_PREFIX = 'curated:';
 
@@ -109,30 +110,45 @@ export async function editGrade(env, a) {
   const name = validateActivityInput(a.atividade, a.integrantes, a.descricao ?? '', a.rookieLimit ?? null);
   const parts = (await db.prepare('SELECT * FROM activity_participants WHERE activity_id = ? ORDER BY created_at, id').bind(act.id).all()).results;
   const tit = parts.filter(p => p.category === 'titular'), subs = parts.filter(p => p.category === 'substituto');
-  const confirmed = tit.map(p => p.discord_user_id);
   const stmts = [db.prepare('UPDATE activities SET name = ?, curated_bungie_activity_id = ?, capacity = ?, rookie_limit = ?, starts_at = ?, description = ? WHERE id = ?')
     .bind(name, curated?.id ?? null, a.integrantes, a.rookieLimit ?? null, startsAt.toISOString(), a.descricao ?? '', act.id)];
   // menos vagas: os últimos a entrar viram substitutos (o criador fica); mais vagas: sobem os substitutos mais antigos
-  const over = tit.length - a.integrantes;
-  if (over > 0) for (const p of tit.filter(p => p.discord_user_id !== act.created_by_discord_id).slice(-over)) stmts.push(db.prepare(`UPDATE activity_participants SET category = 'substituto' WHERE id = ?`).bind(p.id));
-  else for (const p of subs.slice(0, -over)) stmts.push(db.prepare(`UPDATE activity_participants SET category = 'titular' WHERE id = ?`).bind(p.id));
+  const over = tit.length - a.integrantes, down = [], up = [];
+  if (over > 0) for (const p of tit.filter(p => p.discord_user_id !== act.created_by_discord_id).slice(-over)) { down.push(p.discord_user_id); stmts.push(db.prepare(`UPDATE activity_participants SET category = 'substituto' WHERE id = ?`).bind(p.id)); }
+  else for (const p of subs.slice(0, -over)) { up.push(p.discord_user_id); stmts.push(db.prepare(`UPDATE activity_participants SET category = 'titular' WHERE id = ?`).bind(p.id)); }
+  const oldStart = new Date(String(act.starts_at).replace(' ', 'T')), timeChanged = startsAt.getTime() !== oldStart.getTime();
+  if (timeChanged) stmts.push(db.prepare('DELETE FROM push_sent WHERE k LIKE ?').bind(`grade:${act.id}:%`)); // horário novo: o aviso de 30 min vale de novo
   await db.batch(stmts);
+  // o que mudou, com o antes e o depois (mesmo texto no Discord e no celular)
   const ch = [], fmt = d => new Intl.DateTimeFormat('pt-BR', { timeZone: tz, weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(d);
-  if (name !== act.name) ch.push(`atividade: **${name}**`);
-  if (startsAt.toISOString() !== new Date(String(act.starts_at).replace(' ', 'T')).toISOString()) ch.push(`horário: **${fmt(startsAt)}**`);
-  if (a.integrantes !== act.capacity) ch.push(`vagas: **${a.integrantes}**`);
-  if ((a.rookieLimit ?? null) !== (act.rookie_limit ?? null)) ch.push(`novatos: **${a.rookieLimit ?? 'sem limite'}**`);
-  if ((a.descricao ?? '') !== (act.description ?? '')) ch.push('descrição');
+  if (name !== act.name) ch.push(['atividade', act.name, name]);
+  if (timeChanged) ch.push(['horário', fmt(oldStart), fmt(startsAt)]);
+  if (a.integrantes !== act.capacity) ch.push(['vagas', act.capacity, a.integrantes]);
+  if ((a.rookieLimit ?? null) !== (act.rookie_limit ?? null)) ch.push(['novatos', act.rookie_limit ?? 'sem limite', a.rookieLimit ?? 'sem limite']);
+  if ((a.descricao ?? '') !== (act.description ?? '')) ch.push(['descrição']);
+  const line = (bold) => ch.map(([k, x, y]) => y === undefined ? `${k} nova` : `${k}: ${x} → ${bold ? `**${y}**` : y}`).join(' · ');
+  // avisa todos os inscritos (titulares, substitutos e reserva), menos quem editou
+  const notify = parts.map(p => p.discord_user_id).filter(id => id !== act.created_by_discord_id);
   let warning = '';
   if (act.discord_message_id) {
     try { await refreshMessage(env, act.id); } catch (e) { console.error('editar mensagem', e?.message); warning = ' Não consegui atualizar a mensagem da grade no Discord.'; }
-    const notify = confirmed.filter(id => id !== act.created_by_discord_id);
-    if (ch.length && notify.length) {
+    if ((ch.length || down.length || up.length) && notify.length) {
+      const m = id => `<@${id}>`, extra = [down.length ? `\nViraram substitutos (menos vagas): ${down.map(m).join(' ')}` : '', up.length ? `\nSubiram para titular: ${up.map(m).join(' ')}` : ''].join('');
       try {
-        await postMessage(env, act.discord_channel_id, { content: `✏️ <@${act.created_by_discord_id}> editou a grade **${name}** (${ch.join(', ')}). ${notify.map(id => `<@${id}>`).join(' ')}`,
+        await postMessage(env, act.discord_channel_id, { content: `✏️ <@${act.created_by_discord_id}> editou a grade **${name}**${ch.length ? `\n${line(true)}` : ''}${extra}\nInscritos: ${notify.map(m).join(' ')}`,
           allowed_mentions: { users: [...new Set([act.created_by_discord_id, ...notify])] }, message_reference: { message_id: act.discord_message_id, fail_if_not_exists: false } });
-      } catch (e) { console.error('aviso edição', e?.message); warning += ' Não consegui avisar os confirmados no Discord.'; }
+      } catch (e) { console.error('aviso edição', e?.message); warning += ' Não consegui avisar os inscritos no Discord.'; }
     }
   }
-  return { ok: true, changed: ch.length, notified: confirmed.filter(id => id !== act.created_by_discord_id).length, warning: warning.trim() };
+  // no celular: quem ativou os avisos de grade no DPI
+  if ((ch.length || down.length || up.length) && notify.length) {
+    try {
+      const subsP = (await db.prepare(`SELECT endpoint, prefs, discord_user_id d FROM push_subs WHERE discord_user_id IN (${notify.map(() => '?').join(',')})`).bind(...notify).all()).results.filter(s => prefOn(s, 'grade'));
+      for (const s of subsP) {
+        const mv = down.includes(s.d) ? ' Você virou substituto (menos vagas).' : up.includes(s.d) ? ' Você subiu para titular.' : '';
+        await notify_(env, s.endpoint, { title: `Grade alterada: ${name}`, body: `${line(false) || 'Inscritos reorganizados.'}${mv}`, url: '/grade', tag: `grade-edit-${act.id}` }).catch(() => {});
+      }
+    } catch (e) { console.error('push edição', e?.message); }
+  }
+  return { ok: true, changed: ch.length + down.length + up.length, notified: notify.length, warning: warning.trim() };
 }

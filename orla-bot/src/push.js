@@ -36,7 +36,7 @@ export async function notify(env, endpoint, { title, body, url = '/', tag = '' }
   return r.status;
 }
 const once = async (env, k) => (await env.DB.prepare('INSERT OR IGNORE INTO push_sent (k, at) VALUES (?, ?)').bind(k, now()).run()).meta.changes > 0;
-const prefOn = (s, k) => { try { return !!JSON.parse(s.prefs || '{}')[k]; } catch { return false; } };
+export const prefOn = (s, k) => { try { return !!JSON.parse(s.prefs || '{}')[k]; } catch { return false; } };
 
 // 30 min antes: avisa quem está na grade (titular, substituto ou reserva) e ativou o aviso
 export async function gradeReminders(env) {
