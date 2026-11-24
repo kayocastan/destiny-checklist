@@ -6114,7 +6114,8 @@ function apJunk(ws) {
 }
 async function apLock(x, state) { const cid = x.where !== 'v' ? x.where : ivChars()[0]?.characterId; await wPost('/Destiny2/Actions/Items/SetLockState/', { state, itemId: x.iid, characterId: cid }); if (state) x.it.state |= 1; else x.it.state &= ~1; x.lk = state; }
 // perfil recarregado (botão Atualizar, volta à aba depois de 5 min, fim de atividade): perks trocados no jogo entram na nota
-function apFresh() { if (RL.so) RL.so = {}; for (const k in RAPP) delete RAPP[k]; if (AP.av === 'ok' || AP.av === 'err') AP.av = ''; APC.clear(); }
+function apFresh() { if (RL.so) { RL.so = {}; RL.sts = null; if (RL.st === 'ok') RL.st = ''; } // perfil novo: relê as vantagens de todas as armas (antes ficava vazio até recarregar a página)
+  for (const k in RAPP) delete RAPP[k]; if (AP.av === 'ok' || AP.av === 'err') AP.av = ''; APC.clear(); }
 function apChips(w) {
   const T = apt(), ok = AP.av === 'ok', c = {}; if (ok) for (const x of w) { const e = apEval(x); if (e.g) c[e.g] = (c[e.g] || 0) + 1; if (e.plan?.length) c.fix = (c.fix || 0) + 1; } if (ok) c.junk = apJunk(w).size;
   return [['S', 'S'], ['A', 'A'], ['B', 'B'], ['C', 'C'], ['fix', T.fix], ['junk', apj().junk]].map(([k, t]) => `<button type="button" class="ap-c" style="--g:${RG_C[k] || 'var(--acc, #6fd3ff)'}" data-apf="${k}" aria-pressed="${AP.f === k}"${k === 'junk' ? ` title="${esc(apj().junkT)}"` : ''}><small${k === 'fix' || k === 'junk' ? '' : ` title="${lang === 'pt' ? 'Nota ' : 'Grade '}${t}"`}>${esc(k === 'fix' || k === 'junk' ? t : (lang === 'pt' ? 'Nota ' : '') + t)}</small><b>${ok ? c[k] || 0 : '…'}</b></button>`).join('');
