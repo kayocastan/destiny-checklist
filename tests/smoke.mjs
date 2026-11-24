@@ -47,7 +47,7 @@ function profile() {
 }
 const GRADES = [{ id: 1, name: 'Queda do Rei: Normal', g: null, ci: null, desc: '**Atenção**\n\nSó quem já fez.', cap: 6, rk: 0, s: iso(now + 864e5), by: 'Peter', url: null, mine: null, creator: false, p: [{ n: 'Peter', c: 'titular', r: 0 }] }, { id: 2, name: 'Fim de Crota: Normal', g: null, ci: null, desc: 'Inscrita', cap: 6, rk: 0, s: iso(now + 2 * 864e5).replace('T', ' ').slice(0, 19), by: 'Nipanga', url: 'https://discord.com/channels/1/2/3', mine: 'titular', creator: true, p: [{ n: 'Nipanga', c: 'titular', r: 0 }] }];
 
-async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin = false, xsave = false, expectSub = null, expired = false, mobile = false, clicks = true, steps = null, expectText = '', arm = false, owner = false, vc = '', noSub = null, expectBar = false }) {
+async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin = false, xsave = false, expectSub = null, expired = false, mobile = false, clicks = true, steps = null, expectText = '', arm = false, owner = false, vc = '', noSub = null, expectBar = false, orlaClan = false }) {
   if (process.env.F && !name.includes(process.env.F)) return true; // F=trecho: roda só os testes com esse nome
   const b = await chromium.launch(), ctx = await b.newContext(mobile ? { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true } : { viewport: { width: 1366, height: 900 } });
   const page = await ctx.newPage(), errs = [], seen = { refresh: 0 };
@@ -66,7 +66,7 @@ async function run(name, { path = '/', auth = true, ls = {}, orla = 200, admin =
       const p = u.pathname.replace('/Platform', '');
       if (p.startsWith('/User/GetMembershipsForCurrentUser')) return j({ ErrorCode: 1, Response: { destinyMemberships: [{ membershipId: '4611686018400000001', membershipType: 3, displayName: 'Teste', bungieGlobalDisplayName: 'Teste', bungieGlobalDisplayNameCode: 1234 }], primaryMembershipId: '4611686018400000001', bungieNetUser: { membershipId: '99', uniqueName: 'Teste#1234' } } });
       if (/\/Profile\/\d+\/\?/.test(p + '?') && !/Item\//.test(p)) return j({ ErrorCode: 1, Response: arm ? arsenal(profile()) : profile() });
-      if (p.startsWith('/GroupV2/User/')) return j({ ErrorCode: 1, Response: { results: [{ group: { groupId: '4886893', name: 'Clã Teste', clanInfo: { clanCallsign: 'TST' } }, member: { memberType: admin ? 3 : 2 } }] } });
+      if (p.startsWith('/GroupV2/User/')) return j({ ErrorCode: 1, Response: { results: [{ group: { groupId: orlaClan ? '5280120' : '4886893', name: 'Clã Teste', clanInfo: { clanCallsign: 'TST' } }, member: { memberType: admin ? 3 : 2 } }] } });
       if (/\/GroupV2\/\d+\/Members/.test(p)) return j({ ErrorCode: 1, Response: { results: [{ memberType: admin ? 3 : 2, isOnline: true, destinyUserInfo: { membershipId: xsave ? '4611686018499999999' : '4611686018400000001', membershipType: xsave ? 1 : 3, bungieGlobalDisplayName: 'Teste', bungieGlobalDisplayNameCode: 1234 } }] } });
       return j({ ErrorCode: 1, Response: {} });
     }
@@ -200,6 +200,12 @@ R.push(await run('endereço: Hoje → Grade → Arsenal → Voltar (sem recarreg
   await same(p, fail, 'Grade ida e volta'); } }));
 R.push(await run('endereço: /grade → clicar em aba vai sem recarregar', { path: '/grade', clicks: false, steps: async (p, fail) => {
   await clickSub(p, 'gd', 'gd'); await p.waitForTimeout(1000); if (await url(p) !== '/builds') fail.push('da grade para Builds: ' + await url(p)); await same(p, fail, 'grade → builds'); } }));
+R.push(await run('grade: Editar na agenda de Membros abre a edição na /grade', { path: '/membros', orlaClan: true, clicks: false, ls: { 'dc-lang': 'pt' }, steps: async (p, fail) => {
+  await p.waitForSelector('[data-obedit]', { timeout: 8000 }).catch(() => fail.push('botão Editar não apareceu em Membros'));
+  if (fail.length) return; await p.click('[data-obedit]'); await p.waitForTimeout(900);
+  if (await url(p) !== '/grade') fail.push('Editar não levou para /grade: ' + await url(p));
+  const tx = await p.evaluate(() => document.getElementById('obform')?.textContent || ''); if (!/Editar grade|Edit roster/.test(tx) || !/Fim de Crota/.test(await p.evaluate(() => [...document.querySelectorAll('#obform input')].map(i => i.value).join(' ')))) fail.push('formulário de edição não veio preenchido');
+} }));
 R.push(await run('rolagem: Voltar devolve a posição; aba nova sobe para a lista', { path: '/hoje', clicks: false, steps: async (p, fail) => {
   await p.evaluate(() => { document.body.style.minHeight = '5000px'; scrollTo(0, 1500); }); await p.waitForTimeout(300);
   await clickSub(p, 'obj', 'cal'); await p.waitForTimeout(900); const y1 = await p.evaluate(() => scrollY); if (y1 > 1200) fail.push('aba nova não subiu (' + y1 + ')');
