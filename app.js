@@ -1753,7 +1753,7 @@ function renderInner() {
   $('eyebrow').dataset.base = member.name || ''; $('eyebrow').textContent = member.name || ''; $('eyebrow').title = member.name || ''; fitTitle();
   $('ghpw').hidden = false; $('ghout').querySelector('span').textContent = U.logout; $('ghout').classList.remove('ask'); $('pwv').textContent = ch.light; $('pwmax').textContent = mx && mx > ch.light ? `${U.max} ${mx}` : U.power;
   const many = Object.keys(profile.characters.data).length > 1;
-  $('chars').innerHTML = (many ? Object.values(profile.characters.data).map(c => `<button class="char" type="button" data-char="${c.characterId}" aria-pressed="${c.characterId === charId}">${esc(U.classes[c.classType])}<span class="pw">${c.light}</span></button>`).join('') : '') + `<button class="char findbtn" type="button" id="findbtn" title="${esc(U.w.find)}" aria-label="${esc(U.w.find)}">${FIND_ICON}<span>${esc(U.w.findShort)}</span></button>`;
+  $('chars').innerHTML = (many ? Object.values(profile.characters.data).map(c => `<button class="char" type="button" data-char="${c.characterId}" aria-pressed="${c.characterId === charId}">${esc(U.classes[c.classType])}<span class="pw">${c.light}</span></button>`).join('') : '') + `<button class="char findbtn" type="button" id="findbtn" title="${esc(U.w.find)}" aria-label="${esc(U.w.find)}">${FIND_ICON}<span>${esc(U.w.findShort)}</span></button>${farmTgl()}`;
   $('chars').hidden = false;
   $('tabs').innerHTML = GROUPS.map(g => `<button class="tab" type="button" data-group="${g.id}" aria-current="${groupOf(tab)?.id === g.id}">${esc(U.tabs[g.id])}</button>`).join('');
   botNav();
@@ -1802,7 +1802,7 @@ function renderInner() {
   if (tab === 'obj' && have.a && member && LIVE.checked && !LIVE.on) loadSession();
   if ((tab === 'raid' || tab === 'dg' || tab === 'xm') && have.a && member) loadActHist();
   if (tab === 'xm') loadXmRec();
-  $('list').innerHTML = `<div class="panel">${tab === 'obj' ? newsHTML() + todoHTML() + farmHTML('obj') + hjExtraHTML() : ''}${tab === 'prog' ? chalHTML() + (BETA || FX ? qpHTML() : '') : ''}${tab === 'cal' ? calHTML() : ''}${tab === 'pat' ? patHTML() : ''}${tab === 'obj' ? sessHTML() : ''}${wkBar}${tsBar}${!secs.length && SCR[tab]?.ov ? `<p class="empty-msg">${lang === 'pt' ? 'Nada para mostrar aqui ainda. Os dados da Bungie desta parte não vieram ou ainda estão carregando; toque em Atualizar.' : 'Nothing to show here yet. Bungie did not send this part or it is still loading; tap Refresh.'}</p>` : ''}${secs.map(sec => {
+  $('list').innerHTML = `<div class="panel">${tab === 'obj' ? newsHTML() + todoHTML() + hjExtraHTML() : ''}${tab === 'prog' ? chalHTML() + (BETA || FX ? qpHTML() : '') : ''}${tab === 'cal' ? calHTML() : ''}${tab === 'pat' ? patHTML() : ''}${tab === 'obj' ? sessHTML() : ''}${wkBar}${tsBar}${!secs.length && SCR[tab]?.ov ? `<p class="empty-msg">${lang === 'pt' ? 'Nada para mostrar aqui ainda. Os dados da Bungie desta parte não vieram ou ainda estão carregando; toque em Atualizar.' : 'Nothing to show here yet. Bungie did not send this part or it is still loading; tap Refresh.'}</p>` : ''}${secs.map(sec => {
     if (sec.html) return sec.id === 'vendors' ? vendorsHTML() : sec.id === 'goals' ? goalsHTML() : sec.id === 'post' ? postHTML() : sec.id === 'wishobj' ? wishObjHTML() : sec.id === 'focus' ? focusHTML() : sec.id === 'grank' ? grObjHTML() : '';
     if (FX && sec.id === 'week' && sec.items.length) return weekHTML(sec);
     if (sec.empty) return `<p class="empty-msg${/…$/.test(sec.note || '') ? ' wait' : ''}">${esc(sec.note)}</p>`;
@@ -2200,8 +2200,8 @@ function ldListHTML() {
     const ws = WEAPON_B.map(b => eq.find(i => i.bucketHash === b)).filter(Boolean), xa = eq.find(i => ARMOR_B.includes(i.bucketHash) && B.en[i.itemHash]?.tt === 6);
     const ic = (i, cls = '') => { const x = d(i.itemHash); return `<span class="ldc-i ${cls}${B.en[i.itemHash]?.tt === 6 ? ' ex' : ''}" title="${esc(x.n || '')}">${x.ic ? `<img src="${BNET}${x.ic}" alt="" loading="lazy">` : ''}</span>`; };
     const same = buildSig(C) === buildSig(ownCtx());
-    return `<div class="ldc-w">${wOk() ? `<span class="ldc-ed"><button type="button" data-lded="${l.i}">${lang === 'pt' ? 'Editar' : 'Edit'}</button></span>` : ''}${wOk() && !same ? `<button type="button" class="ldc-eq" data-ldeq="${l.i}" title="${esc(lang === 'pt' ? 'Equipar este loadout no personagem' : 'Equip this loadout on the character')}">${esc(lang === 'pt' ? 'Equipar' : 'Equip')}</button>` : ''}<button type="button" class="ld ldc" data-ldo="${l.i}" style="--el:${a1}"><div class="ldc-top">${sub ? ic(sub, 'ldc-sub') : ''}<div class="ldc-t"><small><span class="ld-tag game">${esc(lw().inGame)}</span> ${esc(l.name)}${same ? ` · <b>${esc(W.ldEq)}</b>` : ''}</small><h2>${esc(charTitle(u().classes[C.p.characters.data[C.cid].classType] || '', d(sub?.itemHash).n))}</h2></div><span class="chev" aria-hidden="true"></span></div>
-      <div class="ldc-g">${ws.map(i => ic(i)).join('')}${xa ? ic(xa) : ''}<span class="ldc-n">${esc([...ws, xa].filter(Boolean).filter(i => B.en[i.itemHash]?.tt === 6).map(i => d(i.itemHash).n).join(' · '))}</span></div></button>${ldaNotes(ldaGame(l.i))}</div>`;
+    return `<div class="ldc-o"><div class="ldc-w">${wOk() ? `<span class="ldc-ed"><button type="button" data-lded="${l.i}">${lang === 'pt' ? 'Editar' : 'Edit'}</button></span>` : ''}${wOk() && !same ? `<button type="button" class="ldc-eq" data-ldeq="${l.i}" title="${esc(lang === 'pt' ? 'Equipar este loadout no personagem' : 'Equip this loadout on the character')}">${esc(lang === 'pt' ? 'Equipar' : 'Equip')}</button>` : ''}<button type="button" class="ld ldc" data-ldo="${l.i}" style="--el:${a1}"><div class="ldc-top">${sub ? ic(sub, 'ldc-sub') : ''}<div class="ldc-t"><small><span class="ld-tag game">${esc(lw().inGame)}</span> ${esc(l.name)}${same ? ` · <b>${esc(W.ldEq)}</b>` : ''}</small><h2>${esc(charTitle(u().classes[C.p.characters.data[C.cid].classType] || '', d(sub?.itemHash).n))}</h2></div><span class="chev" aria-hidden="true"></span></div>
+      <div class="ldc-g">${ws.map(i => ic(i)).join('')}${xa ? ic(xa) : ''}<span class="ldc-n">${esc([...ws, xa].filter(Boolean).filter(i => B.en[i.itemHash]?.tt === 6).map(i => d(i.itemHash).n).join(' · '))}</span></div></button></div>${ldaNotes(ldaGame(l.i))}</div>`;
   }).filter(h => ldaShow(h)).join('') + '</div>' + site + '</div>';
 }
 /* builds salvas: uma cópia do equipamento daquele momento, guardada neste navegador */
@@ -5264,6 +5264,7 @@ document.addEventListener('click', e => { const b = e.target.closest('[data-ivpk
 const ivMatch = x => {
   const f = INV.f, q = palNorm(INV.q.trim()), d = INVD[x.h] || {}, t = tagOf(x.iid);
   if (f === 'wish' && !(x.slot < 3 && wishHas(x.h, INVD[x.h]?.n))) return false;
+  if (/^t[SABC]$/.test(f) && !(x.slot < 3 && tierOf(x) === f[1])) return false;
   if ((f === 'rg' || f === 'rp' || f === 'rn') && (x.slot > 2 || rlGrade(x.iid, x.h) !== f[1]) || f === 'w' && x.slot > 2 || f === 'a' && x.slot < 3 || f === 'dup' && !x.dup || f === 'fav' && t !== 'fav' || f === 'junk' && t !== 'junk') return false;
   if (!q) return true;
   if (x.slot < 3 && !PKN.done) pkLoad();
@@ -5279,7 +5280,7 @@ function wishFull(x) {
   if (!PKN.done) pkLoad();
   return cols.every(c => c.some(o => hs.includes(o.h) || (o.ic && ics.includes(o.ic))));
 }
-const ivTile = (x, big) => { const d = INVD[x.h] || {}, t = tagOf(x.iid), m = ivMatch(x); return `<button type="button" class="iv-t${big ? ' big' : ''}${x.ex ? ' ex' : ''}${m ? '' : ' dim'}${INV.picked.has(x.iid) ? ' pk' : ''}" data-iv="${x.iid}" draggable="true" title="${esc([d.n, x.pw ? '✦ ' + x.pw : '', d.tl].filter(Boolean).join(' · '))}" aria-label="${esc(d.n || '')}">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy" draggable="false">` : ''}${x.pw ? `<b>${x.pw}</b>` : ''}${t ? `<i class="iv-tg t-${t}">${{ fav: '★', keep: '✓', junk: '✕', inf: '⇪' }[t]}</i>` : ''}${x.el && ELEMENTS[x.el] && x.slot < 3 ? `<s class="el-${ELEMENTS[x.el]}"></s>` : ''}${x.slot < 3 ? rlBadge(rlGrade(x.iid, x.h)) : ''}${x.slot < 3 && wishFull(x) ? `<i class="iv-wf" title="${lang === 'pt' ? 'Roll desejado' : 'Wished roll'}">☆</i>` : ''}${x.lk ? '<u class="iv-lk" aria-hidden="true"><svg viewBox="0 0 12 12" width="10" height="10" fill="currentColor"><path d="M3.5 5V3.6a2.5 2.5 0 0 1 5 0V5h.7c.4 0 .8.4.8.8v4.4c0 .4-.4.8-.8.8H2.8a.8.8 0 0 1-.8-.8V5.8c0-.4.4-.8.8-.8zm1.2 0h2.6V3.6a1.3 1.3 0 0 0-2.6 0z"/></svg></u>' : ''}</button>`; };
+const ivTile = (x, big) => { const d = INVD[x.h] || {}, t = tagOf(x.iid), m = ivMatch(x); return `<button type="button" class="iv-t${big ? ' big' : ''}${x.ex ? ' ex' : ''}${m ? '' : ' dim'}${INV.picked.has(x.iid) ? ' pk' : ''}" data-iv="${x.iid}" draggable="true" title="${esc([d.n, x.pw ? '✦ ' + x.pw : '', d.tl].filter(Boolean).join(' · '))}" aria-label="${esc(d.n || '')}">${d.ic ? `<img src="${BNET}${d.ic}" alt="" loading="lazy" draggable="false">` : ''}${x.pw ? `<b>${x.pw}</b>` : ''}${t ? `<i class="iv-tg t-${t}">${{ fav: '★', keep: '✓', junk: '✕', inf: '⇪' }[t]}</i>` : ''}${x.el && ELEMENTS[x.el] && x.slot < 3 ? `<s class="el-${ELEMENTS[x.el]}"></s>` : ''}${x.slot < 3 ? tierBadge(tierOf(x)) : ''}${x.slot < 3 && wishFull(x) ? `<i class="iv-wf" title="${lang === 'pt' ? 'Roll desejado' : 'Wished roll'}">☆</i>` : ''}${x.lk ? '<u class="iv-lk" aria-hidden="true"><svg viewBox="0 0 12 12" width="10" height="10" fill="currentColor"><path d="M3.5 5V3.6a2.5 2.5 0 0 1 5 0V5h.7c.4 0 .8.4.8.8v4.4c0 .4-.4.8-.8.8H2.8a.8.8 0 0 1-.8-.8V5.8c0-.4.4-.8.8-.8zm1.2 0h2.6V3.6a1.3 1.3 0 0 0-2.6 0z"/></svg></u>' : ''}</button>`; };
 function ivBar() {
   const T = ivt(), chip = (k, t) => `<button type="button" class="lbd-chip${INV.f === k ? ' on' : ''}" data-ivf="${k}">${esc(t)}</button>`;
   return `<div class="iv-bar"><label class="iv-q"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/></svg><input type="search" id="ivq" value="${esc(INV.q)}" placeholder="${esc(T.q)}" aria-label="${esc(T.q)}" autocomplete="off"></label>${ivPkSug()}<div class="lbd-chips">${chip('all', T.all)}${chip('w', T.w)}${chip('a', T.a)}${chip('dup', T.dup)}${chip('fav', T.fav)}${chip('wish', lang === 'pt' ? '☆ Desejados' : '☆ Wished')}${chip('junk', T.junk)}</div><small class="iv-tip">${esc(T.tip)}<span class="kb-h"> · ${lang === 'pt' ? 'atalhos' : 'shortcuts'}: <kbd>?</kbd></span></small></div>${ivMsgH()}${ivBulkH(invAll().filter(ivMatch))}`;
@@ -5300,7 +5301,7 @@ function invHTML() {
     return `<div class="iv-l">${esc(T.slots[s])}</div>${cells}${showV ? `<div class="iv-c iv-v" data-ivdrop="v" data-ivslot="${s}"><small class="iv-vn">${esc(T.inVault(vs.length))}${dn ? ` · <b>${esc(T.dups(dn))}</b>` : ''}</small><div class="iv-vg">${vs.map(x => ivTile(x)).join('')}</div></div>` : ''}`;
   }).join('');
   const nc = cols.length + (showV ? 1 : 0);
-  return `<div class="panel iv-wrap">${farmHTML('inv')}${rlBar(all)}${ivBar()}${mob}<div class="iv-grid" style="--ivc:${cols.length};--ivv:${showV ? 1 : 0}"><span></span>${cols.map(head).join('')}${showV ? vHead : ''}${rows}</div></div>`;
+  return `<div class="panel iv-wrap">${rlBar(all)}${ivBar()}${mob}<div class="iv-grid" style="--ivc:${cols.length};--ivv:${showV ? 1 : 0}"><span></span>${cols.map(head).join('')}${showV ? vHead : ''}${rows}</div></div>`;
 }
 // Cofre organizado: categorias, agrupar e ordenar, vários de uma vez
 function vltHTML() {
@@ -5928,7 +5929,7 @@ document.addEventListener('change', e => { if (e.target.id === 'keeplock') LS.se
 function rlBar(list) {
   const T = rlt(); if (RL.st !== 'ok') { if (!RL.st) setTimeout(rlLoad); return RL.st === 'err' ? `<div class="rl-bar"><small>${esc(T.err)}</small></div>` : `<div class="rl-bar"><small class="wait">${esc(T.load)}</small></div>`; }
   const w = list.filter(x => x.slot < 3), gs = w.map(x => rlGrade(x.iid, x.h)), c = k => gs.filter(g => g === k).length;
-  return `<div class="rl-bar"><span><b>${esc(T.t)}</b><small>${esc(T.src)} · ${esc(T.upd(new Date(RL.at).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR')))}</small></span><div class="vl-seg rl-mode">${Object.entries(T.mode).map(([k, t]) => `<button type="button" data-rlmode="${k}" aria-pressed="${RL.mode === k}">${esc(t)}</button>`).join('')}</div><div class="rl-k" role="group" aria-label="${esc(lang === 'pt' ? 'Filtrar por roll' : 'Filter by roll')}">${AP.on ? apChips(w) : [['g', T.g, 0], ['p', T.p, 1], ['n', T.n, 2]].map(([k, t, i]) => `<button type="button" class="${k}" data-ivf="r${k}" data-rltog aria-pressed="${INV.f === 'r' + k}" title="${esc(T.leg[i][1] + ': ' + T.leg[i][2])}"><small>${esc(t)}</small><b>${c(k)}</b></button>`).join('')}<button type="button" class="rl-ap${AP.on ? ' on' : ''}" data-rap aria-pressed="${!!AP.on}"><small>${esc(T.apNew)}</small><b>⚖ ${esc(T.ap)}</b></button></div>${(() => { const n = lkbList().length; return n && !LKB.st ? `<button type="button" class="lbd-btn rl-lk" data-lkb>${esc(lkt().bulk(n))}</button>` : ''; })()}</div>${lkbHTML()}`;
+  return `<div class="rl-bar"><span><b>${esc(T.t)}</b><small>${esc(T.src)} · ${esc(T.upd(new Date(RL.at).toLocaleDateString(lang === 'en' ? 'en-US' : 'pt-BR')))}</small></span><div class="vl-seg rl-mode">${Object.entries(T.mode).map(([k, t]) => `<button type="button" data-rlmode="${k}" aria-pressed="${RL.mode === k}">${esc(t)}</button>`).join('')}</div><div class="rl-k" role="group" aria-label="${esc(lang === 'pt' ? 'Filtrar por roll' : 'Filter by roll')}">${AP.on ? apChips(w) : tierChips(w)}<button type="button" class="rl-ap${AP.on ? ' on' : ''}" data-rap aria-pressed="${!!AP.on}"><small>${esc(T.apNew)}</small><b>⚖ ${esc(T.ap)}</b></button></div>${(() => { const n = lkbList().length; return n && !LKB.st ? `<button type="button" class="lbd-btn rl-lk" data-lkb>${esc(lkt().bulk(n))}</button>` : ''; })()}</div>${lkbHTML()}`;
 }
 document.addEventListener('click', e => { const b = e.target.closest('[data-rlmode]'); if (!b) return; RL.mode = b.dataset.rlmode; LS.set('dc-rlmode', RL.mode); render(); if ($('ivdlg')?.open) ivDraw(); });
 
@@ -6682,7 +6683,7 @@ function novoHTML() {
   const all = invAll(), N = newI(); if (N.base == null && all.length) newMark(all);
   const list = all.filter(x => ivIsNew(x) && !(N.hide && tagOf(x.iid))).sort((a, b) => { try { return BigInt(b.iid) > BigInt(a.iid) ? 1 : -1; } catch { return 0; } });
   const where = x => x.where === 'v' ? T.inV : T.on(W.classes[profile.characters.data[x.where]?.classType] || '') + (x.eq ? ' · ' + T.eqd : '');
-  const row = x => { const D = INVD[x.h] || {}, t = tagOf(x.iid); return `<div class="nv-r">${ivTile(x)}<div class="nv-n"><b>${esc(D.n || '…')}${x.slot < 3 ? ' ' + rlBadge(rlGrade(x.iid, x.h)) : ''}</b><small>${esc([D.tl, T.slots[x.slot], x.pw ? '✦ ' + x.pw : '', where(x), invAll().filter(y => y.h === x.h).length > 1 ? T.copies(invAll().filter(y => y.h === x.h).length) : ''].filter(Boolean).join(' · '))}</small></div><div class="nv-t">${TAGS.map(k => `<button type="button" class="tag-b${t === k ? ' t-' + k : ''}" data-nvt="${x.iid}:${k}" title="${esc(tagl()[k])}" aria-label="${esc(tagl()[k])}">${{ fav: '★', keep: '✓', junk: '✕', inf: '⇪' }[k]}</button>`).join('')}</div></div>`; };
+  const row = x => { const D = INVD[x.h] || {}, t = tagOf(x.iid); return `<div class="nv-r">${ivTile(x)}<div class="nv-n"><b>${esc(D.n || '…')}${x.slot < 3 ? ' ' + tierBadge(tierOf(x)) : ''}</b><small>${esc([D.tl, T.slots[x.slot], x.pw ? '✦ ' + x.pw : '', where(x), invAll().filter(y => y.h === x.h).length > 1 ? T.copies(invAll().filter(y => y.h === x.h).length) : ''].filter(Boolean).join(' · '))}</small></div><div class="nv-t">${TAGS.map(k => `<button type="button" class="tag-b${t === k ? ' t-' + k : ''}" data-nvt="${x.iid}:${k}" title="${esc(tagl()[k])}" aria-label="${esc(tagl()[k])}">${{ fav: '★', keep: '✓', junk: '✕', inf: '⇪' }[k]}</button>`).join('')}</div></div>`; };
   return `<div class="panel nv"><div class="nv-hd"><h2>${P ? 'Chegaram desde a última vez' : 'Arrived since last time'}</h2><small>${P ? `${list.length} ${list.length === 1 ? 'item' : 'itens'} · o mais novo primeiro` : `${list.length} items · newest first`}</small><label class="nv-tg"><input type="checkbox" data-nvhide${N.hide ? ' checked' : ''}> ${P ? 'Esconder os que já têm etiqueta' : 'Hide tagged items'}</label><button type="button" class="lbd-btn" data-nvall${list.length ? '' : ' disabled'}>${P ? 'Marcar todos como vistos' : 'Mark all as seen'}</button></div>
     ${list.length ? `<div class="nv-l">${list.map(row).join('')}</div>` : `<p class="empty-msg">${P ? 'Nada novo. Quando cair arma ou armadura, ela aparece aqui para você decidir: toque no item para ver a nota do roll, os loadouts e as cópias parecidas.' : 'Nothing new. New drops show up here so you can decide: tap an item to see its roll grade, loadouts and similar copies.'}</p>`}
     <small class="nv-n2">${P ? '“Novo” = chegou depois da sua primeira visita a esta tela ou do último “Marcar todos”. Dar uma etiqueta tira o item daqui (dá para desligar acima). Itens no Postmaster aparecem depois de retirados.' : '“New” = arrived after your first visit here or the last “Mark all”. Tagging removes the item (toggle above). Postmaster items show up after you pull them.'}</small></div>`;
@@ -6724,7 +6725,7 @@ function ivMCmpHTML() {
   const row = (lab, key, f, num) => { const vs = cols.map(f); return `<tr><th scope="row"${key ? ` data-ivms="${key}" class="srt${INV.msort == key ? ' on' : ''}"` : ''}>${esc(lab)}${key ? ' ↕' : ''}</th>${vs.map(v => `<td class="${num ? cls(v, vs) : ''}">${v == null ? '—' : v}</td>`).join('')}</tr>`; };
   const W = u(), wh = x => x.where === 'v' ? T.inV : (W.classes[profile.characters.data[x.where]?.classType] || '');
   const head = `<tr><th></th>${cols.map(x => `<th class="${x.iid === INV.sel ? 'me' : ''}${x.ex ? ' ex' : ''}"><button type="button" class="mcmp-n" data-ivmo="${x.iid}">${INVD[x.h]?.ic ? `<img src="${BNET}${INVD[x.h].ic}" alt="">` : ''}<span>${esc(INVD[x.h]?.n || '…')}</span></button><small>${esc(wh(x))}</small></th>`).join('')}</tr>`;
-  const body = [row(P ? 'Poder' : 'Power', 'pw', x => x.pw, true), ...hs.map(h => row(sd[h].n, h, x => val(x, h), true)), ...(isW ? [`<tr><th scope="row">${P ? 'Nota do roll' : 'Roll grade'}</th>${cols.map(x => `<td>${rlBadge(rlGrade(x.iid, x.h)) || '<span class="mu">—</span>'}</td>`).join('')}</tr>`] : []), `<tr><th scope="row">${P ? 'Etiqueta' : 'Tag'}</th>${cols.map(x => `<td>${esc(tagOf(x.iid) ? tagl()[tagOf(x.iid)] : '—')}</td>`).join('')}</tr>`].join('');
+  const body = [row(P ? 'Poder' : 'Power', 'pw', x => x.pw, true), ...hs.map(h => row(sd[h].n, h, x => val(x, h), true)), ...(isW ? [`<tr><th scope="row">${P ? 'Nota do roll' : 'Roll grade'}</th>${cols.map(x => `<td>${tierBadge(tierOf(x)) || '<span class="mu">—</span>'}</td>`).join('')}</tr>`] : []), `<tr><th scope="row">${P ? 'Etiqueta' : 'Tag'}</th>${cols.map(x => `<td>${esc(tagOf(x.iid) ? tagl()[tagOf(x.iid)] : '—')}</td>`).join('')}</tr>`].join('');
   return box(`<small class="lbd-n">${P ? 'Azul = melhor; verde → vermelho. Toque no nome da linha para ordenar; no nome do item para abrir.' : 'Blue = best; green → red. Tap a row name to sort; an item name to open it.'}</small><div class="mcmp-w"><table class="mcmp"><thead>${head}</thead><tbody>${body}</tbody></table></div>`);
 }
 document.addEventListener('click', e => {
@@ -6853,13 +6854,13 @@ function vlTools() {
 function vlTableHTML(list) {
   const P = lang === 'pt', T = ivt(), W = u(), ts = INV.ts || { k: 'pw', d: -1 };
   const elN = x => x.slot < 3 ? (ELEMENTS[x.el] || (P ? 'cinética' : 'kinetic')) : '';
-  const cols = [['n', P ? 'Nome' : 'Name', x => INVD[x.h]?.n || ''], ['tl', P ? 'Tipo' : 'Type', x => INVD[x.h]?.tl || ''], ['sl', P ? 'Espaço' : 'Slot', x => T.slots[x.slot]], ['el', P ? 'Elemento' : 'Element', elN], ['pw', P ? 'Poder' : 'Power', x => x.pw], ['gr', P ? 'Nota' : 'Grade', x => x.slot < 3 ? ({ s: 5, g: 4, a: 3, p: 2, b: 2, n: 1, c: 1 }[rlGrade(x.iid, x.h)] || 0) : 0], ['pk', P ? 'Vantagens' : 'Perks', x => x.slot < 3 ? pkNames(x) : ''], ['tg', P ? 'Etiqueta' : 'Tag', x => tagOf(x.iid) ? tagl()[tagOf(x.iid)] : ''], ['nt', P ? 'Anotação' : 'Note', x => LS.get('dc-notes', {})[x.iid] || '']];
+  const cols = [['n', P ? 'Nome' : 'Name', x => INVD[x.h]?.n || ''], ['tl', P ? 'Tipo' : 'Type', x => INVD[x.h]?.tl || ''], ['sl', P ? 'Espaço' : 'Slot', x => T.slots[x.slot]], ['el', P ? 'Elemento' : 'Element', elN], ['pw', P ? 'Poder' : 'Power', x => x.pw], ['gr', P ? 'Tier' : 'Tier', x => ({ S: 4, A: 3, B: 2, C: 1 }[tierOf(x)] || 0)], ['pk', P ? 'Vantagens' : 'Perks', x => x.slot < 3 ? pkNames(x) : ''], ['tg', P ? 'Etiqueta' : 'Tag', x => tagOf(x.iid) ? tagl()[tagOf(x.iid)] : ''], ['nt', P ? 'Anotação' : 'Note', x => LS.get('dc-notes', {})[x.iid] || '']];
   const f = cols.find(c => c[0] === ts.k)?.[2] || cols[4][2], rows = list.slice().sort((a, b) => { const va = f(a), vb = f(b); return (typeof va === 'number' ? va - vb : String(va).localeCompare(String(vb))) * ts.d; });
   if (!PKN.done) pkLoad();
   const pk = INV.picked, all = rows.length && rows.every(x => pk.has(x.iid)), chars = ivChars();
   const bulk = pk.size ? `<div class="vl-bulk vt-bulk"><b>${esc(T.sel(pk.size))}</b>${chars.map(c => `<button type="button" class="lbd-btn" data-ivbulk="${c.characterId}">${esc(T.take(W.classes[c.classType]))}</button>`).join('')}<span class="vl-bt">${esc(T.tagAll)} ${TAGS.map(t => `<button type="button" class="tag-b t-${t}" data-ivbtag="${t}">${esc(tagl()[t])}</button>`).join('')}<button type="button" class="tag-b" data-ivbtag="">${esc(T.clear)}</button></span></div>` : '';
   const th = ([k, n]) => `<th scope="col"><button type="button" data-vlts="${k}" class="${ts.k === k ? 'on' : ''}">${esc(n)}${ts.k === k ? (ts.d < 0 ? ' ↓' : ' ↑') : ''}</button></th>`;
-  const td = x => { const D = INVD[x.h] || {}, g = x.slot < 3 ? rlBadge(rlGrade(x.iid, x.h)) : ''; return `<tr${pk.has(x.iid) ? ' class="pk"' : ''}><td><input type="checkbox" data-vlpick="${x.iid}"${pk.has(x.iid) ? ' checked' : ''} aria-label="${esc(D.n || '')}"></td><td class="vt-n"><button type="button" data-iv="${x.iid}">${D.ic ? `<img src="${BNET}${D.ic}" alt="" loading="lazy">` : ''}<span>${esc(D.n || '…')}</span></button></td><td>${esc(D.tl || '')}</td><td>${esc(T.slots[x.slot])}</td><td>${x.slot < 3 && ELEMENTS[x.el] ? `<span class="vd-el" style="--c:${EL_COLOR[x.el] || 'var(--muted)'}"></span>` : ''}</td><td class="num">${x.pw || ''}</td><td>${g || ''}</td><td class="vt-pk">${esc(x.slot < 3 ? pkNames(x) : '')}</td><td>${esc(tagOf(x.iid) ? tagl()[tagOf(x.iid)] : '')}</td><td class="vt-nt">${esc(LS.get('dc-notes', {})[x.iid] || '')}</td></tr>`; };
+  const td = x => { const D = INVD[x.h] || {}, g = x.slot < 3 ? tierBadge(tierOf(x)) : ''; return `<tr${pk.has(x.iid) ? ' class="pk"' : ''}><td><input type="checkbox" data-vlpick="${x.iid}"${pk.has(x.iid) ? ' checked' : ''} aria-label="${esc(D.n || '')}"></td><td class="vt-n"><button type="button" data-iv="${x.iid}">${D.ic ? `<img src="${BNET}${D.ic}" alt="" loading="lazy">` : ''}<span>${esc(D.n || '…')}</span></button></td><td>${esc(D.tl || '')}</td><td>${esc(T.slots[x.slot])}</td><td>${x.slot < 3 && ELEMENTS[x.el] ? `<span class="vd-el" style="--c:${EL_COLOR[x.el] || 'var(--muted)'}"></span>` : ''}</td><td class="num">${x.pw || ''}</td><td>${g || ''}</td><td class="vt-pk">${esc(x.slot < 3 ? pkNames(x) : '')}</td><td>${esc(tagOf(x.iid) ? tagl()[tagOf(x.iid)] : '')}</td><td class="vt-nt">${esc(LS.get('dc-notes', {})[x.iid] || '')}</td></tr>`; };
   return `${bulk}<div class="vt-w"><table class="vt"><thead><tr><th><input type="checkbox" data-vlpickall${all ? ' checked' : ''} aria-label="${P ? 'Marcar todos' : 'Select all'}"></th>${cols.map(th).join('')}</tr></thead><tbody>${rows.map(td).join('')}</tbody></table></div>`;
 }
 document.addEventListener('click', e => {
@@ -6879,8 +6880,8 @@ if (INV.vt == null) INV.vt = LS.get('dc-vt', 'g');
 const csvQ = v => { const t = String(v ?? ''); return /[;"\n\r]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; };
 function csvOut() {
   const P = lang === 'pt', T = ivt(), W = u(), notes = LS.get('dc-notes', {}); if (!PKN.done) pkLoad();
-  const head = P ? ['Id', 'Hash', 'Nome', 'Tipo', 'Espaço', 'Classe', 'Elemento', 'Poder', 'Nota', 'Vantagens', 'Onde', 'Equipado', 'Trancado', 'Etiqueta', 'Anotação'] : ['Id', 'Hash', 'Name', 'Type', 'Slot', 'Class', 'Element', 'Power', 'Grade', 'Perks', 'Where', 'Equipped', 'Locked', 'Tag', 'Notes'];
-  const rows = invAll().map(x => { const D = INVD[x.h] || {}; return [x.iid, x.h, D.n || '', D.tl || '', T.slots[x.slot], x.slot < 3 || x.cls === 3 ? '' : W.classes[x.cls] || '', x.slot < 3 ? ELEMENTS[x.el] || '' : '', x.pw || '', x.slot < 3 ? (rlGrade(x.iid, x.h) || '').toUpperCase() : '', x.slot < 3 ? pkNames(x) : '', x.where === 'v' ? T.vault : W.classes[profile.characters.data[x.where]?.classType] || '', x.eq ? 'x' : '', x.lk ? 'x' : '', tagOf(x.iid) ? tagl()[tagOf(x.iid)] : '', notes[x.iid] || '']; });
+  const head = P ? ['Id', 'Hash', 'Nome', 'Tipo', 'Espaço', 'Classe', 'Elemento', 'Poder', 'Tier', 'Vantagens', 'Onde', 'Equipado', 'Trancado', 'Etiqueta', 'Anotação'] : ['Id', 'Hash', 'Name', 'Type', 'Slot', 'Class', 'Element', 'Power', 'Tier', 'Perks', 'Where', 'Equipped', 'Locked', 'Tag', 'Notes'];
+  const rows = invAll().map(x => { const D = INVD[x.h] || {}; return [x.iid, x.h, D.n || '', D.tl || '', T.slots[x.slot], x.slot < 3 || x.cls === 3 ? '' : W.classes[x.cls] || '', x.slot < 3 ? ELEMENTS[x.el] || '' : '', x.pw || '', tierOf(x), x.slot < 3 ? pkNames(x) : '', x.where === 'v' ? T.vault : W.classes[profile.characters.data[x.where]?.classType] || '', x.eq ? 'x' : '', x.lk ? 'x' : '', tagOf(x.iid) ? tagl()[tagOf(x.iid)] : '', notes[x.iid] || '']; });
   const csv = '﻿' + [head, ...rows].map(r => r.map(csvQ).join(';')).join('\r\n'), a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = `dpi-armas-e-armaduras-${new Date().toISOString().slice(0, 10)}.csv`; document.body.append(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
 }
@@ -6904,8 +6905,8 @@ function vlImpH() { const I = INV.imp, P = lang === 'pt'; if (!I) return ''; ret
 /* modo farm: só para o clã; a cada 2 min deixa 1 espaço livre de cada tipo no personagem (manda o de menor nota para o cofre). Desliga em 3 h. */
 var FARM; function farm() { return FARM || (FARM = { on: false, cid: null, t: null, at: 0, moved: [], busy: false, err: '', last: 0, pm: 0 }); }
 const farmOk = () => !!member && (orlaOK() || LS.get('dc-orla', null)?.ok === true);
-function farmStop() { const F = farm(); F.on = false; clearInterval(F.t); F.t = null; render(); }
-function farmStart() { const F = farm(), c = ivChars()[0]; if (!c) return; Object.assign(F, { on: true, cid: c.characterId, at: Date.now(), moved: [], err: '' }); clearInterval(F.t); F.t = setInterval(farmTick, 120000); farmTick(); render(); }
+function farmStop() { const F = farm(); F.on = false; clearInterval(F.t); F.t = null; render(); renderFarm(); }
+function farmStart() { const F = farm(), c = ivChars()[0]; if (!c) return; Object.assign(F, { on: true, cid: c.characterId, at: Date.now(), moved: [], err: '' }); clearInterval(F.t); F.t = setInterval(farmTick, 120000); farmTick(); render(); renderFarm(); }
 async function farmTick() {
   const F = farm(); if (!F.on || F.busy || !profile) return; if (Date.now() - F.at > 3 * 3600e3) { farmStop(); return; } F.busy = true;
   try {
@@ -6920,7 +6921,7 @@ async function farmTick() {
     }
     F.err = '';
   } catch (e) { F.err = ivErr(e); }
-  F.busy = false; F.last = Date.now(); if (tab === 'inv' || tab === 'obj') render();
+  F.busy = false; F.last = Date.now(); renderFarm(); if (tab === 'inv' || tab === 'vlt') render();
 }
 function farmHTML(where) {
   if (!farmOk() || !have.c) return ''; const F = farm(), P = lang === 'pt', W = u();
@@ -6932,6 +6933,33 @@ function farmHTML(where) {
 }
 document.addEventListener('change', e => { if (e.target.matches?.('[data-farm]')) { if (e.target.checked) farmStart(); else farmStop(); } });
 document.addEventListener('click', e => { if (e.target.closest('[data-farmstop]')) farmStop(); });
+
+/* ---------- Tier S/A/B/C (Avaliar rolls) no lugar de God roll / Parcial / Nada de bom ---------- */
+function tierOf(x) { if (!x || x.slot >= 3 || x.ex) return ''; if (AP.av !== 'ok') { if (!AP.av) setTimeout(() => apAvLoad()); return ''; } return apEval(x).g || ''; }
+function tierBadge(g) { return g ? `<i class="rl-b rl-t" style="--g:${RG_C[g]}" aria-label="Tier ${g}">${g}</i>` : ''; }
+function tierChips(w) { const ok = AP.av === 'ok', c = {}; if (ok) for (const x of w) { const g = tierOf(x); if (g) c[g] = (c[g] || 0) + 1; } else if (!AP.av) setTimeout(() => apAvLoad());
+  const tip = { S: lang === 'pt' ? 'todas as colunas do roll recomendado mais próximo' : 'every column of the closest recommended roll', A: lang === 'pt' ? 'falta 1 coluna' : '1 column missing', B: lang === 'pt' ? 'faltam 2' : '2 missing', C: lang === 'pt' ? 'nada recomendado' : 'nothing recommended' };
+  return ['S', 'A', 'B', 'C'].map(k => `<button type="button" class="ap-c" style="--g:${RG_C[k]}" data-ivf="t${k}" data-rltog aria-pressed="${INV.f === 't' + k}" title="Tier ${k}: ${esc(tip[k])}"><small>Tier ${k}</small><b>${ok ? c[k] || 0 : '…'}</b></button>`).join(''); }
+/* modo farm: chave ao lado dos personagens (com ? de ajuda); ligado, vira uma ilha como o Ao vivo */
+function farmTgl() {
+  if (!farmOk()) return ''; const F = farm(), P = lang === 'pt';
+  return `<span class="farm-q"><label class="farm-sw"><input type="checkbox" role="switch" data-farm${F.on ? ' checked' : ''}><i aria-hidden="true"></i><span>Farm</span></label><button type="button" class="farm-hb" data-farmhelp aria-expanded="${!!F.help}" aria-label="${P ? 'O que é o modo farm' : 'What is farming mode'}">?</button>${F.help ? `<span class="farm-pop" role="tooltip">${P ? '<b>Modo farm</b> (só para o clã): a cada 2 min manda para o cofre o necessário para deixar 1 espaço livre de cada tipo no personagem atual, para nada cair no Postmaster. Nunca move equipado, Favorito nem Manter. Desliga sozinho em 3 h ou ao fechar o site.' : '<b>Farming mode</b> (clan only): every 2 min it sends items to the vault so each slot keeps 1 free space. Never moves equipped, Favorite or Keep items. Turns off after 3 h.'}</span>` : ''}</span>`;
+}
+function renderFarm() {
+  let el = $('farmisl'); const F = farm();
+  if (!F.on) { if (el) { el.hidden = true; el.innerHTML = ''; } return; }
+  if (!el) { el = document.createElement('div'); el.id = 'farmisl'; el.className = 'live farm-isl'; ($('live') || $('chars'))?.after(el); }
+  const P = lang === 'pt', W = u(), mins = Math.round((Date.now() - F.at) / 60000), nx = F.last ? Math.max(0, Math.ceil((F.last + 120000 - Date.now()) / 60000)) : 0, vUsed = profile ? ivVUsed() : 0;
+  el.hidden = false;
+  el.innerHTML = `<div class="lv-h"><span class="lv-dot fm" aria-hidden="true"></span><b>${P ? 'Modo farm' : 'Farming'}</b><span>${esc(W.classes[profile?.characters?.data?.[F.cid]?.classType] || '')}</span><small>${esc(P ? `ligado há ${mins} min${F.busy ? ' · conferindo…' : nx ? ` · próxima em ~${nx} min` : ''}` : `on for ${mins} min`)}</small><button type="button" class="lbd-btn fm-x" data-farmstop>${P ? 'Parar' : 'Stop'}</button></div>
+    <div class="fm-k"><span class="ok">✓ ${esc(P ? `${F.moved.length} no cofre` : `${F.moved.length} to vault`)}${F.moved.length ? ` <small>${esc(F.moved.slice(-3).map(ivNameOf).join(', '))}</small>` : ''}</span><span class="${F.pm ? 'wa' : 'ok'}">${F.pm ? '!' : '✓'} Postmaster ${F.pm || (P ? 'vazio' : 'empty')}</span><span class="${vUsed >= VAULT_MAX - 10 ? 'wa' : 'ok'}">${vUsed >= VAULT_MAX - 10 ? '!' : '✓'} ${P ? 'Cofre' : 'Vault'} ${vUsed}/${VAULT_MAX}</span>${F.err ? `<span class="er">✕ ${esc(F.err)}</span>` : ''}</div>`;
+}
+setInterval(() => { if (FARM?.on) renderFarm(); }, 30000);
+document.addEventListener('click', e => {
+  const h = e.target.closest('[data-farmhelp]'); const F = farm();
+  if (h) { F.help = !F.help; render(); return; }
+  if (F.help && !e.target.closest('.farm-q')) { F.help = false; render(); }
+});
 
 // deslizar para o lado na lista troca de subaba; puxar para baixo no topo atualiza (só toque, só /beta)
 (() => {
