@@ -42,7 +42,7 @@ export async function createGrade(env, a) {
     }
   }
   const limitApplies = !!curated && requiresBungie, rl = a.rookieLimit ?? null, now = new Date().toISOString();
-  const category = (limitApplies && rl != null && creatorIsRookie == null) || (limitApplies && creatorIsRookie === true && rl === 0) ? 'substituto' : 'titular';
+  const category = limitApplies && creatorIsRookie === true && rl === 0 ? 'reserva' : limitApplies && rl != null && creatorIsRookie == null ? 'substituto' : 'titular'; // novato acima do limite: reserva
   const ins = await db.prepare(`INSERT INTO activities (name, curated_bungie_activity_id, capacity, rookie_limit, starts_at, description, created_by_discord_id, created_at, discord_channel_id)
     VALUES (?,?,?,?,?,?,?,?,?)`).bind(name, curated?.id ?? null, a.integrantes, rl, startsAt.toISOString(), a.descricao ?? '', String(a.userId), now, env.LFG_CHANNEL_ID).run();
   const activityId = ins.meta.last_row_id;
@@ -126,12 +126,12 @@ export async function editGrade(env, a) {
   const byIn = c => parts.filter(p => p.category === c && p.discord_user_id !== act.created_by_discord_id);
   const me = parts.find(p => p.discord_user_id === act.created_by_discord_id && p.category !== 'reserva');
   const pool = [...(me ? [me] : []), ...byIn('titular'), ...byIn('substituto')];
-  const down = [], up = [], why = {}; let nT = 0, nR = 0;
+  const down = [], up = [], res = [], why = {}; let nT = 0, nR = 0;
   for (const p of pool) {
     const rk = rookie[p.discord_user_id], gated = limitApplies && rl != null && (rk == null || (rk && nR >= rl));
-    const to = nT < a.integrantes && !gated ? 'titular' : 'substituto';
+    const to = nT < a.integrantes && !gated ? 'titular' : gated && rk === true ? 'reserva' : 'substituto'; // novato acima do limite vai para a reserva
     if (to === 'titular') { nT++; if (rk) nR++; }
-    if (to !== p.category) { (to === 'titular' ? up : down).push(p.discord_user_id); why[p.discord_user_id] = to === 'titular' ? '' : nT >= a.integrantes && !gated ? 'vagas' : rk == null ? 'sem histórico' : 'novatos'; rkStmts.push(db.prepare('UPDATE activity_participants SET category = ? WHERE id = ?').bind(to, p.id)); }
+    if (to !== p.category) { (to === 'titular' ? up : to === 'reserva' ? res : down).push(p.discord_user_id); why[p.discord_user_id] = to === 'titular' ? '' : nT >= a.integrantes && !gated ? 'vagas' : rk == null ? 'sem histórico' : 'novatos'; rkStmts.push(db.prepare('UPDATE activity_participants SET category = ? WHERE id = ?').bind(to, p.id)); }
   }
   const stmts = [db.prepare('UPDATE activities SET name = ?, curated_bungie_activity_id = ?, capacity = ?, rookie_limit = ?, starts_at = ?, description = ? WHERE id = ?')
     .bind(name, curated?.id ?? null, a.integrantes, rl, startsAt.toISOString(), a.descricao ?? '', act.id), ...rkStmts];
@@ -151,9 +151,9 @@ export async function editGrade(env, a) {
   let warning = '';
   if (act.discord_message_id) {
     try { await refreshMessage(env, act.id); } catch (e) { console.error('editar mensagem', e?.message); warning = ' Não consegui atualizar a mensagem da grade no Discord.'; }
-    if ((ch.length || down.length || up.length) && notify.length) {
+    if ((ch.length || down.length || up.length || res.length) && notify.length) {
       const m = id => `<@${id}>`, rs = { vagas: 'menos vagas', novatos: 'limite de novatos', 'sem histórico': 'sem histórico Bungie' };
-      const extra = [down.length ? `\nViraram substitutos: ${down.map(id => `${m(id)} (${rs[why[id]] || why[id]})`).join(', ')}` : '', up.length ? `\nSubiram para titular: ${up.map(m).join(' ')}` : ''].join('');
+      const extra = [down.length ? `\nViraram substitutos: ${down.map(id => `${m(id)} (${rs[why[id]] || why[id]})`).join(', ')}` : '', res.length ? `\nForam para a reserva (limite de novatos): ${res.map(m).join(' ')}` : '', up.length ? `\nSubiram para titular: ${up.map(m).join(' ')}` : ''].join('');
       try {
         await postMessage(env, act.discord_channel_id, { content: `✏️ <@${act.created_by_discord_id}> editou a grade **${name}**${ch.length ? `\n${line(true)}` : ''}${extra}\nInscritos: ${notify.map(m).join(' ')}`,
           allowed_mentions: { users: [...new Set([act.created_by_discord_id, ...notify])] }, message_reference: { message_id: act.discord_message_id, fail_if_not_exists: false } });
@@ -161,14 +161,14 @@ export async function editGrade(env, a) {
     }
   }
   // no celular: quem ativou os avisos de grade no DPI
-  if ((ch.length || down.length || up.length) && notify.length) {
+  if ((ch.length || down.length || up.length || res.length) && notify.length) {
     try {
       const subsP = (await db.prepare(`SELECT endpoint, prefs, discord_user_id d FROM push_subs WHERE discord_user_id IN (${notify.map(() => '?').join(',')})`).bind(...notify).all()).results.filter(s => prefOn(s, 'grade'));
       for (const s of subsP) {
-        const mv = down.includes(s.d) ? ` Você virou substituto (${{ vagas: 'menos vagas', novatos: 'limite de novatos', 'sem histórico': 'sem histórico Bungie' }[why[s.d]]}).` : up.includes(s.d) ? ' Você subiu para titular.' : '';
+        const mv = down.includes(s.d) ? ` Você virou substituto (${{ vagas: 'menos vagas', novatos: 'limite de novatos', 'sem histórico': 'sem histórico Bungie' }[why[s.d]]}).` : res.includes(s.d) ? ' Você foi para a reserva (limite de novatos).' : up.includes(s.d) ? ' Você subiu para titular.' : '';
         await notify_(env, s.endpoint, { title: `Grade alterada: ${name}`, body: `${line(false) || 'Inscritos reorganizados.'}${mv}`, url: '/grade', tag: `grade-edit-${act.id}` }).catch(() => {});
       }
     } catch (e) { console.error('push edição', e?.message); }
   }
-  return { ok: true, changed: ch.length + down.length + up.length, notified: notify.length, warning: warning.trim() };
+  return { ok: true, changed: ch.length + down.length + up.length + res.length, notified: notify.length, warning: warning.trim() };
 }

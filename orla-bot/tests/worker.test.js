@@ -212,9 +212,9 @@ describe('API do DPI', () => {
     await env.DB.prepare(`INSERT INTO activity_participants (activity_id, discord_user_id, category, is_rookie, created_at) VALUES (?, '10', 'titular', NULL, 'a'), (?, '20', 'titular', NULL, 'b'), (?, '40', 'titular', NULL, 'c'), (?, '30', 'substituto', NULL, 'd')`).bind(id, id, id, id).run();
     const r = await api(`/grades/${id}`, { method: 'PUT', body: JSON.stringify({ atividade: 'Fim de Crota: Normal', curatedId: 3, integrantes: 4, novatos: 1, inicio: t0, descricao: '' }) }); expect(r.status).toBe(200);
     const rows = (await env.DB.prepare('SELECT discord_user_id d, category c, is_rookie r FROM activity_participants WHERE activity_id = ? ORDER BY d').bind(id).all()).results;
-    expect(rows).toEqual([{ d: '10', c: 'titular', r: 0 }, { d: '20', c: 'titular', r: 1 }, { d: '30', c: 'titular', r: 0 }, { d: '40', c: 'substituto', r: 1 }]); // só 1 novato titular; 30 sobe
+    expect(rows).toEqual([{ d: '10', c: 'titular', r: 0 }, { d: '20', c: 'titular', r: 1 }, { d: '30', c: 'titular', r: 0 }, { d: '40', c: 'reserva', r: 1 }]); // só 1 novato titular; 30 sobe
     const aviso = calls.find(c => c.method === 'POST' && c.url.includes('/channels/c1/messages'));
-    expect(aviso.body.content).toMatch(/Viraram substitutos: <@40> \(limite de novatos\)/); expect(aviso.body.content).toMatch(/Subiram para titular: <@30>/);
+    expect(aviso.body.content).toMatch(/Foram para a reserva \(limite de novatos\): <@40>/); expect(aviso.body.content).toMatch(/Subiram para titular: <@30>/);
   });
   it('presença: 4 h depois, confere no histórico se cada titular jogou', async () => {
     await link('10');

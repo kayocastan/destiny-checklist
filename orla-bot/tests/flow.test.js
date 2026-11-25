@@ -35,31 +35,40 @@ describe('inscrições', () => {
     expect(r.message).toContain('<@3> foi promovido');
     expect((await cats(id))['3']).toBe('titular');
   });
-  it('limite de novatos manda novato extra para substitutos', async () => {
+  it('limite de novatos manda novato extra para a reserva', async () => {
     const id = await mkActivity({ capacity: 6, rookie: 1 });
     await enroll(db, id, '2', 'titular', { isRookie: true });
     expect(await enroll(db, id, '3', 'titular', { isRookie: true })).toContain('limite de novatos');
-    expect((await cats(id))['3']).toBe('substituto');
+    expect((await cats(id))['3']).toBe('reserva');
     expect(await enroll(db, id, '4', 'titular', { isRookie: false })).toBe('Inscrição atualizada como titular.');
   });
   it('ao abrir vaga, só sobe substituto apto: novato espera se não há vaga de novato', async () => {
     const id = await mkActivity({ capacity: 3, rookie: 0 });
     await db.prepare('UPDATE activity_participants SET is_rookie = 0 WHERE activity_id = ?').bind(id).run();
     await enroll(db, id, '2', 'titular', { isRookie: false }); await wait();
-    expect(await enroll(db, id, '3', 'titular', { isRookie: true })).toContain('substitutos'); await wait();
+    expect(await enroll(db, id, '3', 'titular', { isRookie: true })).toContain('reservas'); await wait();
     await enroll(db, id, '4', 'titular', { isRookie: false }); await wait();
-    expect(await cats(id)).toEqual({ 1: 'titular', 2: 'titular', 3: 'substituto', 4: 'titular' });
-    // sai um veterano e não há veterano na fila: o novato continua substituto
+    expect(await cats(id)).toEqual({ 1: 'titular', 2: 'titular', 3: 'reserva', 4: 'titular' });
+    // sai um veterano: a fila está vazia e o novato segue na reserva
     const r = await removeSignup(db, id, '4');
     expect(r.message).toContain('Nenhum substituto podia subir');
-    expect((await cats(id))['3']).toBe('substituto');
+    expect((await cats(id))['3']).toBe('reserva');
     // entra um veterano (vai para titular, há vaga), depois entra outro veterano que vira substituto atrás do novato
     await enroll(db, id, '5', 'titular', { isRookie: false }); await wait();
     await enroll(db, id, '6', 'titular', { isRookie: false }); await wait();
     expect((await cats(id))['6']).toBe('substituto');
     // sai um titular: sobe o primeiro veterano da fila (6), não o novato (3)
     expect((await removeSignup(db, id, '2')).message).toContain('<@6> foi promovido');
-    expect(await cats(id)).toMatchObject({ 3: 'substituto', 6: 'titular' });
+    expect(await cats(id)).toMatchObject({ 3: 'reserva', 6: 'titular' });
+  });
+  it('novato que estava na fila (antes da mudança) não sobe sem vaga de novato', async () => {
+    const id = await mkActivity({ capacity: 2, rookie: 0 });
+    await db.prepare('UPDATE activity_participants SET is_rookie = 0 WHERE activity_id = ?').bind(id).run();
+    await enroll(db, id, '2', 'titular', { isRookie: false }); await wait();
+    await db.prepare(`INSERT INTO activity_participants (activity_id, discord_user_id, category, is_rookie, created_at) VALUES (?, '3', 'substituto', 1, ?)`).bind(id, now()).run(); await wait();
+    await enroll(db, id, '4', 'titular', { isRookie: false }); await wait();
+    expect((await removeSignup(db, id, '2')).message).toContain('<@4> foi promovido');
+    expect((await cats(id))['3']).toBe('substituto');
   });
   it('com vaga de novato, a fila sobe por ordem de entrada', async () => {
     const id = await mkActivity({ capacity: 2, rookie: 1 });

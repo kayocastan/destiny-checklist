@@ -35,13 +35,14 @@ export async function enroll(db, activityId, userId, category, { isRookie = null
     } else if (isRookie === true && activity.rookie_limit != null && rookieLimitApplicable) {
       const rc = (await one(db, `SELECT count(*) n FROM activity_participants WHERE activity_id = ? AND category = 'titular' AND is_rookie = 1`, activityId)).n;
       rookieLimitFull = rc >= activity.rookie_limit;
-      if (rookieLimitFull) actual = 'substituto';
+      if (rookieLimitFull) { // novato acima do limite vai para a reserva (não entra na fila de substitutos)
+        if (participant?.category === 'reserva') return 'O limite de novatos da grade está cheio; você continua na reserva. Se abrir vaga de novato, toque em Entrar de novo.';
+        actual = 'reserva';
+      }
     }
-    if (titularCount >= activity.capacity) {
+    if (titularCount >= activity.capacity && !rookieLimitFull) {
       actual = 'substituto';
       if (participant?.category === 'substituto') return 'Você já está na fila de substitutos e mantém sua posição.';
-    } else if (rookieLimitFull && participant?.category === 'substituto') {
-      return 'Você já está na fila de substitutos e mantém sua posição.';
     }
   }
   const ts = now();
@@ -59,10 +60,10 @@ export async function enroll(db, activityId, userId, category, { isRookie = null
     if (promoted) return `Inscrição atualizada; <@${promoted.discord_user_id}> foi promovido a titular.`;
   }
   if (actual === 'substituto') {
-    if (classificationUnavailable) return 'Não foi possível verificar se você é novato; você entrou na fila de substitutos e será promovido quando abrir uma vaga.';
-    if (rookieLimitFull && titularCount < activity.capacity) return 'O limite de novatos da grade foi preenchido. Você entrou na fila de substitutos e será promovido quando abrir uma vaga.';
+    if (classificationUnavailable) return 'Não foi possível verificar se você é novato; você entrou na fila de substitutos. Para subir quando abrir vaga, toque em Entrar de novo mais tarde (o DPI tenta verificar de novo).';
     return 'Você entrou na fila de substitutos. Ao abrir uma vaga, será promovido automaticamente.';
   }
+  if (actual === 'reserva' && rookieLimitFull) return 'O limite de novatos da grade está cheio. Você entrou na lista de reservas; ela não sobe sozinha. Se abrir vaga de novato, toque em Entrar de novo.';
   if (actual === 'reserva') return 'Você entrou na lista de reservas. Essa lista não preenche vagas automaticamente.';
   return 'Inscrição atualizada como titular.';
 }
