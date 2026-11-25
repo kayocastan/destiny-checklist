@@ -5,8 +5,15 @@ export class SignupError extends Error {}
 const now = () => new Date().toISOString();
 const one = (db, sql, ...b) => db.prepare(sql).bind(...b).first();
 
-async function oldestSubstitute(db, activityId, exceptUser) {
-  return one(db, `SELECT id, discord_user_id FROM activity_participants WHERE activity_id = ? AND category = 'substituto' AND discord_user_id != ? ORDER BY created_at, id LIMIT 1`, activityId, exceptUser ?? '');
+/* Próximo substituto que PODE virar titular, por ordem de entrada. Com limite de novatos:
+   quem não é novato sobe primeiro; novato só sobe se ainda couber novato entre os titulares (sem contar quem está saindo);
+   quem não tem classificação (sem histórico Bungie) espera. Sem ninguém apto, ninguém sobe. */
+async function oldestSubstitute(db, activityId, exceptUser, activity) {
+  const subs = (await db.prepare(`SELECT id, discord_user_id, is_rookie FROM activity_participants WHERE activity_id = ? AND category = 'substituto' AND discord_user_id != ? ORDER BY created_at, id`).bind(activityId, exceptUser ?? '').all()).results;
+  const limit = activity?.rookie_limit;
+  if (limit == null) return subs[0] || null;
+  const rookies = (await one(db, `SELECT count(*) n FROM activity_participants WHERE activity_id = ? AND category = 'titular' AND is_rookie = 1 AND discord_user_id != ?`, activityId, exceptUser ?? '')).n;
+  return subs.find(p => p.is_rookie === 0 || (p.is_rookie === 1 && rookies < limit)) || null;
 }
 const promote = (db, id) => db.prepare(`UPDATE activity_participants SET category = 'titular' WHERE id = ?`).bind(id);
 
@@ -45,7 +52,7 @@ export async function enroll(db, activityId, userId, category, { isRookie = null
     const stmts = [db.prepare('UPDATE activity_participants SET category = ?, is_rookie = ?, created_at = ? WHERE id = ?').bind(actual, rookieVal, ts, participant.id)];
     let promoted = null;
     if (wasTitular && actual !== 'titular') {
-      promoted = await oldestSubstitute(db, activityId, userId);
+      promoted = await oldestSubstitute(db, activityId, userId, activity);
       if (promoted) stmts.push(promote(db, promoted.id));
     }
     await db.batch(stmts);
@@ -75,10 +82,10 @@ export async function removeSignup(db, activityId, userId) {
   }
   const stmts = [db.prepare('DELETE FROM activity_participants WHERE id = ?').bind(p.id)];
   if (!wasTitular) { await db.batch(stmts); return { message: 'Inscrição removida.' }; }
-  const next = await oldestSubstitute(db, activityId, userId);
+  const next = await oldestSubstitute(db, activityId, userId, activity);
   if (next) stmts.push(promote(db, next.id));
   await db.batch(stmts);
-  return { message: next ? `Inscrição removida; <@${next.discord_user_id}> foi promovido da fila de substitutos.` : 'Inscrição removida. Não havia substituto para promover.' };
+  return { message: next ? `Inscrição removida; <@${next.discord_user_id}> foi promovido da fila de substitutos.` : 'Inscrição removida. Nenhum substituto podia subir (limite de novatos ou fila vazia).' };
 }
 
 export async function getRoster(db, activityId) {
