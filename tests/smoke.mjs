@@ -236,7 +236,7 @@ R.push(run('Padrões: lista e filtros', { path: '/padroes', clicks: false, ls: {
 } }));
 R.push(run('rolagem: Voltar devolve a posição; aba nova sobe para a lista', { path: '/hoje', clicks: false, steps: async (p, fail) => {
   await p.evaluate(() => { document.body.style.minHeight = '5000px'; scrollTo(0, 1500); }); await p.waitForTimeout(300);
-  await clickSub(p, 'obj', 'cal'); await p.waitForTimeout(900); const y1 = await p.evaluate(() => scrollY); if (y1 > 1200) fail.push('aba nova não subiu (' + y1 + ')');
+  await clickSub(p, 'obj', 'prog'); await p.waitForTimeout(900); const y1 = await p.evaluate(() => scrollY); if (y1 > 1200) fail.push('aba nova não subiu (' + y1 + ')');
   await p.goBack(); await p.waitForTimeout(1200); const y2 = await p.evaluate(() => scrollY); if (Math.abs(y2 - 1500) > 60) fail.push('Voltar não devolveu a rolagem (' + y2 + ')'); } }));
 R.push(run('teclado: trocar de aba pelo teclado leva o foco ao conteúdo', { path: '/hoje', clicks: false, steps: async (p, fail) => {
   await p.focus('#tabs .tab[data-group="drops"]'); await p.keyboard.press('Enter'); await p.waitForTimeout(900);
