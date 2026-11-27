@@ -305,8 +305,8 @@ R.push(run('itens novos: lista, etiqueta, triagem e comparar', { path: '/itens-n
   const tri = await p.evaluate(() => document.querySelector('#ivdlg .ivd-tri')?.textContent || ''); if (!/Em loadouts do jogo/.test(tri)) fail.push('triagem não apareceu · ' + tri.slice(0, 80));
   const cmp = await p.$('#ivdlg [data-ivmv]'); if (cmp) { await cmp.click(); for (let t = 0; t < 20; t++) { if (await p.$('#ivdlg .mcmp')) break; await p.waitForTimeout(300); } if (!(await p.$('#ivdlg .mcmp'))) fail.push('comparar lado a lado não abriu'); }
   if (!(await p.evaluate(() => document.querySelector('#ivdlg .ivd-fuel') || document.querySelector('#ivdlg .mcmp')))) fail.push('faltou combustível de infusão');
-  await p.keyboard.press('Escape'); await p.evaluate(() => document.querySelector('[data-nvall]')?.click()); await p.waitForTimeout(300);
-  if ((await p.$$('.nv-r')).length) fail.push('marcar todos como vistos não limpou');
+  await p.keyboard.press('Escape'); await p.evaluate(() => document.querySelector('[data-nvm="s"]')?.click()); await p.waitForTimeout(300);
+  if (!(await p.$('[data-nvm="s"][aria-pressed="true"]'))) fail.push('troca para Sessão de jogo não funcionou');
 } }));
 R.push(run('cofre: grupos, repetidas juntas, tabela e vendedores', { path: '/cofre', arm: true, full: true, clicks: false, ls: { 'dc-lang': 'pt' }, steps: async (p, fail) => {
   for (let t = 0; t < 30; t++) { if (await p.$('[data-vlg]')) break; await p.waitForTimeout(400); }

@@ -2656,7 +2656,7 @@ function sessHTML() {
    Favoritos, builds salvas, marcações e preferências ficam ligados à conta Bungie.
    Cada chave guarda a hora da última mudança; a mais nova vence. Na primeira vez num aparelho, listas são somadas. */
 const SY = { t: LS.get('dc-synct', {}), dirty: new Set(), timer: null, applying: false, pulled: 0 };
-const syKeys = () => member ? ['favs', 'builds', 'opts', 'hide2', 'goals', 'wish', 'focus', 'tags', 'notes', 'evo', 'newbase', 'marks-' + member.id] : [];
+const syKeys = () => member ? ['favs', 'builds', 'opts', 'hide2', 'goals', 'wish', 'focus', 'tags', 'notes', 'evo', 'newbase', 'iidlog', 'marks-' + member.id] : [];
 LS.hook = k => {
   if (SY.applying || !member || !k.startsWith('dc-')) return; const n = k.slice(3);
   if (!syKeys().includes(n)) return;
@@ -2673,6 +2673,7 @@ function syMerge(n, a, b) {
   if (n === 'focus') return [...a, ...b.filter(x => !a.some(y => y.id === x.id))].slice(0, 30);
   if (n === 'wish') return [...a, ...b.filter(x => !a.some(y => y.h === x.h))].slice(0, 40);
   if (n.startsWith('marks-')) return [...new Set([...a, ...b])];
+  if (n === 'iidlog') { const m = new Map([...b, ...a].map(x => [x[0], x])); return [...m.values()].sort((x, y) => x[0] - y[0]).slice(-120); }
   return b;
 }
 async function syncPull() {
@@ -6682,27 +6683,54 @@ function newI() { return NEWI || (NEWI = { base: LS.get('dc-newbase', null), hid
 function ivIsNew(x) { const N = newI(); try { return N.base != null && BigInt(x.iid) > BigInt(N.base); } catch { return false; } }
 // guarda o maior id da visita anterior: no primeiro uso de Itens novos (ou num aparelho novo sem nada na conta), o que caiu desde a última visita já aparece
 function newTrack() {
-  if (newTrack.done || !have?.c || !profile?.characterInventories) return; let m = 0n; for (const x of invAll()) { try { const b = BigInt(x.iid); if (b > m) m = b; } catch {} } if (!m) return;
-  newTrack.done = true; newI().prev = LS.get('dc-lastmax', null); try { localStorage.setItem('dc-lastmax', JSON.stringify(String(m))); } catch {}
+  if (!have?.c || !profile?.characterInventories) return; let m = 0n; for (const x of invAll()) { try { const b = BigInt(x.iid); if (b > m) m = b; } catch {} } if (!m) return;
+  if (!newTrack.done) { newTrack.done = true; newI().prev = LS.get('dc-lastmax', null); try { localStorage.setItem('dc-lastmax', JSON.stringify(String(m))); } catch {} }
+  // diário de "maior id de item em cada hora": serve para achar o que caiu a partir do começo de uma partida
+  const log = LS.get('dc-iidlog', []), last = log[log.length - 1];
+  if (!last || last[1] !== String(m)) { log.push([Date.now(), String(m)]); LS.set('dc-iidlog', log.slice(-120)); }
 }
 function newMark(all) { let m = 0n; for (const x of all) { try { const b = BigInt(x.iid); if (b > m) m = b; } catch {} } if (m) { newI().base = String(m); LS.set('dc-newbase', newI().base); } }
+// partidas recentes (histórico da Bungie, guardado 2 min): começo da última partida e da sessão (partidas com menos de 45 min entre elas)
+var NVA; // { at, cid, acts: [{ st, end, h }] }
+function nvActs() {
+  if (!member || !profile?.characters) return null; if (NVA && Date.now() - NVA.at < 120000) return NVA.acts;
+  if (!nvActs.busy) { nvActs.busy = true; const chars = Object.keys(profile.characters.data || {});
+    Promise.all(chars.map(c => bungie(`/Destiny2/${member.type}/Account/${member.id}/Character/${c}/Stats/Activities/?count=8&mode=0`, false).then(r => r.activities || []).catch(() => [])))
+      .then(async l => { const acts = l.flat().map(a => { const st = Date.parse(a.period); return { st, end: st + (a.values?.activityDurationSeconds?.basic?.value || 0) * 1000, h: a.activityDetails?.directorActivityHash || a.activityDetails?.referenceId }; }).sort((a, b) => b.st - a.st);
+        const nm = await entities('DestinyActivityDefinition', acts.slice(0, 1).map(a => a.h), lang).catch(() => ({})); if (acts[0]) acts[0].n = nm[acts[0].h]?.n || '';
+        NVA = { at: Date.now(), acts }; })
+      .finally(() => { nvActs.busy = false; if (tab === 'novo') render(); }); }
+  return NVA?.acts || null;
+}
 function novoHTML() {
   const P = lang === 'pt', T = ivt(), W = u(); if (!have.c) return `<div class="panel"><p class="empty-msg wait">${esc(T.wait)}</p></div>`;
-  const all = invAll(), N = newI();
-  if (N.base == null && all.length) { // primeira vez: começa da visita anterior (sem mandar para a conta, para não apagar a marca de outro aparelho)
-    newTrack(); if (N.prev) { N.base = N.prev; try { localStorage.setItem('dc-newbase', JSON.stringify(N.base)); } catch {} } else { const ls = LS.hook; LS.hook = () => {}; try { newMark(all); } finally { LS.hook = ls; } }
+  newTrack(); const all = invAll(), N = newI(), mode = LS.get('dc-nvmode', 'p'), acts = nvActs(), log = LS.get('dc-iidlog', []);
+  const tm = t => new Date(t).toLocaleTimeString(P ? 'pt-BR' : 'en-US', { hour: '2-digit', minute: '2-digit' }), dd = t => { const d = new Date(t), n = new Date(); return d.toDateString() === n.toDateString() ? (P ? 'hoje' : 'today') : d.toLocaleDateString(P ? 'pt-BR' : 'en-US', { day: '2-digit', month: '2-digit' }); };
+  // começo do período: partida atual (se estiver jogando) ou a última; "sessão" volta até a primeira partida da sequência
+  let from = null, label = '';
+  if (acts) {
+    const live = LIVE.on && LIVE.since ? Date.parse(LIVE.since) : null, a0 = acts[0];
+    if (mode === 'p') { from = live || a0?.st || null; label = live ? (P ? 'a partida que você está jogando agora' : 'the match you are playing now') : a0 ? `${P ? 'a última partida' : 'your last match'}${a0.n ? ` (${a0.n})` : ''}, ${dd(a0.st)} ${tm(a0.st)}` : ''; }
+    else { let st = live || a0?.st || null; if (st) { let prev = live ? (a0 ? Math.min(st, a0.st) : st) : st; for (const a of acts) { if (a.st >= prev) continue; if (prev - a.end > 45 * 60e3) break; prev = a.st; } st = Math.min(st, prev); } from = st; label = st ? `${P ? 'o começo da sua sessão de jogo' : 'the start of your play session'}, ${dd(st)} ${tm(st)}` : ''; }
   }
-  const list = all.filter(x => ivIsNew(x) && !(N.hide && tagOf(x.iid))).sort((a, b) => { try { return BigInt(b.iid) > BigInt(a.iid) ? 1 : -1; } catch { return 0; } });
+  // linha de corte: o maior id de item que o DPI viu antes desse começo
+  let cut = null, cutT = null; if (from) for (const [t, m] of log) if (t <= from) { cut = m; cutT = t; }
+  const fallback = !cut; if (fallback) cut = N.base || N.prev || null;
+  const isNew = x => { try { return cut != null && BigInt(x.iid) > BigInt(cut); } catch { return false; } };
+  const list = all.filter(x => isNew(x) && !(N.hide && tagOf(x.iid))).sort((a, b) => { try { return BigInt(b.iid) > BigInt(a.iid) ? 1 : -1; } catch { return 0; } });
   const where = x => x.where === 'v' ? T.inV : T.on(W.classes[profile.characters.data[x.where]?.classType] || '') + (x.eq ? ' · ' + T.eqd : '');
-  const row = x => { const D = INVD[x.h] || {}, t = tagOf(x.iid); return `<div class="nv-r">${ivTile(x)}<div class="nv-n"><b>${esc(D.n || '…')}${x.slot < 3 ? ' ' + tierBadge(tierOf(x)) : ''}</b><small>${esc([D.tl, T.slots[x.slot], x.pw ? '✦ ' + x.pw : '', where(x), invAll().filter(y => y.h === x.h).length > 1 ? T.copies(invAll().filter(y => y.h === x.h).length) : ''].filter(Boolean).join(' · '))}</small></div><div class="nv-t">${TAGS.map(k => `<button type="button" class="tag-b${t === k ? ' t-' + k : ''}" data-nvt="${x.iid}:${k}" title="${esc(tagl()[k])}" aria-label="${esc(tagl()[k])}">${{ fav: '★', keep: '✓', junk: '✕', inf: '⇪' }[k]}</button>`).join('')}</div></div>`; };
-  return `<div class="panel nv"><div class="nv-hd"><h2>${P ? 'Chegaram desde a última vez' : 'Arrived since last time'}</h2><small>${P ? `${list.length} ${list.length === 1 ? 'item' : 'itens'} · o mais novo primeiro` : `${list.length} items · newest first`}</small><label class="nv-tg"><input type="checkbox" data-nvhide${N.hide ? ' checked' : ''}> ${P ? 'Esconder os que já têm etiqueta' : 'Hide tagged items'}</label><button type="button" class="lbd-btn" data-nvall${list.length ? '' : ' disabled'}>${P ? 'Marcar todos como vistos' : 'Mark all as seen'}</button></div>
-    ${list.length ? `<div class="nv-l">${list.map(row).join('')}</div>` : `<p class="empty-msg">${P ? 'Nada novo. Quando cair arma ou armadura, ela aparece aqui para você decidir: toque no item para ver a nota do roll, os loadouts e as cópias parecidas.' : 'Nothing new. New drops show up here so you can decide: tap an item to see its roll grade, loadouts and similar copies.'}</p>`}
-    <small class="nv-n2">${P ? '“Novo” = chegou depois da sua primeira visita a esta tela ou do último “Marcar todos”. Dar uma etiqueta tira o item daqui (dá para desligar acima). Itens no Postmaster aparecem depois de retirados.' : '“New” = arrived after your first visit here or the last “Mark all”. Tagging removes the item (toggle above). Postmaster items show up after you pull them.'}</small></div>`;
+  const row = x => { const D = INVD[x.h] || {}, t = tagOf(x.iid); return `<div class="nv-r">${ivTile(x)}<div class="nv-n"><b>${esc(D.n || '…')}${x.slot < 3 ? ' ' + tierBadge(tierOf(x)) : ''}</b><small>${esc([D.tl, T.slots[x.slot], x.pw ? '✦ ' + x.pw : '', where(x), all.filter(y => y.h === x.h).length > 1 ? T.copies(all.filter(y => y.h === x.h).length) : ''].filter(Boolean).join(' · '))}</small></div><div class="nv-t">${TAGS.map(k => `<button type="button" class="tag-b${t === k ? ' t-' + k : ''}" data-nvt="${x.iid}:${k}" title="${esc(tagl()[k])}" aria-label="${esc(tagl()[k])}">${{ fav: '★', keep: '✓', junk: '✕', inf: '⇪' }[k]}</button>`).join('')}</div></div>`; };
+  const seg = `<span class="vl-seg" role="group" aria-label="${P ? 'Período' : 'Period'}"><button type="button" data-nvm="p" aria-pressed="${mode === 'p'}">${P ? 'Última partida' : 'Last match'}</button><button type="button" data-nvm="s" aria-pressed="${mode === 's'}">${P ? 'Sessão de jogo' : 'Play session'}</button></span>`;
+  const note = !acts ? (P ? 'Lendo as suas últimas partidas…' : 'Reading your last matches…') : fallback ? (P ? 'O DPI ainda não tinha visto o seu inventário antes dessa partida, então mostra o que chegou desde a sua visita anterior. Da próxima vez já fica certo.' : 'DPI had not seen your inventory before that match, so this shows what arrived since your previous visit.') : cutT && from - cutT > 20 * 60e3 ? (P ? `Pode incluir itens que chegaram entre a sua última visita ao DPI (${dd(cutT)} ${tm(cutT)}) e o começo da partida.` : `May include items that arrived between your last DPI visit (${tm(cutT)}) and the start of the match.`) : '';
+  return `<div class="panel nv"><div class="nv-hd"><h2>${P ? 'Itens novos' : 'New items'}</h2><small>${esc(label ? (P ? `Desde ${label}` : `Since ${label}`) : '')}${label ? ' · ' : ''}${P ? `${list.length} ${list.length === 1 ? 'item' : 'itens'}` : `${list.length} items`}</small>${seg}<label class="nv-tg"><input type="checkbox" data-nvhide${N.hide ? ' checked' : ''}> ${P ? 'Esconder os que já têm etiqueta' : 'Hide tagged items'}</label></div>
+    ${note ? `<p class="nv-n2">${esc(note)}</p>` : ''}
+    ${list.length ? `<div class="nv-l">${list.map(row).join('')}</div>` : `<p class="empty-msg">${acts ? (P ? 'Nenhuma arma ou armadura dessa partida ainda está no inventário. Desmontou tudo? Ou pode estar no Postmaster.' : 'No weapon or armor from that match is still in your inventory.') : ''}</p>`}
+    <small class="nv-n2">${P ? 'Mostra as armas e armaduras que caíram a partir do começo da partida e que você ainda tem (desmontadas somem). Itens no Postmaster aparecem depois de retirados. Dar uma etiqueta tira o item daqui (dá para desligar acima).' : 'Shows weapons and armor that dropped from the start of the match and that you still have. Postmaster items show after you pull them.'}</small></div>`;
 }
 document.addEventListener('click', e => {
   if (tab !== 'novo') return;
   const t = e.target.closest('[data-nvt]'); if (t) { const [id, k] = t.dataset.nvt.split(':'), m = LS.get('dc-tags', {}); if (m[id] === k) delete m[id]; else m[id] = k; LS.set('dc-tags', m); if (m[id] === 'keep') keepLock(id); render(); return; }
-  if (e.target.closest('[data-nvall]')) { newMark(invAll()); render(); }
+  const mb = e.target.closest('[data-nvm]'); if (mb) { LS.set('dc-nvmode', mb.dataset.nvm); render(); }
 });
 document.addEventListener('change', e => { if (e.target.matches?.('[data-nvhide]')) { newI().hide = e.target.checked; LS.set('dc-newhide', newI().hide); render(); } });
 // triagem no detalhe: loadouts do jogo com o item e itens parecidos (mesmo tipo e elemento; armadura: cópias)
