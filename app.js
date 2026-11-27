@@ -2656,7 +2656,7 @@ function sessHTML() {
    Favoritos, builds salvas, marcações e preferências ficam ligados à conta Bungie.
    Cada chave guarda a hora da última mudança; a mais nova vence. Na primeira vez num aparelho, listas são somadas. */
 const SY = { t: LS.get('dc-synct', {}), dirty: new Set(), timer: null, applying: false, pulled: 0 };
-const syKeys = () => member ? ['favs', 'builds', 'opts', 'hide2', 'goals', 'wish', 'focus', 'tags', 'notes', 'evo', 'marks-' + member.id] : [];
+const syKeys = () => member ? ['favs', 'builds', 'opts', 'hide2', 'goals', 'wish', 'focus', 'tags', 'notes', 'evo', 'newbase', 'marks-' + member.id] : [];
 LS.hook = k => {
   if (SY.applying || !member || !k.startsWith('dc-')) return; const n = k.slice(3);
   if (!syKeys().includes(n)) return;
@@ -2692,7 +2692,7 @@ async function syncPull() {
     SY.applying = false; try { localStorage.setItem('dc-synct', JSON.stringify(SY.t)); } catch {}
     if (SY.dirty.size) await syncPush();
     if (changed) {
-      marks = new Set(LS.get('dc-marks-' + member.id, [])); Object.assign(OPTS, LS.get('dc-opts', {}));
+      marks = new Set(LS.get('dc-marks-' + member.id, [])); Object.assign(OPTS, LS.get('dc-opts', {})); NEWI = undefined; // Itens novos relê a marca que veio de outro aparelho
       const hd = LS.get('dc-hide2', false); $('hide').checked = hd; document.body.classList.toggle('hide-done', hd);
       if (profile) { build(); render(); }
     }
@@ -6116,7 +6116,7 @@ function apJunk(ws) {
 }
 async function apLock(x, state) { const cid = x.where !== 'v' ? x.where : ivChars()[0]?.characterId; await wPost('/Destiny2/Actions/Items/SetLockState/', { state, itemId: x.iid, characterId: cid }); if (state) x.it.state |= 1; else x.it.state &= ~1; x.lk = state; }
 // perfil recarregado (botão Atualizar, volta à aba depois de 5 min, fim de atividade): perks trocados no jogo entram na nota
-function apFresh() { if (RL.so) { RL.so = {}; RL.sts = null; if (RL.st === 'ok') RL.st = ''; } // perfil novo: relê as vantagens de todas as armas (antes ficava vazio até recarregar a página)
+function apFresh() { try { newTrack(); } catch {} if (RL.so) { RL.so = {}; RL.sts = null; if (RL.st === 'ok') RL.st = ''; } // perfil novo: relê as vantagens de todas as armas (antes ficava vazio até recarregar a página)
   for (const k in RAPP) delete RAPP[k]; if (AP.av === 'ok' || AP.av === 'err') AP.av = ''; APC.clear(); }
 function apChips(w) {
   const T = apt(), ok = AP.av === 'ok', c = {}; if (ok) for (const x of w) { const e = apEval(x); if (e.g) c[e.g] = (c[e.g] || 0) + 1; if (e.plan?.length) c.fix = (c.fix || 0) + 1; } if (ok) c.junk = apJunk(w).size;
@@ -6680,10 +6680,18 @@ document.addEventListener('keydown', e => {
 var NEWI; // lido na primeira vez (o render pode rodar antes deste trecho)
 function newI() { return NEWI || (NEWI = { base: LS.get('dc-newbase', null), hide: LS.get('dc-newhide', true) }); }
 function ivIsNew(x) { const N = newI(); try { return N.base != null && BigInt(x.iid) > BigInt(N.base); } catch { return false; } }
+// guarda o maior id da visita anterior: no primeiro uso de Itens novos (ou num aparelho novo sem nada na conta), o que caiu desde a última visita já aparece
+function newTrack() {
+  if (newTrack.done || !have?.c || !profile?.characterInventories) return; let m = 0n; for (const x of invAll()) { try { const b = BigInt(x.iid); if (b > m) m = b; } catch {} } if (!m) return;
+  newTrack.done = true; newI().prev = LS.get('dc-lastmax', null); try { localStorage.setItem('dc-lastmax', JSON.stringify(String(m))); } catch {}
+}
 function newMark(all) { let m = 0n; for (const x of all) { try { const b = BigInt(x.iid); if (b > m) m = b; } catch {} } if (m) { newI().base = String(m); LS.set('dc-newbase', newI().base); } }
 function novoHTML() {
   const P = lang === 'pt', T = ivt(), W = u(); if (!have.c) return `<div class="panel"><p class="empty-msg wait">${esc(T.wait)}</p></div>`;
-  const all = invAll(), N = newI(); if (N.base == null && all.length) newMark(all);
+  const all = invAll(), N = newI();
+  if (N.base == null && all.length) { // primeira vez: começa da visita anterior (sem mandar para a conta, para não apagar a marca de outro aparelho)
+    newTrack(); if (N.prev) { N.base = N.prev; try { localStorage.setItem('dc-newbase', JSON.stringify(N.base)); } catch {} } else { const ls = LS.hook; LS.hook = () => {}; try { newMark(all); } finally { LS.hook = ls; } }
+  }
   const list = all.filter(x => ivIsNew(x) && !(N.hide && tagOf(x.iid))).sort((a, b) => { try { return BigInt(b.iid) > BigInt(a.iid) ? 1 : -1; } catch { return 0; } });
   const where = x => x.where === 'v' ? T.inV : T.on(W.classes[profile.characters.data[x.where]?.classType] || '') + (x.eq ? ' · ' + T.eqd : '');
   const row = x => { const D = INVD[x.h] || {}, t = tagOf(x.iid); return `<div class="nv-r">${ivTile(x)}<div class="nv-n"><b>${esc(D.n || '…')}${x.slot < 3 ? ' ' + tierBadge(tierOf(x)) : ''}</b><small>${esc([D.tl, T.slots[x.slot], x.pw ? '✦ ' + x.pw : '', where(x), invAll().filter(y => y.h === x.h).length > 1 ? T.copies(invAll().filter(y => y.h === x.h).length) : ''].filter(Boolean).join(' · '))}</small></div><div class="nv-t">${TAGS.map(k => `<button type="button" class="tag-b${t === k ? ' t-' + k : ''}" data-nvt="${x.iid}:${k}" title="${esc(tagl()[k])}" aria-label="${esc(tagl()[k])}">${{ fav: '★', keep: '✓', junk: '✕', inf: '⇪' }[k]}</button>`).join('')}</div></div>`; };
